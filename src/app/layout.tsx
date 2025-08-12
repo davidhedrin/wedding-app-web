@@ -4,8 +4,7 @@ import "./globals.css";
 import "boxicons/css/boxicons.min.css";
 
 import PrelineScriptWrapper from '@/components/PrelineScriptWrapper';
-import MainSidebar from "@/components/main-sidebar";
-import MainHeader from "@/components/main-header";
+import LayoutWraper from "./layout-wraper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased hs-overlay-body-open overflow-hidden bg-gray-100`}>
-        <MainHeader />
-        <main className="lg:hs-overlay-layout-open:ps-60 transition-all duration-300 lg:fixed lg:inset-0 pt-13 px-3 pb-3">
-          <MainSidebar />
-          <div className="h-[calc(100dvh-62px)] lg:h-full overflow-hidden flex flex-col bg-white border border-gray-200 shadow-xs rounded-lg">
-            {children}
-          </div>
-        </main>
+        <LayoutWraper children={children} />
         <PrelineScriptWrapper />
       </body>
     </html>

@@ -47,7 +47,7 @@ export default function MainSidebar() {
                   <i className='bx bx-customize text-lg'></i> Posts
                 </a>
               </li>
-              <li className="hs-accordion" id="account-accordion">
+              {/* <li className="hs-accordion" id="account-accordion">
                 <a className="hs-accordion-toggle w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" aria-expanded="true" aria-controls="account-accordion-sub-1-collapse-1">
                   <i className='bx bx-user-pin text-lg'></i> Account
                   <svg className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
@@ -73,7 +73,7 @@ export default function MainSidebar() {
                     </li>
                   </ul>
                 </div>
-              </li>
+              </li> */}
             </ul>
           </div>
         </nav>
