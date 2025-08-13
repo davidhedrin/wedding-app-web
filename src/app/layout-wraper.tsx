@@ -8,7 +8,7 @@ import AppHeader from '@/components/app-header';
 
 export default function LayoutWraper({ children }: Readonly<{ children: React.ReactNode; }>) {
   const pathname = usePathname();
-  const isAdminLayout = pathname.startsWith('/admin');
+  const isAdminLayout = pathname.startsWith('/client');
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/not-found';
 
   return (

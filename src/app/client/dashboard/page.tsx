@@ -1,13 +1,14 @@
-"use client";
+// "use client";
 
 import BreadcrumbList from "@/components/breadcrumb-list";
 import { BreadcrumbType } from "@/lib/model-types";
 
-export default function Page() {
+export default async function Page() {
   const listBr: BreadcrumbType[] = [
     {name: "Home", url: "/"},
     {name: "Dashboard", url: null},
-  ]
+  ];
+  // await new Promise((resolve) => setTimeout(resolve, 553000));
 
   return (
     <>

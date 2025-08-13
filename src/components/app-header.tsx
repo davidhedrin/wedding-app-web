@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function AppHeader() {
   return (
     <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-[26px] before:bg-neutral-300/45 before:backdrop-blur-md">
@@ -12,9 +14,9 @@ export default function AppHeader() {
 
         <div className="md:order-3 flex items-center gap-x-3">
           <div className="ps-3">
-            <a className="group inline-flex items-center gap-x-2 py-1 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-full focus:outline-hidden" href="#">
+            <Link href="/client/dashboard" className="group inline-flex items-center gap-x-2 py-1 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-full focus:outline-hidden">
               Start Here!
-            </a>
+            </Link>
           </div>
 
           <div className="md:hidden">
