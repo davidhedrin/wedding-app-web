@@ -4,6 +4,7 @@ import React from 'react'
 import { usePathname } from 'next/navigation';
 import MainSidebar from "@/components/main-sidebar";
 import MainHeader from "@/components/main-header";
+import AppHeader from '@/components/app-header';
 
 export default function LayoutWraper({ children }: Readonly<{ children: React.ReactNode; }>) {
   const pathname = usePathname();
@@ -13,7 +14,7 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
   return (
     <>
       {
-        isAdminLayout ? <>
+        isAdminLayout ? <div className="overflow-hidden">
           <MainHeader />
           <main className="lg:hs-overlay-layout-open:ps-60 transition-all duration-300 lg:fixed lg:inset-0 pt-13 px-3 pb-3">
             <MainSidebar />
@@ -21,11 +22,15 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
               {children}
             </div>
           </main>
-        </> : <div className="bg-gray-100 flex h-full items-center py-16 dark:bg-neutral-800">
-          <div className='w-full max-w-md mx-auto p-6'>
-            {children}
-          </div>
-        </div>
+        </div> : <>
+          {
+            !isAuthPage && <>
+              <AppHeader />
+            </>
+          }
+
+          {children}
+        </>
       }
     </>
   )
