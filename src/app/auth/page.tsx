@@ -1,8 +1,16 @@
 "use client";
 
+import { useLoading } from "@/components/loading/loading-context";
 import SignIn from "./signin";
+import { useEffect } from "react";
 
 export default function AuthPage() {
+  const { setLoading } = useLoading();
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-muted px-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-4">

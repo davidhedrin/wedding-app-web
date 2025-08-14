@@ -6,6 +6,8 @@ import "boxicons/css/boxicons.min.css";
 import PrelineScriptWrapper from '@/components/PrelineScriptWrapper';
 import LayoutWraper from "./layout-wraper";
 import Configs from "@/lib/config";
+import { LoadingProvider } from "@/components/loading/loading-context";
+import Loading from "@/components/loading/loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased hs-overlay-body-open bg-gray-100`}>
-        <LayoutWraper children={children} />
+        <LoadingProvider>
+          <Loading />
+          <LayoutWraper children={children} />
+        </LoadingProvider>
         <PrelineScriptWrapper />
       </body>
     </html>

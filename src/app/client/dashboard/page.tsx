@@ -1,14 +1,20 @@
-// "use client";
+"use client";
 
 import BreadcrumbList from "@/components/breadcrumb-list";
+import { useLoading } from "@/components/loading/loading-context";
 import { BreadcrumbType } from "@/lib/model-types";
+import { useEffect } from "react";
 
-export default async function Page() {
+export default function Page() {
   const listBr: BreadcrumbType[] = [
     {name: "Home", url: "/"},
     {name: "Dashboard", url: null},
   ];
-  // await new Promise((resolve) => setTimeout(resolve, 553000));
+  const {setLoading} = useLoading();
+
+  useEffect(() => {
+    setLoading(false);
+  },[]);
 
   return (
     <>

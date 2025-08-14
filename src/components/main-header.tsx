@@ -1,22 +1,14 @@
-import Configs from "@/lib/config";
-
 export default function MainHeader() {
-  const appName = Configs.app_name;
-
   return (
     <header className="fixed top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 lg:z-61 w-full bg-zinc-100 text-sm py-2.5">
       <nav className="px-4 sm:px-5.5 flex basis-full items-center w-full mx-auto">
         <div className="w-full flex items-center gap-x-1.5">
           <ul className="flex items-center gap-1.5">
-            <li className="inline-flex items-center relative gap-3 pe-1.5 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
-              <img src="/assets/img/logo/wedlyvite-logo.png" className="h-6 w-auto" />
+            <li className="inline-flex items-center relative gap-6 pe-1.5 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
+              <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-28" />
 
-              <div className="font-semibold">
-                {appName}
-              </div>
-
-              <button type="button" className="cursor-pointer p-1.5 size-7.5 inline-flex items-center gap-x-1 text-xs rounded-md border border-transparent text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:text-gray-800" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-pro-sidebar" data-hs-overlay="#hs-pro-sidebar">
-                <i className='bx bx-book-content text-lg'></i>
+              <button type="button" className="cursor-pointer pt-0.5 inline-flex items-center text-xs rounded-md border border-transparent text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:text-gray-800" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-pro-sidebar" data-hs-overlay="#hs-pro-sidebar">
+                <i className='bx bx-book-content text-xl'></i>
                 <span className="sr-only">Sidebar Toggle</span>
               </button>
             </li>

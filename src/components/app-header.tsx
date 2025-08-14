@@ -1,20 +1,23 @@
 "use client";
 
+import { useSmartLink } from "@/lib/smart-link";
 import Link from "next/link";
 
 export default function AppHeader() {
+  const smartLink = useSmartLink();
+  
   return (
     <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-[26px] before:bg-neutral-300/45 before:backdrop-blur-md">
       <nav className="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-4 md:py-1 mx-2 lg:mx-auto">
         <div className="flex items-center">
           <a href="/">
-            <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-40" />
+            <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-[144px]" />
           </a>
         </div>
 
         <div className="md:order-3 flex items-center gap-x-3">
           <div className="ps-3">
-            <Link href="/client/dashboard" className="group inline-flex items-center gap-x-2 py-1 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-full focus:outline-hidden">
+            <Link href="/auth" onClick={() => smartLink("/auth")} className="group inline-flex items-center gap-x-2 py-1 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-full focus:outline-hidden">
               Start Here!
             </Link>
           </div>
