@@ -6,11 +6,11 @@ export default function SignIn() {
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
       <div className="text-center">
-        <h1 className="block text-2xl font-bold text-gray-800">Sign in</h1>
+        <div className="block text-xl font-bold text-gray-800">Sign-In</div>
         <p className="mt-1 text-sm text-gray-600">
           Don't have an account yet? <a className="text-blue-600 decoration-2 hover:underline focus:outline-hidden focus:underline font-medium" href="../examples/html/signup.html">
-            Sign up here
-          </a>
+            Sign up
+          </a> now.
         </p>
       </div>
 

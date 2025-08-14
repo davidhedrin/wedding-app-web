@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import MainSidebar from "@/components/main-sidebar";
 import MainHeader from "@/components/main-header";
 import AppHeader from '@/components/app-header';
+import AppFooter from '@/components/app-footer';
 
 export default function LayoutWraper({ children }: Readonly<{ children: React.ReactNode; }>) {
   const pathname = usePathname();
@@ -30,6 +31,12 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
           }
 
           {children}
+
+          {
+            !isAuthPage && <>
+              <AppFooter />
+            </>
+          }
         </>
       }
     </>

@@ -8,6 +8,11 @@
 :root {
   --color-primary: #e9a5a0;
   --color-primary-hover: #da8d87;
+  --muted-foreground: oklch(52.081% 0.00006 271.152);
+}
+
+button {
+  cursor: pointer;
 }
 
 .text-color-app {
@@ -16,7 +21,10 @@
 
 .bg-color-app {
   background-color: var(--color-primary);
-  color: white;
+}
+
+.bg-color-app-50 {
+  background-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
 }
 
 .btn-color-app {
@@ -27,6 +35,27 @@
 
 .btn-color-app:hover {
   background-color: var(--color-primary-hover);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.blinking-cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  50.01%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* @theme inline {

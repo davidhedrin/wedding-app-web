@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Work_Sans, Rubik, Poppins } from "next/font/google";
 import "./globals.css";
 import "boxicons/css/boxicons.min.css";
 
@@ -9,14 +9,23 @@ import Configs from "@/lib/config";
 import { LoadingProvider } from "@/components/loading/loading-context";
 import Loading from "@/components/loading/loading";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// const fontStyleApp = Work_Sans({
+//   variable: "--font-work-sans",
+//   subsets: ["latin"],
+//   weight: ["400", "500", "700"],
+//   display: "swap",
+// });
+// const fontStyleApp = Rubik({
+//   variable: "--font-rubik",
+//   subsets: ["latin"],
+//   weight: ["400", "500", "700"],
+//   display: "swap",
+// });
+const fontStyleApp = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased hs-overlay-body-open bg-gray-100`}>
+      <body className={`${fontStyleApp.className} antialiased hs-overlay-body-open bg-gray-100`}>
         <LoadingProvider>
           <Loading />
           <LayoutWraper children={children} />

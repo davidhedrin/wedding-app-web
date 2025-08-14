@@ -9,5 +9,7 @@ const Configs = {
   nameBtnSubmit: "submitType",
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
+
+  tryDays: 3
 };
 export default Configs;
