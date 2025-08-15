@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Work_Sans, Rubik, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import "boxicons/css/boxicons.min.css";
 
@@ -8,6 +8,7 @@ import LayoutWraper from "./layout-wraper";
 import Configs from "@/lib/config";
 import { LoadingProvider } from "@/components/loading/loading-context";
 import Loading from "@/components/loading/loading";
+import { SessionProvider } from "next-auth/react";
 
 // const fontStyleApp = Work_Sans({
 //   variable: "--font-work-sans",
@@ -44,10 +45,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fontStyleApp.className} antialiased hs-overlay-body-open bg-gray-100`}>
-        <LoadingProvider>
-          <Loading />
-          <LayoutWraper children={children} />
-        </LoadingProvider>
+        <SessionProvider>
+          <LoadingProvider>
+            <Loading />
+            <LayoutWraper children={children} />
+          </LoadingProvider>
+        </SessionProvider>
         <PrelineScriptWrapper />
       </body>
     </html>
