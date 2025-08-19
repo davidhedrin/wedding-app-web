@@ -1,8 +1,76 @@
 "use client";
 
+import { useLoading } from "@/components/loading/loading-context";
 import Input from "@/components/ui/input";
+import { ZodErrors } from "@/components/zod-errors";
+import { FormState } from "@/lib/model-types";
+import { toast } from "@/lib/utils";
+import { signInCredential } from "@/server/auth";
+import { getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import z from "zod";
 
 export default function SignIn() {
+  const { push } = useRouter();
+  const { setLoading } = useLoading();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [toggle_pass, setTogglePass] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const [stateForm, setStateForm] = useState<FormState>({ success: false, errors: {} });
+  const FormSchemaSignIn = z.object({
+    login_email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
+    login_password: z
+      .string()
+      .min(8, { message: 'Be at least 8 characters long' })
+      .regex(/[a-zA-Z]/, { message: 'Contain at least one letter.' })
+      .regex(/[0-9]/, { message: 'Contain at least one number.' })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: 'Contain at least one special character.',
+      })
+      .trim(),
+  });
+
+  const handleSubmit = async (formData: FormData) => {
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaSignIn.safeParse(data);
+    if (!valResult.success) {
+      setStateForm({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateForm({ success: true, errors: {} });
+
+    setLoadingSubmit(true);
+    setTimeout(async () => {
+      try {
+        await signInCredential(formData);
+        await getSession();
+
+        setLoading(true);
+        push("/client/dashboard");
+        toast({
+          type: "success",
+          title: "Login successfully",
+          message: `Welcome back ${email}`
+        });
+      } catch (error: any) {
+        toast({
+          type: "warning",
+          title: "Login failed!",
+          message: error?.message || "An unknown error occurred."
+        });
+        if (error?.name == "Email Not Verify") push(`/auth/send-verification?email=${email}`);
+      }
+      setLoadingSubmit(false);
+    }, 100)
+  };
+
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
       <div className="text-center">
@@ -15,29 +83,52 @@ export default function SignIn() {
       </div>
 
       <div className="mt-5">
-        <form>
+        <form action={(formData) => handleSubmit(formData)}>
           <div className="grid gap-y-3">
-            <Input label='Email' placeholder='Enter your email' id='login_email' />
-            <Input label='Password' placeholder='Enter your password' id='login_password' />
+            <div>
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="text" label='Email' placeholder='Enter your email' id='login_email' />
+              {stateForm.errors?.login_email && <ZodErrors err={stateForm.errors?.login_email} />}
+            </div>
+            <div className="relative w-full">
+              <div>
+                <Input value={password} onChange={(e) => setPassword(e.target.value)} type={toggle_pass ? "text" : "password"} label='Password' placeholder='Enter your password' id='login_password' />
+                {stateForm.errors?.login_password && <ZodErrors err={stateForm.errors?.login_password} />}
+              </div>
+              <div
+                className="absolute right-2 top-[34px] text-muted-foreground hover:text-foreground cursor-pointer"
+                onClick={() => setTogglePass((prev) => !prev)}
+                tabIndex={-1}
+              >
+                {toggle_pass ? <i className='bx bx-show text-xl text-muted' ></i> : <i className='bx bx-hide text-xl text-muted'></i>}
+              </div>
+            </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center py-0.5">
               <div className="flex">
-                <input type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded-sm text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-default-checkbox" />
+                <input type="checkbox" className="shrink-0 border-gray-200 rounded-sm text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-default-checkbox" />
                 <label htmlFor="hs-default-checkbox" className="text-sm text-gray-500 ms-2">Remember me</label>
               </div>
               <div>
                 <a href="" className="text-sm text-gray-500 hover:underline hover:text-black">forgot passwor?</a>
-                
               </div>
             </div>
 
-            <button type="submit" className="w-full py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent btn-color-app">Sign in</button>
+            <button disabled={loadingSubmit} type="submit" className="w-full py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent btn-color-app">
+              {loadingSubmit ? "Signing In..." : "Sign in"}
+            </button>
           </div>
         </form>
 
         <div className="py-3 flex items-center text-xs text-gray-400 uppercase before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">Or</div>
 
-        <button type="button" className="w-full py-2 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+        <button onClick={() => {
+          toast({
+            type: 'success',
+            title: "Karolin",
+            message: 'Berhasil disimpan! Berhasil disimpan! Berhasil disimpan!',
+            duration: 3000
+          })
+        }} type="button" className="w-full py-2 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
           <svg className="w-4 h-auto" width="46" height="47" viewBox="0 0 46 47" fill="none">
             <path d="M46 24.0287C46 22.09 45.8533 20.68 45.5013 19.2112H23.4694V27.9356H36.4069C36.1429 30.1094 34.7347 33.37 31.5957 35.5731L31.5663 35.8669L38.5191 41.2719L38.9885 41.3306C43.4477 37.2181 46 31.1669 46 24.0287Z" fill="#4285F4" />
             <path d="M23.4694 47C29.8061 47 35.1161 44.9144 39.0179 41.3012L31.625 35.5437C29.6301 36.9244 26.9898 37.8937 23.4987 37.8937C17.2793 37.8937 12.0281 33.7812 10.1505 28.1412L9.88649 28.1706L2.61097 33.7812L2.52296 34.0456C6.36608 41.7125 14.287 47 23.4694 47Z" fill="#34A853" />

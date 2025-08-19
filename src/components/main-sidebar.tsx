@@ -1,3 +1,6 @@
+import { showConfirm, signOutAction, toast } from "@/lib/utils";
+import { signOutAuth } from "@/server/auth";
+
 export default function MainSidebar() {
   return (
     <div id="hs-pro-sidebar" className="hs-overlay [--body-scroll:true] lg:[--overlay-backdrop:false] [--is-layout-affect:true] [--opened:lg] [--auto-close:lg] hs-overlay-open:translate-x-0 lg:hs-overlay-layout-open:translate-x-0 -translate-x-full transition-all duration-300 transform w-60 hidden fixed inset-y-0 z-60 start-0 bg-gray-100 lg:block lg:-translate-x-full lg:end-auto lg:bottom-0" role="dialog" aria-label="Sidebar">
@@ -71,16 +74,16 @@ export default function MainSidebar() {
         <footer className="mt-auto p-3 flex flex-col">
           <ul className="flex flex-col">
             <li>
-              <a className="w-full flex items-center leading-none gap-x-2 py-2 px-2.5 text-sm text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" href="#">
+              <div className="w-full cursor-pointer flex items-center leading-none gap-x-2 py-2 px-2.5 text-sm text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                 <i className='bx bx-cog text-lg'></i>
                 Setting
-              </a>
+              </div>
             </li>
             <li>
-              <a className="w-full flex items-center leading-none gap-x-2 py-2 px-2.5 text-sm text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" href="#">
+              <div onClick={() => signOutAction()} className="w-full cursor-pointer flex items-center leading-none gap-x-2 py-2 px-2.5 text-sm text-gray-500 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                 <i className='bx bx-log-out text-lg'></i>
                 Logout
-              </a>
+              </div>
             </li>
           </ul>
         </footer>

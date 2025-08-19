@@ -1,3 +1,5 @@
+import { signOutAction } from "@/lib/utils";
+
 export default function MainHeader() {
   return (
     <header className="fixed top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 lg:z-61 w-full bg-zinc-100 text-sm py-2.5">
@@ -57,14 +59,14 @@ export default function MainHeader() {
                         </svg>
                         Settings
                       </a>
-                      <a className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100" href="#">
+                      <div onClick={() => signOutAction()} className="flex cursor-pointer items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                         <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="m16 17 5-5-5-5" />
                           <path d="M21 12H9" />
                           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         </svg>
                         Log out
-                      </a>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -9,6 +9,8 @@ import Configs from "@/lib/config";
 import { LoadingProvider } from "@/components/loading/loading-context";
 import Loading from "@/components/loading/loading";
 import { SessionProvider } from "next-auth/react";
+import { ToastProvider } from "@/components/toast-provider";
+import ModalConfirm from "@/components/modal-confirm";
 
 // const fontStyleApp = Work_Sans({
 //   variable: "--font-work-sans",
@@ -45,13 +47,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fontStyleApp.className} antialiased hs-overlay-body-open bg-gray-100`}>
+        <ModalConfirm />
+        <ToastProvider />
         <SessionProvider>
           <LoadingProvider>
             <Loading />
             <LayoutWraper children={children} />
+            <PrelineScriptWrapper />
           </LoadingProvider>
         </SessionProvider>
-        <PrelineScriptWrapper />
       </body>
     </html>
   );

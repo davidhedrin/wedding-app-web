@@ -10,6 +10,7 @@ const Configs = {
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
 
-  tryDays: 3
+  tryDays: 3,
+  toastDuration: 4000 // In second
 };
 export default Configs;
