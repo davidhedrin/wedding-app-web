@@ -22,8 +22,8 @@ export async function getUserById(params: GetUserByIdParams): Promise<User | nul
 
 export async function signInCredential(formData: FormData) {
   const data = Object.fromEntries(formData);
-  const email = data.login_email as string;
-  const password = data.login_password as string;
+  const email = data.email as string;
+  const password = data.password as string;
   const dataSign = {
     redirect: false,
     email,

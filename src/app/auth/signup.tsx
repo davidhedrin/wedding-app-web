@@ -1,5 +1,7 @@
 "use client";
 
+import Input from "@/components/ui/input";
+
 export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dispatch<React.SetStateAction<number>> }) {
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
@@ -10,6 +12,18 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
             Sign In
           </span> here.
         </p>
-      </div></div>
+      </div>
+
+      <form className="grid gap-y-3 mt-5">
+        <div>
+          <Input type="text" label='Fullname' placeholder='Ex. John Thor Doe' id='fullname' />
+          {/* {stateForm.errors?.login_email && <ZodErrors err={stateForm.errors?.login_email} />} */}
+        </div>
+        <div>
+          <Input type="text" label='Email' placeholder='Enter your email' id='email' />
+          {/* {stateForm.errors?.login_email && <ZodErrors err={stateForm.errors?.login_email} />} */}
+        </div>
+      </form>
+    </div>
   )
 }
