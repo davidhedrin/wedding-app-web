@@ -2,13 +2,16 @@
 
 import { useLoading } from "@/components/loading/loading-context";
 import SignIn from "./signin";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSmartLink } from "@/lib/smart-link";
+import SignUp from "./signup";
 
 export default function AuthPage() {
   const { setLoading } = useLoading();
   const smartLink = useSmartLink();
+
+  const [signinSignup, setSigninSignup] = useState(1);
 
   useEffect(() => {
     setLoading(false);
@@ -23,7 +26,8 @@ export default function AuthPage() {
           </Link>
         </div>
 
-        <SignIn />
+        {signinSignup == 1 && <SignIn setSigninSignup={setSigninSignup} />}
+        {signinSignup == 2 && <SignUp setSigninSignup={setSigninSignup} />}
 
         <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
           By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "} and <a href="#">Privacy Policy</a>.
