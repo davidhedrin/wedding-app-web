@@ -8,7 +8,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
     await tx.user.createMany({
       data: [
         { 
-          email: "davidhedrin123@gmail.com",
+          email: "portpolio.david99@gmail.com",
           password: "$2a$15$ygGbPlcO3BQsl1M29T5RUuTUKDrvY7zp4ny9X0Hc9js3qVZfMjF7K",
           email_verified: new Date(),
           role: RolesEnum.ADMIN,

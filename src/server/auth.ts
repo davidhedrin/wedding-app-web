@@ -1,9 +1,13 @@
 "use server";
 
-import { Prisma, User } from "@prisma/client";
+import { AuthProviderEnum, Prisma, RolesEnum, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { db } from "../../prisma/db-init";
 import { signIn, signOut } from "@/app/api/auth/auth-setup";
+import { generateOtp, hashPassword } from "@/lib/utils";
+import { randomUUID } from "crypto";
+import { EmailVerification } from "./email";
+import { handlePrismaUniqueError } from "@/lib/prisma-handle-error";
 
 type GetUserByIdParams = {
   id: number,
@@ -40,4 +44,44 @@ export async function signInCredential(formData: FormData) {
 
 export async function signOutAuth() {
   await signOut({redirectTo: "/auth"});
+};
+
+export async function signUpAction(formData: FormData) {
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const hashPass = await hashPassword(password, 15);
+  
+    await db.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email,
+          password: hashPass,
+          is_active: true,
+          createdBy: email,
+          provider: AuthProviderEnum.CREDENTIAL,
+          role: RolesEnum.CLIENT
+        }
+      });
+      
+      const otpCode = generateOtp(6);
+      const token = user.id + `${randomUUID()}${randomUUID()}`.replace(/-/g, '');
+      await tx.verificationToken.create({
+        data: {
+          userId: user.id,
+          token,
+          otp: otpCode
+        }
+      });
+
+      await EmailVerification(user.email, token, otpCode);
+    });
+  } catch (error: any) {
+    const uniqueErr = handlePrismaUniqueError(error, {
+      email: 'This email is already registered.',
+    });
+    if (uniqueErr) throw new Error(uniqueErr);
+    
+    throw new Error(error.message);
+  }
 };

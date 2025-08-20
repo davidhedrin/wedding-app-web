@@ -23,7 +23,7 @@ export default function LoadingUI({ className, ...props }: React.ComponentProps<
       {...props}
     >
       <div className="flex flex-col items-center space-y-1">
-        <i className='bx bx-shopping-bag bx-tada text-3xl'></i>
+        <img src="/assets/img/logo/wedlyvite-logo-web.png" className="w-8 h-auto tada-animation" />
         <p className='text-sm font-medium'>{appName}...</p>
       </div>
     </div>,

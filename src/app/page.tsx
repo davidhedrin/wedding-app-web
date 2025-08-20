@@ -28,7 +28,7 @@ export default function Page() {
           </div>
 
           <div className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-snug">
-            Create Your Own <br /> <span className="text-color-app px-3 py-0 bg-white/30"><TypingEffect texts={["Invitations"]} /></span> &nbsp; Easily
+            Create Your Own <br /> <span className="text-color-app px-3 py-0 bg-black/25"><TypingEffect texts={["Invitations"]} /></span>&nbsp; Easily
           </div>
 
           <p className="text-sm md:text-base text-muted mb-8 leading-relaxed max-w-2xl mx-auto">

@@ -38,4 +38,17 @@ export async function signOutAction() {
   localStorage.clear();
   // clearuserData();
   await signOutAuth();
-}
+};
+
+export async function hashPassword(password: string, salt: number = 10): Promise<string> {
+  return await bcrypt.hash(password, salt);
+};
+
+export function generateOtp(length: number): string {
+  const digits = "0123456789";
+  let otp = "";
+  for (let i = 0; i < length; i++) {
+    otp += digits[Math.floor(Math.random() * digits.length)];
+  }
+  return otp;
+};

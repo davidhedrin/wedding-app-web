@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "email": "email dev --dir src/components/email --port 3021",
     "tunnel": "ngrok http 3005"
   },
   "prisma": {
@@ -16,6 +17,8 @@
     "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.14.0",
     "@prisma/extension-accelerate": "^2.0.2",
+    "@react-email/components": "^0.5.0",
+    "@react-email/render": "1.2.0",
     "@types/jquery": "^3.5.32",
     "@types/lodash": "^4.17.20",
     "bcryptjs": "^3.0.2",
@@ -28,6 +31,8 @@
     "preline": "^3.2.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-email": "^4.2.8",
+    "resend": "^6.0.1",
     "tailwind-merge": "^3.3.1",
     "ts-node": "^10.9.2",
     "zod": "^4.0.17",
@@ -35,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@react-email/preview-server": "^4.2.8",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

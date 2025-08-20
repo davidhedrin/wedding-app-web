@@ -2,9 +2,9 @@ import Configs from "@/lib/config";
 
 export default function AppFooter() {
   return (
-    <footer className="bg-soft-background">
-      <div className="max-w-5xl px-4 xl:px-0 mx-auto">
-        <div className="border-t border-b border-gray-300 grid grid-cols-12 gap-8 md:gap-16 py-14">
+    <footer className="bg-soft-background border-t border-gray-300">
+      <div className="max-w-5xl px-4 xl:px-0 mx-auto py-16">
+        <div className="grid grid-cols-12 gap-8 md:gap-16">
           {/* Brand */}
           <div className="col-span-12 md:col-span-5 space-y-2">
             <div className="flex items-center space-x-2">
@@ -94,12 +94,12 @@ export default function AppFooter() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="py-3 text-center">
-          <p className="text-muted text-sm">
-            Copyright © 2025 <span className="text-color-app font-semibold">{Configs.app_name}</span>. All rights reserved.
-          </p>
-        </div>
+      <div className="py-3 text-center border-t border-gray-300">
+        <p className="text-muted text-sm">
+          Copyright © 2025 <span className="text-color-app font-semibold">{Configs.app_name}</span>. All rights reserved.
+        </p>
       </div>
     </footer>
   )

@@ -82,7 +82,7 @@ export default function SignIn({ setSigninSignup }: { setSigninSignup: React.Dis
         </p>
       </div>
 
-      <form action={(formData) => handleSubmit(formData)} className="grid gap-y-3 mt-5">
+      <form action={(formData) => handleSubmit(formData)} className="grid gap-y-3 mt-4">
         <div>
           <Input value={email} onChange={(e) => setEmail(e.target.value)} type="text" label='Email' placeholder='Enter your email' id='email' />
           {stateForm.errors?.email && <ZodErrors err={stateForm.errors?.email} />}

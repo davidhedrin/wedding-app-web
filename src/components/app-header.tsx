@@ -39,11 +39,11 @@ export default function AppHeader() {
 
         <div id="hs-navbar-floating-dark" className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block" aria-labelledby="hs-navbar-floating-dark-collapse">
           <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-y-3 py-2 md:py-0 md:ps-7">
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" aria-current="page">Home</a>
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Catalog</a>
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">About Us</a>
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Contact</a>
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</a>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" onClick={() => smartLink("/")} aria-current="page">Home</Link>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Catalog</Link>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">About Us</Link>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Contact</Link>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</Link>
             {/* <div className="hs-dropdown [--strategy:static] md:[--strategy:absolute] [--adaptive:none] md:[--trigger:hover] [--auto-close:inside] md:inline-block">
               <button id="hs-pro-anpd" type="button" className="gap-0.5 hs-dropdown-toggle px-3 md:py-3 w-full md:w-auto flex items-center text-sm font-medium hover:text-neutral-600 focus:outline-hidden" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
                 Product
