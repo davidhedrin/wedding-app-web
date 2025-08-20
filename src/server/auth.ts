@@ -3,7 +3,7 @@
 import { AuthProviderEnum, Prisma, RolesEnum, User } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { db } from "../../prisma/db-init";
-import { signIn, signOut } from "@/app/api/auth/auth-setup";
+import { auth, signIn, signOut } from "@/app/api/auth/auth-setup";
 import { generateOtp, hashPassword } from "@/lib/utils";
 import { randomUUID } from "crypto";
 import { EmailVerification } from "./email";
@@ -66,17 +66,15 @@ export async function signUpAction(formData: DtoSignUp) {
       });
       
       const otpCode = generateOtp(6);
-      const token = user.id + `${randomUUID()}${randomUUID()}`.replace(/-/g, '');
       await tx.verificationToken.create({
         data: {
           userId: user.id,
-          token,
           otp: otpCode
         }
       });
-
-      await EmailVerification(email, token, otpCode);
+      await EmailVerification(email, otpCode);
     });
+
     await signInCredential({email, password});
   } catch (error: any) {
     const uniqueErr = handlePrismaUniqueError(error, {
@@ -88,17 +86,37 @@ export async function signUpAction(formData: DtoSignUp) {
   }
 };
 
-export async function checkTokenEmail(token: string) {
+export async function emailVerify(otp: string) {
   try {
-    const findData = await db.verificationToken.findUnique({
-      where: { 
-        token,
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    const findToken = await db.verificationToken.findUnique({
+      where: {
+        otp,
+        userId: Number(user?.id),
         createAt: { gt: new Date(Date.now() - 1000 * 60 * Configs.valid_email_verify)},
         usingAt: null
       }
     });
+    if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
 
-    if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
+    await db.$transaction(async (tx) => {
+      await tx.user.update({
+        where: {
+          id: findToken.userId
+        },
+        data: {
+          email_verified: new Date()
+        }
+      });
+
+      await tx.verificationToken.update({
+        where: { userId: findToken.userId },
+        data: { usingAt: new Date() }
+      });
+    });
   } catch (error: any) {
     throw new Error(error.message);
   }

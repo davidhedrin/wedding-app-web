@@ -35,6 +35,20 @@
   }
 }
 
+@layer base {
+
+  .input-no-spinner::-webkit-inner-spin-button,
+  .input-no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .input-no-spinner {
+    -moz-appearance: textfield;
+  }
+
+}
+
 button {
   cursor: pointer;
 }

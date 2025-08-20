@@ -11,10 +11,15 @@ export async function middleware(request: NextRequest) {
   
   if (!token && pathname !== "/auth") return redirectTo(request, "/auth");
   if (token && pathname === "/auth") return redirectTo(request, "/");
-  // if (token) {
-  //   const emailVerified = token.email_verified;
-  //   if ((!emailVerified || emailVerified === null) && pathname !== "/auth/email-verify") return redirectTo(request, "/auth/email-verify");
-  // }
+
+  if (token && pathname === "/auth/email-verify") {
+    const emailVerified = token.email_verified;
+    if(emailVerified || emailVerified !== null) return redirectTo(request, "/");
+  };
+  if (token) {
+    const emailVerified = token.email_verified;
+    if ((!emailVerified || emailVerified === null) && pathname !== "/auth/email-verify") return redirectTo(request, "/auth/email-verify");
+  };
   
   // const isAdminPath = adminMenu.some((menu) => pathname.startsWith(menu));
   // if (isAdminPath && token?.role != RolesEnum.ADMIN) return redirectTo(request, "/"); 
