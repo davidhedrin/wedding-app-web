@@ -8,6 +8,8 @@ import { generateOtp, hashPassword } from "@/lib/utils";
 import { randomUUID } from "crypto";
 import { EmailVerification } from "./email";
 import { handlePrismaUniqueError } from "@/lib/prisma-handle-error";
+import Configs from "@/lib/config";
+import { DtoSignIn, DtoSignUp } from "@/lib/dto";
 
 type GetUserByIdParams = {
   id: number,
@@ -24,14 +26,11 @@ export async function getUserById(params: GetUserByIdParams): Promise<User | nul
   return findData;
 };
 
-export async function signInCredential(formData: FormData) {
-  const data = Object.fromEntries(formData);
-  const email = data.email as string;
-  const password = data.password as string;
+export async function signInCredential(formData: DtoSignIn) {
   const dataSign = {
     redirect: false,
-    email,
-    password,
+    email: formData.email,
+    password: formData.password,
   };
   
   try {
@@ -46,15 +45,17 @@ export async function signOutAuth() {
   await signOut({redirectTo: "/auth"});
 };
 
-export async function signUpAction(formData: FormData) {
+export async function signUpAction(formData: DtoSignUp) {
   try {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const fullname = formData.fullname;
+    const email = formData.email;
+    const password = formData.password;
     const hashPass = await hashPassword(password, 15);
   
     await db.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
+          fullname,
           email,
           password: hashPass,
           is_active: true,
@@ -74,14 +75,31 @@ export async function signUpAction(formData: FormData) {
         }
       });
 
-      await EmailVerification(user.email, token, otpCode);
+      await EmailVerification(email, token, otpCode);
     });
+    await signInCredential({email, password});
   } catch (error: any) {
     const uniqueErr = handlePrismaUniqueError(error, {
       email: 'This email is already registered.',
     });
     if (uniqueErr) throw new Error(uniqueErr);
     
+    throw new Error(error.message);
+  }
+};
+
+export async function checkTokenEmail(token: string) {
+  try {
+    const findData = await db.verificationToken.findUnique({
+      where: { 
+        token,
+        createAt: { gt: new Date(Date.now() - 1000 * 60 * Configs.valid_email_verify)},
+        usingAt: null
+      }
+    });
+
+    if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
+  } catch (error: any) {
     throw new Error(error.message);
   }
 };

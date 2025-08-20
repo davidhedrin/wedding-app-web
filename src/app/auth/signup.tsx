@@ -1,14 +1,21 @@
 "use client";
 
+import { useLoading } from "@/components/loading/loading-context";
 import Input from "@/components/ui/input";
 import { ZodErrors } from "@/components/zod-errors";
 import { FormState } from "@/lib/model-types";
 import { toast } from "@/lib/utils";
 import { signUpAction } from "@/server/auth";
+import { getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
 
 export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dispatch<React.SetStateAction<number>> }) {
+  const { push } = useRouter();
+  const { setLoading } = useLoading();
+
+  const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [coPassword, setCoPassword] = useState('');
@@ -18,6 +25,10 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
 
   const [stateForm, setStateForm] = useState<FormState>({ success: false, errors: {} });
   const FormSchemaSignUp = z.object({
+    fullname: z
+      .string()
+      .min(2, { message: 'Name must be at least 2 characters long.' })
+      .trim(),
     email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
     password: z
       .string()
@@ -57,12 +68,15 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
     setLoadingSubmit(true);
     setTimeout(async () => {
       try {
-        await signUpAction(formData);
+        await signUpAction({ email, fullname, password });
+        await getSession();
 
+        setLoading(true);
+        push("/auth/email-verify");
         toast({
           type: "success",
           title: "Register successfully",
-          message: "A verification email has been sent to your inbox for verify!"
+          message: "A OTP code verification email has been sent to your inbox!"
         });
         setSigninSignup(1);
       } catch (error: any) {
@@ -85,7 +99,11 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
         </p>
       </div>
 
-      <form action={(formData) => handleSubmit(formData)} className="grid gap-y-3 my-4">
+      <form action={(formData) => handleSubmit(formData)} className="grid gap-y-3 my-3">
+        <div>
+          <Input type="text" label='Fullname' placeholder='Ex. John Thor Doe' id='fullname' value={fullname} onChange={(e) => setFullname(e.target.value)} />
+          {stateForm.errors?.fullname && <ZodErrors err={stateForm.errors?.fullname} />}
+        </div>
         <div>
           <Input type="text" label='Email' placeholder='Enter your email' id='email' value={email} onChange={(e) => setEmail(e.target.value)} />
           {stateForm.errors?.email && <ZodErrors err={stateForm.errors?.email} />}
