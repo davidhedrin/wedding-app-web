@@ -6,7 +6,8 @@ import { ZodErrors } from '@/components/zod-errors';
 import { FormState } from '@/lib/model-types';
 import { useSmartLink } from '@/lib/smart-link';
 import { toast } from '@/lib/utils';
-import { emailVerify } from '@/server/auth';
+import { emailVerify, resendEmailVerify } from '@/server/auth';
+import { getSession, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -56,7 +57,7 @@ export default function Page() {
       try {
         await emailVerify(txtOtpCode);
 
-        setLoading(true);
+        setLoading(true);        
         push("/client/dashboard");
         toast({
           type: "success",
@@ -72,6 +73,26 @@ export default function Page() {
       }
       setLoadingSubmit(false);
     }, 100);
+  };
+
+  const [loadingResend, setLoadingResend] = useState(false);
+  const handleResendEmail = async () => {
+    setLoadingResend(true);
+    try {
+      await resendEmailVerify();
+      toast({
+        type: "success",
+        title: "Email sent successfully",
+        message: "A new verification email has been sent to your inbox for verify"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Resend Failed!",
+        message: error.message
+      });
+    }
+    setLoadingResend(false);
   };
 
   return (
@@ -101,9 +122,9 @@ export default function Page() {
           </button>
 
           <p className="text-center text-sm text-muted">
-            Don't receive code. Click <span className="cursor-pointer text-blue-600 decoration-2 hover:underline focus:outline-hidden focus:underline font-medium">
-              Resend OTP
-            </span>
+            Don't receive code. Click <button disabled={loadingResend} onClick={() => handleResendEmail()} type="button" className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">
+              {loadingResend ? "Resending…" : "Resend OTP"}
+            </button>
           </p>
         </form>
 

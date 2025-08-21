@@ -1,5 +1,21 @@
 import { create } from 'zustand';
 import { ToastType } from './model-types';
+import { Session } from 'next-auth';
+
+interface UserLoginData {
+  userData: Session | null,
+  statusLogin: "authenticated" | "loading" | "unauthenticated",
+  fetchuserData: (data: Session | null, status: "unauthenticated" | "authenticated" | "loading") => void,
+  clearuserData: () => void,
+};
+export const userLoginData = create<UserLoginData>((set) => ({
+  userData: null,
+  statusLogin: 'unauthenticated',
+  fetchuserData: (data: Session | null, status: "unauthenticated" | "authenticated" | "loading") => {
+    set({ userData: data, statusLogin: status });
+  },
+  clearuserData: () => set({ userData: null, statusLogin: 'unauthenticated' })
+}));
 
 export type ToastProps = {
   id?: string;

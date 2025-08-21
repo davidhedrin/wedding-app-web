@@ -41,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if(finduser.is_active == false) throw new CustomError("Account Blocked!", "Please contact administrator if this is a mistake.");
           // if(finduser.email_verified == null) throw new CustomError("Email Not Verify", "Please confirm your email address verification!");
           
-          const verifiedPass = await verifyPassword(credPassword, finduser.password)
+          const verifiedPass = await verifyPassword(credPassword, finduser.password);
           if(!verifiedPass) throw new CustomError("Invalid credentials", "Your email or password is incorrect!");
 
           return {
@@ -73,12 +73,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Logged in users are authenticated, otherwise redirect to login page
       return !!auth
     },
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.name = user.name;
         token.id = user.id;
-        token.role = user.role;
-        token.email_verified = user.email_verified ? user.email_verified.toString() : null;
+
+        const exisUser = await getUserById({
+          id: user.id ? parseInt(user.id) : 0,
+          select: {
+            id: true,
+            fullname: true,
+            role: true,
+            email_verified: true,
+          }
+        });
+        
+        if(exisUser){
+          token.name = exisUser.fullname;
+          token.role = exisUser.role;
+          token.email_verified = exisUser.email_verified !== null ? true : false;
+        }
       };
       return token;
     },
@@ -86,7 +99,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.name = token.name;
       session.user.id = token.id as string;
       session.user.role = token.role;
-      session.user.email_verified =  token.email_verified;
+      session.user.email_verified = token.email_verified;
       return session;
     },
   },

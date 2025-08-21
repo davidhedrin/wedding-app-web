@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { ConfirmProps, ToastProps, useConfirmStore, useToastStore } from "./zustand";
+import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 
 export function cn(...inputs: ClassValue[]) {
@@ -30,13 +30,13 @@ export async function signOutAction() {
   });
   if (!confirmed) return;
 
+  localStorage.clear();
+  userLoginData.getState().clearuserData();
   toast({
     type: "success",
     title: "Logged Out!",
     message: "We'll be here when you're ready to log back in."
   });
-  localStorage.clear();
-  // clearuserData();
   await signOutAuth();
 };
 

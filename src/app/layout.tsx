@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${fontStyleApp.className} antialiased hs-overlay-body-open bg-gray-100`}>
         <ModalConfirm />
         <ToastProvider />

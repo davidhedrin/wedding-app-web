@@ -1,26 +1,67 @@
 "use client";
 
 import { useSmartLink } from "@/lib/smart-link";
+import { signOutAction } from "@/lib/utils";
+import { userLoginData } from "@/lib/zustand";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AppHeader() {
+  const { push } = useRouter();
   const smartLink = useSmartLink();
-  
+  const { userData, statusLogin, fetchuserData, clearuserData } = userLoginData();
+  const { data, status } = useSession();
+
+  useEffect(() => {
+    fetchuserData(data, status);
+  }, [data, status]);
+
   return (
     <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-xl before:bg-neutral-300/45 before:backdrop-blur-md">
       <nav className="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-3 md:py-0.5 mx-2 lg:mx-auto">
         <div className="flex items-center">
-          <a href="/">
+          <Link href="/" onClick={() => smartLink("/")}>
             <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-[144px]" />
-          </a>
+          </Link>
         </div>
 
         <div className="md:order-3 flex items-center gap-x-3">
-          <div className="ps-3">
-            <Link href="/auth" onClick={() => smartLink("/auth")} className="group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
-              Start Here! <i className='bx bx-log-in text-lg'></i>
-            </Link>
-          </div>
+          {
+            userData && statusLogin === "authenticated" ? <div className="hidden md:inline-flex hs-dropdown [--strategy:absolute] [--auto-close:inside] [--placement:bottom-right] relative text-start">
+              <button id="hs-profile-app" type="button" className="cursor-pointer p-0.5 inline-flex shrink-0 items-center gap-x-3 text-start rounded-full hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                <img className="shrink-0 size-8 rounded-full" src="https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80" alt="Avatar" />
+              </button>
+
+              <div className="hs-dropdown-menu hs-dropdown-open:opacity-100 w-60 transition-[opacity,margin] duration opacity-0 hidden z-20 bg-white border border-gray-200 rounded-xl shadow-xl" role="menu" aria-orientation="vertical" aria-labelledby="hs-profile-app">
+                <div className="py-2 px-3.5">
+                  <span className="font-medium text-gray-800">
+                    {userData.user?.name}
+                  </span>
+                  <p className="text-sm text-gray-500">
+                    {userData.user?.email}
+                  </p>
+                </div>
+                <div className="p-1 border-t border-gray-200 ">
+                  <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
+                    <i className='bx bx-tachometer text-lg'></i>Dashboard
+                  </Link>
+                  <div onClick={() => signOutAction()} className="flex cursor-pointer items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
+                    <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m16 17 5-5-5-5" />
+                      <path d="M21 12H9" />
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    </svg>Log out
+                  </div>
+                </div>
+              </div>
+            </div> : <div className="ps-3">
+              <Link href="/auth" onClick={() => smartLink("/auth")} className="group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+                Start Here! <i className='bx bx-log-in text-lg'></i>
+              </Link>
+            </div>
+          }
 
           <div className="md:hidden">
             <button type="button" className="hs-collapse-toggle size-9 flex justify-center items-center text-sm font-semibold rounded-full bg-neutral-800 text-white disabled:opacity-50 disabled:pointer-events-none" id="hs-navbar-floating-dark-collapse" aria-expanded="false" aria-controls="hs-navbar-floating-dark" aria-label="Toggle navigation" data-hs-collapse="#hs-navbar-floating-dark">
@@ -38,7 +79,38 @@ export default function AppHeader() {
         </div>
 
         <div id="hs-navbar-floating-dark" className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block" aria-labelledby="hs-navbar-floating-dark-collapse">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-y-3 py-2 md:py-0 md:ps-7">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-y-3 pb-2 pt-4 md:py-0 md:ps-7">
+            {
+              userData && statusLogin === "authenticated" && <>
+                <hr className="text-muted" />
+                <div className="md:hidden px-3 grid gap-2">
+                  <div className="flex justify-between items-center gap-4">
+                    <div>
+                      <span className="font-medium text-gray-800">
+                        {userData.user?.name}
+                      </span>
+                      <p className="text-sm text-muted">
+                        {userData.user?.email}
+                      </p>
+                    </div>
+                    <div>
+                      <img className="shrink-0 size-11 rounded-full" src="https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80" alt="Avatar" />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="group inline-flex items-center gap-x-1 py-1.5 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+                      Dashboard <i className='bx bx-tachometer text-lg'></i>
+                    </Link>
+                    <button onClick={() => signOutAction()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-800 text-gray-800 hover:border-gray-500 hover:text-gray-500 focus:outline-hidden focus:border-gray-500 focus:text-gray-500 disabled:opacity-50 disabled:pointer-events-none">
+                      Sign Out <i className='bx bx-log-out text-lg bx-rotate-180' ></i>
+                    </button>
+                  </div>
+                </div>
+              </>
+            }
+            <hr className="text-muted" />
+
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" onClick={() => smartLink("/")} aria-current="page">Home</Link>
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Catalog</Link>
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">About Us</Link>

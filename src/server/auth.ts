@@ -42,7 +42,7 @@ export async function signInCredential(formData: DtoSignIn) {
 };
 
 export async function signOutAuth() {
-  await signOut({redirectTo: "/auth"});
+  await signOut({redirect: true, redirectTo: "/auth"});
 };
 
 export async function signUpAction(formData: DtoSignUp) {
@@ -121,3 +121,22 @@ export async function emailVerify(otp: string) {
     throw new Error(error.message);
   }
 };
+
+export async function resendEmailVerify() {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const findUser = await db.user.findUnique({
+      where: {
+        id:  Number(user?.id)
+      }
+    });
+    if(!findUser) throw new Error("We couldn't find an account data!");
+    
+    await EmailVerification(findUser.email);
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}

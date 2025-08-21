@@ -36,7 +36,6 @@
 }
 
 @layer base {
-
   .input-no-spinner::-webkit-inner-spin-button,
   .input-no-spinner::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -47,18 +46,17 @@
     -moz-appearance: textfield;
   }
 
-}
+  button {
+    cursor: pointer;
+  }
 
-button {
-  cursor: pointer;
-}
+  .btn-color-app:hover {
+    background-color: var(--color-primary-hover);
+  }
 
-.btn-color-app:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.blinking-cursor {
-  animation: blink 1s infinite;
+  .blinking-cursor {
+    animation: blink 1s infinite;
+  }
 }
 
 @keyframes blink {
