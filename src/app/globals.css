@@ -11,6 +11,11 @@
   --muted-foreground: oklch(46.04% 0.00005 271.152);
 }
 
+@theme {
+  --color-theme: var(--color-primary);
+  --color-grey-theme: #e5e7eb;
+}
+
 @layer components {
   .text-color-app {
     color: var(--color-primary);

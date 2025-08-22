@@ -3,10 +3,8 @@
 import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function AppHeader() {
   const { push } = useRouter();
