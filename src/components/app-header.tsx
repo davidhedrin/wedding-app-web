@@ -11,12 +11,7 @@ import { useEffect } from "react";
 export default function AppHeader() {
   const { push } = useRouter();
   const smartLink = useSmartLink();
-  const { userData, statusLogin, fetchuserData, clearuserData } = userLoginData();
-  const { data, status } = useSession();
-
-  useEffect(() => {
-    fetchuserData(data, status);
-  }, [data, status]);
+  const { userData, statusLogin } = userLoginData();
 
   return (
     <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-xl before:bg-neutral-300/45 before:backdrop-blur-md">
@@ -56,11 +51,9 @@ export default function AppHeader() {
                   </div>
                 </div>
               </div>
-            </div> : <div className="ps-3">
-              <Link href="/auth" onClick={() => smartLink("/auth")} className="group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
-                Start Here! <i className='bx bx-log-in text-lg'></i>
-              </Link>
-            </div>
+            </div> : <Link href="/auth" onClick={() => smartLink("/auth")} className="ps-3 group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+              Start Here! <i className='bx bx-log-in text-lg'></i>
+            </Link>
           }
 
           <div className="md:hidden">

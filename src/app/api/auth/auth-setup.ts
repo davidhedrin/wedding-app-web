@@ -55,20 +55,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    // async signIn({ user, account }) {
-    //   if(account?.provider !== "credentials") return false;
-    //   const exisUser = await getUserById({
-    //     id: user.id ? parseInt(user.id) : 0,
-    //     select: {
-    //       id: true,
-    //       email_verified: true
-    //     }
-    //   });
-    //   if(!exisUser?.email_verified) {
-    //     throw new CustomError("Email Not Verify", "Please confirm your email address verification!");
-    //   }
-    //   return true;
-    // },
+    async signIn({ user, account }) {
+      if(account?.provider !== "credentials") return false;
+      const exisUser = await getUserById({
+        id: user.id ? parseInt(user.id) : 0,
+        select: {
+          id: true,
+          email_verified: true
+        }
+      });
+      if(!exisUser?.email_verified) {
+        const findToken = await db.verificationToken.findUnique({
+          where: { userId: exisUser?.id},
+          select: { token: true }
+        });
+        if(!findToken) throw new CustomError("Token Not Found", "Please confirm your email address verification!");
+        throw new CustomError("Email Not Verify", findToken.token);
+      }
+      return true;
+    },
     authorized: async ({ auth }) => {
       // Logged in users are authenticated, otherwise redirect to login page
       return !!auth
@@ -76,22 +81,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-
-        const exisUser = await getUserById({
-          id: user.id ? parseInt(user.id) : 0,
-          select: {
-            id: true,
-            fullname: true,
-            role: true,
-            email_verified: true,
-          }
-        });
-        
-        if(exisUser){
-          token.name = exisUser.fullname;
-          token.role = exisUser.role;
-          token.email_verified = exisUser.email_verified !== null ? true : false;
-        }
+        token.name = user.name;
+        token.role = user.role;
+        token.email_verified = user.email_verified !== null ? true : false;
       };
       return token;
     },

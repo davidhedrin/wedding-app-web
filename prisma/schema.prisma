@@ -54,6 +54,7 @@ model User {
 
 model VerificationToken {
   userId   Int       @unique
+  token    String    @unique
   otp      String
   createAt DateTime? @default(now())
   usingAt  DateTime?

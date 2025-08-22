@@ -9,7 +9,7 @@ import { randomUUID } from "crypto";
 import { EmailVerification } from "./email";
 import { handlePrismaUniqueError } from "@/lib/prisma-handle-error";
 import Configs from "@/lib/config";
-import { DtoSignIn, DtoSignUp } from "@/lib/dto";
+import { DtoOtpVerify, DtoSignIn, DtoSignUp } from "@/lib/dto";
 
 type GetUserByIdParams = {
   id: number,
@@ -66,16 +66,16 @@ export async function signUpAction(formData: DtoSignUp) {
       });
       
       const otpCode = generateOtp(6);
+      const token = user.id + randomUUID().replace(/-/g, '');
       await tx.verificationToken.create({
         data: {
           userId: user.id,
+          token,
           otp: otpCode
         }
       });
-      await EmailVerification(email, otpCode);
+      await EmailVerification(email, token, otpCode);
     });
-
-    await signInCredential({email, password});
   } catch (error: any) {
     const uniqueErr = handlePrismaUniqueError(error, {
       email: 'This email is already registered.',
@@ -86,16 +86,30 @@ export async function signUpAction(formData: DtoSignUp) {
   }
 };
 
-export async function emailVerify(otp: string) {
+export async function checkTokenEmail(token: string) {
   try {
-    const session = await auth();
-    if(!session) throw new Error("Authentication credential not Found!");
-    const { user } = session;
+    const findData = await db.verificationToken.findUnique({
+      where: { 
+        token,
+        usingAt: null
+      }
+    });
+
+    if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function emailVerify(formData: DtoOtpVerify) {
+  try {
+    if(formData.token.toString().trim() === "") throw new Error("Looks like something wrong with your url. Click the link and try again!");
+    if(formData.otp.toString().trim() === "" || formData.otp.toString().trim().length != 6) throw new Error("Invalid one-time-password (OTP). Try again or generate new OTP!");
     
     const findToken = await db.verificationToken.findUnique({
       where: {
-        otp,
-        userId: Number(user?.id),
+        token: formData.token,
+        otp: formData.otp,
         createAt: { gt: new Date(Date.now() - 1000 * 60 * Configs.valid_email_verify)},
         usingAt: null
       }
@@ -113,7 +127,7 @@ export async function emailVerify(otp: string) {
       });
 
       await tx.verificationToken.update({
-        where: { userId: findToken.userId },
+        where: { token: formData.token, userId: findToken.userId },
         data: { usingAt: new Date() }
       });
     });
@@ -122,20 +136,35 @@ export async function emailVerify(otp: string) {
   }
 };
 
-export async function resendEmailVerify() {
+export async function resendEmailVerify(token: string) {
   try {
-    const session = await auth();
-    if(!session) throw new Error("Authentication credential not Found!");
-    const { user } = session;
+    if(token.toString().trim() === "") throw new Error("Looks like something wrong with your url. Click the link and try again!");
+    
+    const findToken = await db.verificationToken.findUnique({
+      where: { token },
+      select: { userId: true }
+    });
+    if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
 
     const findUser = await db.user.findUnique({
       where: {
-        id:  Number(user?.id)
+        id: findToken.userId
       }
     });
     if(!findUser) throw new Error("We couldn't find an account data!");
     
-    await EmailVerification(findUser.email);
+    const otpCode = generateOtp(6);
+    
+    await db.verificationToken.update({
+      where: { userId: findToken.userId },
+      data: {
+        token,
+        createAt: new Date(),
+        otp: otpCode
+      }
+    });
+
+    await EmailVerification(findUser.email, token, otpCode);
   } catch (error: any) {
     throw new Error(error.message);
   }

@@ -3,18 +3,11 @@
 import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect } from "react";
 
 export default function MainHeader() {
   const smartLink = useSmartLink();
-  const { userData, fetchuserData } = userLoginData();
-  const { data, status } = useSession();
-
-  useEffect(() => {
-    fetchuserData(data, status);
-  }, [data]);
+  const { userData } = userLoginData();
 
   return (
     <header className="fixed top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 lg:z-61 w-full bg-zinc-100 text-sm py-2.5">
@@ -36,7 +29,7 @@ export default function MainHeader() {
           <ul className="flex flex-row items-center gap-x-3 ms-auto">
             <li className="hidden lg:inline-flex items-center gap-1.5 relative text-gray-500 pe-3 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
               <a className="flex items-center gap-x-1.5 py-1.5 px-2 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200" href="#">
-                davidhedrin123@gmail.com
+                {userData ? userData.user?.email : "-"}
               </a>
             </li>
 
@@ -50,16 +43,11 @@ export default function MainHeader() {
                   <div className="hs-dropdown-menu hs-dropdown-open:opacity-100 w-60 transition-[opacity,margin] duration opacity-0 hidden z-20 bg-white border border-gray-200 rounded-xl shadow-xl" role="menu" aria-orientation="vertical" aria-labelledby="hs-dnad">
                     <div className="py-2 px-3.5">
                       <span className="font-medium text-gray-800">
-                        James Collison
+                        {userData ? userData.user?.name : "-"}
                       </span>
                       <p className="text-sm text-gray-500">
-                        jamescollison@site.com
+                        {userData ? userData.user?.email : "-"}
                       </p>
-                      <div className="mt-1.5">
-                        <a className="flex justify-center items-center gap-x-1.5 py-2 px-2.5 font-medium text-[13px] bg-black text-white rounded-lg focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none" href="#">
-                          Upgrade to Pro
-                        </a>
-                      </div>
                     </div>
                     <div className="p-1 border-t border-gray-200 ">
                       <a className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100" href="#">

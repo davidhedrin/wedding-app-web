@@ -1,15 +1,15 @@
 "use client";
 
 import { useLoading } from '@/components/loading/loading-context';
+import LoadingUI from '@/components/loading/loading-ui';
 import InputOtp from '@/components/ui/input-otp';
 import { ZodErrors } from '@/components/zod-errors';
 import { FormState } from '@/lib/model-types';
 import { useSmartLink } from '@/lib/smart-link';
 import { toast } from '@/lib/utils';
-import { emailVerify, resendEmailVerify } from '@/server/auth';
-import { getSession, useSession } from 'next-auth/react';
+import { checkTokenEmail, emailVerify, resendEmailVerify } from '@/server/auth';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import z from 'zod';
 
@@ -19,9 +19,34 @@ export default function Page() {
   const { push } = useRouter();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+  const [shouldRender, setShouldRender] = useState(false);
+  const checkingToken = async (token: string) => {
+    try {
+      await checkTokenEmail(token);
+      setShouldRender(true);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      push("/auth");
+    }
+  };
   useEffect(() => {
-    setLoading(false);
-  }, []);
+    if (!token || token.trim() === '') {
+      toast({
+        type: "warning",
+        title: "Invalid Token",
+        message: "Looks like something wrong with your url. Click the link and try again!"
+      });
+      push("/auth");
+    } else {
+      checkingToken(token);
+    }
+  }, [token]);
 
   const [txtOtpCode, setTxtOtpCode] = useState("");
   const [stateForm, setStateForm] = useState<FormState>({ success: false, errors: {} });
@@ -52,13 +77,25 @@ export default function Page() {
     };
     setStateForm({ success: true, errors: {} });
 
+    if (!token || token.trim() === '') {
+      toast({
+        type: "warning",
+        title: "Invalid Token",
+        message: "Looks like something wrong with your url. Click the link and try again!"
+      });
+      return;
+    }
+
     setLoadingSubmit(true);
     setTimeout(async () => {
       try {
-        await emailVerify(txtOtpCode);
+        await emailVerify({
+          token,
+          otp: txtOtpCode
+        });
 
-        setLoading(true);        
-        push("/client/dashboard");
+        setLoading(true);
+        push("/auth");
         toast({
           type: "success",
           title: "Verified success",
@@ -77,9 +114,18 @@ export default function Page() {
 
   const [loadingResend, setLoadingResend] = useState(false);
   const handleResendEmail = async () => {
+    if (!token || token.trim() === '') {
+      toast({
+        type: "warning",
+        title: "Invalid Token",
+        message: "Looks like something wrong with your url. Click the link and try again!"
+      });
+      return;
+    };
+
     setLoadingResend(true);
     try {
-      await resendEmailVerify();
+      await resendEmailVerify(token);
       toast({
         type: "success",
         title: "Email sent successfully",
@@ -95,6 +141,7 @@ export default function Page() {
     setLoadingResend(false);
   };
 
+  if (!shouldRender) return (<LoadingUI />);
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-muted px-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-4">

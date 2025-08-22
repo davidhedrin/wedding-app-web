@@ -8,3 +8,8 @@ export type DtoSignUp = {
   email: string;
   password: string;
 };
+
+export type DtoOtpVerify = {
+  token: string;
+  otp: string;
+};

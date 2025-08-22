@@ -69,10 +69,7 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
     setTimeout(async () => {
       try {
         await signUpAction({ email, fullname, password });
-        await getSession();
-
-        setLoading(true);
-        push("/auth/email-verify");
+        
         toast({
           type: "success",
           title: "Register successfully",

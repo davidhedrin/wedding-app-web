@@ -60,7 +60,14 @@ export default function SignIn({ setSigninSignup }: { setSigninSignup: React.Dis
           message: `Welcome back ${email}`
         });
       } catch (error: any) {
-        toast({
+        if (error?.name == "Email Not Verify") {
+          push(`/auth/email-verify?token=${error?.message}`);
+          toast({
+            type: "info",
+            title: error?.name,
+            message: "Please confirm your email address verification OTP"
+          });
+        } else toast({
           type: "warning",
           title: "Login failed!",
           message: error?.message || "An unknown error occurred."
