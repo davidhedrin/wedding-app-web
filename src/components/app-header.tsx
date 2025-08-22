@@ -105,7 +105,7 @@ export default function AppHeader() {
             <hr className="text-muted" />
 
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" onClick={() => smartLink("/")} aria-current="page">Home</Link>
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Catalog</Link>
+            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/catalog" onClick={() => smartLink("/catalog")}>Catalog</Link>
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">About Us</Link>
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">Contact</Link>
             <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</Link>
