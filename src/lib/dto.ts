@@ -13,3 +13,8 @@ export type DtoOtpVerify = {
   token: string;
   otp: string;
 };
+
+export type DtoResetPassword = {
+  token: string;
+  password: string;
+}

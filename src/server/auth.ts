@@ -9,7 +9,7 @@ import { randomUUID } from "crypto";
 import { EmailVerification } from "./email";
 import { handlePrismaUniqueError } from "@/lib/prisma-handle-error";
 import Configs from "@/lib/config";
-import { DtoOtpVerify, DtoSignIn, DtoSignUp } from "@/lib/dto";
+import { DtoOtpVerify, DtoResetPassword, DtoSignIn, DtoSignUp } from "@/lib/dto";
 
 type GetUserByIdParams = {
   id: number,
@@ -142,9 +142,13 @@ export async function resendEmailVerify(token: string) {
     
     const findToken = await db.verificationToken.findUnique({
       where: { token },
-      select: { userId: true }
+      select: { userId: true, createAt: true }
     });
     if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
+    if (findToken.createAt) {
+      const timeDifference = new Date().getTime() - new Date(findToken.createAt).getTime();
+      if (timeDifference < 1000 * 60 * Configs.valid_email_verify) throw new Error("An email has already been sent. Please wait a minutes before requesting again.");
+    };
 
     const findUser = await db.user.findUnique({
       where: {
@@ -154,7 +158,6 @@ export async function resendEmailVerify(token: string) {
     if(!findUser) throw new Error("We couldn't find an account data!");
     
     const otpCode = generateOtp(6);
-    
     await db.verificationToken.update({
       where: { userId: findToken.userId },
       data: {
@@ -168,4 +171,59 @@ export async function resendEmailVerify(token: string) {
   } catch (error: any) {
     throw new Error(error.message);
   }
-}
+};
+
+export async function checkTokenResetPass(token: string) {
+  try {
+    const findData = await db.passwordResetToken.findUnique({
+      where: { 
+        token,
+        createAt: { gt: new Date(Date.now() - 1000 * 60 * Configs.valid_reset_pass)},
+        usingAt: null
+      }
+    });
+
+    if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function resetPassword(formData: DtoResetPassword) {
+  try {
+    if(formData.token === undefined || formData.token.toString().trim() === "") throw new Error("Looks like something wrong with your url. Click the link and try again!");
+
+    const findToken = await db.passwordResetToken.findUnique({
+      where: {
+        token: formData.token,
+        createAt: { gt: new Date(Date.now() - 1000 * 60 * Configs.valid_reset_pass)},
+        usingAt: null
+      }
+    });
+    if(!findToken) throw new Error("We couldn't verify. The token may be incorrect or no longer valid.");
+
+    const hashPass = await hashPassword(formData.password, 15);
+    await db.$transaction(async (tx) => {
+      await tx.user.update({
+        where: {
+          id: findToken.userId
+        },
+        data: {
+          password: hashPass
+        }
+      });
+  
+      await tx.passwordResetToken.update({
+        where: {
+          id: findToken.id,
+          token: formData.token
+        },
+        data: {
+          usingAt: new Date()
+        }
+      });
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

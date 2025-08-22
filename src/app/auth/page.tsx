@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSmartLink } from "@/lib/smart-link";
 import SignUp from "./signup";
+import ForgotPassword from "./forgot-password";
 
 export default function AuthPage() {
   const { setLoading } = useLoading();
@@ -28,6 +29,7 @@ export default function AuthPage() {
 
         {signinSignup == 1 && <SignIn setSigninSignup={setSigninSignup} />}
         {signinSignup == 2 && <SignUp setSigninSignup={setSigninSignup} />}
+        {signinSignup == 3 && <ForgotPassword setSigninSignup={setSigninSignup} />}
 
         <div className="text-balance text-center text-xs text-muted [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
           By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "} and <a href="#">Privacy Policy</a>.

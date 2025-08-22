@@ -112,9 +112,7 @@ export default function SignIn({ setSigninSignup }: { setSigninSignup: React.Dis
             <input type="checkbox" className="shrink-0 border-gray-200 rounded-sm text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-default-checkbox" />
             <label htmlFor="hs-default-checkbox" className="text-sm text-gray-500 ms-2">Remember me</label>
           </div>
-          <div>
-            <a href="" className="text-sm text-gray-500 hover:underline hover:text-black">forgot passwor?</a>
-          </div>
+          <div onClick={() => setSigninSignup(3)} className="cursor-pointer text-sm text-gray-500 hover:underline hover:text-black">forgot passwor?</div>
         </div>
 
         <button disabled={loadingSubmit} type="submit" className="w-full py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent btn-color-app">
