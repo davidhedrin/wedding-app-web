@@ -2,19 +2,20 @@
 
 import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
+import TableTopToolbar from "@/components/table-top-toolbar";
 import { BreadcrumbType } from "@/lib/model-types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const listBr: BreadcrumbType[] = [
-    {name: "Home", url: "/"},
-    {name: "Dashboard", url: null},
+    { name: "Home", url: null },
+    { name: "Dashboard", url: "/client/dashboard" },
   ];
-  const {setLoading} = useLoading();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     setLoading(false);
-  },[]);
+  }, []);
 
   return (
     <>
@@ -34,6 +35,20 @@ export default function Page() {
         <div className="flex-1 flex flex-col lg:flex-row">
           <div className="flex-1 min-w-0 flex flex-col border-e border-gray-200 p-4">
             {/* Conten Here */}
+
+            <TableTopToolbar
+              tblName="Product Category"
+              tblDesc="List product category to manage your data"
+            // inputSearch={inputSearch}
+            // tblSortList={tblSortList}
+            // thColomn={tblThColomns}
+            // setTblThColomns={setTblThColomns}
+            // setTblSortList={setTblSortList}
+            // setInputSearch={setInputSearch}
+            // fatchData={() => fatchDatas(pageTable)}
+
+            // openModal={() => openModalAddEdit()}
+            />
           </div>
         </div>
       </div>

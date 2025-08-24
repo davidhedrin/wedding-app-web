@@ -13,3 +13,15 @@ export type FormState = {
   success?: boolean;
   message?: string;
 };
+
+export type TableThModel = {
+  key: string;
+  name: string;
+  key_sort: string;
+  IsVisible?: boolean;
+};
+
+export type TableShortList = {
+  key: string;
+  sort?: "asc" | "desc" | "";
+};
