@@ -3,6 +3,7 @@
 import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
 import TableTopToolbar from "@/components/table-top-toolbar";
+import DatePicker from "@/components/ui/date-picker";
 import { BreadcrumbType } from "@/lib/model-types";
 import { useEffect, useState } from "react";
 
@@ -16,6 +17,8 @@ export default function Page() {
   useEffect(() => {
     setLoading(false);
   }, []);
+
+  const [selected, setSelected] = useState<Date | undefined>(undefined);
 
   return (
     <>

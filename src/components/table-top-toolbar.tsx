@@ -4,7 +4,7 @@ import { TableShortList, TableThModel } from '@/lib/model-types';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { DateRange } from "react-day-picker";
 import Input from './ui/input';
-import DatePickerPopover from './popover-datepicker';
+import DatePicker from './ui/date-picker';
 
 type TableTopToolbarProps = {
   tblName?: string;
@@ -79,7 +79,8 @@ export default function TableTopToolbar({
 
         <div className="flex items-center gap-2 justify-end">
           <div className="w-full">
-            <DatePickerPopover mode='range' onChange={(date) => setSelectedDate(date)} />
+            {/* <DatePickerPopover mode='range' onChange={(date) => setSelectedDate(date)} /> */}
+            <DatePicker mode='range' />
           </div>
         </div>
       </div>
