@@ -62,6 +62,7 @@ export default function TableTopToolbar({
     { label: 'Description', value: 'description' },
     { label: 'User ID', value: 'user_id' },
   ];
+
   return (
     <div>
       {
@@ -75,26 +76,38 @@ export default function TableTopToolbar({
       }
       <div className="flex flex-col w-full lg:flex-row lg:items-center lg:justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className='w-full'>
-            <Input type="search" className="lg:w-72" placeholder="Type to search..." prefixIcon={<i className='bx bx-search-alt-2 text-muted'></i>} />
-          </div>
+          {
+            setInputSearch && <div className='w-full'>
+              <Input type="search" value={inputSearch} onChange={(e) => setInputSearch(e.target.value)} className="lg:w-72" placeholder="Type to search..." prefixIcon={<i className='bx bx-search-alt-2 text-muted'></i>} />
+            </div>
+          }
 
-          <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-400 text-gray-500 hover:border-gray-800 hover:text-gray-800 focus:outline-hidden focus:border-gray-800 focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none">
-            <i className='bx bx-plus-circle text-lg'></i> New
-          </button>
+          {
+            openModal && <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-400 text-gray-500 hover:border-gray-800 hover:text-gray-800 focus:outline-hidden focus:border-gray-800 focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none">
+              <i className='bx bx-plus-circle text-lg'></i> New
+            </button>
+          }
         </div>
 
         <div className="flex items-center gap-2 justify-end">
-          <div className="w-full">
-            <DatePicker mode='range' onChange={(date) => { }} />
-          </div>
-          <SortPopover />
-          <ViewPopover />
+          {
+            setDateRange && <div className="w-full">
+              <DatePicker mode='range' onChange={(date) => { }} />
+            </div>
+          }
 
-          <div>
-            <div className="col-start-2 text-center">
+          {
+            setTblSortList && <SortPopover />
+          }
+
+          {
+            setTblThColomns && <ViewPopover />
+          }
+
+          {
+            fatchData && <div className="col-start-2 text-center">
               <div className="hs-tooltip [--placement:top] inline-block">
-                <button type="button" className="hs-tooltip-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm shadow-sm rounded-lg border border-gray-400 text-muted hover:border-gray-800 hover:text-gray-800 focus:outline-hidden focus:border-gray-800 focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none">
+                <button onClick={() => fatchData()} type="button" className="hs-tooltip-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm shadow-sm rounded-lg border border-gray-400 text-muted hover:border-gray-800 hover:text-gray-800 focus:outline-hidden focus:border-gray-800 focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none">
                   <i className='bx bx-refresh text-lg'></i>
 
                   <span className="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-2xs" role="tooltip">
@@ -103,7 +116,7 @@ export default function TableTopToolbar({
                 </button>
               </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>
