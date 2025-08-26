@@ -36,11 +36,11 @@ export default function Page() {
           </p>
 
           <div className="flex gap-4 justify-center mb-12">
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm md:text-base font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
               Try {Configs.tryDays} Days <i className='bx bx-rocket bx-tada text-lg'></i>
             </button>
 
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-blue-600 text-blue-600 hover:border-blue-500 hover:text-blue-500 focus:outline-hidden focus:border-blue-500 focus:text-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400">
+            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm md:text-base font-medium rounded-lg border border-blue-600 text-blue-600 hover:border-blue-500 hover:text-blue-500 focus:outline-hidden focus:border-blue-500 focus:text-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400">
               Find Template
             </button>
           </div>
@@ -74,7 +74,7 @@ export default function Page() {
         </div>
 
         <div className="flex justify-end mb-2">
-          <Link href="/" className="text-blue-500 inline-flex items-center gap-x-1 text-sm font-medium">More Services <i className='bx bx-right-arrow-alt text-lg'></i></Link>
+          <Link href="/" className="text-blue-500 inline-flex items-center gap-x-1 text-sm md:text-base font-medium">More Services <i className='bx bx-right-arrow-alt text-lg'></i></Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -92,7 +92,7 @@ export default function Page() {
                 <div className="text-muted font-semibold mb-1">
                   {x.name}
                 </div>
-                <p className="text-muted text-sm leading-relaxed">
+                <p className="text-muted text-sm md:text-base leading-relaxed">
                   {x.desc}
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function Page() {
                     </div>
                     <i className='bx bxs-quote-right text-color-app text-4xl mb-2'></i>
                   </div>
-                  <p className="text-muted leading-relaxed">
+                  <p className="text-muted text-sm md:text-base leading-relaxed">
                     "{x.quote}"
                   </p>
                 </div>
@@ -179,7 +179,7 @@ export default function Page() {
                   <div className="font-semibold">
                     {item.title}
                   </div>
-                  <p className="text-muted">
+                  <p className="text-sm md:text-base text-muted">
                     {item.desc}
                   </p>
                 </div>
@@ -204,11 +204,11 @@ export default function Page() {
           </div>
 
           <div className="flex gap-4 justify-center">
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm md:text-base font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
               Create Invitation Now
             </button>
 
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm font-medium rounded-lg border border-blue-600 text-blue-600 hover:border-blue-500 hover:text-blue-500 focus:outline-hidden focus:border-blue-500 focus:text-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400">
+            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm md:text-base font-medium rounded-lg border border-blue-600 text-blue-600 hover:border-blue-500 hover:text-blue-500 focus:outline-hidden focus:border-blue-500 focus:text-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400">
               Learn More
             </button>
           </div>

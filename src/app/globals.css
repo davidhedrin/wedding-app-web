@@ -5,6 +5,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --color-primary: #e9a5a0;
+  --color-primary-hover: #da8d87;
+  --muted-foreground: oklch(46.04% 0.00005 271.152);
+}
+
 @layer components {
   .text-color-app {
     color: var(--color-primary);
