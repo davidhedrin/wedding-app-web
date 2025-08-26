@@ -25,3 +25,18 @@ export type TableShortList = {
   key: string;
   sort?: "asc" | "desc" | "";
 };
+
+export type CommonParams = {
+  curPage?: number;
+  perPage?: number;
+};
+
+export type PaginateResult<T> = {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};

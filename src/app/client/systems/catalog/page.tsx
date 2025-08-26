@@ -19,7 +19,7 @@ export default function Page() {
     <>
       <div className="py-2 px-4 flex flex-wrap justify-between items-center gap-2 bg-white border-b border-gray-200">
         <div>
-          <h1 className="font-medium text-gray-800">
+          <h1 className="text-sm font-medium text-gray-800">
             Catalog
           </h1>
         </div>

@@ -81,8 +81,13 @@ export default function MainSidebar() {
 
               <ul className="flex flex-col">
                 <li>
-                  <Link href="/client/catalog" onClick={() => smartLink("/client/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                  <Link href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                     <i className='bx bx-customize text-lg'></i> Catalog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/client/systems/users-manage" onClick={() => smartLink("/client/systems/users-manage")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                    <i className='bx bx-user-pin text-lg'></i> Users Mangement
                   </Link>
                 </li>
               </ul>
