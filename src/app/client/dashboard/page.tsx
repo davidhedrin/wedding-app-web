@@ -2,10 +2,8 @@
 
 import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
-import TablePagination from "@/components/table-pagination";
-import TableTopToolbar from "@/components/table-top-toolbar";
 import { BreadcrumbType } from "@/lib/model-types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Page() {
   const listBr: BreadcrumbType[] = [
@@ -17,13 +15,6 @@ export default function Page() {
   useEffect(() => {
     setLoading(false);
   }, []);
-
-  // Start Master
-  const [inputPage, setInputPage] = useState("1");
-  const [pageTable, setPageTable] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPage, setTotalPage] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
 
   return (
     <>
@@ -43,22 +34,7 @@ export default function Page() {
         <div className="flex-1 flex flex-col lg:flex-row">
           <div className="flex-1 min-w-0 flex flex-col border-e border-gray-200 p-4">
             {/* Conten Here */}
-
-            <TableTopToolbar
-              // tblName="Product Category"
-              tblDesc="List product category to manage your data"
-            // inputSearch={inputSearch}
-            // tblSortList={tblSortList}
-            // thColomn={tblThColomns}
-            // setTblThColomns={setTblThColomns}
-            // setTblSortList={setTblSortList}
-            // setInputSearch={setInputSearch}
-            // fatchData={() => fatchDatas(pageTable)}
-
-            // openModal={() => openModalAddEdit()}
-            />
-
-            <div className="flex flex-col pt-5 pb-4 px-1.5">
+            {/* <div className="flex flex-col pt-5 pb-4 px-1.5">
               <div className="-m-1.5 overflow-x-auto">
                 <div className="min-w-full inline-block align-middle">
                   <div className="border border-gray-200 rounded-lg shadow-xs overflow-hidden">
@@ -119,20 +95,7 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <TablePagination
-              perPage={10}
-              pageTable={1}
-              totalPage={2}
-              totalCount={5}
-              setPerPage={setPerPage}
-              setPageTable={setPageTable}
-              // fatchData={fatchDatas}
-
-              inputPage={inputPage}
-              setInputPage={setInputPage}
-            />
+            </div> */}
           </div>
         </div>
       </div>

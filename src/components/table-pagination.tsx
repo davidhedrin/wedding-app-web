@@ -40,13 +40,19 @@ export default function TablePagination({
           <span className="text-sm text-muted">
             Show
           </span>
-          <div>
-            <select value="3" onChange={(e) => { }} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm hover:border-gray-800 focus:ring-gray-800 disabled:opacity-50 disabled:pointer-events-none">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>
+          {
+            perPage !== undefined && <div>
+              <select value={perPage.toString()} onChange={(e) => {
+                const val = e.target.value;
+                setPerPage(parseInt(val));
+                changePaginate(1, parseInt(val));
+              }} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm hover:border-gray-800 focus:ring-gray-800 disabled:opacity-50 disabled:pointer-events-none">
+                {[5, 10, 15, 20, 25].map((pageSize) => (
+                  <option key={pageSize} value={`${pageSize}`}>{pageSize}</option>
+                ))}
+              </select>
+            </div>
+          }
           <span className="hidden text-sm lg:block text-muted">
             rows of {totalCount} entries
           </span>
@@ -76,24 +82,44 @@ export default function TablePagination({
         </div>
 
         <div className="flex items-center gap-2 ml-0">
-          <button type="button" className="hidden lg:inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+          <button
+            disabled={pageTable <= 1}
+            onClick={() => {
+              if (pageTable >= 1) changePaginate(1);
+            }}
+            type="button" className="hidden lg:inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
             <i className='bx bx-chevrons-left text-lg'></i>
-            
+
             <span className="sr-only">Go to first page</span>
           </button>
-          <button type="button" className="inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+          <button
+            disabled={pageTable <= 1}
+            onClick={() => {
+              if (pageTable >= 1) changePaginate(pageTable - 1)
+            }}
+            type="button" className="inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
             <i className='bx bx-chevron-left text-lg'></i>
-            
+
             <span className="sr-only">Go to previous page</span>
           </button>
-          <button type="button" className="inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+          <button
+            disabled={pageTable >= totalPage}
+            onClick={() => {
+              if (pageTable <= totalPage) changePaginate(pageTable + 1)
+            }}
+            type="button" className="inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
             <i className='bx bx-chevron-right text-lg'></i>
-            
+
             <span className="sr-only">Go to next page</span>
           </button>
-          <button type="button" className="hidden lg:inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+          <button
+            disabled={pageTable >= totalPage}
+            onClick={() => {
+              if (pageTable <= totalPage) changePaginate(totalPage)
+            }}
+            type="button" className="hidden lg:inline-flex p-1.5 w-9 justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
             <i className='bx bx-chevrons-right text-lg'></i>
-            
+
             <span className="sr-only">Go to last page</span>
           </button>
         </div>
