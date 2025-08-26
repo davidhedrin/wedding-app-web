@@ -18,7 +18,7 @@ type TableTopToolbarProps = {
   setInputSearch?: Dispatch<SetStateAction<string>>;
   fatchData?: (page?: number) => Promise<void>;
 
-  openModal?: (id?: number) => Promise<void>;
+  modalId?: string;
   dateRange?: DateRange | undefined;
   setDateRange?: (date: DateRange | undefined) => void;
 };
@@ -34,7 +34,7 @@ export default function TableTopToolbar({
   setInputSearch,
   fatchData,
 
-  openModal,
+  modalId,
   dateRange,
   setDateRange,
 }: TableTopToolbarProps) {
@@ -95,8 +95,13 @@ export default function TableTopToolbar({
             </div>
           }
 
-          {
+          {/* {
             openModal && <button onClick={() => openModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+              <i className='bx bx-plus-circle text-lg'></i> New
+            </button>
+          } */}
+          {
+            modalId && <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalId} data-hs-overlay={`#${modalId}`}>
               <i className='bx bx-plus-circle text-lg'></i> New
             </button>
           }
@@ -130,38 +135,38 @@ export default function TableTopToolbar({
                     <p className="text-sm text-gray-500">Select column for modify sorting your rows.</p>
                   </div>
 
-                    {
-                      tblSortList && tblSortList.length > 0 && <div className="grid gap-1.5">
-                        {
-                          tblSortList.map((x, i) => (
-                            thColomn && thColomn?.length > 0 && <div key={i} className="flex gap-1.5 overflow-y-auto">
-                              <div>
-                                <select value={x.key} onChange={(e) => updateSortField(i, "key", e.target.value)} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                                  <option>Select colomn</option>
-                                  {
-                                    thColomn?.filter(x => x.IsVisible && x.key_sort.trim() != "").map(y => {
-                                      return <option key={i + y.key} value={y.key_sort}>{y.name}</option>
-                                    })
-                                  }
-                                </select>
-                              </div>
-                              <div>
-                                <select value={x.sort} onChange={(e) => updateSortField(i, "sort", e.target.value)} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                                  <option>Type</option>
-                                  <option value="asc">Asc</option>
-                                  <option value="desc">Desc</option>
-                                </select>
-                              </div>
-                              <button onClick={() => {
-                                setTblSortList(prev => removeListStateByIndex(prev ?? [], i))
-                              }} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                                <i className='bx bx-trash text-lg'></i>
-                              </button>
+                  {
+                    tblSortList && tblSortList.length > 0 && <div className="grid gap-1.5">
+                      {
+                        tblSortList.map((x, i) => (
+                          thColomn && thColomn?.length > 0 && <div key={i} className="flex gap-1.5 overflow-y-auto">
+                            <div>
+                              <select value={x.key} onChange={(e) => updateSortField(i, "key", e.target.value)} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                                <option>Select colomn</option>
+                                {
+                                  thColomn?.filter(x => x.IsVisible && x.key_sort.trim() != "").map(y => {
+                                    return <option key={i + y.key} value={y.key_sort}>{y.name}</option>
+                                  })
+                                }
+                              </select>
                             </div>
-                          ))
-                        }
-                      </div>
-                    }
+                            <div>
+                              <select value={x.sort} onChange={(e) => updateSortField(i, "sort", e.target.value)} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                                <option>Type</option>
+                                <option value="asc">Asc</option>
+                                <option value="desc">Desc</option>
+                              </select>
+                            </div>
+                            <button onClick={() => {
+                              setTblSortList(prev => removeListStateByIndex(prev ?? [], i))
+                            }} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                              <i className='bx bx-trash text-lg'></i>
+                            </button>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  }
 
                   <div className="flex items-center gap-16">
                     <div className="flex items-center gap-2">

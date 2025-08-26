@@ -126,3 +126,14 @@ export function normalizeSelectObj(tblThColomns: TableThModel[]): Record<string,
 
   return selectObj;
 };
+
+export function formatDate(dateString: string | Date, dtStyle: "short" | "full" | "long" | "medium" = "short", tmStyle?: "short" | "full" | "long" | "medium") {
+  const date = new Date(dateString);
+  const dateFormatter = new Intl.DateTimeFormat("id-ID", { dateStyle: dtStyle });
+  const timeFormatter = tmStyle ? new Intl.DateTimeFormat("id-ID", { timeStyle: tmStyle }) : null;
+
+  const formattedDate = dateFormatter.format(date);
+  const formattedTime = timeFormatter ? timeFormatter.format(date) : "";
+
+  return tmStyle ? `${formattedDate} ${formattedTime}` : formattedDate;
+};
