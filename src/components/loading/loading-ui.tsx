@@ -1,20 +1,11 @@
-"use client";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import Configs from "@/lib/config";
 import { cn } from "@/lib/utils";
+import UiPortal from "../ui-portal";
 
 export default function LoadingUI({ className, ...props }: React.ComponentProps<"div">) {
-  const [mounted, setMounted] = useState(false);
   const appName = Configs.app_name;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return createPortal(
+  return <UiPortal>
     <div
       className={cn(
         "fixed inset-0 z-[9999] flex items-center justify-center",
@@ -26,7 +17,6 @@ export default function LoadingUI({ className, ...props }: React.ComponentProps<
         <img src="/assets/img/logo/wedlyvite-logo-web.png" className="w-8 h-auto tada-animation" />
         <p className='text-sm font-medium'>{appName}...</p>
       </div>
-    </div>,
-    document.body
-  );
+    </div>
+  </UiPortal>
 }

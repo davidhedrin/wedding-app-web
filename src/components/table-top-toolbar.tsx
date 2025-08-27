@@ -119,7 +119,7 @@ export default function TableTopToolbar({
               <button
                 type="button"
                 onClick={() => setOpenSort(prev => !prev)}
-                className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white p-1.5 text-sm shadow-sm hover:border-gray-800 focus:ring-gray-800"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white p-1.5 text-sm hover:border-gray-800 focus:ring-gray-800"
                 aria-expanded={openSort}
                 aria-haspopup="true"
               >
@@ -187,7 +187,7 @@ export default function TableTopToolbar({
               <button
                 type="button"
                 onClick={() => setOpenView(prev => !prev)}
-                className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white p-1.5 text-sm shadow-sm hover:border-gray-800 focus:ring-gray-800"
+                className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white p-1.5 text-sm hover:border-gray-800 focus:ring-gray-800"
                 aria-expanded={openView}
                 aria-haspopup="true"
               >

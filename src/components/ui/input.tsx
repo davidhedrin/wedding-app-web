@@ -8,10 +8,14 @@ type InputProps = {
 
 export default function Input({ label, prefixIcon, className, type, ...props }: InputProps & React.ComponentProps<"input">) {
   const inpId = props.id;
+  const isReq = props.required;
+
   return (
     <div className="relative">
       {
-        label !== undefined && <label htmlFor={inpId} className="block text-sm font-medium mb-1 dark:text-white">{label}</label>
+        label !== undefined && <label htmlFor={inpId} className="block text-sm font-medium mb-1 dark:text-white">
+          {label}{(isReq !== undefined && isReq === true) && <span className="text-red-500">*</span>}
+        </label>
       }
       <input type={type} id={inpId} name={inpId}
         className={cn(

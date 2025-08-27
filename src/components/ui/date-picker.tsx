@@ -1,20 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { DayPicker, SelectSingleEventHandler, SelectMultipleEventHandler, SelectRangeEventHandler } from 'react-day-picker';
+import { DayPicker, SelectSingleEventHandler, SelectMultipleEventHandler, SelectRangeEventHandler, DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format } from 'date-fns';
 
 type DatePickerProps = {
+  label?: string;
+  required?: boolean | undefined;
   mode?: 'single' | 'multiple' | 'range';
-  onChange?: (date: Date | Date[] | { from: Date; to?: Date } | undefined) => void;
+  value?: Date | Date[] | DateRange | undefined;
+  onChange?: (date: Date | Date[] | DateRange | undefined) => void;
   position?: 'start' | 'end';
 };
 
-export default function DatePicker({ mode = 'single', onChange, position = 'start' }: DatePickerProps) {
+export default function DatePicker({ label, required, mode = 'single', value, onChange, position = 'start' }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedSingle, setSelectedSingle] = useState<Date | undefined>();
-  const [selectedMultiple, setSelectedMultiple] = useState<Date[] | undefined>();
-  const [selectedRange, setSelectedRange] = useState<{ from: Date; to?: Date } | undefined>();
+  const [selectedSingle, setSelectedSingle] = useState<Date | undefined>(value as Date);
+  const [selectedMultiple, setSelectedMultiple] = useState<Date[] | undefined>(value as Date[]);
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(value as DateRange);
 
   const formatDate = (date: Date) => {
     return format(date, 'dd MMM yyyy');
@@ -76,11 +79,17 @@ export default function DatePicker({ mode = 'single', onChange, position = 'star
   }, [isOpen]);
 
   return (
-    <div className="relative grid gap-2" ref={popoverRef}>
+    <div className="relative" ref={popoverRef}>
+      {label && (
+        <label className="block text-sm font-medium mb-1 dark:text-white">
+          {label}{(required !== undefined && required === true) && <span className="text-red-500">*</span>}
+        </label>
+      )}
+
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full truncate justify-start hs-dropdown-toggle inline-flex items-center gap-2 py-1.5 px-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:border-gray-800 focus:ring-gray-800 focus:outline-none"
+        className="w-full truncate justify-between hs-dropdown-toggle inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-800 focus:ring-gray-800 focus:outline-none"
       >
         <span className='truncate overflow-hidden whitespace-nowrap'>
           {getFormattedDate()}
@@ -92,12 +101,13 @@ export default function DatePicker({ mode = 'single', onChange, position = 'star
 
       {isOpen && (
         <div
-          className={`absolute top-10 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg ${getPositionClass()}`}
+          className={`absolute mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg ${getPositionClass()}`}
           onClick={(e) => e.stopPropagation()}
         >
           {mode === 'single' && (
             <DayPicker
               mode="single"
+              captionLayout="dropdown"
               selected={selectedSingle}
               onSelect={handleSelectSingle}
               className="p-1"
@@ -106,6 +116,7 @@ export default function DatePicker({ mode = 'single', onChange, position = 'star
           {mode === 'multiple' && (
             <DayPicker
               mode="multiple"
+              captionLayout="dropdown"
               selected={selectedMultiple}
               onSelect={handleSelectMultiple}
               className="p-1"
@@ -114,6 +125,7 @@ export default function DatePicker({ mode = 'single', onChange, position = 'star
           {mode === 'range' && (
             <DayPicker
               mode="range"
+              captionLayout="dropdown"
               selected={selectedRange}
               onSelect={handleSelectRange}
               className="p-1"

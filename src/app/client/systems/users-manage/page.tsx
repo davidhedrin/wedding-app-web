@@ -4,10 +4,14 @@ import BreadcrumbList from '@/components/breadcrumb-list';
 import { useLoading } from '@/components/loading/loading-context';
 import TablePagination from '@/components/table-pagination';
 import TableTopToolbar from '@/components/table-top-toolbar';
-import { BreadcrumbType, TableShortList, TableThModel } from '@/lib/model-types';
-import { formatDate, normalizeSelectObj, sortListToOrderBy, toast } from '@/lib/utils';
+import UiPortal from '@/components/ui-portal';
+import DatePicker from '@/components/ui/date-picker';
+import Input from '@/components/ui/input';
+import Select from '@/components/ui/select';
+import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
+import { formatDate, normalizeSelectObj, roleLabels, sortListToOrderBy, toast } from '@/lib/utils';
 import { GetDataUser } from '@/server/systems/user-manage';
-import { User } from '@prisma/client';
+import { RolesEnum, User } from '@prisma/client';
 import React, { useEffect, useState } from 'react'
 
 export default function Page() {
@@ -96,6 +100,17 @@ export default function Page() {
   }, []);
   // End Master
 
+  const [stateFormAddEdit, setStateFormAddEdit] = useState<FormState>({ success: false, errors: {} });
+  const [addEditId, setAddEditId] = useState<number | null>(null);
+  
+  const [txtEmail, setTxtEmail] = useState("");
+  const [txtName, setTxtName] = useState("");
+  const [isActive, setIsActive] = useState("");
+  const [txtRole, setTxtRole] = useState("");
+  const [txtPhone, setTxtPhone] = useState("");
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [txtBirthPlace, setTxtBirthPlace] = useState("");
+
   return (
     <>
       <div className="py-2 px-4 flex flex-wrap justify-between items-center gap-2 bg-white border-b border-gray-200">
@@ -124,7 +139,6 @@ export default function Page() {
               fatchData={() => fatchDatas(pageTable)}
 
               modalId='hs-scale-animation-modal'
-            // openModal={() => openModalAddEdit()}
             />
 
             <div className="flex flex-col pt-5 pb-4 px-1.5">
@@ -202,37 +216,93 @@ export default function Page() {
         </div>
       </div>
 
-      <div id="hs-scale-animation-modal" className="hs-overlay hidden size-full fixed inset-0 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" aria-labelledby="hs-scale-animation-modal-label">
-        <div className="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
-          <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
-            <div className="flex justify-between items-center py-3 px-4 border-b border-gray-200">
-              <h3 id="hs-scale-animation-modal-label" className="font-bold text-gray-800">
-                Modal title
-              </h3>
-              <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay="#hs-scale-animation-modal">
-                <span className="sr-only">Close</span>
-                <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18"></path>
-                  <path d="m6 6 12 12"></path>
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto">
-              <p className="mt-1 text-gray-800">
-                This is a wider card with supporting text below as a natural lead-in to additional content.
-              </p>
-            </div>
-            <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200">
-              <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay="#hs-scale-animation-modal">
-                Close
-              </button>
-              <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                Save changes
-              </button>
+      <UiPortal>
+        <div id="hs-scale-animation-modal" className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" aria-labelledby="hs-scale-animation-modal-label">
+          <div className="sm:max-w-lg hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
+            <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div id="hs-scale-animation-modal-label" className="flex items-center gap-1 text-sm">
+                  <i className='bx bx-user-pin text-lg'></i> {addEditId ? "Edit" : "Add"} User
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay="#hs-scale-animation-modal">
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4">
+                <div className="flex items-center justify-between gap-4 py-2 px-3 border border-gray-200 rounded-xl bg-white shadow-sm mb-3">
+                  <div className="flex flex-col gap-1.5 text-sm w-full sm:w-auto">
+                    <div>
+                      <h3 className="font-medium text-gray-900 text-sm">Upload profile picture</h3>
+                      <p className="text-gray-500 text-xs">
+                        Allow file type JPG, JPEG or PNG. Max file size 2MB
+                      </p>
+                    </div>
+                    <div>
+                      <label className="inline-block">
+                        <input
+                          type="file"
+                          accept=".jpg,.jpeg,.png"
+                          className="sr-only"
+                        />
+                        <span className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
+                          Choose File
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex-shrink-0">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                      <i className="bx bx-user text-2xl text-gray-500" />
+                    </div>
+                  </div>
+                </div>
+
+                <form className="grid md:grid-cols-2 grid-cols-1 gap-3">
+                  <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select user status' required
+                    options={[
+                      { label: "Active", value: "true" },
+                      { label: "Inactive", value: "false" },
+                    ]}
+                  />
+                  <Input value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' required />
+                  <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' required />
+                  <Select className='py-1.5' id='role' label='Role' placeholder='Select user role' required
+                    options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
+                  />
+                  <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
+                  <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
+                    options={[
+                      { label: "Male", value: "Male" },
+                      { label: "Female", value: "Female" },
+                      { label: "Other", value: "Other" },
+                    ]}
+                  />
+                  <DatePicker mode='single' value={birthDate as Date} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
+                  <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
+                </form>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500 sm:order-1 order-1">
+                  Fields marked with <span className="text-red-500">*</span> are required.
+                </p>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay="#hs-scale-animation-modal">
+                    Close
+                  </button>
+                  <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </UiPortal>
     </>
   )
 }
