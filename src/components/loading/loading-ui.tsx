@@ -8,7 +8,7 @@ export default function LoadingUI({ className, ...props }: React.ComponentProps<
   return <UiPortal>
     <div
       className={cn(
-        "fixed inset-0 z-[9999] flex items-center justify-center",
+        "fixed inset-0 z-[99] flex items-center justify-center",
         className
       )}
       {...props}

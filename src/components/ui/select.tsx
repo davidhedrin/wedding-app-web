@@ -9,23 +9,24 @@ type SelectProps = {
   label?: string;
   placeholder?: string;
   options: Option[];
+  mandatory?: boolean | undefined;
 } & React.ComponentProps<'select'>;
 
 export default function Select({
   label,
   placeholder,
   options,
+  mandatory,
   className,
   ...props
 }: SelectProps) {
   const inpId = props.id;
-  const isReq = props.required;
 
   return (
     <div>
       {label && (
         <label htmlFor={inpId} className="block text-sm font-medium mb-1 dark:text-white">
-          {label}{(isReq !== undefined && isReq === true) && <span className="text-red-500">*</span>}
+          {label}{(mandatory !== undefined && mandatory === true) && <span className="text-red-500">*</span>}
         </label>
       )}
 

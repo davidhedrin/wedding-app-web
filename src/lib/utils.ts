@@ -19,6 +19,11 @@ export async function verifyPassword(password: string, hashed: string): Promise<
   return await bcrypt.compare(password, hashed);
 };
 
+export function modalAction(btnId: string) {
+  const closeButton = document.getElementById(btnId) as HTMLButtonElement | null;
+  closeButton?.click();
+};
+
 export function toast(params: ToastProps) {
   useToastStore.getState().add(params);
 };

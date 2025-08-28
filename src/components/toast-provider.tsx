@@ -37,7 +37,7 @@ export const ToastProvider = () => {
   const { toasts, remove } = useToastStore();
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-62">
+    <div className="fixed top-4 right-4 flex flex-col gap-3 z-[100]">
       {toasts.map((t) => (
         <div key={t.id} className="w-xs p-3 bg-white border border-gray-200 rounded-xl shadow-lg" role="alert">
           <div className="flex justify-between gap-3">

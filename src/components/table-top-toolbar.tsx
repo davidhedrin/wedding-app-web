@@ -94,14 +94,8 @@ export default function TableTopToolbar({
               <Input type="search" value={inputSearch} onChange={(e) => setInputSearch(e.target.value)} className="lg:w-72 py-1.5" placeholder="Type to search..." prefixIcon={<i className='bx bx-search-alt-2 text-muted'></i>} />
             </div>
           }
-
-          {/* {
-            openModal && <button onClick={() => openModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-              <i className='bx bx-plus-circle text-lg'></i> New
-            </button>
-          } */}
           {
-            modalId && <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalId} data-hs-overlay={`#${modalId}`}>
+            modalId && <button id={`btn-${modalId}`} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalId} data-hs-overlay={`#${modalId}`}>
               <i className='bx bx-plus-circle text-lg'></i> New
             </button>
           }

@@ -3,18 +3,18 @@ import React from 'react'
 
 type InputProps = {
   label?: string;
-  prefixIcon?: React.JSX.Element
+  prefixIcon?: React.JSX.Element;
+  mandatory?: boolean | undefined;
 };
 
-export default function Input({ label, prefixIcon, className, type, ...props }: InputProps & React.ComponentProps<"input">) {
+export default function Input({ label, prefixIcon, mandatory, className, type, ...props }: InputProps & React.ComponentProps<"input">) {
   const inpId = props.id;
-  const isReq = props.required;
 
   return (
     <div className="relative">
       {
         label !== undefined && <label htmlFor={inpId} className="block text-sm font-medium mb-1 dark:text-white">
-          {label}{(isReq !== undefined && isReq === true) && <span className="text-red-500">*</span>}
+          {label}{(mandatory !== undefined && mandatory === true) && <span className="text-red-500">*</span>}
         </label>
       }
       <input type={type} id={inpId} name={inpId}
