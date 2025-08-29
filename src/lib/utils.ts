@@ -148,3 +148,32 @@ export function formatDate(dateString: string | Date, dtStyle: "short" | "full" 
 
   return tmStyle ? `${formattedDate} ${formattedTime}` : formattedDate;
 };
+
+type StringWithTimestampFunction = {
+  (length?: number, tmp?: boolean, prefix?: string): string;
+  v2: (length?: number, tmp?: boolean, prefix?: string) => string;
+};
+export const stringWithTimestamp: StringWithTimestampFunction = function (length: number = 5, tmp: boolean = false, prefix?: string): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let randomChar = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomChar += characters[randomIndex];
+  }
+
+  const timestamp = tmp === true ? Date.now() : "";
+  return `${prefix !== undefined ? prefix + "/" : "" }${randomChar}${timestamp}`;
+} as StringWithTimestampFunction;
+stringWithTimestamp.v2 = function (length: number = 5, tmp: boolean = false, prefix?: string): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomChar = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomChar += characters[randomIndex];
+  }
+
+  const timestamp = tmp === true ? Date.now() : "";
+  return `${prefix !== undefined ? prefix + "/" : "" }${randomChar}${timestamp}`;
+};

@@ -6,6 +6,8 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 import { db } from "../../../prisma/db-init";
 import { auth } from "@/app/api/auth/auth-setup";
 import { DtoUser } from "@/lib/dto";
+import { DeleteFile, UploadFile } from "../common";
+import Configs from "@/lib/config";
 
 type GetDataUserParams = {
   where?: Prisma.UserWhereInput;
@@ -37,31 +39,51 @@ export async function GetDataUser(params: GetDataUserParams): Promise<PaginateRe
   };
 };
 
-export async function StoreUpdateDataProductCategory(formData: DtoUser) {
+export async function UpdateDataUser(formData: DtoUser) {
   try {
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
 
     const data_id = formData.id ?? 0;
-    await db.user.upsert({
+    const findUserData = await db.user.findUnique({
+      where: { id: data_id }
+    });
+
+    const directoryImg = "public/upload/profile";
+    if(findUserData && findUserData.image && formData.img_url === null) await DeleteFile(directoryImg, findUserData.image);
+    if(formData.file_img !== null) {
+      if(findUserData && findUserData.image) await DeleteFile(directoryImg, findUserData.image);
+      var upFile = await UploadFile(formData.file_img, directoryImg);
+      if(upFile != null && upFile.status == true) {
+        formData.img_name = upFile.filename;
+        formData.img_url = `${Configs.base_url}/upload/profile/${upFile.filename}`;
+      };
+    };
+    
+    await db.user.update({
       where: { id: data_id },
-      update: {
+      data: {
         fullname: formData.fullname,
+        role: formData.role,
+        no_phone: formData.no_phone,
+        gender: formData.gender,
+        birth_date: formData.birth_date,
+        birth_place: formData.birth_place,
+        image: formData.img_name,
+        image_path: formData.img_url,
         is_active: formData.is_active,
         updatedBy: user?.email
-      },
-      create: {
-        email: formData.email,
-        password: "",
-        role: formData.role,
-        fullname: formData.fullname,
-        provider: "CREDENTIAL",
-        is_active: formData.is_active,
-        createdBy: user?.email
       }
     });
   } catch (error: any) {
     throw new Error(error.message);
   }
+};
+
+export async function GetDataUserById(id: number): Promise<User | null> {
+  const getData = await db.user.findUnique({
+    where: { id }
+  });
+  return getData;
 };

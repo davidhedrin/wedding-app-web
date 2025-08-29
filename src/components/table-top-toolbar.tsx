@@ -18,7 +18,7 @@ type TableTopToolbarProps = {
   setInputSearch?: Dispatch<SetStateAction<string>>;
   fatchData?: (page?: number) => Promise<void>;
 
-  modalId?: string;
+  openModal?: (id?: number) => Promise<void>;
   dateRange?: DateRange | undefined;
   setDateRange?: (date: DateRange | undefined) => void;
 };
@@ -34,7 +34,7 @@ export default function TableTopToolbar({
   setInputSearch,
   fatchData,
 
-  modalId,
+  openModal,
   dateRange,
   setDateRange,
 }: TableTopToolbarProps) {
@@ -95,7 +95,7 @@ export default function TableTopToolbar({
             </div>
           }
           {
-            modalId && <button id={`btn-${modalId}`} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalId} data-hs-overlay={`#${modalId}`}>
+            openModal && <button onClick={() => openModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
               <i className='bx bx-plus-circle text-lg'></i> New
             </button>
           }

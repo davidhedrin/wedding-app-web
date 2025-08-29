@@ -40,3 +40,10 @@ export type PaginateResult<T> = {
     totalPages: number;
   };
 };
+
+export type UploadFileRespons = {
+  status: boolean;
+  message: string | null;
+  filename: string | null;
+  path: string | null;
+};

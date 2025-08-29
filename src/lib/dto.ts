@@ -31,6 +31,7 @@ export type DtoUser = {
   gender: string | null;
   birth_date: Date | null;
   birth_place: string | null;
+  img_name: string | null;
   img_url: string | null;
   file_img: File | null;
 };

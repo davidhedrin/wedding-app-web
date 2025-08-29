@@ -13,9 +13,9 @@ export default function ResetPassword({ url }: ResetPasswordProps) {
       <Head />
       <Body style={{ backgroundColor: '#f9f9f9', fontFamily: 'Arial, sans-serif', paddingRight: '0px', paddingLeft: '0px', color: '#333' }}>
         <Container style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-          <Section style={{ textAlign: 'center' }}>
+          <Section style={{ textAlign: 'center', marginBottom: '15px' }}>
             {/* Image Here */}
-            <img width={140} src='https://chatgpt.com/backend-api/public_content/enc/eyJpZCI6Im1fNjg5YzIxNmZhZWUwODE5MWIzYjA3NDBkYmExMWQxYmU6ZmlsZV8wMDAwMDAwMDg4MWM2MWY2OTkyNjVkN2Q2MzI3MWU5MyIsInRzIjoiNDg3Njg0IiwicCI6InB5aSIsInNpZyI6IjBjMGY0ZDQ1NGE4MzIwZTFiZTI4NmM3ZjVhNTczYWRmYmJjNjY3MmUxYjEyNWQzNjhlZWI3N2ZhNGFkMmZiZGEiLCJ2IjoiMCIsImdpem1vX2lkIjpudWxsfQ==' />
+            <img height={30} src='https://i.postimg.cc/RFZ5cYCY/wedlyvite-landscape.png' />
             {/* <Text style={{ fontSize: '20px', fontWeight: 'bold', color: '#0070f3', marginTop: '0px' }}>{appName}</Text> */}
           </Section>
 

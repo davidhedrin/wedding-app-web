@@ -10,9 +10,10 @@ import Input from '@/components/ui/input';
 import Select from '@/components/ui/select';
 import { ZodErrors } from '@/components/zod-errors';
 import Configs from '@/lib/config';
+import { DtoUser } from '@/lib/dto';
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
 import { formatDate, modalAction, normalizeSelectObj, roleLabels, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
-import { GetDataUser } from '@/server/systems/user-manage';
+import { GetDataUser, GetDataUserById, UpdateDataUser } from '@/server/systems/user-manage';
 import { RolesEnum, User } from '@prisma/client';
 import React, { useEffect, useState } from 'react'
 import z from 'zod';
@@ -114,6 +115,7 @@ export default function Page() {
   const [isActive, setIsActive] = useState("");
   const [txtRole, setTxtRole] = useState("");
   const [txtPhone, setTxtPhone] = useState("");
+  const [txtGender, setTxtGender] = useState("");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [txtBirthPlace, setTxtBirthPlace] = useState("");
   const [filePP, setFilePP] = useState<File | null>(null);
@@ -160,9 +162,61 @@ export default function Page() {
     setFilePP(null);
   };
 
-  const FormSchemaAddEditPersonalInfo = z.object({
+  const createDtoUser = (): DtoUser => {
+    const newData: DtoUser = {
+      id: addEditId,
+      email: txtEmail,
+      fullname: txtName,
+      role: txtRole as RolesEnum,
+      no_phone: txtPhone,
+      gender: txtGender,
+      birth_date: birthDate,
+      birth_place: txtBirthPlace,
+      img_url: urlPrevPP || null,
+      file_img: filePP,
+
+      img_name: null,
+      is_active: isActive === "true" ? true : false,
+    };
+    return newData;
+  };
+
+  const openModalAddEdit = async (id?: number) => {
+    if (id) {
+      setLoading(true);
+      const data = await GetDataUserById(id);
+      if (data) {
+        setAddEditId(data.id);
+        setIsActive(data.is_active != null ? data.is_active.toString() : "");
+        setTxtEmail(data.email || "");
+        setTxtName(data.fullname || "");
+        setTxtRole(data.role);
+        setTxtPhone(data.no_phone || "");
+        setTxtGender(data.gender || "");
+        setBirthDate(data.birth_date);
+        setTxtBirthPlace(data.birth_place || "");
+        setUrlPrevPP(data.image_path || undefined);
+        setFilePP(null);
+      }
+      setLoading(false);
+    } else {
+      setAddEditId(null);
+      setIsActive("");
+      setTxtEmail("");
+      setTxtName("");
+      setTxtRole("");
+      setTxtPhone("");
+      setTxtGender("");
+      setBirthDate(null);
+      setTxtBirthPlace("");
+      setFilePP(null);
+      setUrlPrevPP(undefined);
+    }
+    setStateFormAddEdit({ success: true, errors: {} });
+    modalAction(`btn-${modalAddEdit}`);
+  };
+  const FormSchemaAddEdit = z.object({
     is_active: z.string().min(1, { message: 'Status is required field.' }).trim(),
-    email: z.string().email({ message: 'Please enter a valid email.' }).trim(),
     fullname: z.string().min(1, { message: 'Fullname required field.' }).trim(),
     role: z.string().min(1, { message: 'User role is required field.' }).trim(),
   });
@@ -170,8 +224,17 @@ export default function Page() {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    let formSchame = FormSchemaAddEdit;
+    if(addEditId === null){
+      const newFormSchame = FormSchemaAddEdit.extend({
+        email: z.string().email({ message: 'Please enter a valid email.' }).trim()
+      });
+      formSchame = newFormSchame;
+    }
+
     const data = Object.fromEntries(formData);
-    const valResult = FormSchemaAddEditPersonalInfo.safeParse(data);
+    const valResult = formSchame.safeParse(data);
     if (!valResult.success) {
       setStateFormAddEdit({
         success: false,
@@ -194,16 +257,15 @@ export default function Page() {
       return;
     }
 
+    setLoading(true);
     try {
-      // await UpdateUserPersonalInfo(createDtoDataPersonalInfo());
+      await UpdateDataUser(createDtoUser());
       await fatchDatas();
       toast({
         type: "success",
         title: "Submit successfully",
         message: "Your submission has been successfully completed"
       });
-
-      modalAction(btnCloseModal);
     } catch (error: any) {
       toast({
         type: "warning",
@@ -212,6 +274,7 @@ export default function Page() {
       });
       modalAction(`btn-${modalAddEdit}`);
     }
+    setLoading(false);
   };
 
   return (
@@ -241,7 +304,7 @@ export default function Page() {
               setInputSearch={setInputSearch}
               fatchData={() => fatchDatas(pageTable)}
 
-              modalId={modalAddEdit}
+              // openModal={openModalAddEdit}
             />
 
             <div className="flex flex-col pt-5 pb-4 px-1.5">
@@ -278,7 +341,7 @@ export default function Page() {
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
-                                <i className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
+                                <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
                                 <i className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>
                             </tr>
@@ -319,6 +382,9 @@ export default function Page() {
         </div>
       </div>
 
+      <button id={`btn-${modalAddEdit}`} type="button" className="hidden" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`}>
+        <i className='bx bx-plus-circle text-lg'></i> New
+      </button>
       <UiPortal>
         <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-lg hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
@@ -380,7 +446,7 @@ export default function Page() {
                       {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
                     </div>
                     <div>
-                      <Input value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
+                      <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
                       {stateFormAddEdit.errors?.email && <ZodErrors err={stateFormAddEdit.errors?.email} />}
                     </div>
                     <div>
@@ -388,20 +454,20 @@ export default function Page() {
                       {stateFormAddEdit.errors?.fullname && <ZodErrors err={stateFormAddEdit.errors?.fullname} />}
                     </div>
                     <div>
-                      <Select className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
+                      <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
                         options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
                       />
                       {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
                     </div>
                     <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
-                    <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
+                    <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
                       options={[
                         { label: "Male", value: "Male" },
                         { label: "Female", value: "Female" },
                         { label: "Other", value: "Other" },
                       ]}
                     />
-                    <DatePicker mode='single' value={birthDate as Date} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
+                    <DatePicker mode='single' value={birthDate || undefined} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
                     <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
                   </div>
                 </div>
