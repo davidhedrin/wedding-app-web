@@ -26,7 +26,7 @@ export default function Input({ label, prefixIcon, mandatory, className, type, .
         {...props}
       />
       {
-        prefixIcon && <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
+        prefixIcon && <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
           {prefixIcon}
         </div>
       }
