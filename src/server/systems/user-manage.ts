@@ -87,3 +87,21 @@ export async function GetDataUserById(id: number): Promise<User | null> {
   });
   return getData;
 };
+
+export async function DeleteDataUser(id: number) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.user.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: user?.email
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

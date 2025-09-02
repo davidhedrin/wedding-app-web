@@ -13,7 +13,7 @@ import Configs from '@/lib/config';
 import { DtoUser } from '@/lib/dto';
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
 import { formatDate, modalAction, normalizeSelectObj, roleLabels, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
-import { GetDataUser, GetDataUserById, UpdateDataUser } from '@/server/systems/user-manage';
+import { DeleteDataUser, GetDataUser, GetDataUserById, UpdateDataUser } from '@/server/systems/user-manage';
 import { RolesEnum, User } from '@prisma/client';
 import React, { useEffect, useState } from 'react'
 import z from 'zod';
@@ -226,7 +226,7 @@ export default function Page() {
     const formData = new FormData(form);
 
     let formSchame = FormSchemaAddEdit;
-    if(addEditId === null){
+    if (addEditId === null) {
       const newFormSchame = FormSchemaAddEdit.extend({
         email: z.string().email({ message: 'Please enter a valid email.' }).trim()
       });
@@ -273,6 +273,35 @@ export default function Page() {
         message: error.message
       });
       modalAction(`btn-${modalAddEdit}`);
+    }
+    setLoading(false);
+  };
+
+  const deleteRow = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataUser(id);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
     }
     setLoading(false);
   };
@@ -342,7 +371,7 @@ export default function Page() {
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
                                 <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
-                                <i className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                                <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>
                             </tr>
                           ))
@@ -387,8 +416,8 @@ export default function Page() {
       </button>
       <UiPortal>
         <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
-          <div className="sm:max-w-lg hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:w-full m-3 sm:mx-auto min-h-[calc(100%-56px)] flex items-center">
-            <div className="w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+          <div className="sm:max-w-lg hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
                 <div className="flex items-center gap-1 text-sm">
                   <i className='bx bx-user-pin text-lg'></i> {addEditId ? "Edit" : "Add"} User
@@ -401,92 +430,90 @@ export default function Page() {
                   </svg>
                 </button>
               </div>
-              <form onSubmit={handleSubmitForm}>
-                <div className="py-3 px-4">
-                  <div className="flex items-center justify-between gap-4 py-2 px-3 border border-gray-200 rounded-xl bg-white shadow-sm mb-3">
-                    <div className="flex flex-col gap-1.5 text-sm w-full sm:w-auto">
-                      <div>
-                        <h3 className="font-medium text-gray-900 text-sm">Upload profile picture</h3>
-                        <p className="text-gray-500 text-xs">
-                          Allow file type JPG, JPEG or PNG. Max file size {Configs.maxSizePictureInMB}MB
-                        </p>
-                      </div>
-                      <div className='flex gap-2 items-center'>
-                        <label className="inline-block">
-                          <Input onChange={handleFileProfilePictureChange} type="file" accept=".jpg,.jpeg,.png" className="sr-only" />
-                          <span className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                            {(filePP !== null || urlPrevPP) ? "Change" : "Choose"} File
-                          </span>
-                        </label>
-                        {
-                          (filePP !== null || urlPrevPP) && <button onClick={() => handleRemoveProfilePicture()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-red-200 focus:outline-hidden focus:bg-red-200 disabled:opacity-50 disabled:pointer-events-none">
-                            <i className='bx bx-trash text-lg'></i>
-                          </button>
-                        }
-                      </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="flex items-center justify-between gap-4 py-2 px-3 border border-gray-200 rounded-xl bg-white shadow-sm mb-3">
+                  <div className="flex flex-col gap-1.5 text-sm w-full sm:w-auto">
+                    <div>
+                      <h3 className="font-medium text-gray-900 text-sm">Upload profile picture</h3>
+                      <p className="text-gray-500 text-xs">
+                        Allow file type JPG, JPEG or PNG. Max file size {Configs.maxSizePictureInMB}MB
+                      </p>
                     </div>
-
-                    <div className="flex-shrink-0">
-                      <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                        {
-                          urlPrevPP !== undefined && urlPrevPP !== null ? <img src={urlPrevPP} alt="profile" /> : <i className="bx bx-user text-2xl text-gray-500" />
-                        }
-                      </div>
+                    <div className='flex gap-2 items-center'>
+                      <label className="inline-block">
+                        <Input onChange={handleFileProfilePictureChange} type="file" accept=".jpg,.jpeg,.png" className="sr-only" />
+                        <span className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
+                          {(filePP !== null || urlPrevPP) ? "Change" : "Choose"} File
+                        </span>
+                      </label>
+                      {
+                        (filePP !== null || urlPrevPP) && <button onClick={() => handleRemoveProfilePicture()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-red-200 focus:outline-hidden focus:bg-red-200 disabled:opacity-50 disabled:pointer-events-none">
+                          <i className='bx bx-trash text-lg'></i>
+                        </button>
+                      }
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
-                    <div>
-                      <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select user status' mandatory
-                        options={[
-                          { label: "Active", value: "true" },
-                          { label: "Inactive", value: "false" },
-                        ]}
-                      />
-                      {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
+                  <div className="flex-shrink-0">
+                    <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                      {
+                        urlPrevPP !== undefined && urlPrevPP !== null ? <img src={urlPrevPP} alt="profile" /> : <i className="bx bx-user text-2xl text-gray-500" />
+                      }
                     </div>
-                    <div>
-                      <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
-                      {stateFormAddEdit.errors?.email && <ZodErrors err={stateFormAddEdit.errors?.email} />}
-                    </div>
-                    <div>
-                      <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' mandatory />
-                      {stateFormAddEdit.errors?.fullname && <ZodErrors err={stateFormAddEdit.errors?.fullname} />}
-                    </div>
-                    <div>
-                      <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
-                        options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
-                      />
-                      {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
-                    </div>
-                    <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
-                    <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
+                  <div>
+                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select user status' mandatory
                       options={[
-                        { label: "Male", value: "Male" },
-                        { label: "Female", value: "Female" },
-                        { label: "Other", value: "Other" },
+                        { label: "Active", value: "true" },
+                        { label: "Inactive", value: "false" },
                       ]}
                     />
-                    <DatePicker mode='single' value={birthDate || undefined} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
-                    <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
+                    {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
                   </div>
+                  <div>
+                    <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
+                    {stateFormAddEdit.errors?.email && <ZodErrors err={stateFormAddEdit.errors?.email} />}
+                  </div>
+                  <div>
+                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' mandatory />
+                    {stateFormAddEdit.errors?.fullname && <ZodErrors err={stateFormAddEdit.errors?.fullname} />}
+                  </div>
+                  <div>
+                    <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
+                      options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
+                    />
+                    {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
+                  </div>
+                  <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
+                  <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
+                    options={[
+                      { label: "Male", value: "Male" },
+                      { label: "Female", value: "Female" },
+                      { label: "Other", value: "Other" },
+                    ]}
+                  />
+                  <DatePicker mode='single' value={birthDate || undefined} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
+                  <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
-                  <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
-                    <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
-                    <p>Randomly password well be send to user email.</p>
-                  </div>
-                  <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
-                    <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
-                      Close
-                    </button>
-                    <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                      Submit
-                    </button>
-                  </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                  <p>Randomly password well be send to user email.</p>
                 </div>
-              </form>
-            </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </UiPortal>
