@@ -13,6 +13,7 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
   const pathname = usePathname();
   const isAdminLayout = pathname.startsWith('/client');
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/not-found';
+  const isTemplate = pathname.startsWith('/templates');
 
   const { fetchuserData } = userLoginData();
   const { data, status } = useSession();
@@ -30,8 +31,8 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
 
   return (
     <>
-      {
-        isAdminLayout ? <div className="overflow-hidden">
+      { // Must be admin layout
+        isAdminLayout && <div className="overflow-hidden">
           <MainHeader />
           <main className="lg:hs-overlay-layout-open:ps-60 transition-all duration-300 lg:fixed lg:inset-0 pt-13 px-3 pb-3">
             <MainSidebar />
@@ -39,7 +40,17 @@ export default function LayoutWraper({ children }: Readonly<{ children: React.Re
               {children}
             </div>
           </main>
-        </div> : <>
+        </div>
+      }
+
+      { // Must be catalog template layout
+        isTemplate && <div>
+          {children}
+        </div>
+      }
+
+      { // Must be not admin and not catalog template for landing page layout
+        !isAdminLayout && !isTemplate && <>
           {
             !isAuthPage && <>
               <AppHeader />

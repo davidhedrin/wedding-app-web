@@ -1,3 +1,6 @@
+import { CategoryKeyProps } from "./model-types";
+import categoryKeys from "@/json/template-key.json";
+
 const Configs = {
   app_name: "Wedlyvite",
   base_url: "http://localhost:3005",
@@ -16,3 +19,5 @@ const Configs = {
   toastDuration: 4000 // In second
 };
 export default Configs;
+
+export const CategoryKeys: CategoryKeyProps[] = categoryKeys;

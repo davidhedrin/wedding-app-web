@@ -355,7 +355,7 @@ export default function Page() {
                       <tbody className="divide-y divide-gray-200">
                         {
                           datas.map((data, i) => (
-                            <tr key={data.id} className="hover:bg-gray-100 dark:hover:bg-neutral-700">
+                            <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
                               <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
 
                               {'fullname' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.fullname}</td>}
@@ -502,7 +502,6 @@ export default function Page() {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
                 <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
                   <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
-                  <p>Randomly password well be send to user email.</p>
                 </div>
                 <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
                   <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>

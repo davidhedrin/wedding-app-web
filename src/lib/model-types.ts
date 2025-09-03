@@ -47,3 +47,9 @@ export type UploadFileRespons = {
   filename: string | null;
   path: string | null;
 };
+
+export type CategoryKeyProps = {
+  key: string;
+  name: string;
+  status: boolean;
+};

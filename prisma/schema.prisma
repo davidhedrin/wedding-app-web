@@ -67,3 +67,26 @@ model PasswordResetToken {
   createAt DateTime? @default(now())
   usingAt  DateTime?
 }
+
+model Templates {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique
+  name       String
+  price      Int
+  disc_price Int?
+  short_desc String?
+  desc       String?
+  ctg_key    String?
+  ctg_name   String?
+  url        String
+  flag_name  String?
+  flag_color String?
+  is_active  Boolean? @default(true)
+
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+}
