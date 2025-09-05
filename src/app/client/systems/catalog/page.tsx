@@ -8,13 +8,16 @@ import TableTopToolbar from '@/components/table-top-toolbar';
 import UiPortal from '@/components/ui-portal';
 import Input from '@/components/ui/input';
 import Select from '@/components/ui/select';
+import { ZodErrors } from '@/components/zod-errors';
 import Configs, { CategoryKeys } from '@/lib/config';
+import { DtoCaptureTemplate, DtoTemplates } from '@/lib/dto';
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
-import { formatDate, modalAction, normalizeSelectObj, sortListToOrderBy, toast } from '@/lib/utils';
-import { GetDataTemplates } from '@/server/systems/catalog';
+import { formatDate, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
+import { DeleteDataTemplates, GetDataTemplates, GetDataTemplatesById, StoreUpdateDataTemplates } from '@/server/systems/catalog';
 import { Templates } from '@prisma/client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react'
+import z from 'zod';
 
 export default function Page() {
   const listBr: BreadcrumbType[] = [
@@ -111,7 +114,18 @@ export default function Page() {
   const [stateFormAddEdit, setStateFormAddEdit] = useState<FormState>({ success: false, errors: {} });
   const [addEditId, setAddEditId] = useState<number | null>(null);
 
-  const [filesCapture, setFilesCapture] = useState<File[]>([]);
+  const [txtName, setTxtName] = useState("");
+  const [txtCategory, setTxtCategory] = useState("");
+  const [txtPrice, setTxtPrice] = useState("");
+  const [txtDiscPrice, setTxtDiscPrice] = useState("");
+  const [txtFlagName, setTxtFlagName] = useState("");
+  const [txtFlagColor, setTxtFlagColor] = useState("");
+  const [txtShortDesc, setTxtShortDesc] = useState("");
+  const [txtDesc, setTxtDesc] = useState<string | undefined>();
+  const [txtPrevUrl, setTxtPrevUrl] = useState("");
+  const [isActive, setIsActive] = useState("");
+
+  const [filesCapture, setFilesCapture] = useState<DtoCaptureTemplate[]>([]);
   const handleFileCaptureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -155,7 +169,8 @@ export default function Page() {
         message: message
       });
 
-      setFilesCapture((prevFiles) => [...prevFiles, ...validFiles]);
+      const setFiles = validFiles.map((x, i) => ({ id: null, file: x, file_name: null, file_path: null, idx: i }));
+      setFilesCapture((prevFiles) => [...prevFiles, ...setFiles]);
     }
   };
   const handleRemoveImageCapture = (index: number) => {
@@ -180,42 +195,152 @@ export default function Page() {
     e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
   };
 
+  const createDtoData = (): DtoTemplates => {
+    const newData: DtoTemplates = {
+      id: addEditId,
+      name: txtName,
+      price: parseFromIDR(txtPrice),
+      disc_price: parseFromIDR(txtDiscPrice),
+      short_desc: txtShortDesc.trim() != "" ? txtShortDesc : null,
+      desc: txtDesc ?? null,
+      ctg_key: txtCategory.trim() != "" ? txtCategory : null,
+      url: txtPrevUrl,
+      flag_name: txtFlagName.trim() != "" ? txtFlagName : null,
+      flag_color: txtFlagColor.trim() != "" ? txtFlagColor : null,
+
+      is_active: isActive === "true" ? true : false,
+      captures: filesCapture,
+    };
+    return newData;
+  };
+
   const openModalAddEdit = async (id?: number) => {
     if (id) {
-      // setLoading(true);
-      // const data = await GetDataUserById(id);
-      // if (data) {
-      //   setAddEditId(data.id);
-      //   setIsActive(data.is_active != null ? data.is_active.toString() : "");
-      //   setTxtEmail(data.email || "");
-      //   setTxtName(data.fullname || "");
-      //   setTxtRole(data.role);
-      //   setTxtPhone(data.no_phone || "");
-      //   setTxtGender(data.gender || "");
-      //   setBirthDate(data.birth_date);
-      //   setTxtBirthPlace(data.birth_place || "");
-      //   setUrlPrevPP(data.image_path || undefined);
-      //   setFilePP(null);
-      // }
-      // setLoading(false);
+      setLoading(true);
+      const data = await GetDataTemplatesById(id);
+      if (data) {
+        setAddEditId(data.id);
+        setIsActive(data.is_active != null ? data.is_active.toString() : "");
+        setTxtName(data.name);
+        setTxtCategory(data.ctg_key || "");
+        setTxtPrice(data.price ? data.price.toLocaleString('id-ID') : "");
+        setTxtDiscPrice(data.disc_price ? data.disc_price.toLocaleString('id-ID') : "");
+        setTxtFlagName(data.flag_name || "");
+        setTxtFlagColor(data.flag_color || "");
+        setTxtShortDesc(data.short_desc || "");
+        setTxtPrevUrl(data.url);
+        setTxtDesc(data.desc || undefined);
+
+        const setCaptures: DtoCaptureTemplate[] = data.captures.map((x, i) => ({
+          id: x.id, file: null, file_name: x.file_name, file_path: x.file_path, idx: i
+        }));
+        setFilesCapture(setCaptures);
+      }
+      setLoading(false);
     } else {
-      // setAddEditId(null);
-      // setIsActive("");
-      // setTxtEmail("");
-      // setTxtName("");
-      // setTxtRole("");
-      // setTxtPhone("");
-      // setTxtGender("");
-      // setBirthDate(null);
-      // setTxtBirthPlace("");
-      // setFilePP(null);
-      // setUrlPrevPP(undefined);
+      setAddEditId(null);
+      setIsActive("");
+      setTxtName("");
+      setTxtCategory("");
+      setTxtPrice("");
+      setTxtDiscPrice("");
+      setTxtFlagName("");
+      setTxtFlagColor("");
+      setTxtShortDesc("");
+      setTxtPrevUrl("");
+      setTxtDesc(undefined);
+      setFilesCapture([]);
     }
     setStateFormAddEdit({ success: true, errors: {} });
     modalAction(`btn-${modalAddEdit}`);
   };
 
+  const FormSchemaAddEdit = z.object({
+    is_active: z.string().min(1, { message: 'Status is required field.' }).trim(),
+    name: z.string().min(1, { message: 'Template name required field.' }).trim(),
+    category: z.string().min(1, { message: 'Category required field.' }).trim(),
+    price: z.string().min(1, { message: 'Price required field.' }).trim(),
+    url_preview: z.string().min(1, { message: 'URL preview required field.' }).trim(),
+    preview_capture: z.string().min(1, { message: 'At least one preview capture is required.' }).trim(),
+  });
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    formData.append("preview_capture", "");
+    if (filesCapture.length > 0) formData.append("preview_capture", filesCapture.length.toString());
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaAddEdit.safeParse(data);
+    if (!valResult.success) {
+      setStateFormAddEdit({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormAddEdit({ success: true, errors: {} });
+
+    modalAction(btnCloseModal);
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) {
+      modalAction(`btn-${modalAddEdit}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await StoreUpdateDataTemplates(createDtoData());
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      modalAction(`btn-${modalAddEdit}`);
+    }
+    setLoading(false);
+  };
+
+  const deleteRow = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataTemplates(id);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -277,7 +402,7 @@ export default function Page() {
                               {'price' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {(data.price - (data.disc_price ?? 0)).toLocaleString('id-ID')}</td>}
                               {'ctg_name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.ctg_name || "-"}</td>}
                               {'url' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                                <Link href={data.url} target='_blank'>{data.url}</Link>
+                                <Link href={`${Configs.base_url}/${data.url}`} target='_blank'>{data.url}</Link>
                               </td>}
                               {
                                 'is_active' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.is_active === true ? "text-green-600" : "text-red-600"}`}>
@@ -287,8 +412,8 @@ export default function Page() {
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
-                                <i className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
-                                <i className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                                <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
+                                <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>
                             </tr>
                           ))
@@ -351,41 +476,13 @@ export default function Page() {
                 </button>
               </div>
               <div className="py-3 px-4 overflow-y-auto">
-                {/* <div className="flex items-center justify-between gap-4 py-2 px-3 border border-gray-200 rounded-xl bg-white shadow-sm mb-3">
-                  <div className="flex flex-col gap-1.5 text-sm w-full sm:w-auto">
-                    <div>
-                      <h3 className="font-medium text-gray-900 text-sm">Upload profile picture</h3>
-                      <p className="text-gray-500 text-xs">
-                        Allow file type JPG, JPEG or PNG. Max file size {Configs.maxSizePictureInMB}MB
-                      </p>
-                    </div>
-                    <div className='flex gap-2 items-center'>
-                      <label className="inline-block">
-                        <Input onChange={handleFileProfilePictureChange} type="file" accept=".jpg,.jpeg,.png" className="sr-only" />
-                        <span className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                          {(filePP !== null || urlPrevPP) ? "Change" : "Choose"} File
-                        </span>
-                      </label>
-                      {
-                        (filePP !== null || urlPrevPP) && <button onClick={() => handleRemoveProfilePicture()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-red-200 focus:outline-hidden focus:bg-red-200 disabled:opacity-50 disabled:pointer-events-none">
-                          <i className='bx bx-trash text-lg'></i>
-                        </button>
-                      }
-                    </div>
+                <div className="grid grid-cols-12 gap-3">
+                  <div className='col-span-12'>
+                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='name' label='Name' placeholder='Enter template name' mandatory />
+                    {stateFormAddEdit.errors?.name && <ZodErrors err={stateFormAddEdit.errors?.name} />}
                   </div>
-
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                      {
-                        urlPrevPP !== undefined && urlPrevPP !== null ? <img src={urlPrevPP} alt="profile" /> : <i className="bx bx-user text-2xl text-gray-500" />
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
-                  <div>
-                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select user status' mandatory
+                  <div className='col-span-12 md:col-span-6'>
+                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select template status' mandatory
                       options={[
                         { label: "Active", value: "true" },
                         { label: "Inactive", value: "false" },
@@ -393,60 +490,24 @@ export default function Page() {
                     />
                     {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
                   </div>
-                  <div>
-                    <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
-                    {stateFormAddEdit.errors?.email && <ZodErrors err={stateFormAddEdit.errors?.email} />}
-                  </div>
-                  <div>
-                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' mandatory />
-                    {stateFormAddEdit.errors?.fullname && <ZodErrors err={stateFormAddEdit.errors?.fullname} />}
-                  </div>
-                  <div>
-                    <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
-                      options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
-                    />
-                    {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
-                  </div>
-                  <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
-                  <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
-                    options={[
-                      { label: "Male", value: "Male" },
-                      { label: "Female", value: "Female" },
-                      { label: "Other", value: "Other" },
-                    ]}
-                  />
-                  <DatePicker mode='single' value={birthDate || undefined} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
-                  <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
-                </div> */}
-                <div className="grid grid-cols-12 gap-3">
-                  <div className='col-span-12'>
-                    <Input type='text' className='py-1.5' id='name' label='Name' placeholder='Enter template name' mandatory />
-                  </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Select className='py-1.5' id='is_active' label='Status' placeholder='Select template status' mandatory
-                      options={[
-                        { label: "Active", value: "true" },
-                        { label: "Inactive", value: "false" },
-                      ]}
-                    />
-                    {/* {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />} */}
-                  </div>
-                  <div className='col-span-12 md:col-span-6'>
-                    <Select className='py-1.5' id='category' label='Category' placeholder='Select template category' mandatory
+                    <Select value={txtCategory} onChange={(e) => setTxtCategory(e.target.value)} className='py-1.5' id='category' label='Category' placeholder='Select template category' mandatory
                       options={categoryTemplate.map(x => ({ label: x.name, value: x.key }))}
                     />
+                    {stateFormAddEdit.errors?.category && <ZodErrors err={stateFormAddEdit.errors?.category} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input type='text' className='py-1.5' id='price' label='Price' placeholder='Enter template price' mandatory />
+                    <Input value={txtPrice} onChange={(e) => setTxtPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='py-1.5 input-no-spinner' id='price' label='Price' placeholder='Enter template price' mandatory />
+                    {stateFormAddEdit.errors?.price && <ZodErrors err={stateFormAddEdit.errors?.price} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input type='text' className='py-1.5' id='disc_price' label='Discount' placeholder='Enter discount price' />
+                    <Input value={txtDiscPrice} onChange={(e) => setTxtDiscPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='py-1.5 input-no-spinner' id='disc_price' label='Discount' placeholder='Enter discount price' />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input type='text' className='py-1.5' id='flag_name' label='Flag Name' placeholder='Enter flag information' />
+                    <Input value={txtFlagName} onChange={(e) => setTxtFlagName(e.target.value)} type='text' className='py-1.5' id='flag_name' label='Flag Name' placeholder='Enter flag information' />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Select className='py-1.5' id='flag_color' label='Flag Color' placeholder='Select flag color'
+                    <Select value={txtFlagColor} onChange={(e) => setTxtFlagColor(e.target.value)} className='py-1.5' id='flag_color' label='Flag Color' placeholder='Select flag color'
                       options={[
                         { label: "Success", value: "success" },
                         { label: "Warning", value: "warning" },
@@ -457,10 +518,14 @@ export default function Page() {
                     />
                   </div>
                   <div className='col-span-12'>
-                    <Input type='text' className='py-1.5' id='short_desc' label='Short Desc' placeholder='Enter short descripion if any' />
+                    <Input value={txtPrevUrl} onChange={(e) => setTxtPrevUrl(e.target.value)} prefixGroup={<span>{Configs.base_url + "/"}</span>} type='text' className='py-1.5' id='url_preview' label='Preview URL' placeholder='Enter preview url template' mandatory />
+                    {stateFormAddEdit.errors?.url_preview && <ZodErrors err={stateFormAddEdit.errors?.url_preview} />}
                   </div>
                   <div className='col-span-12'>
-                    <Tiptap label='Description' placeholder="Enter template description if any" className="min-h-24" />
+                    <Input value={txtShortDesc} onChange={(e) => setTxtShortDesc(e.target.value)} type='text' className='py-1.5' id='short_desc' label='Short Desc' placeholder='Enter short descripion if any' />
+                  </div>
+                  <div className='col-span-12'>
+                    <Tiptap content={txtDesc || ""} setContent={setTxtDesc} label='Description' placeholder="Enter template description if any" className="min-h-24" />
                   </div>
                   <div className='col-span-12'>
                     <label className="block text-sm font-medium mb-1 dark:text-white">
@@ -469,10 +534,10 @@ export default function Page() {
                     </label>
 
                     <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture}>
-                      <label htmlFor="file-upload" className="cursor-pointer px-6 py-4 flex justify-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl" data-hs-file-upload-trigger="">
+                      <label htmlFor="file-upload" className="cursor-pointer px-6 py-3 flex justify-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl" data-hs-file-upload-trigger="">
                         <div className="text-center">
                           <span className="inline-flex justify-center items-center">
-                            <svg className="shrink-0 w-12 h-auto" width="71" height="51" viewBox="0 0 71 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="shrink-0 w-11 h-auto" width="71" height="51" viewBox="0 0 71 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M6.55172 8.74547L17.7131 6.88524V40.7377L12.8018 41.7717C9.51306 42.464 6.29705 40.3203 5.67081 37.0184L1.64319 15.7818C1.01599 12.4748 3.23148 9.29884 6.55172 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
                               <path d="M64.4483 8.74547L53.2869 6.88524V40.7377L58.1982 41.7717C61.4869 42.464 64.703 40.3203 65.3292 37.0184L69.3568 15.7818C69.984 12.4748 67.7685 9.29884 64.4483 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
                               <g filter="url(#filter4)">
@@ -506,24 +571,37 @@ export default function Page() {
                     </div>
 
                     {/* Showing all file selected */}
-                    <div className="image-preview-grid grid grid-cols-2 gap-4 mt-3 md:grid-cols-4">
-                      {filesCapture.map((file, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Preview ${index}`}
-                            className="w-full h-24 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImageCapture(index)}
-                            className="leading-none absolute top-1 right-1 text-white bg-red-500 hover:bg-red-600 rounded-full px-1 h-6"
-                          >
-                            <i className="bx bx-x"></i>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    {
+                      filesCapture.length > 0 && <div className="image-preview-grid grid grid-cols-2 gap-4 mt-2 md:grid-cols-4">
+                        {filesCapture.map((x, index) => (
+                          (x.file || x.file_path) && <div key={index} className="relative border border-gray-300 rounded-lg">
+                            {
+                              x.file && <img
+                                src={URL.createObjectURL(x.file)}
+                                alt={`Preview ${index}`}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
+                            }
+                            {
+                              x.file_path && <img
+                                src={x.file_path}
+                                alt={`Preview ${index}`}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
+                            }
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImageCapture(index)}
+                              className="leading-none absolute top-1 right-1 text-white bg-red-500 hover:bg-red-600 rounded-full px-1 h-6"
+                            >
+                              <i className="bx bx-x"></i>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    }
+                    {stateFormAddEdit.errors?.preview_capture && <ZodErrors err={stateFormAddEdit.errors?.preview_capture} />}
                   </div>
                 </div>
               </div>

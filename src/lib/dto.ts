@@ -35,3 +35,27 @@ export type DtoUser = {
   img_url: string | null;
   file_img: File | null;
 };
+
+export type DtoTemplates = {
+  id: number | null;
+  name: string;
+  price: number;
+  disc_price: number | null;
+  short_desc: string | null;
+  desc: string | null;
+  ctg_key: string | null;
+  url: string;
+  flag_name: string | null;
+  flag_color: string | null;
+  is_active: boolean | null;
+
+  captures: DtoCaptureTemplate[];
+};
+
+export type DtoCaptureTemplate = {
+  id: number | null;
+  file: File | null;
+  file_name: string | null;
+  file_path: string | null;
+  idx: number;
+}

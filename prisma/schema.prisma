@@ -89,4 +89,16 @@ model Templates {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
+
+  captures TemplateCaptures[]
+}
+
+model TemplateCaptures {
+  id        Int     @id @default(autoincrement())
+  tmp_id    Int
+  index     Int
+  file_name String
+  file_path String
+
+  template Templates @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
 }

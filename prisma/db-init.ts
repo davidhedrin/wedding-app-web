@@ -1,43 +1,53 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
-// SoftDelete
+// Soft Delete
+const softModels = ['User', 'Templates'];
 const extendedPrisma = new PrismaClient().$extends({
   query: {
     $allModels: {
-      async findUnique({ model, args, query }: { model: Prisma.ModelName; args: Prisma.UserFindUniqueArgs; query: (args: any) => any }) {
-        return query(softDeleteHandler(model, args));
-      },
-      async findFirst({ model, args, query }: { model: Prisma.ModelName; args: Prisma.UserFindFirstArgs; query: (args: any) => any }) {
-        return query(softDeleteHandler(model, args));
-      },
-      async findMany({ model, args, query }: { model: Prisma.ModelName; args: Prisma.UserFindManyArgs; query: (args: any) => any }) {
-        return query(softDeleteHandler(model, args));
+      async $allOperations({ model, operation, args, query }) {
+        if (!model || !softModels.includes(model)) return query(args);
+        const a = args as any;
+
+        // --- Query filter default (hanya ambil deletedAt = null) ---
+        const opsNeedingWhere = [
+          "findMany",
+          "findFirst",
+          "count",
+          "aggregate",
+          "groupBy",
+        ];
+
+        if (opsNeedingWhere.includes(operation)) {
+          const where = a.where ?? {};
+          if (where.deletedAt === undefined) {
+            a.where = { ...where, deletedAt: null };
+          }
+          return query(a);
+        }
+
+        if (operation === "findUnique") {
+          const where = a.where ?? {};
+          const hasField = Object.prototype.hasOwnProperty.call(where, "deletedAt");
+          a.where = hasField ? where : { ...where, deletedAt: null };
+          return query(a);
+        }
+
+        return query(args);
       },
     },
   },
 });
-const softDeleteModels = ['User',];
-function softDeleteHandler(model: string, args: any) {
-  if (softDeleteModels.includes(model)) {
-    if (!args.where) args.where = {};
-    if (args.where.deletedAt === undefined) {
-      args.where.deletedAt = null;
-    }
-  }
-  return args;
-};
-// End SoftDelete
+// End Soft Delete
 
-const globalForPrisma = global as unknown as {
-  prisma: typeof extendedPrisma;
-};
+const globalForPrisma = global as unknown as { prisma: typeof extendedPrisma };
 let prisma: typeof extendedPrisma;
 
-if (!globalForPrisma.prisma) {
+if(!globalForPrisma.prisma) {
   prisma = extendedPrisma;
   globalForPrisma.prisma = prisma;
-} else {
+}else{
   prisma = globalForPrisma.prisma;
-}
+};
 
 export const db = prisma;

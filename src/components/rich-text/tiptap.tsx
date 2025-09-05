@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from '@tiptap/extension-placeholder';
 import MenuBar from './menu-bar';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export default function Tiptap({ label, mandatory, content, setContent, placeholder, className }: {
@@ -51,7 +51,14 @@ export default function Tiptap({ label, mandatory, content, setContent, placehol
       if (setContent) setContent(text);
     },
     immediatelyRender: false
-  })
+  });
+
+  useEffect(() => {
+    if (editor && content !== undefined && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+      if (setContent) setContent(content);
+    }
+  }, [content, editor]);
 
   return (
     <div>
@@ -60,7 +67,7 @@ export default function Tiptap({ label, mandatory, content, setContent, placehol
           {label}{(mandatory !== undefined && mandatory === true) && <span className="text-red-500">*</span>}
         </label>
       )}
-      
+
       <div className="w-full rounded-md border border-gray-300 bg-transparent p-2 mb-1">
         <MenuBar editor={editor} />
         <EditorContent editor={editor} />

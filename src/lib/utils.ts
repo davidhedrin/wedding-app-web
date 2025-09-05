@@ -177,3 +177,23 @@ stringWithTimestamp.v2 = function (length: number = 5, tmp: boolean = false, pre
   const timestamp = tmp === true ? Date.now() : "";
   return `${prefix !== undefined ? prefix + "/" : "" }${randomChar}${timestamp}`;
 };
+
+export function genSlugify(text: string) {
+  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '').replace(/\-+/g, '-');
+};
+
+export function inputFormatPriceIdr(value: string){
+  const rawValue = value.replace(/[^0-9]/g, '');
+  if (rawValue === '') return;
+  const formatted = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return formatted;
+};
+
+export function formatToIDR(value: string | number): string {
+  const numberValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  return numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+export function parseFromIDR(formatted: string): number {
+  return parseInt(formatted.replace(/\./g, ''), 10);
+};
