@@ -7,20 +7,20 @@ import { useEffect } from "react";
 
 export default function Page() {
   const listBr: BreadcrumbType[] = [
-    {name: "Home", url: "/"},
-    {name: "Dashboard", url: null},
+    { name: "Home", url: null },
+    { name: "Dashboard", url: "/client/dashboard" },
   ];
-  const {setLoading} = useLoading();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
     setLoading(false);
-  },[]);
+  }, []);
 
   return (
     <>
       <div className="py-2 px-4 flex flex-wrap justify-between items-center gap-2 bg-white border-b border-gray-200">
         <div>
-          <h1 className="font-medium text-gray-800">
+          <h1 className="text-sm font-medium text-muted">
             Dashboard
           </h1>
         </div>
@@ -34,6 +34,7 @@ export default function Page() {
         <div className="flex-1 flex flex-col lg:flex-row">
           <div className="flex-1 min-w-0 flex flex-col border-e border-gray-200 p-4">
             {/* Conten Here */}
+            
           </div>
         </div>
       </div>

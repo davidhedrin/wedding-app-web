@@ -13,3 +13,43 @@ export type FormState = {
   success?: boolean;
   message?: string;
 };
+
+export type TableThModel = {
+  key: string;
+  name: string;
+  key_sort: string;
+  IsVisible?: boolean;
+};
+
+export type TableShortList = {
+  key: string;
+  sort?: "asc" | "desc" | "";
+};
+
+export type CommonParams = {
+  curPage?: number;
+  perPage?: number;
+};
+
+export type PaginateResult<T> = {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type UploadFileRespons = {
+  status: boolean;
+  message: string | null;
+  filename: string | null;
+  path: string | null;
+};
+
+export type CategoryKeyProps = {
+  key: string;
+  name: string;
+  status: boolean;
+};

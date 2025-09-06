@@ -1,0 +1,27 @@
+[
+  {
+    "key": "wed",
+    "name": "Wedding",
+    "status": true
+  },
+  {
+    "key": "bth",
+    "name": "Birthday",
+    "status": true
+  },
+  {
+    "key": "pts",
+    "name": "Parties",
+    "status": true
+  },
+  {
+    "key": "mti",
+    "name": "Meeting",
+    "status": true
+  },
+  {
+    "key": "gth",
+    "name": "Gethering",
+    "status": true
+  }
+]

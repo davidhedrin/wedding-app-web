@@ -57,12 +57,12 @@ export default function Page() {
       .trim(),
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
     formData.append("otp_code", txtOtpCode);
-    await handleSubmitForm(formData);
+    handleSubmitForm(formData);
   };
 
   const handleSubmitForm = async (formData: FormData) => {
