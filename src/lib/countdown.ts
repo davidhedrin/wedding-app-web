@@ -8,13 +8,20 @@ export default function useCountdown(targetDate: string) {
     minutes: 0,
     seconds: 0,
     isExpired: false,
+    isToday: false,
   });
 
   useEffect(() => {
     const updateCountdown = () => {
-      const now = new Date().getTime();
-      const target = new Date(targetDate).getTime();
-      const diff = target - now;
+      const now = new Date();
+      const target = new Date(targetDate);
+      const diff = target.getTime() - now.getTime();
+
+      // cek apakah hari ini
+      const isSameDay =
+        now.getFullYear() === target.getFullYear() &&
+        now.getMonth() === target.getMonth() &&
+        now.getDate() === target.getDate();
 
       if (diff <= 0) {
         setTimeLeft({
@@ -23,6 +30,7 @@ export default function useCountdown(targetDate: string) {
           minutes: 0,
           seconds: 0,
           isExpired: true,
+          isToday: isSameDay,
         });
         return;
       }
@@ -38,6 +46,7 @@ export default function useCountdown(targetDate: string) {
         minutes,
         seconds,
         isExpired: false,
+        isToday: isSameDay,
       });
     };
 
