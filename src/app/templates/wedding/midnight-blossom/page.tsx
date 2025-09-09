@@ -45,6 +45,7 @@ export default function UndanganPage() {
     setMenuOpen(false);
     const el = sectionsRef.current[id];
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActive(id);
   };
 
   // Scroll spy

@@ -88,6 +88,7 @@ export default function WeddingInvitationPage() {
   const scrollTo = (id: SectionKey) => {
     const el = sectionsRef.current[id];
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActive(id);
   };
 
   // Gallery slider

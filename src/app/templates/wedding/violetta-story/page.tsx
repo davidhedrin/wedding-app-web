@@ -53,37 +53,6 @@ type RSVPForm = {
   message: string;
 };
 
-// === UTILITAS WAKTU ===
-function getCountdown(target: Date) {
-  const now = new Date().getTime();
-  const t = target.getTime();
-  const diff = t - now;
-  const isToday =
-    new Date().toDateString() === target.toDateString() &&
-    Math.abs(diff) < 1000 * 60 * 60 * 24;
-
-  if (diff > 0 && !isToday) {
-    // Menjelang hari-H
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const m = Math.floor((diff / (1000 * 60)) % 60);
-    const s = Math.floor((diff / 1000) % 60);
-    return { state: "before" as const, d, h, m, s };
-  } else if (isToday) {
-    // Hari-H
-    const untilEnd = t + 1000 * 60 * 60 * 24 - now;
-    const h = Math.max(0, Math.floor((untilEnd / (1000 * 60 * 60)) % 24));
-    const m = Math.max(0, Math.floor((untilEnd / (1000 * 60)) % 60));
-    const s = Math.max(0, Math.floor((untilEnd / 1000) % 60));
-    return { state: "today" as const, h, m, s };
-  } else {
-    // Setelah hari-H
-    const elapsed = now - t;
-    const d = Math.floor(elapsed / (1000 * 60 * 60 * 24));
-    return { state: "after" as const, d };
-  }
-}
-
 // === KOMPONEN KECIL ===
 const SectionTitle: React.FC<{ title: string; subtitle?: string }> = ({
   title,
