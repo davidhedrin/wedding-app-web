@@ -1,17 +1,21 @@
 Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya adalah undangan pernikahan digital yang: 
 - Sangat lengkap, detail, dan kompleks, dengan desain modern dan elegan. Responsive di semua ukuran layar (mobile, tablet, desktop. Terutama mobile yg paling penting!). 
 - Memiliki navigation header (sticky atau fixed) yang mengarah ke setiap section dengan smooth scroll.
-- Bagian atas (hero section) menampilkan countdown tanggal pernikahan (buatkan design countdown kondisi menunggu hari h, sedang hari h, dan setelah hari h) dan background carousel gambar agar terlihat hidup dan mewah, juga terdapat tombol untuk buka undangan. Susunan konten dibagian atas buat semenarik mungkin!! boleh colomn kanan kiri, atau row atas bawah, atau terserah bagaimana bagusnya.
-- Gunakan satu tema berwarna yang elegan untuk latar belakang halaman (kalau bisa jangan warna putih, dan boleh warna apa saja dengan perpaduan warna pada text yg cocok dan enak dilihat), atau latar belakang gambar seluruh halaman (kalau boleh digabung saja), serta gunakan tipografi yang sesuai untuk acara pernikahan. 
-- Setiap elemen harus terlihat indah, kekinian, dan interaktif (gunakan animasi/hover/transition agar pengalaman pengguna terasa premium), dan tolong yang paling penting juga mainkan beberapa jenis font yg menarik dan elegan.
+- Bagian atas (hero section) menampilkan countdown tanggal pernikahan (buatkan design countdown kondisi menunggu hari h, sedang hari h, dan setelah hari h) dan background carousel gambar agar terlihat hidup dan mewah, juga terdapat tombol untuk buka undangan. Susunan konten dibagian atas buat semenarik mungkin!! boleh row atas ke bawah, atau terserah bagaimana bagusnya.
+- Untuk tema latar belakang seluruh halaman gunakan gambar(sticky atau fixed) yang dilapisi warna yang elegan untuk latar belakang seluruh halaman (kalau bisa jangan tema warna putih, dan boleh warna apa saja dengan) serta gunakan tipografi yang sesuai untuk acara pernikahan.
+- Setiap elemen harus terlihat indah, kekinian, dan interaktif (gunakan animasi/hover/transition agar pengalaman pengguna terasa premium).
+- Yang paling penting juga mainkan beberapa jenis font yg menarik serta elegan dan Gunakan perpaduan warna text yg cocok dan enak dilihat.
 - Untuk setiap gambar gunakan ini saja sementara: http://localhost:3005/assets/img/2149043983.jpg.
 
 Section yang Harus Ada (urutan):
 Mempelai – menampilkan foto, nama, dan deskripsi singkat kedua mempelai, dan kata sambutan yg umum untuk pengunjung.
-Acara – berisi informasi waktu & tempat pernikahan, informasi tambahan seperti dress code atau info peting lainnya, serta Google Maps iframe untuk lokasi.
+Acara – berisi informasi lengkap akad nikah, resepsi, juga waktu & tempat pernikahan, serta informasi tambahan lainnya seperti dress code atau info peting lainnya, serta Google Maps iframe untuk lokasi.
 Galeri – galeri foto dengan slider/carousel yang interaktif.
-Cerita – kisah perjalanan cinta pasangan dalam bentuk timeline/storytelling.
+Cerita – kisah perjalanan cinta pasangan dalam bentuk timeline/storytelling (buatkan posisi konten yang bagus dan menarik, atau juga mungkin tambahkan gambar).
 RSVP – form elegan untuk konfirmasi kehadiran.
 Hadiah – informasi atau tombol untuk memberikan hadiah (rekening/e-wallet/link).
 FAQ – daftar pertanyaan umum dengan format interaktif (accordion/dropdown).
 Footer - buatkan footer nya juga yg cantik dan menarik, yang pasti harus ada kumpulan menu navigasi nya gitu.
+
+Catatan:
+Untuk setiap section, buatkan design posisi yang menarik dan bagus
