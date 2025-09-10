@@ -1,0 +1,32 @@
+Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya adalah undangan ulang tahun digital yang:
+- Sangat lengkap, detail, modern, kekinian, dan elegan. Responsif di semua ukuran layar (mobile sangat diutamakan, tapi juga bagus di tablet & desktop).
+- Memiliki navigation header (sticky/fixed) yang mengarah ke setiap section dengan smooth scroll.
+- Bagian atas (hero section) menampilkan:
+  - Countdown menuju hari ulang tahun (dengan kondisi: sebelum hari H, saat hari H, dan setelah hari H).
+  - Background carousel/gambar agar terlihat hidup & meriah.
+  - Tombol "Buka Undangan" yang interaktif.
+  - Konten bagian atas harus menarik, estetik, dan kekinian (boleh pakai kombinasi row/column yang bagus).
+- Untuk tema latar belakang seluruh halaman gunakan gambar (sticky/fixed) yang selalu dilapisi overlay warna ceria/meriah (misalnya merah dengan opacity 70%, atau gradient warna kekinian) di depannya agar terlihat elegan (hindari full putih polos).
+- Gunakan tipografi yang playful namun tetap elegan, khas acara ulang tahun.
+- Setiap elemen harus terlihat indah, interaktif, premium (gunakan animasi/hover/transition).
+- Gunakan kombinasi beberapa font menarik (misalnya font script untuk nama, sans-serif untuk teks utama).
+- Warna teks harus serasi dan enak dilihat.
+- Untuk sementara, gunakan gambar berikut: http://localhost:3005/assets/img/2149043983.jpg.
+
+Section yang Harus Ada (urutan):
+Hero Section – countdown + carousel + tombol “Buka Undangan”.
+Welcome – kata sambutan singkat untuk tamu undangan. Juga menampilkan foto, nama, umur yang dirayakan, dan sedikit deskripsi tentang yang berulang tahun.
+Acara – detail acara ulang tahun (tanggal, waktu, tempat, tema pesta, dress code, dll), serta Google Maps iframe untuk lokasi.
+Galeri – kumpulan foto (slider/carousel).
+Cerita / Momen Spesial – timeline atau storytelling perjalanan hidup/kenangan yang berkesan dari yang berulang tahun.
+RSVP – form elegan untuk konfirmasi kehadiran.
+Hadiah – informasi rekening/e-wallet/link hadiah digital.
+FAQ – daftar pertanyaan umum (accordion/dropdown interaktif).
+Footer – footer cantik dengan menu navigasi, social media, dan ucapan terima kasih.
+
+Catatan Penting:
+Buat posisi layout tiap section yang menarik & kekinian (bisa dengan grid, flex, atau kombinasi).
+Tambahkan animasi scroll reveal agar pengalaman terasa lebih hidup.
+Gunakan warna ceria namun tetap elegan (contoh: pastel, gold, navy, pink, dll).
+Background halaman harus selalu berupa gambar + overlay warna transparan di atasnya (misalnya bg-red-500/70, atau gradient from-pink-400/60 to-yellow-200/60) agar hasil lebih estetik.
+Buatkan design yang kompleks dan kode yang sangat panjang.
