@@ -2,11 +2,11 @@ Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya ada
 - Sangat lengkap, detail, modern, kekinian, dan elegan. Responsif di semua ukuran layar (mobile sangat diutamakan, tapi juga bagus di tablet & desktop).
 - Memiliki navigation header (sticky/fixed) yang mengarah ke setiap section dengan smooth scroll.
 - Bagian atas (hero section) menampilkan:
-  - Countdown menuju hari ulang tahun (dengan kondisi: sebelum hari H, saat hari H, dan setelah hari H).
+  - Countdown menuju hari ulang tahun (buatkan design yang sangat bagus untuk kondisi: sebelum hari H, saat hari H, dan setelah hari H).
   - Background carousel/gambar agar terlihat hidup & meriah.
   - Tombol "Buka Undangan" yang interaktif.
   - Konten bagian atas harus menarik, estetik, dan kekinian (boleh pakai kombinasi row/column yang bagus).
-- Untuk tema latar belakang seluruh halaman gunakan gambar (sticky/fixed) yang selalu dilapisi overlay warna ceria/meriah (misalnya merah dengan opacity 70%, atau gradient warna kekinian) di depannya agar terlihat elegan (hindari full putih polos).
+- Untuk tema latar belakang seluruh halaman gunakan gambar (sticky/fixed) berupa gambar + overlay warna transparan di atasnya dengan opacity agar hasil lebih estetik dan elegan (hindari full putih polos dan hindari pink).
 - Gunakan tipografi yang playful namun tetap elegan, khas acara ulang tahun.
 - Setiap elemen harus terlihat indah, interaktif, premium (gunakan animasi/hover/transition).
 - Gunakan kombinasi beberapa font menarik (misalnya font script untuk nama, sans-serif untuk teks utama).
@@ -28,5 +28,4 @@ Catatan Penting:
 Buat posisi layout tiap section yang menarik & kekinian (bisa dengan grid, flex, atau kombinasi).
 Tambahkan animasi scroll reveal agar pengalaman terasa lebih hidup.
 Gunakan warna ceria namun tetap elegan (contoh: pastel, gold, navy, pink, dll).
-Background halaman harus selalu berupa gambar + overlay warna transparan di atasnya (misalnya bg-red-500/70, atau gradient from-pink-400/60 to-yellow-200/60) agar hasil lebih estetik.
 Buatkan design yang kompleks dan kode yang sangat panjang.

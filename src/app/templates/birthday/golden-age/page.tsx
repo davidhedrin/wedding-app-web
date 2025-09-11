@@ -184,15 +184,13 @@ export default function Invitation(): JSX.Element {
         aria-hidden
       />
 
-      {/* Overlay merah dengan opacity 70% */}
-      <div className="fixed inset-0 -z-10 bg-red-700/25" aria-hidden />
       {/* overlay gradient to give pastel/meriah look */}
       <div
         className="fixed inset-0 -z-10 pointer-events-none"
         style={{
           background:
-            "linear-gradient(135deg, rgba(246,193,216,0.22), rgba(251,232,166,0.18) 40%, rgba(15,23,42,0.18) 100%)",
-          mixBlendMode: "overlay",
+            "linear-gradient(135deg, rgba(249,115,22,0.6), rgba(236,72,153,0.55) 40%, rgba(234,179,8,0.35))",
+          backdropFilter: "saturate(1.05) blur(4px)",
         }}
         aria-hidden
       />
@@ -233,7 +231,7 @@ export default function Invitation(): JSX.Element {
                 <li key={it.k}>
                   <button
                     onClick={() => scrollToId(it.k)}
-                    className="px-3 py-2 rounded-md hover:bg-black/40 transition-colors"
+                    className="px-3 py-2 rounded-md hover:backdrop-blur-sm bg-gray-800/25 transition-colors"
                   >
                     {it.label}
                   </button>
@@ -248,15 +246,15 @@ export default function Invitation(): JSX.Element {
                   e.preventDefault();
                   scrollToId("rsvp");
                 }}
-                className="bg-gradient-to-r from-pink-400 to-yellow-300 text-slate-900 px-3 py-2 rounded-md font-semibold shadow-sm transform hover:-translate-y-0.5 transition"
+                className="md:block hidden bg-gradient-to-r from-pink-400 to-yellow-300 text-slate-900 px-3 py-2 rounded-md font-semibold shadow-sm transform hover:-translate-y-0.5 transition"
               >
                 Konfirmasi
               </a>
               <div className="md:hidden">
                 {/* Mobile quick nav (dropdown) */}
                 <details className="relative">
-                  <summary className="text-white/90 px-2 py-1 cursor-pointer">Menu ▾</summary>
-                  <div className="absolute right-0 mt-2 w-44 rounded-md overflow-hidden bg-black/40 backdrop-blur-md p-2 shadow-lg">
+                  <summary className="text-white/90 px-2 py-1 cursor-pointer">Menu</summary>
+                  <div className="absolute right-0 mt-2 w-44 rounded-md overflow-hidden bg-gray-600 backdrop-blur-md p-2 shadow-lg">
                     <ul className="flex flex-col gap-1 text-sm text-white/90">
                       {[
                         { k: "hero", label: "Home" },
@@ -324,8 +322,8 @@ export default function Invitation(): JSX.Element {
 
                 {/* Countdown card */}
                 <div
-                  className="rounded-2xl p-4 md:p-6 flex items-center gap-4 md:gap-6 backdrop-blur-sm"
-                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.04)" }}
+                  className="rounded-2xl p-4 md:p-6 flex items-center gap-4 md:gap-6 backdrop-blur-sm bg-white/25"
+                  style={{ border: "1px solid rgba(255,255,255,0.04)" }}
                 >
                   <div className="flex-1">
                     {isExpired ? (
@@ -416,7 +414,7 @@ export default function Invitation(): JSX.Element {
             }}
             className="mt-12 max-w-6xl mx-auto px-4 md:px-6 reveal"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-black/40 p-6 rounded-2xl outline-soft">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center backdrop-blur-sm bg-gray-800/25 p-6 rounded-2xl outline-soft">
               <div className="col-span-1 flex items-center justify-center">
                 <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-white/10 shadow-lg">
                   <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Foto Raya" className="w-full h-full object-cover" />
@@ -449,7 +447,7 @@ export default function Invitation(): JSX.Element {
             }}
             className="mt-12 max-w-6xl mx-auto px-4 md:px-6 reveal"
           >
-            <div className="bg-black/40 rounded-2xl p-6 md:p-8 outline-soft grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="backdrop-blur-sm bg-gray-800/25 rounded-2xl p-6 md:p-8 outline-soft grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h3 className="text-2xl font-semibold text-white">Detail Acara</h3>
 
@@ -512,7 +510,7 @@ export default function Invitation(): JSX.Element {
             className="mt-12 max-w-6xl mx-auto px-4 md:px-6 reveal"
           >
             <h3 className="text-2xl font-semibold text-white mb-4">Galeri Momen</h3>
-            <div className="bg-black/40 p-4 rounded-2xl outline-soft">
+            <div className="backdrop-blur-sm bg-gray-800/25 p-4 rounded-2xl outline-soft">
               <div className="relative">
                 <div className="overflow-hidden rounded-xl">
                   <img src={GALLERY[galleryIndex]} alt={`Gallery ${galleryIndex}`} className="w-full h-64 object-cover transition-transform duration-700" />
@@ -559,7 +557,7 @@ export default function Invitation(): JSX.Element {
             className="mt-12 max-w-6xl mx-auto px-4 md:px-6 reveal"
           >
             <h3 className="text-2xl font-semibold text-white mb-6">Cerita & Momen Spesial</h3>
-            <div className="bg-black/40 p-6 rounded-2xl outline-soft">
+            <div className="backdrop-blur-sm bg-gray-800/25 p-6 rounded-2xl outline-soft">
               <div className="relative pl-8 md:pl-12">
                 {/* Vertical timeline line */}
                 <div className="absolute left-4 top-4 bottom-4 w-1 bg-gradient-to-b from-pink-300 to-yellow-200 rounded" style={{ opacity: 0.6 }} />
@@ -592,7 +590,7 @@ export default function Invitation(): JSX.Element {
           >
             <h3 className="text-2xl font-semibold text-white mb-4">RSVP — Konfirmasi Kehadiran</h3>
 
-            <div className="bg-black/40 p-6 md:p-8 rounded-2xl outline-soft grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="backdrop-blur-sm bg-gray-800/25 p-6 md:p-8 rounded-2xl outline-soft grid grid-cols-1 md:grid-cols-2 gap-6">
               <form onSubmit={handleRsvpSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/80">Nama</label>
@@ -694,7 +692,7 @@ export default function Invitation(): JSX.Element {
           >
             <h3 className="text-2xl font-semibold text-white mb-4">Informasi Hadiah</h3>
 
-            <div className="bg-black/40 rounded-2xl p-6 outline-soft">
+            <div className="backdrop-blur-sm bg-gray-800/25 rounded-2xl p-6 outline-soft">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg border border-white/6">
                   <div className="text-sm text-white/80">Rekening Bank</div>
@@ -736,7 +734,7 @@ export default function Invitation(): JSX.Element {
           >
             <h3 className="text-2xl font-semibold text-white mb-4">Pertanyaan Umum (FAQ)</h3>
 
-            <div className="bg-black/40 p-4 md:p-6 rounded-2xl outline-soft">
+            <div className="backdrop-blur-sm bg-gray-800/25 p-4 md:p-6 rounded-2xl outline-soft">
               <div className="space-y-3">
                 {FAQ.map((f, i) => (
                   <div key={i} className="border border-white/6 rounded-md overflow-hidden">
@@ -764,7 +762,7 @@ export default function Invitation(): JSX.Element {
 
           {/* FOOTER */}
           <footer className="mt-12">
-            <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 rounded-2xl bg-black/40" style={{ border: "1px solid rgba(255,255,255,0.03)" }}>
+            <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 rounded-2xl backdrop-blur-sm bg-white/25" style={{ border: "1px solid rgba(255,255,255,0.03)" }}>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <div style={{ fontFamily: "'Great Vibes', cursive", fontSize: 22, color: "white" }}>Raya Putri</div>
