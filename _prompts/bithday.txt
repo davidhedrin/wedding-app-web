@@ -1,8 +1,9 @@
+Prompt 1:
 Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya adalah undangan ulang tahun digital yang:
 - Sangat lengkap, detail, modern, kekinian, dan elegan. Responsif di semua ukuran layar (mobile sangat diutamakan, tapi juga bagus di tablet & desktop).
 - Memiliki navigation header (sticky/fixed) yang mengarah ke setiap section dengan smooth scroll.
 - Bagian atas (hero section) menampilkan:
-  - Countdown menuju hari ulang tahun (buatkan design yang sangat bagus untuk kondisi: sebelum hari H, saat hari H, dan setelah hari H).
+  - Countdown menuju hari ulang tahun (buatkan design yang sangat bagus untuk kondisi if sebelum hari H, saat hari H, dan setelah hari H).
   - Background carousel/gambar agar terlihat hidup & meriah.
   - Tombol "Buka Undangan" yang interaktif.
   - Konten bagian atas harus menarik, estetik, dan kekinian (boleh pakai kombinasi row/column yang bagus).
@@ -14,7 +15,7 @@ Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya ada
 - Untuk sementara, gunakan gambar berikut: http://localhost:3005/assets/img/2149043983.jpg.
 
 Section yang Harus Ada (urutan):
-Hero Section – countdown + carousel + tombol “Buka Undangan”.
+Home Section – countdown + carousel + tombol “Buka Undangan”.
 Welcome – kata sambutan singkat untuk tamu undangan. Juga menampilkan foto, nama, umur yang dirayakan, dan sedikit deskripsi tentang yang berulang tahun.
 Acara – detail acara ulang tahun (tanggal, waktu, tempat, tema pesta, dress code, dll), serta Google Maps iframe untuk lokasi.
 Galeri – kumpulan foto (slider/carousel).
@@ -27,5 +28,36 @@ Footer – footer cantik dengan menu navigasi, social media, dan ucapan terima k
 Catatan Penting:
 Buat posisi layout tiap section yang menarik & kekinian (bisa dengan grid, flex, atau kombinasi).
 Tambahkan animasi scroll reveal agar pengalaman terasa lebih hidup.
-Gunakan warna ceria namun tetap elegan (contoh: pastel, gold, navy, pink, dll).
 Buatkan design yang kompleks dan kode yang sangat panjang.
+
+Prompt 2:
+Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya adalah undangan ulang tahun digital yang:
+- Modern, estetik, kekinian, dengan gaya minimal elegan + playful. Responsif penuh (mobile-first, tapi tetap bagus di tablet & desktop).
+- Navigasi berupa header sticky/fixed transparan dengan efek blur glassmorphism, setiap menu menuju section dengan smooth scroll.
+- Hero section menampilkan:
+  - Countdown interaktif dengan desain premium (tampilan berbeda untuk sebelum hari H, tepat saat hari H, dan setelah hari H).
+  - Background berupa video loop singkat atau carousel gambar dengan efek fade/zoom.
+  - Tombol “Lihat Undangan” yang beranimasi saat hover (misalnya scale + glow).
+  - Nama dan umur yang dirayakan ditampilkan besar dengan font script elegan, dilengkapi tagline singkat.
+- Untuk latar belakang keseluruhan halaman gunakan gambar yang fixed + overlay gradasi transparan agar lebih estetik dan elegan (hindari full putih polos dan hindari pink).
+- Gunakan kombinasi tipografi menarik: script untuk nama, serif elegan untuk judul section, sans-serif modern untuk body text.
+ Setiap elemen memiliki animasi halus (hover, transition, scroll reveal).
+
+Section yang harus ada (urut):
+Home – countdown + carousel/video + tombol “Lihat Undangan”.
+Welcome – ucapan sambutan singkat, foto, nama & umur yang berulang tahun, serta deskripsi singkat.
+Detail Acara – informasi lengkap (tanggal, waktu, tempat, tema, dress code) + Google Maps iframe.
+Galeri – kumpulan foto dalam bentuk slider/album.
+Cerita / Kenangan – timeline atau list momen spesial dengan desain interaktif.
+RSVP – form konfirmasi kehadiran yang simpel namun elegan.
+Hadiah – informasi rekening/e-wallet/tautan hadiah digital dengan desain card/accordion.
+FAQ – pertanyaan umum dengan accordion interaktif.
+Footer – navigasi kecil, sosial media, ucapan terima kasih.
+
+Catatan penting:
+Layout tiap section dibuat bervariasi dan menarik (grid/flex kombinasi).
+Tambahkan efek animasi scroll reveal agar terasa hidup.
+Gunakan warna yang elegan (hindari pink mencolok atau full putih).
+Pastikan kode cukup kompleks dan panjang, dengan komponen terpisah serta interaksi menarik.
+Gunakan gambar sementara: http://localhost:3005/assets/img/2149043983.jpg.
+Buatkan semua bagian section dalam satu function saja, jangan dipisah pisah.
