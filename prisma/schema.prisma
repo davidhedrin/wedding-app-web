@@ -81,6 +81,9 @@ model Templates {
   url        String
   flag_name  String?
   flag_color String?
+  colors     Json?
+  language   String[]
+  layouts    String[]
   is_active  Boolean? @default(true)
 
   createdBy String?
@@ -90,11 +93,17 @@ model Templates {
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
 
+  rate_1_count Int? @default(0)
+  rate_2_count Int? @default(0)
+  rate_3_count Int? @default(0)
+  rate_4_count Int? @default(0)
+  rate_5_count Int? @default(0)
+
   captures TemplateCaptures[]
 }
 
 model TemplateCaptures {
-  id        Int     @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   tmp_id    Int
   index     Int
   file_name String

@@ -23,7 +23,6 @@ export default function Invitation() {
   const BG_IMAGE = "http://localhost:3005/assets/img/2149043983.jpg";
 
   // === Countdown state ===
-  const diffMs = TARGET_DATE.getTime() - new Date().getTime();
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // === Background carousel (simple) ===
@@ -253,19 +252,6 @@ export default function Invitation() {
                         )}
                       </div>
                     </div>
-
-                    {/* visual indicator */}
-                    <div className="mt-4 h-2 bg-white/6 rounded-full overflow-hidden">
-                      <div
-                        className="h-2 rounded-full"
-                        style={{
-                          width: (!isExpired && !isToday)
-                            ? `${Math.max(6, Math.min(99, (1 - diffMs / (1000 * 60 * 60 * 24 * 30)) * 100))}%`
-                            : "100%",
-                          background: "linear-gradient(90deg,#FFD166,#F4A261)",
-                        }}
-                      />
-                    </div>
                   </div>
 
                   {/* CTA */}
@@ -294,7 +280,7 @@ export default function Invitation() {
                 </div>
 
                 {/* mini carousel thumbnails */}
-                <div className="mt-6 flex items-center gap-3 overflow-hidden">
+                <div className="mt-3 flex items-center gap-3 overflow-hidden">
                   {carouselImages.map((src, i) => (
                     <div key={i} className={`w-20 h-12 rounded-lg overflow-hidden border ${i === bgIndex ? "ring-2 ring-amber-300" : "opacity-60"}`}>
                       <img src={src} alt={`bg ${i}`} className="w-full h-full object-cover transform transition hover:scale-105" />
