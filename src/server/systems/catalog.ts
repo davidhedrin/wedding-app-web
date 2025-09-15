@@ -87,6 +87,9 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
           url: formData.url,
           flag_name: formData.flag_name,
           flag_color: formData.flag_color,
+          language: formData.language,
+          layouts: formData.layouts,
+          colors: formData.colors != null ? JSON.parse(formData.colors) : null,
           is_active: formData.is_active,
           updatedBy: user?.email
         },
@@ -102,6 +105,9 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
           url: formData.url,
           flag_name: formData.flag_name,
           flag_color: formData.flag_color,
+          language: formData.language,
+          layouts: formData.layouts,
+          colors: formData.colors != null ? JSON.parse(formData.colors) : null,
           is_active: formData.is_active,
           createdBy: user?.email
         }

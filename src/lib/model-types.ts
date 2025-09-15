@@ -3,6 +3,11 @@ export type BreadcrumbType = {
   name: string;
 };
 
+export type Color = {
+  name: string;
+  value: string;
+};
+
 export type ToastType = 'success' | 'info' | 'warning' | 'danger';
 
 export type FormState = {

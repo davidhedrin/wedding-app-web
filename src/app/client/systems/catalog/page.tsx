@@ -11,7 +11,7 @@ import Select from '@/components/ui/select';
 import { ZodErrors } from '@/components/zod-errors';
 import Configs, { CategoryKeys } from '@/lib/config';
 import { DtoCaptureTemplate, DtoTemplates } from '@/lib/dto';
-import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
+import { BreadcrumbType, Color, FormState, TableShortList, TableThModel } from '@/lib/model-types';
 import { formatDate, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
 import { DeleteDataTemplates, GetDataTemplates, GetDataTemplatesById, StoreUpdateDataTemplates } from '@/server/systems/catalog';
 import { Templates } from '@prisma/client';
@@ -121,9 +121,12 @@ export default function Page() {
   const [txtFlagName, setTxtFlagName] = useState("");
   const [txtFlagColor, setTxtFlagColor] = useState("");
   const [txtShortDesc, setTxtShortDesc] = useState("");
+  const [txtLanguage, setTxtLanguage] = useState("");
+  const [txtLayouts, setTxtLayouts] = useState("");
   const [txtDesc, setTxtDesc] = useState<string | undefined>();
   const [txtPrevUrl, setTxtPrevUrl] = useState("");
   const [isActive, setIsActive] = useState("");
+  const [templateColors, setTemplateColors] = useState<Color[]>([]);
 
   const [filesCapture, setFilesCapture] = useState<DtoCaptureTemplate[]>([]);
   const handleFileCaptureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,6 +210,9 @@ export default function Page() {
       url: txtPrevUrl,
       flag_name: txtFlagName.trim() != "" ? txtFlagName : null,
       flag_color: txtFlagColor.trim() != "" ? txtFlagColor : null,
+      language: txtLanguage.trim() != "" ? txtLanguage : null,
+      layouts: txtLayouts.trim() != "" ? txtLayouts : null,
+      colors: templateColors.length > 0 ? JSON.stringify(templateColors) : null,
 
       is_active: isActive === "true" ? true : false,
       captures: filesCapture,
@@ -222,14 +228,18 @@ export default function Page() {
         setAddEditId(data.id);
         setIsActive(data.is_active != null ? data.is_active.toString() : "");
         setTxtName(data.name);
-        setTxtCategory(data.ctg_key || "");
+        setTxtCategory(data.ctg_key ?? "");
         setTxtPrice(data.price ? data.price.toLocaleString('id-ID') : "");
         setTxtDiscPrice(data.disc_price ? data.disc_price.toLocaleString('id-ID') : "");
-        setTxtFlagName(data.flag_name || "");
-        setTxtFlagColor(data.flag_color || "");
-        setTxtShortDesc(data.short_desc || "");
+        setTxtFlagName(data.flag_name ?? "");
+        setTxtFlagColor(data.flag_color ?? "");
+        setTxtShortDesc(data.short_desc ?? "");
         setTxtPrevUrl(data.url);
-        setTxtDesc(data.desc || undefined);
+        setTxtDesc(data.desc ?? undefined);
+
+        setTxtLanguage(data.language ?? "");
+        setTxtLayouts(data.layouts ?? "");
+        setTemplateColors(data.colors !== null ? JSON.parse(JSON.stringify(data.colors)) : []);
 
         const setCaptures: DtoCaptureTemplate[] = data.captures.map((x, i) => ({
           id: x.id, file: null, file_name: x.file_name, file_path: x.file_path, idx: i
@@ -250,6 +260,9 @@ export default function Page() {
       setTxtPrevUrl("");
       setTxtDesc(undefined);
       setFilesCapture([]);
+      setTxtLanguage("");
+      setTxtLayouts("");
+      setTemplateColors([]);
     }
     setStateFormAddEdit({ success: true, errors: {} });
     modalAction(`btn-${modalAddEdit}`);
@@ -312,6 +325,20 @@ export default function Page() {
       modalAction(`btn-${modalAddEdit}`);
     }
     setLoading(false);
+  };
+
+  const [newColor, setNewColor] = useState<Color>({ name: '', value: '#000000' });
+
+  const addColor = () => {
+    if (!newColor.name.trim()) return;
+    setTemplateColors([...templateColors, newColor]);
+    setNewColor({ name: '', value: '#000000' });
+  };
+
+  const removeColor = (index: number) => {
+    const updated = [...templateColors];
+    updated.splice(index, 1);
+    setTemplateColors(updated);
   };
 
   const deleteRow = async (id: number) => {
@@ -516,6 +543,40 @@ export default function Page() {
                         { label: "Danger", value: "danger" },
                       ]}
                     />
+                  </div>
+                  <div className='col-span-12 md:col-span-6'>
+                    <Input value={txtLanguage} onChange={(e) => setTxtLanguage(e.target.value)} type='text' className='py-1.5' id='language' label='Language' placeholder='Enter template language' />
+                  </div>
+                  <div className='col-span-12 md:col-span-6'>
+                    <Input value={txtLayouts} onChange={(e) => setTxtLayouts(e.target.value)} type='text' className='py-1.5' id='layouts' label='Layouts' placeholder='Enter template layout' />
+                  </div>
+                  <div className='col-span-12'>
+                    <Input value={newColor.name} onChange={(e) => setNewColor({ ...newColor, name: e.target.value })} id='color_name' label='Colors' type='text' className='py-1.5' placeholder='Enter name and select the color'
+                      sufixGroup={<>
+                        <input
+                          type="color"
+                          value={newColor.value}
+                          onChange={(e) => setNewColor({ ...newColor, value: e.target.value })}
+                          className="w-12 h-8"
+                        />
+                        <button type="button" onClick={addColor} className={`btn btn-primary text-sm ps-2 leading-none ${newColor.name.trim() !== "" ? "text-blue-500" : ""}`}>
+                          <i className='bx bx-plus-circle text-lg'></i>
+                        </button>
+                      </>}
+                    />
+
+                    {templateColors.map((color, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-100 p-2 py-1 rounded mt-1.5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-6 h-6 rounded" style={{ backgroundColor: color.value }} />
+                          <span className='text-sm'>{color.name}</span>
+                          <span className="text-sm text-gray-500">{color.value}</span>
+                        </div>
+                        <button type="button" onClick={() => removeColor(index)} className="text-red-500 text-sm leading-none">
+                          <i className='bx bx-trash text-lg'></i>
+                        </button>
+                      </div>
+                    ))}
                   </div>
                   <div className='col-span-12'>
                     <Input value={txtPrevUrl} onChange={(e) => setTxtPrevUrl(e.target.value)} prefixGroup={<span>{Configs.base_url + "/"}</span>} type='text' className='py-1.5' id='url_preview' label='Preview URL' placeholder='Enter preview url template' mandatory />

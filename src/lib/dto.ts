@@ -48,6 +48,9 @@ export type DtoTemplates = {
   flag_name: string | null;
   flag_color: string | null;
   is_active: boolean | null;
+  colors: string | null;
+  language: string | null;
+  layouts: string | null;
 
   captures: DtoCaptureTemplate[];
 };

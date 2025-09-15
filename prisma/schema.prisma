@@ -82,8 +82,8 @@ model Templates {
   flag_name  String?
   flag_color String?
   colors     Json?
-  language   String[]
-  layouts    String[]
+  language   String?
+  layouts    String?
   is_active  Boolean? @default(true)
 
   createdBy String?
