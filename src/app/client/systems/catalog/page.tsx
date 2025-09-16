@@ -37,13 +37,12 @@ export default function Page() {
   const [inputSearch, setInputSearch] = useState("");
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
-    { name: "Slug", key: "slug", key_sort: "fullname", IsVisible: true },
-    { name: "Name", key: "name", key_sort: "email", IsVisible: true },
-    { name: "Price", key: "price", key_sort: "role", IsVisible: true },
-    { name: "Category", key: "ctg_name", key_sort: "no_phone", IsVisible: true },
-    { name: "URL", key: "url", key_sort: "is_active", IsVisible: true },
+    { name: "Slug", key: "slug", key_sort: "slug", IsVisible: true },
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
+    { name: "Price", key: "price", key_sort: "price", IsVisible: true },
+    { name: "Category", key: "ctg_name", key_sort: "ctg_name", IsVisible: true },
+    { name: "Layout", key: "layouts", key_sort: "layouts", IsVisible: true },
     { name: "Status", key: "is_active", key_sort: "is_active", IsVisible: true },
-    { name: "Created At", key: "createdAt", key_sort: "createdAt", IsVisible: true },
   ]);
   const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
     const selectObj = normalizeSelectObj(tblThColomns);
@@ -62,6 +61,7 @@ export default function Page() {
         select: {
           id: true,
           disc_price: true,
+          url: true,
           ...selectObj
         },
         orderBy: orderObj
@@ -239,7 +239,9 @@ export default function Page() {
 
         setTxtLanguage(data.language ?? "");
         setTxtLayouts(data.layouts ?? "");
-        setTemplateColors(data.colors !== null ? JSON.parse(JSON.stringify(data.colors)) : []);
+
+        const colorsParse: Color[] = data.colors !== null ? JSON.parse(data.colors) : [];
+        setTemplateColors(colorsParse);
 
         const setCaptures: DtoCaptureTemplate[] = data.captures.map((x, i) => ({
           id: x.id, file: null, file_name: x.file_name, file_path: x.file_path, idx: i
@@ -425,20 +427,20 @@ export default function Page() {
                               {'slug' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                                 <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-md text-xs font-medium bg-gray-100 text-gray-800">{data.slug}</span>
                               </td>}
-                              {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
+                              {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                                <Link href={`/template-detail?name=${data.slug}`} target='_blank' className='underline'>{data.name}</Link>
+                              </td>}
                               {'price' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {(data.price - (data.disc_price ?? 0)).toLocaleString('id-ID')}</td>}
                               {'ctg_name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.ctg_name || "-"}</td>}
-                              {'url' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                                <Link href={`${Configs.base_url}/${data.url}`} target='_blank'>{data.url}</Link>
-                              </td>}
+                              {'layouts' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.layouts || "-"}</td>}
                               {
                                 'is_active' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.is_active === true ? "text-green-600" : "text-red-600"}`}>
                                   {data.is_active === true ? "Active" : "Inactive"}
                                 </td>
                               }
-                              {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
+                                <Link href={`${Configs.base_url}/${data.url}`} target='_blank'><i className='bx bx-show-alt text-lg text-blue-500 cursor-pointer'></i></Link>
                                 <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
                                 <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>
@@ -556,7 +558,7 @@ export default function Page() {
                         <input
                           type="color"
                           value={newColor.value}
-                          onChange={(e) => setNewColor({ ...newColor, value: e.target.value })}
+                          onChange={(e) => setNewColor({ ...newColor, value: e.target.value.toUpperCase() })}
                           className="w-12 h-8"
                         />
                         <button type="button" onClick={addColor} className={`btn btn-primary text-sm ps-2 leading-none ${newColor.name.trim() !== "" ? "text-blue-500" : ""}`}>

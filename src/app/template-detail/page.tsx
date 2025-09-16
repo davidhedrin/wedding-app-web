@@ -1,8 +1,22 @@
 "use client";
 
+import { useLoading } from '@/components/loading/loading-context';
+import { useSmartLink } from '@/lib/smart-link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function page() {
+  const smartLink = useSmartLink();
+  const { setLoading } = useLoading();
+  const { push } = useRouter();
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const searchParams = useSearchParams();
+  const token = searchParams.get('name');
+
+  // Fatch detail here
+
+  //---------------------------------------------------------------
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const images = [
@@ -130,7 +144,7 @@ export default function page() {
             <h2 className="text-lg font-semibold text-gray-800 mb-2">
               Detail & Spesifikasi
             </h2>
-            
+
             <table className="w-full border border-gray-200 text-sm text-gray-600">
               <tbody>
                 <tr className="bg-gray-50">

@@ -81,7 +81,7 @@ model Templates {
   url        String
   flag_name  String?
   flag_color String?
-  colors     Json?
+  colors     String?
   language   String?
   layouts    String?
   is_active  Boolean? @default(true)
