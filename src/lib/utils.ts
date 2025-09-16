@@ -197,3 +197,11 @@ export function formatToIDR(value: string | number): string {
 export function parseFromIDR(formatted: string): number {
   return parseInt(formatted.replace(/\./g, ''), 10);
 };
+
+export function calculateRateProduct({rate_1, rate_2, rate_3, rate_4, rate_5}: {rate_1: number,rate_2: number,rate_3: number,rate_4: number,rate_5: number}) {
+  const totalRating = rate_1 * 1 + rate_2 * 2 + rate_3 * 3 + rate_4 * 4 + rate_5 * 5;
+  const totalVotes = rate_1 + rate_2 + rate_3 + rate_4 + rate_5;
+  if (totalVotes === 0) return 0;
+  const average = parseFloat((totalRating / totalVotes).toFixed(2));
+  return average;
+};

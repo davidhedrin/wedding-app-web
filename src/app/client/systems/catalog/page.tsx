@@ -538,11 +538,11 @@ export default function Page() {
                   <div className='col-span-12 md:col-span-6'>
                     <Select value={txtFlagColor} onChange={(e) => setTxtFlagColor(e.target.value)} className='py-1.5' id='flag_color' label='Flag Color' placeholder='Select flag color'
                       options={[
-                        { label: "Success", value: "success" },
-                        { label: "Warning", value: "warning" },
-                        { label: "Secondary", value: "secondary" },
-                        { label: "Primary", value: "primary" },
-                        { label: "Danger", value: "danger" },
+                        { label: "Success", value: "bg-green-500" },
+                        { label: "Warning", value: "bg-yellow-500" },
+                        { label: "Secondary", value: "bg-gray-500" },
+                        { label: "Primary", value: "bg-indigo-500" },
+                        { label: "Danger", value: "bg-red-500" },
                       ]}
                     />
                   </div>

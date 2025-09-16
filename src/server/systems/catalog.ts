@@ -158,3 +158,15 @@ export async function DeleteDataTemplates(id: number) {
     throw new Error(error.message);
   }
 };
+
+export async function GetDataTemplatesBySlug(slug: string): Promise<Templates & {
+  captures: TemplateCaptures[]
+} | null> {
+  const getData = await db.templates.findUnique({
+    where: { slug },
+    include: {
+      captures: true
+    }
+  });
+  return getData;
+};
