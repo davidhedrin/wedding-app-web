@@ -15,7 +15,9 @@ type GetDataTemplatesParams = {
   orderBy?: Prisma.TemplatesOrderByWithRelationInput | Prisma.TemplatesOrderByWithRelationInput[];
   select?: Prisma.TemplatesSelect<DefaultArgs> | undefined;
 } & CommonParams;
-export async function GetDataTemplates(params: GetDataTemplatesParams): Promise<PaginateResult<Templates>> {
+export async function GetDataTemplates(params: GetDataTemplatesParams): Promise<PaginateResult<Templates & {
+  captures: TemplateCaptures[] | null
+}>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
   const [data, total] = await Promise.all([
@@ -24,7 +26,10 @@ export async function GetDataTemplates(params: GetDataTemplatesParams): Promise<
       take: perPage,
       where,
       orderBy,
-      select
+      select: {
+        ...select,
+        captures: select?.captures
+      }
     }),
     db.templates.count({ where })
   ]);
@@ -49,14 +54,14 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     const data_id = formData.id ?? 0;
     const findCategory = CategoryKeys.find(x => x.key === formData.ctg_key);
 
-    const directoryImg = "public/upload/template";
+    const directoryImg = "public/template";
     await Promise.all(
       formData.captures.map(async (x) => {
         if (x.file !== null) {
           const upFile = await UploadFile(x.file, directoryImg);
           if (upFile?.status) {
             x.file_name = upFile.filename;
-            x.file_path = `${Configs.base_url}/upload/template/${upFile.filename}`;
+            x.file_path = `${Configs.base_url}/template/${upFile.filename}`;
           }
         }
       })

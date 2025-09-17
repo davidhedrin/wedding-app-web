@@ -93,11 +93,13 @@ model Templates {
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
 
-  rate_1_count Int? @default(0)
-  rate_2_count Int? @default(0)
-  rate_3_count Int? @default(0)
-  rate_4_count Int? @default(0)
-  rate_5_count Int? @default(0)
+  rate_1_count Int?    @default(0)
+  rate_2_count Int?    @default(0)
+  rate_3_count Int?    @default(0)
+  rate_4_count Int?    @default(0)
+  rate_5_count Int?    @default(0)
+  sold         BigInt? @default(0)
+  rate_count   Int?    @default(0)
 
   captures TemplateCaptures[]
 }

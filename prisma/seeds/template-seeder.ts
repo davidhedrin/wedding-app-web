@@ -418,13 +418,13 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
           tmp_id: tempId, 
           index: 1,
           file_name: "",
-          file_path: "http://localhost:3005/assets/img/2149043983.jpg",
+          file_path: "http://localhost:3005/template/2149043983.jpg",
         },
         {
           tmp_id: tempId, 
           index: 2,
           file_name: "",
-          file_path: "http://localhost:3005/assets/img/2149043983.jpg",
+          file_path: "http://localhost:3005/template/2149043983.jpg",
         }
       ]
     });

@@ -14,8 +14,8 @@ export default function AppHeader() {
   const { userData, statusLogin } = userLoginData();
 
   return (
-    <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-xl before:bg-neutral-300/45 before:backdrop-blur-md">
-      <nav className="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-3 md:py-0.5 mx-2 lg:mx-auto">
+    <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-6xl before:mx-2 lg:before:mx-auto before:rounded-xl before:bg-neutral-300/45 before:backdrop-blur-md">
+      <nav className="relative max-w-6xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-3 md:py-0.5 mx-2 lg:mx-auto">
         <div className="flex items-center">
           <Link href="/" onClick={() => smartLink("/")}>
             <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-[144px]" />
