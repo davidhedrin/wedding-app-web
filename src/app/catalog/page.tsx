@@ -192,7 +192,7 @@ export default function CatalogPage() {
             <button
               onClick={() => setSelectedCategories([])}
               className={`px-4 py-1.5 rounded-full text-sm border transition ${selectedCategories.length == 0
-                ? "bg-indigo-600 text-white border-indigo-600"
+                ? "bg-color-app text-white"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                 }`}
             >
@@ -203,7 +203,7 @@ export default function CatalogPage() {
                 key={i}
                 onClick={() => toggleCategory(cat.key)}
                 className={`px-4 py-1.5 rounded-full text-sm border transition ${selectedCategories.includes(cat.key)
-                  ? "bg-indigo-600 text-white border-indigo-600"
+                  ? "bg-color-app text-white"
                   : "bg-gray-100 text-gray-700 border-gray-400 hover:bg-gray-200"
                   }`}
               >
