@@ -405,6 +405,24 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         colors: '[{"name": "Dark Gray", "value": "#2C2C2C"},{"name": "Yellow", "value": "#FFC107"}]',
         is_active: true,
         createdBy: "SEEDER"
+      },
+      {
+        slug: "celebration-countdown",
+        name: "Celebration Countdown",
+        price: 149000,
+        disc_price: null,
+        short_desc: "Elegant midnight tones with golden and blush accents for a modern birthday celebration.",
+        desc: "<h1 style=\"text-align: center;\">Midnight Elegance: A Celebration in Style</h1><p style=\"text-align: left;\">The <strong>Midnight Elegance</strong> template combines deep midnight blue tones with radiant golden and blush highlights. Designed for those who want a birthday invitation that feels modern, stylish, and premium, it creates a magical atmosphere that stands out on every screen. With smooth animations, elegant typography, and responsive layouts, this template captures both warmth and sophistication.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Midnight-inspired background with gradient golden and blush accents</li><li>Interactive countdown and smooth scroll navigation</li><li>Dedicated sections for greetings, event details, gallery, and RSVP</li><li>Playful yet elegant typography combinations</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Modern & stylish birthday parties</li><li>Celebrations with elegant evening themes</li><li>Anyone who loves a premium, classy digital invitation</li></ol><p style=\"text-align: center;\"><em>“Midnight Elegance turned my birthday into a stylish and unforgettable memory.”</em> — <strong>Aurelia</strong></p>",
+        ctg_key: "bth",
+        ctg_name: "Birthday",
+        url: "templates/birthday/celebration-countdown",
+        flag_name: null,
+        flag_color: null,
+        language: "Indonesia",
+        layouts: "Mobile & Dekstop",
+        colors: '[{"name": "Midnight Blue", "value": "#0f172a"},{"name": "Sunset Gold", "value": "#FFB86B"},{"name": "Blush Pink", "value": "#FF7AAD"}]',
+        is_active: true,
+        createdBy: "SEEDER"
       }
     ]
     await tx.templates.createMany({
