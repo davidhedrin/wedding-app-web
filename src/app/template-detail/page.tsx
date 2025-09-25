@@ -86,7 +86,6 @@ export default function page() {
     },
   ];
 
-  // 👉 Carousel logic
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % captureImage.length);
   const prevSlide = () => setCurrentIndex((prev) => (prev === 0 ? captureImage.length - 1 : prev - 1));
 
@@ -100,9 +99,20 @@ export default function page() {
       {
         dataTemplate ? <>
           <div className='relative w-full pt-20'>
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-800/30 to-gray-100 backdrop-blur-xs pointer-events-none -z-30" />
+            {/* <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
+            <div className="absolute -z-30 top-10 left-10 w-72 h-72 rounded-full bg-indigo-400/70 blur-3xl" />
+            <div className="absolute -z-30 bottom-20 right-20 w-80 h-80 rounded-full bg-pink-400/70 blur-3xl" />
+            <div className="absolute -z-30 -top-16 right-1/3 w-96 h-96 bg-gradient-to-tr from-purple-400/40 to-blue-400/40 rounded-full mix-blend-multiply blur-3xl opacity-70 animate-pulse" />
+            <div className="absolute -z-30 bottom-10 left-1/4 w-32 h-32 bg-teal-400/70 rounded-full blur-xl opacity-60" /> */}
+
+            {/* <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
+            <div className="absolute top-0 -left-30 w-[500px] h-[500px] bg-purple-400/40 blur-3xl rounded-full mix-blend-multiply [clip-path:polygon(60%_0%,100%_38%,84%_100%,20%_80%,0%_20%)]" />
+            <div className="absolute bottom-0 -right-30 w-[400px] h-[400px] bg-blue-400/40 blur-3xl rounded-full mix-blend-multiply [clip-path:polygon(50%_0%,100%_50%,50%_100%,0%_50%)]" /> */}
+
+            <ShapeBackground templateColor={templateColor} />
+
             <div className='max-w-5xl px-4 xl:px-0 mx-auto'>
-              <BreadcrumbList className='mb-2' listBr={listBr} />
+              <BreadcrumbList className='my-3' listBr={listBr} textColor='text-gray-800' />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Carousel */}
                 <div className="relative w-full md:h-[460px] h-[300px] overflow-hidden rounded-xl shadow-lg">
@@ -209,7 +219,7 @@ export default function page() {
                             {templateColor.length > 0 ? templateColor.map((x, i) => (
                               <div
                                 key={i}
-                                className="w-8 h-5"
+                                className="w-8 h-5 border"
                                 style={{ backgroundColor: x.value }}
                               ></div>
                             )) : "-"}
@@ -322,4 +332,45 @@ export default function page() {
       }
     </div>
   )
+}
+
+function ShapeBackground({ templateColor }: { templateColor: Color[] }) {
+  if (!templateColor || templateColor.length === 0) return null;
+
+  const positions: Array<Record<string, string>> = [
+    { top: "0%", left: "0%" },
+    { top: "0%", right: "0%" },
+    { bottom: "0%", left: "0%" },
+    { bottom: "0%", right: "0%" },
+    { top: "20%", left: "10%" },
+    { top: "20%", right: "10%" },
+    { bottom: "20%", left: "30%" },
+    { bottom: "20%", right: "30%" },
+    { top: "50%", left: "50%", transform: "translate(-50%, -50%)" },
+  ];
+
+  return (
+    <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/30 to-transparent backdrop-blur-xs pointer-events-none">
+      {templateColor.map((x, i) => {
+        const pos = positions[i % positions.length];
+
+        const maxPx = 300 + (i % 3) * 100;
+        const vwPreferred = 30 + (i % 3) * 5;
+        const size = `clamp(160px, ${vwPreferred}vw, ${maxPx}px)`;
+
+        return (
+          <div
+            key={i}
+            className="absolute rounded-full blur-xl md:blur-3xl mix-blend-multiply opacity-60"
+            style={{
+              backgroundColor: x.value,
+              width: size,
+              height: size,
+              ...pos,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
 }

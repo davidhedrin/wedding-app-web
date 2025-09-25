@@ -423,6 +423,24 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         colors: '[{"name": "Midnight Blue", "value": "#0f172a"},{"name": "Sunset Gold", "value": "#FFB86B"},{"name": "Blush Pink", "value": "#FF7AAD"}]',
         is_active: true,
         createdBy: "SEEDER"
+      },
+      {
+        slug: "timless-elegance",
+        name: "Timeless Birthday Elegance",
+        price: 149000,
+        disc_price: null,
+        short_desc: "Modern digital invitation with playful yet elegant tones, countdown, and interactive sections for a premium experience.",
+        desc: "<h1 style=\"text-align: center;\">Timeless Birthday Elegance Birthday Celebration</h1><p style=\"text-align: left;\">The <strong>Premium Birthday Invite</strong> template brings together cheerful pastel gradients, smooth scroll navigation, and a beautifully styled countdown to create a warm, modern digital invitation. With responsive layouts, elegant typography, and interactive sections, it ensures every guest feels welcomed and informed in style.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Pastel gradient background with playful decorative shapes</li><li>Interactive countdown timer with day-of adjustments</li><li>Smooth navigation across welcome, event details, gallery, and RSVP</li><li>Elegant typography mix with script for names and clean sans-serif for content</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Birthday parties with a modern aesthetic</li><li>Digital-first invitations with responsive design</li><li>Hosts who want both elegance and interactivity in their invite</li></ol><p style=\"text-align: center;\"><em>“This template made Alya’s celebration feel truly special and premium.”</em> — <strong>Guest Feedback</strong></p>",
+        ctg_key: "bth",
+        ctg_name: "Birthday",
+        url: "templates/birthday/timless-elegance",
+        flag_name: null,
+        flag_color: null,
+        language: "Indonesia",
+        layouts: "Mobile & Dekstop",
+        colors: '[{"name": "Soft Mint", "value": "#E6F7F2"},{"name": "Warm Yellow", "value": "#FFD54F"},{"name": "Deep Navy", "value": "#1E293B"}]',
+        is_active: true,
+        createdBy: "SEEDER"
       }
     ]
     await tx.templates.createMany({

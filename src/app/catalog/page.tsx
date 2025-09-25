@@ -173,7 +173,17 @@ export default function CatalogPage() {
   return (
     <div className="pb-16">
       <div className='relative w-full h-[50vh] md:h-[55vh] flex items-end justify-center text-center pb-14'>
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-800/30 to-gray-100 backdrop-blur-xs pointer-events-none -z-30" />
+        <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
+        <div className="
+          absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+          w-[280px] h-[280px] sm:w-[300px] sm:h-[300px] lg:w-[650px] lg:h-[650px]
+          bg-pink-400/40 blur-3xl rounded-full mix-blend-multiply
+          [clip-path:polygon(50%_0%,80%_20%,100%_50%,80%_80%,50%_100%,20%_80%,0%_50%,20%_20%)]
+        " />
+        <div className="absolute -z-30 top-10 left-10 w-60 h-60 md:w-96 md:h-96 rounded-full bg-indigo-400/70 blur-3xl" />
+        <div className="absolute -z-30 top-40 right-10 w-60 h-60 md:w-96 md:h-96 rounded-full bg-pink-400/70 blur-3xl" />
+
+
         <div className='max-w-3xl px-4 xl:px-0 mx-auto text-center'>
           <h1 className="text-2xl md:text-4xl font-bold mb-3 drop-shadow-lg">
             Welcome to the {Configs.app_name} Catalog

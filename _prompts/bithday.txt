@@ -7,7 +7,7 @@ Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya ada
   - Background carousel/gambar agar terlihat hidup & meriah.
   - Tombol "Buka Undangan" yang interaktif.
   - Konten bagian atas harus menarik, estetik, dan kekinian (boleh pakai kombinasi row/column yang bagus).
-- Untuk tema latar belakang seluruh halaman gunakan warna yang estetik dan elegan dan juga berikan hiasan shape yang menarik pada latar belakangnya (hindari full putih polos dan hindari pink).
+- Untuk tema latar belakang berikan banyak hiasan shape-shape yang menarik,dan gunakan warna yang estetik dan elegan untuk latar belakangnya (hindari warna background full putih polos dan hindari pink).
 - Gunakan tipografi yang playful namun tetap elegan, khas acara ulang tahun.
 - Setiap elemen harus terlihat indah, interaktif, premium (gunakan animasi/hover/transition).
 - Gunakan kombinasi beberapa font menarik (misalnya font script untuk nama, sans-serif untuk teks utama).
