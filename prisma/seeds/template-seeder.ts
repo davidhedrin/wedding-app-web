@@ -299,24 +299,6 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         createdBy: "SEEDER"
       },
       {
-        slug: "calestial-party",
-        name: "Celestial Party",
-        price: 149000,
-        disc_price: null,
-        short_desc: "Celebrate your birthday under the stars with cosmic elegance.",
-        desc: "<h1 style=\"text-align: center;\">Celestial Party: A Night Among the Stars</h1><p style=\"text-align: left;\">The <strong>Celestial Party</strong> template brings a starry theme to your special day. With cosmic-inspired details, dreamy colors, and modern layouts, it feels like a birthday celebration under the night sky. It’s perfect for creating a magical and elegant vibe that guests will remember.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Starry and cosmic-themed design</li><li>Responsive and user-friendly</li><li>Sections for greetings, photo gallery, and RSVP</li><li>Elegant fonts with a touch of magic</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Starry night or galaxy-themed birthdays</li><li>Indoor or outdoor night celebrations</li><li>Those who want a mystical, elegant design</li></ol><p style=\"text-align: center;\"><em>“Celestial Party turned my birthday into a night full of stars.”</em> — <strong>Leo</strong></p>",
-        ctg_key: "bth",
-        ctg_name: "Birthday",
-        url: "templates/birthday/calestial-party",
-        flag_name: null,
-        flag_color: null,
-        language: "Indonesia",
-        layouts: "Mobile & Dekstop",
-        colors: '[{"name": "Green", "value": "#2ECC71"},{"name": "Blue", "value": "#87CEEB"},{"name": "Yellow", "value": "#FFD700"}]',
-        is_active: true,
-        createdBy: "SEEDER"
-      },
-      {
         slug: "eternal-birthday-moments",
         name: "Eternal Birthday Moments",
         price: 149000,

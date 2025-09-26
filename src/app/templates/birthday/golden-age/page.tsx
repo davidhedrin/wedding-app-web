@@ -4,6 +4,8 @@ import React, { JSX, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
+import bgImage from './bg.jpg'
+
 /**
  * Invitation Type: Birthday
  * Theme Name: "Golden Age"
@@ -178,7 +180,7 @@ export default function Invitation(): JSX.Element {
       <div
         className="fixed inset-0 -z-20 fixed-bg"
         style={{
-          backgroundImage: `url('http://localhost:3005/assets/img/2149043983.jpg')`,
+          backgroundImage: `url(${bgImage.src})`,
           filter: "saturate(1.05) contrast(1.02) brightness(.92)",
         }}
         aria-hidden
@@ -189,8 +191,8 @@ export default function Invitation(): JSX.Element {
         className="fixed inset-0 -z-10 pointer-events-none"
         style={{
           background:
-            "linear-gradient(135deg, rgba(249,115,22,0.6), rgba(236,72,153,0.55) 40%, rgba(234,179,8,0.35))",
-          backdropFilter: "saturate(1.05) blur(4px)",
+            "linear-gradient(135deg, rgba(249,115,22,0.7), rgba(236,72,153,0.7) 40%, rgba(234,179,8,0.5))",
+          backdropFilter: "saturate(1.05) blur(1px)",
         }}
         aria-hidden
       />
@@ -199,10 +201,10 @@ export default function Invitation(): JSX.Element {
       <div className="min-h-screen relative text-slate-900">
         {/* Sticky navigation header */}
         <header
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-6xl backdrop-blur-md rounded-xl"
+          className="fixed top-4  left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-6xl backdrop-blur-md rounded-xl"
           style={{ background: "var(--nav-bg)", border: "1px solid rgba(255,255,255,0.04)" }}
         >
-          <nav className="flex items-center justify-between py-3 px-4 md:px-6">
+          <nav className="flex items-center justify-between py-3 px-4 md:px-6 bg-gray-800/25">
             <div className="flex items-center gap-3">
               <button
                 className="px-3 py-1 rounded-md text-white/95 font-semibold glass-hover"

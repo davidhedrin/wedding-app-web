@@ -5,6 +5,8 @@ import React, { useEffect, useState, useRef } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
+import bgImage from './bg.jpg'
+
 /**
  * Invitation Type: Birthday
  * Theme Name: "Shimmering Gold"
@@ -145,14 +147,14 @@ export default function Invitation() {
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center"
         style={{
-          backgroundImage: `url("${carouselImages[bgIndex]}")`,
+          backgroundImage: `url("${bgImage.src}")`,
           filter: "saturate(1.05) contrast(1.02)",
         }}
         aria-hidden
       >
         {/* overlay with elegant tint */}
         <div
-          className="absolute inset-0 bg-gray-800/40 backdrop-blur-sm"
+          className="absolute inset-0 bg-gray-800/60 backdrop-blur-xs"
         />
       </div>
 

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Great_Vibes, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import useCountdown from '@/lib/countdown';
+
+import bgImage from './bg.jpeg';
 
 const greatVibes = Great_Vibes({ subsets: ['latin'], weight: ['400'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'] });
@@ -117,8 +119,8 @@ export default function WeddingInvitationPage() {
     <main className={classNames('min-h-screen scroll-smooth', jakarta.className)}>
       {/* Background global */}
       <div className={classNames('fixed inset-0 -z-10', `bg-gradient-to-br ${THEME.bgGradient}`)} />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),transparent_60%)]" />
-      <div className="pointer-events-none fixed inset-0 -z-10 mix-blend-overlay opacity-30" style={{ backgroundImage: 'url(http://localhost:3005/assets/img/2149043983.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.5),transparent_90%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 mix-blend-overlay" style={{ backgroundImage: `url(${bgImage.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
 
       {/* Header */}
       <header ref={headerRef} className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">

@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Playfair_Display, Cormorant_Garamond, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 
+import bgImage from './bg.jpg';
+
 /**
  * Invitation Type: Wedding
  * Theme Name: "Violetta Story"
@@ -102,15 +104,6 @@ export default function WeddingInvitationPage() {
   // Countdown
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
 
-  // Hero carousel
-  const [bgIdx, setBgIdx] = useState(0);
-  useEffect(() => {
-    const t = setInterval(
-      () => setBgIdx((i) => (i + 1) % IMAGES.length),
-      4500
-    );
-    return () => clearInterval(t);
-  }, []);
   const goToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -170,17 +163,13 @@ export default function WeddingInvitationPage() {
 
       {/* BACKGROUND HERO CAROUSEL (blur + parallax-ish) */}
       <div className="fixed inset-0 -z-20 overflow-hidden">
-        {IMAGES.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt=""
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-out ${i === bgIdx ? "opacity-40" : "opacity-0"
-              }`}
-            style={{ transform: "scale(1.05)" }}
-            loading={i === 0 ? "eager" : "lazy"}
-          />
-        ))}
+        <img
+          src={bgImage.src}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover opacity-45`}
+          style={{ transform: "scale(1.05)" }}
+          loading="lazy"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
       </div>
 

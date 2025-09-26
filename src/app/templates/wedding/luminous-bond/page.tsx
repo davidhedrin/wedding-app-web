@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
+import bgImage from './bg.jpg';
+
 /**
  * Invitation Type: Wedding
  * Theme Name: "Luminous Bond"
@@ -124,8 +126,6 @@ export default function WeddingInvitePage() {
   return (
     <>
       <Head>
-        <title>Undangan Pernikahan — [Nama & Nama]</title>
-        <meta name="description" content="Undangan pernikahan digital yang elegan dan interaktif." />
         {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -139,8 +139,8 @@ export default function WeddingInvitePage() {
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center"
         style={{
-          backgroundImage: `url(${HERO_IMAGES[0]})`,
-          filter: "blur(2px) brightness(0.5)",
+          backgroundImage: `url(${bgImage.src})`,
+          filter: "blur(0px) brightness(0.7)",
         }}
         aria-hidden
       />
@@ -372,7 +372,7 @@ export default function WeddingInvitePage() {
                 </div>
               </div>
 
-              <div className="mt-10 bg-rose-900/30 p-6 rounded-2xl border border-rose-700/40 shadow-inner">
+              <div className="mt-10 bg-rose-900/30 p-6 rounded-2xl border border-rose-700/40 shadow-inner backdrop-blur-sm">
                 <div className="text-lg font-playfair mb-2">Kata Sambutan</div>
                 <p className="text-rose-200/80">
                   Assalamualaikum/Salam sejahtera. Kami berterima kasih atas kehadiran dan doa restu dari teman, keluarga
@@ -392,7 +392,7 @@ export default function WeddingInvitePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
-                  <div className="p-6 rounded-xl bg-rose-900/30 border border-rose-700/40 shadow">
+                  <div className="p-6 rounded-xl bg-rose-900/30 border border-rose-700/40 shadow backdrop-blur-sm">
                     <div className="flex items-start gap-4">
                       <div className="text-amber-300 text-2xl">💍</div>
                       <div>
@@ -403,7 +403,7 @@ export default function WeddingInvitePage() {
                     </div>
                   </div>
 
-                  <div className="p-6 rounded-xl bg-rose-900/30 border border-rose-700/40 shadow">
+                  <div className="p-6 rounded-xl bg-rose-900/30 border border-rose-700/40 shadow backdrop-blur-sm">
                     <div className="flex items-start gap-4">
                       <div className="text-amber-300 text-2xl">🎉</div>
                       <div>
@@ -417,7 +417,7 @@ export default function WeddingInvitePage() {
                     </div>
                   </div>
 
-                  <div className="p-4 text-sm rounded-lg bg-rose-900/20 border border-rose-700/30">
+                  <div className="p-4 text-sm rounded-lg bg-rose-900/20 border border-rose-700/30 backdrop-blur-sm">
                     <strong>Info Penting:</strong> Mohon konfirmasi kehadiran melalui form RSVP. Jika memerlukan
                     informasi tambahan (akomodasi / transport), hubungi panitia.
                   </div>
@@ -505,7 +505,7 @@ export default function WeddingInvitePage() {
                     <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-rose-900 font-bold shadow">
                       1
                     </div>
-                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30">
+                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30 backdrop-blur-sm">
                       <div className="font-semibold">Pertemuan Pertama</div>
                       <div className="text-sm text-rose-200/80">Di sebuah acara kecil, kami bertemu dan saling berkenalan.</div>
                     </div>
@@ -515,7 +515,7 @@ export default function WeddingInvitePage() {
                     <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-rose-900 font-bold shadow">
                       2
                     </div>
-                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30">
+                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30 backdrop-blur-sm">
                       <div className="font-semibold">Perjalanan Bersama</div>
                       <div className="text-sm text-rose-200/80">Banyak momen berharga, liburan, hingga dukungan untuk mimpi masing-masing.</div>
                     </div>
@@ -525,7 +525,7 @@ export default function WeddingInvitePage() {
                     <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-rose-900 font-bold shadow">
                       3
                     </div>
-                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30">
+                    <div className="bg-rose-900/30 p-4 rounded-xl border border-rose-700/30 backdrop-blur-sm">
                       <div className="font-semibold">Lamaran</div>
                       <div className="text-sm text-rose-200/80">Momen spesial yang mengikat janji untuk hidup bersama selamanya.</div>
                     </div>
@@ -558,7 +558,7 @@ export default function WeddingInvitePage() {
 
               <form
                 onSubmit={submitRsvp}
-                className="bg-rose-900/30 p-6 rounded-2xl border border-rose-700/40 shadow-lg"
+                className="bg-rose-900/30 p-6 rounded-2xl border border-rose-700/40 shadow-lg backdrop-blur-sm"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className="flex flex-col">
@@ -646,7 +646,7 @@ export default function WeddingInvitePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center">
+                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center backdrop-blur-sm">
                   <div className="text-sm text-rose-200">Bank</div>
                   <div className="font-semibold text-lg mt-2">BCA</div>
                   <div className="text-rose-200/80 mt-1">a.n. Nama Rekening</div>
@@ -657,7 +657,7 @@ export default function WeddingInvitePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center">
+                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center backdrop-blur-sm">
                   <div className="text-sm text-rose-200">OVO / GoPay / Dana</div>
                   <div className="font-semibold text-lg mt-2">0812-xxxx-xxxx</div>
                   <div className="text-rose-200/80 mt-1">a.n. Nama</div>
@@ -671,7 +671,7 @@ export default function WeddingInvitePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center">
+                <div className="p-4 rounded-xl bg-rose-900/30 border border-rose-700/30 text-center backdrop-blur-sm">
                   <div className="text-sm text-rose-200">Wishlist</div>
                   <div className="font-semibold text-lg mt-2">Link Online</div>
                   <div className="text-rose-200/80 mt-1">Pilihan hadiah praktis</div>
@@ -698,7 +698,7 @@ export default function WeddingInvitePage() {
 
               <div className="space-y-3">
                 {faqList.map((f, i) => (
-                  <div key={i} className="bg-rose-900/30 p-3 rounded-lg border border-rose-700/30">
+                  <div key={i} className="bg-rose-900/30 p-3 rounded-lg border border-rose-700/30 backdrop-blur-sm">
                     <button
                       className="w-full flex items-center justify-between text-left"
                       onClick={() => setOpenFaq((prev) => (prev === i ? null : i))}

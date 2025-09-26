@@ -3,6 +3,8 @@
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
+import bgImage from './bg.jpg';
+
 /**
  * Invitation Type: Wedding
  * Theme Name: "Eterna Wedding"
@@ -123,9 +125,9 @@ export default function WeddingInvitationPage() {
   };
 
   return (
-    <main className="scroll-smooth bg-[url('http://localhost:3005/assets/img/2149043983.jpg')] bg-fixed bg-cover bg-center">
+    <main className="scroll-smooth bg-fixed bg-cover bg-center" style={{ backgroundImage: `url(${bgImage.src})` }}>
       {/* Overlay theme */}
-      <div className="min-h-screen bg-gradient-to-b from-stone-950/80 via-stone-900/80 to-stone-950/90 text-stone-100">
+      <div className="min-h-screen bg-stone-900/60 text-stone-100">
         {/* Header */}
         <header className="sticky top-0 z-50">
           <nav className="backdrop-blur-xl bg-stone-900/60 border-b border-white/10">
@@ -296,7 +298,7 @@ export default function WeddingInvitationPage() {
                 place="Balai Kartini, Ballroom"
                 extra="Dress code: Formal / Palet warna netral elegan."
               />
-              <div className="rounded-3xl border border-white/10 p-6 bg-white/5">
+              <div className="rounded-3xl border border-white/10 p-6 bg-white/5 backdrop-blur-md">
                 <h4 className="font-serif text-xl">Informasi Tambahan</h4>
                 <ul className="mt-3 list-disc list-inside text-stone-300 space-y-1">
                   <li>Mohon menjaga protokol kebersihan.</li>
@@ -408,7 +410,7 @@ export default function WeddingInvitationPage() {
             ].map((ev, i) => (
               <li key={i} className="mb-10 ms-2">
                 <span className="absolute -left-[7px] mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition backdrop-blur-md">
                   <div className="flex items-baseline justify-between">
                     <h4 className="font-serif text-xl">{ev.title}</h4>
                     <span className="text-xs uppercase tracking-widest text-stone-300">
@@ -431,7 +433,7 @@ export default function WeddingInvitationPage() {
         >
           <form
             onSubmit={onSubmitRSVP}
-            className="grid md:grid-cols-2 gap-6 rounded-3xl border border-white/10 bg-white/5 p-6"
+            className="grid md:grid-cols-2 gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
           >
             <Field label="Nama" name="nama" placeholder="Nama lengkap" />
             <Field
@@ -493,7 +495,7 @@ export default function WeddingInvitationPage() {
           sectionsRef={sectionsRef}
         >
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
               <h4 className="font-serif text-xl">Transfer Rekening</h4>
               <div className="mt-3 space-y-2 text-stone-300">
                 <p>Bank BCA · A/N Aisyah Putri</p>
@@ -510,7 +512,7 @@ export default function WeddingInvitationPage() {
                 </div>
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
               <h4 className="font-serif text-xl">E-Wallet / Link Hadiah</h4>
               <div className="mt-3 space-y-2 text-stone-300">
                 <p>OVO / GoPay / Dana</p>
@@ -629,7 +631,7 @@ function InfoCard({
   extra?: string;
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 backdrop-blur-md transition">
       <h4 className="font-serif text-xl">{title}</h4>
       <div className="mt-2 space-y-1 text-stone-300">
         <p className="flex items-center gap-2">
@@ -690,7 +692,7 @@ function Accordion({
 }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5">
+    <div className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md">
       {items.map((it, i) => {
         const isOpen = open === i;
         return (

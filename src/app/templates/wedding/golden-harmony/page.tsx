@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
+import bgImage from './bg.jpg';
+
 /**
  * Invitation Type: Wedding
  * Theme Name: "Golden Harmony"
@@ -60,11 +62,6 @@ export default function WeddingInvite() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // a11y: prefer-reduced-motion respect
-  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia
-    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    : false;
-
   return (
     <>
       <Head>
@@ -79,7 +76,7 @@ export default function WeddingInvite() {
         className="min-h-screen font-inter text-slate-100"
         style={{
           // background image fixed + elegant color overlay
-          backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.7), rgba(8,10,20,0.8)), url(${HERO_IMAGES[0]})`,
+          backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.4), rgba(8,10,20,0.6)), url(${bgImage.src})`,
           backgroundAttachment: "fixed",
           backgroundSize: "cover",
           backgroundPosition: "center",
