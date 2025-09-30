@@ -5,6 +5,7 @@ import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
 import bgImage from './bg.jpg';
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -19,7 +20,9 @@ const HERO_IMAGES = [
   "http://localhost:3005/assets/img/2149043983.jpg",
 ];
 
-const WEDDING_DATE = new Date("2025-12-20T09:00:00"); // <-- set tanggal & jam akad di sini (ISO)
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const MAP_EMBED = `https://www.google.com/maps?q=-6.200000,106.816666&z=15&output=embed`; // contoh: Jakarta
 
 export default function WeddingInvite() {
@@ -216,7 +219,7 @@ export default function WeddingInvite() {
                       <div className="pl-4">
                         <div className="text-xs text-slate-400">Tanggal</div>
                         <div className="text-sm">
-                          {WEDDING_DATE.toLocaleDateString()} • {WEDDING_DATE.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {formatDate(WEDDING_DATE, "full", "short")}
                         </div>
                       </div>
                     </>

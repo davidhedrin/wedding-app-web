@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, Great_Vibes, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -17,7 +18,9 @@ const greatVibes = Great_Vibes({ weight: "400", subsets: ["latin"], variable: "-
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 // ---------- Configurable Data ----------
-const WEDDING_DATE = "2025-12-20T10:00:00+07:00"; // ubah sesuai jadwalmu (WIB)
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const THEME_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
 const GALLERY_IMAGES = Array.from({ length: 10 }, () => THEME_IMG);
 const COUPLE = {
@@ -359,7 +362,7 @@ function Hero({ countDown }: {
             Rama <span className="text-amber-300">&</span> Aisyah
           </h1>
           <p className="mt-3 text-sm/6 sm:text-base text-emerald-100/90">
-            Sabtu, 20 Desember 2025 · Jakarta
+            {formatDate(WEDDING_DATE, "full", "short")}
           </p>
         </div>
 

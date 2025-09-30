@@ -1,6 +1,7 @@
 "use client";
 
 import useCountdown from "@/lib/countdown";
+import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 /**
@@ -10,7 +11,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
  * Create By: David
 */
 
-const WEDDING_DATE = "2025-12-14T10:00:00+07:00"; // contoh: 14 Des 2025, 10:00 WIB
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
 
 type Countdown = {
@@ -312,7 +315,7 @@ export default function Page() {
           </div>
 
           <p className="mt-6 text-sm text-emerald-100/70">
-            Minggu, 14 Desember 2025 • Pukul 10.00 WIB
+            {formatDate(WEDDING_DATE, "full", "short")}
           </p>
         </div>
       </section>

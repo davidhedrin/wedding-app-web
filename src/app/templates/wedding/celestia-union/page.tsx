@@ -52,15 +52,17 @@ function classNames(...a: (string | false | null | undefined)[]) {
  * Komponen Utama Halaman
  * =========================
  */
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 export default function WeddingInvitationPage() {
   // Atur tanggal pernikahan di sini (format ISO agar aman):
-  const TARGET_DATE = '2025-12-21T10:00:00+07:00';
 
   const [active, setActive] = useState<string>('mempelai');
   const [navOpen, setNavOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // Hero background carousel
   const [slide, setSlide] = useState(0);

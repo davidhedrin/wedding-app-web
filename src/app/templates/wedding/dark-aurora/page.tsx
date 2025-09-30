@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Playfair_Display, Lora, Great_Vibes } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 
@@ -35,7 +35,6 @@ const COUPLE = {
   groom: { name: "Fajar Pratama", desc: "Putra pertama dari Bpk. Pratama & Ibu Sari" },
   bride: { name: "Anindya Sarasvati", desc: "Putri kedua dari Bpk. Handoyo & Ibu Retno" },
   // Tanggal pernikahan (YYYY-MM-DDTHH:mm:ss lokal)
-  weddingDate: "2025-12-20T10:00:00",
   venueName: "The Grand Atrium",
   venueAddress: "Jl. Kemang Raya No. 88, Jakarta Selatan",
   dressCode: "Formal / Touch of Gold",
@@ -57,10 +56,13 @@ const scrollToId = (id: string) => {
   window.scrollTo({ top: y, behavior: "smooth" });
 };
 
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 // === COMPONENT ===
 export default function WeddingInvitationPage() {
   // Countdown
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(COUPLE.weddingDate.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
 
   // Hero background carousel sederhana
   const [heroIdx, setHeroIdx] = useState(0);
@@ -271,7 +273,7 @@ export default function WeddingInvitationPage() {
                 <span className="font-semibold">Akad:</span> Sabtu, 20 Desember 2025 — 10.00 WIB
               </li>
               <li>
-                <span className="font-semibold">Resepsi:</span> Sabtu, 20 Desember 2025 — 12.00–15.00 WIB
+                <span className="font-semibold">Resepsi:</span> Sabtu, 20 Desember 2025 — 12.00-15.00 WIB
               </li>
               <li>
                 <span className="font-semibold">Tempat:</span> {COUPLE.venueName}, {COUPLE.venueAddress}

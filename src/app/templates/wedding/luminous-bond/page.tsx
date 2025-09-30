@@ -6,6 +6,7 @@ import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 
 import bgImage from './bg.jpg';
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -14,7 +15,9 @@ import bgImage from './bg.jpg';
  * Create By: David
 */
 
-const WEDDING_DATE = new Date("2025-10-10T10:00:00"); // <- ganti sesuai kebutuhan
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const HERO_IMAGES = [
   "http://localhost:3005/assets/img/2149043983.jpg",
   "http://localhost:3005/assets/img/2149043983.jpg",
@@ -238,7 +241,7 @@ export default function WeddingInvitePage() {
                   >
                     <div className="text-center px-4 py-3 bg-rose-900/30 rounded-lg">
                       <div className="text-xs uppercase text-amber-200">Tanggal</div>
-                      <div className="text-sm text-rose-100">10 Oktober 2025 • 10:00</div>
+                      <div className="text-sm text-rose-100">{formatDate(WEDDING_DATE, "full", "short")}</div>
                     </div>
 
                     <div className="flex-1 grid grid-cols-4 gap-3">

@@ -4,6 +4,7 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -31,7 +32,8 @@ const GALLERY = new Array(8).fill(
   "http://localhost:3005/assets/img/2149043983.jpg"
 );
 
-const WEDDING_DATE = "2025-12-20T10:00:00+07:00"; // Ubah sesuai tanggal acara (WIB)
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 export default function WeddingInvitationPage() {
   // Carousel (Hero)
@@ -148,8 +150,8 @@ export default function WeddingInvitationPage() {
                     <button
                       onClick={() => scrollTo(id)}
                       className={`px-3 py-2 rounded-full text-sm transition-all duration-300 hover:bg-white/10 ${active === id
-                          ? "bg-white/10 ring-1 ring-white/20 underline underline-offset-8"
-                          : ""
+                        ? "bg-white/10 ring-1 ring-white/20 underline underline-offset-8"
+                        : ""
                         }`}
                       aria-current={active === id ? "page" : undefined}
                     >
@@ -202,7 +204,7 @@ export default function WeddingInvitationPage() {
               Aisyah & Bagas
             </h1>
             <p className="mt-3 text-stone-300">
-              Sabtu, 20 Desember 2025 · Jakarta
+              {formatDate(WEDDING_DATE, "full", "short")}
             </p>
 
             {/* Countdown */}

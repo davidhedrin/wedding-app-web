@@ -4,6 +4,7 @@
 import React, { JSX, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -13,7 +14,9 @@ import useCountdown from "@/lib/countdown";
 */
 
 /* ---------------------------- CONFIG ---------------------------- */
-const WEDDING_DATE = new Date("2025-12-12T10:00:00+07:00"); // Ganti sesuai tanggal/hari-jam pernikahan
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const HERO_IMAGES = [
   "http://localhost:3005/assets/img/2149043983.jpg",
   "http://localhost:3005/assets/img/2149043983.jpg",
@@ -215,13 +218,13 @@ export default function WeddingInvitePage(): JSX.Element {
                   </p>
 
                   {/* Countdown card */}
-                  <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4">
+                  <div className="flex flex-col items-center gap-4">
                     <div className="p-4 rounded-lg bg-white/6 backdrop-blur-sm border border-white/5 shadow-md w-full sm:w-auto">
                       {/* Countdown states */}
                       {isExpired ? (
                         <div className="text-center">
                           <p className="text-amber-200 font-medium">Terima kasih atas kehadiran Anda</p>
-                          <p className="text-xs text-slate-300 mt-1">Acara telah berlalu pada {WEDDING_DATE.toLocaleString()}</p>
+                          <p className="text-xs text-slate-300 mt-1">Acara telah berlalu pada {formatDate(WEDDING_DATE, "full")}</p>
                         </div>
                       ) : isToday ? (
                         <div className="text-center animate-pulse">
@@ -272,7 +275,7 @@ export default function WeddingInvitePage(): JSX.Element {
 
                   {/* small event preview */}
                   <div className="text-sm text-slate-300">
-                    <strong className="text-amber-200">Tanggal:</strong> {WEDDING_DATE.toLocaleDateString()} •{" "}
+                    <strong className="text-amber-200">Tanggal:</strong> {formatDate(WEDDING_DATE, "long")} •{" "}
                     <strong className="text-amber-200">Lokasi:</strong> [Nama Gedung / Lokasi] • <strong className="text-amber-200">Dress Code:</strong> Semi Formal
                   </div>
                 </div>

@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -25,7 +26,9 @@ const IMAGE = "http://localhost:3005/assets/img/2149043983.jpg";
 /**
  * Ubah TARGET_DATE di sini (ISO string). Contoh: "2025-12-31T09:00:00+07:00"
  */
-const TARGET_DATE = "2025-12-31T09:00:00+07:00";
+
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const formatNumber = (n: number) => String(n).padStart(2, "0");
 
@@ -302,7 +305,7 @@ export default function InvitationPage() {
                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 shadow-sm">
                   <h4 className="text-sm font-semibold">Akad & Resepsi</h4>
                   <p className="mt-1 text-sm text-slate-700">Akad: <strong>09:00 WIB</strong> — Resepsi: <strong>11:00 - 14:00 WIB</strong></p>
-                  <p className="mt-1 text-sm text-slate-700">Tanggal: <strong>{target.toLocaleDateString()}</strong></p>
+                  <p className="mt-1 text-sm text-slate-700">Tanggal: <strong>{formatDate(TARGET_DATE, "full", "short")}</strong></p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white border border-white/30 shadow-sm">
