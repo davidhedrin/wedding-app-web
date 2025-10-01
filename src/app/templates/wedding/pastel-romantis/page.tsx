@@ -11,7 +11,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 */
 
 const IMG = "http://localhost:3005/assets/img/2149043983.jpg";
-const weddingDate = new Date("2025-12-20T10:00:00+07:00");
+const weddingDate = new Date();
+weddingDate.setDate(weddingDate.getDate() + 12);
 
 type NavItem = { id: string; label: string };
 

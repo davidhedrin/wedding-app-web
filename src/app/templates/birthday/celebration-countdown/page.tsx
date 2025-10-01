@@ -13,6 +13,9 @@ import React, { JSX, useEffect, useMemo, useRef, useState } from "react";
 */
 
 /* -------------- Konfigurasi (ganti sesuai kebutuhan) ---------------- */
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 const CELEBRANT = {
   name: "Nama yang Berulang Tahun",
   age: 27,
@@ -23,7 +26,6 @@ const CELEBRANT = {
 
 const EVENT = {
   title: "Pesta Ulang Tahun",
-  dateISO: new Date("2025-10-02T18:00:00+07:00"), // ganti ke tanggal H
   locationName: "Cafe Meriah, Jakarta",
   address: "Jl. Contoh No.99, Jakarta",
   dressCode: "Smart Casual (warna hangat dianjurkan)",
@@ -47,7 +49,7 @@ export default function Invitation(): JSX.Element {
   }, []);
 
   // Countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(EVENT.dateISO.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // scroll reveal - simple fade/slide
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function Invitation(): JSX.Element {
 
   // derived formatted date
   const eventDate = useMemo(
-    () => new Date(EVENT.dateISO).toLocaleString("id-ID", {
+    () => new Date(TARGET_DATE).toLocaleString("id-ID", {
       weekday: "long",
       day: "numeric",
       month: "long",

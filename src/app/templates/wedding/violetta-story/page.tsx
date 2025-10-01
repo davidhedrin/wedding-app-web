@@ -32,7 +32,9 @@ const inter = Inter({
 });
 
 // === KONFIGURASI DASAR UNDANGAN ===
-const WEDDING_DATE = new Date("2025-12-20T10:00:00+07:00"); // atur ke tanggal akad/resepsi
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const THEME = {
   primary: "from-purple-900 via-fuchsia-900 to-purple-800",
   primarySoft: "bg-purple-900/60",

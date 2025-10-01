@@ -15,7 +15,8 @@ import useCountdown from "@/lib/countdown";
 /* ==================== CONFIG ==================== */
 const IMAGE_SRC = "http://localhost:3005/assets/img/2149043983.jpg";
 // Example date (YYYY-MM-DDTHH:MM:SS); replace with actual wedding datetime in local timezone.
-const WEDDING_DATE = "2025-12-12T16:00:00"; // <-- change this to the real date/time
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 /* ================================================= */
 
 type RSVPData = {

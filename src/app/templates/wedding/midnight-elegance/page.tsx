@@ -20,7 +20,8 @@ const THEME = {
   softBg: "bg-white/5",
 };
 const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
-const WEDDING_DATE = new Date("2025-12-20T10:00:00+07:00"); // Asia/Jakarta ceremony start
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 
 export default function Page() {

@@ -20,10 +20,12 @@ type RSVP = {
   coming: "yes" | "no" | "maybe";
 };
 
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 export default function Invitation() {
   // === CONFIG: ganti tanggal/waktu/nama/gambar sesuai kebutuhan ===
   const BIRTHDAY_NAME = "Alya Putri";
-  const BIRTHDAY_DATE_ISO = new Date("2025-10-10T18:00:00"); // gunakan ISO (YYYY-MM-DDTHH:mm:ss)
   const BIRTHDAY_PHOTO = "http://localhost:3005/assets/img/2149043983.jpg";
   const LOCATION_IFRAME =
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1234567890123!2d106.827153315315!3d-6.175110000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5e1a1234567%3A0xabcdef1234567890!2sMonas!5e0!3m2!1sen!2sid!4v1690000000000!5m2!1sen!2sid";
@@ -50,7 +52,7 @@ export default function Invitation() {
   ];
 
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(BIRTHDAY_DATE_ISO.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // carousel autoplay
   useEffect(() => {
@@ -241,7 +243,7 @@ export default function Invitation() {
                       <div>
                         <div className="text-xs text-slate-600">Waktu Perayaan</div>
                         <div className="text-sm font-semibold">
-                          {formatDate(BIRTHDAY_DATE_ISO, "full", "short")}
+                          {formatDate(TARGET_DATE, "full", "short")}
                         </div>
                       </div>
                       <div className="text-right">
@@ -393,7 +395,7 @@ export default function Invitation() {
                   <span className="text-xs text-slate-500">Selamat datang</span>
                 </div>
                 <p className="text-slate-700">
-                  Terima kasih telah mampir. Perkenalkan, <span className="font-semibold">{BIRTHDAY_NAME}</span> — yang akan merayakan ulang tahun pada <span className="font-medium">{new Date(BIRTHDAY_DATE_ISO).toLocaleDateString()}</span>.
+                  Terima kasih telah mampir. Perkenalkan, <span className="font-semibold">{BIRTHDAY_NAME}</span> — yang akan merayakan ulang tahun pada <span className="font-medium">{new Date(TARGET_DATE).toLocaleDateString()}</span>.
                   Dia dikenal ramah, penuh semangat, dan menyukai momen kumpul bersama keluarga & teman. Mari hadir dan beri doa terbaik!
                 </p>
 
@@ -438,7 +440,7 @@ export default function Invitation() {
                     <div className="p-4 rounded-xl bg-white/80 shadow hover:shadow-md transition">
                       <div className="text-xs text-slate-500">Tanggal</div>
                       <div className="font-semibold">
-                        {new Date(BIRTHDAY_DATE_ISO).toLocaleDateString("id-ID", {
+                        {new Date(TARGET_DATE).toLocaleDateString("id-ID", {
                           weekday: "long",
                           day: "numeric",
                           month: "long",
@@ -452,7 +454,7 @@ export default function Invitation() {
                     <div className="p-4 rounded-xl bg-white/80 shadow hover:shadow-md transition">
                       <div className="text-xs text-slate-500">Waktu</div>
                       <div className="font-semibold">
-                        {new Date(BIRTHDAY_DATE_ISO).toLocaleTimeString([], {
+                        {new Date(TARGET_DATE).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}

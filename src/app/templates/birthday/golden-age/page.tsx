@@ -18,7 +18,9 @@ type FAQItem = {
   a: string;
 };
 
-const EVENT_DATE_ISO = new Date("2025-12-25T18:00:00"); // <-- change to the actual event date/time (ISO)
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 const HERO_IMAGES = [
   "http://localhost:3005/assets/img/2149043983.jpg",
   // For demonstration, reuse same image with slight query variations (in production use different images)
@@ -35,7 +37,7 @@ export default function Invitation(): JSX.Element {
   }, []);
 
   // Countdown state
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(EVENT_DATE_ISO.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // Hero image carousel state
   const [heroIndex, setHeroIndex] = useState(0);
@@ -336,7 +338,7 @@ export default function Invitation(): JSX.Element {
                     ) : isToday ? (
                       <div>
                         <div className="text-sm text-amber-100 font-semibold">Hari ini adalah hari H! 🎂</div>
-                        <div className="mt-2 text-white/90">Acara dimulai pada {EVENT_DATE_ISO.toLocaleTimeString()}</div>
+                        <div className="mt-2 text-white/90">Acara dimulai pada {TARGET_DATE.toLocaleTimeString()}</div>
                       </div>
                     ) : (
                       <>
@@ -347,7 +349,7 @@ export default function Invitation(): JSX.Element {
                           <CounterUnit label="Menit" value={String(Math.max(0, minutes))} />
                           <CounterUnit label="Detik" value={String(Math.max(0, seconds))} />
                         </div>
-                        <div className="mt-2 text-xs text-white/60">Catat tanggalnya: {EVENT_DATE_ISO.toLocaleString()}</div>
+                        <div className="mt-2 text-xs text-white/60">Catat tanggalnya: {TARGET_DATE.toLocaleString()}</div>
                       </>
                     )}
                   </div>
@@ -454,8 +456,8 @@ export default function Invitation(): JSX.Element {
                 <h3 className="text-2xl font-semibold text-white">Detail Acara</h3>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <InfoCard label="Tanggal" value={EVENT_DATE_ISO.toLocaleDateString()} />
-                  <InfoCard label="Waktu" value={EVENT_DATE_ISO.toLocaleTimeString()} />
+                  <InfoCard label="Tanggal" value={TARGET_DATE.toLocaleDateString()} />
+                  <InfoCard label="Waktu" value={TARGET_DATE.toLocaleTimeString()} />
                   <InfoCard label="Tempat" value="Garden Hall, Jl. Bahagia No. 10" />
                   <InfoCard label="Dress code" value="Casual Fancy (pastel & gold accents)" />
                 </div>

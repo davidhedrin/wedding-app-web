@@ -32,11 +32,13 @@ const galleryImages = [
   "http://localhost:3005/assets/img/2149043983.jpg",
 ];
 
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 export default function InvitationPage() {
   // --- Countdown state and logic ------------------------------------------------
   // Set target date/time (UTC or local). Ganti tanggal sesuai kebutuhan.
   // Contoh: hari ulang tahun 2025-12-05 18:00 (local)
-  const TARGET_DATE = new Date("2025-12-05T18:00:00");
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // --- Carousel (hero background) ------------------------------------------------

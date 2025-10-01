@@ -20,7 +20,9 @@ type RSVPData = {
   contact?: string;
 };
 
-const EVENT_DATE = new Date("2025-09-25T18:00:00+07:00"); // <-- ubah sesuai hari-H (WIB / Asia-Jakarta)
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 const HERO_IMAGES = [
   "http://localhost:3005/assets/img/2149043983.jpg",
   // Anda bisa menambahkan url gambar lain di sini bila tersedia
@@ -28,7 +30,7 @@ const HERO_IMAGES = [
 
 export default function InvitationPage() {
   // Countdown state
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(EVENT_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // hero carousel
   const [heroIdx, setHeroIdx] = useState(0);

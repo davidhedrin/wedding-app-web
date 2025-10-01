@@ -12,7 +12,9 @@ import { JSX, useEffect, useRef, useState } from "react";
  * Create By: David
 */
 
-const TARGET_DATE_ISO = new Date("2025-12-05T18:00:00"); // <-- ubah sesuai hari H (format ISO)
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 const carouselImages: string[] = [
   "http://localhost:3005/assets/img/2149043983.jpg",
   // Tambahkan URL gambar lain jika tersedia
@@ -46,7 +48,7 @@ function useScrollReveal(refs: React.RefObject<HTMLElement | null>[]) {
 
 export default function InvitationPage(): JSX.Element {
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE_ISO.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // carousel
   const [index, setIndex] = useState(0);

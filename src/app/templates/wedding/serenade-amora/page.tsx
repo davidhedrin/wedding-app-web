@@ -10,7 +10,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
  * Create By: David
 */
 
-const WEDDING_DATE = new Date("2025-12-20T10:00:00+07:00"); // contoh: 20 Des 2025 10:00 WIB
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
 const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
 const HERO_IMAGES = [PLACEHOLDER_IMG, PLACEHOLDER_IMG, PLACEHOLDER_IMG]; // bisa ganti beragam foto
 const MAPS_EMBED_SRC =

@@ -1,6 +1,7 @@
 "use client";
 
 import useCountdown from "@/lib/countdown";
+import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 /**
@@ -15,8 +16,10 @@ type NavItem = {
   label: string;
 };
 
-const WEDDING_DATE = new Date("2025-12-20T09:00:00+07:00"); // ubah sesuai tanggal akad/resepsi
-const IMAGE_URL = "http://localhost:3005/assets/img/2149043983.jpg"; // placeholder yang sama untuk semua gambar
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
+
+const IMAGE_URL = "http://localhost:3005/assets/img/2149043983.jpg";
 
 const navItems: NavItem[] = [
   { id: "mempelai", label: "Mempelai" },
@@ -233,7 +236,7 @@ export default function UndanganPage() {
             </span>
           </h1>
           <p className="mt-4 text-neutral-200/90 max-w-2xl mx-auto">
-            Sabtu, 20 Desember 2025 · Jakarta, Indonesia
+            {formatDate(WEDDING_DATE, "full", "short")}
           </p>
 
           {/* Countdown */}

@@ -16,12 +16,14 @@ import bgImage from './bg.jpg'
 
 type FAQItem = { q: string; a: string };
 
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
+
 export default function Invitation() {
   // === CONFIG ===
   const BIRTHDAY_NAME = "Alya Putri";
   const BIRTHDAY_AGE = 25;
   // Set the target date/time for the birthday event (UTC+7 assumed)
-  const TARGET_DATE = new Date("2025-10-02T18:00:00+07:00"); // contoh: 2 Okt 2025, jam 18:00
   const BG_IMAGE = "http://localhost:3005/assets/img/2149043983.jpg";
 
   // === Countdown state ===

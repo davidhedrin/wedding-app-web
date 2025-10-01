@@ -22,11 +22,12 @@ type RSVPState = {
   attending: "yes" | "no" | "";
 };
 
-const EVENT_DATE = new Date("2025-10-05T18:00:00"); // <-- set to desired event datetime (ISO)
+const TARGET_DATE = new Date();
+TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const Invitation: NextPage = () => {
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(EVENT_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
 
   // navigation active
   const [active, setActive] = useState("hero");
@@ -169,7 +170,7 @@ const Invitation: NextPage = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-xs uppercase tracking-widest text-gray-300">Acara Dimulai</div>
-                          <div className="text-sm text-gray-200">{formatDate(EVENT_DATE, "long", "short")}</div>
+                          <div className="text-sm text-gray-200">{formatDate(TARGET_DATE, "long", "short")}</div>
                         </div>
 
                         <div className="ml-4">
@@ -219,7 +220,7 @@ const Invitation: NextPage = () => {
                       <a
                         target="_blank"
                         rel="noreferrer"
-                        href={`https://www.google.com/calendar/render?action=TEMPLATE&text=Undangan+Ulang+Tahun&dates=${toGoogleDate(EVENT_DATE)}&details=Yuk+hadir+di+acara+ulang+tahun`}
+                        href={`https://www.google.com/calendar/render?action=TEMPLATE&text=Undangan+Ulang+Tahun&dates=${toGoogleDate(TARGET_DATE)}&details=Yuk+hadir+di+acara+ulang+tahun`}
                         className="px-4 py-3 rounded-lg border border-white/8 text-sm hover:border-amber-300 transition inline-flex items-center gap-2"
                       >
                         <svg className="w-4 h-4 text-amber-300" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z" /></svg>
@@ -298,11 +299,11 @@ const Invitation: NextPage = () => {
                     <dl className="grid grid-cols-1 gap-3 text-sm text-gray-300">
                       <div className="p-4 rounded-lg bg-white/5 border border-white/6">
                         <dt className="text-xs text-gray-400">Tanggal</dt>
-                        <dd className="mt-1 font-semibold">{EVENT_DATE.toLocaleDateString()}</dd>
+                        <dd className="mt-1 font-semibold">{TARGET_DATE.toLocaleDateString()}</dd>
                       </div>
                       <div className="p-4 rounded-lg bg-white/5 border border-white/6">
                         <dt className="text-xs text-gray-400">Waktu</dt>
-                        <dd className="mt-1 font-semibold">{EVENT_DATE.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</dd>
+                        <dd className="mt-1 font-semibold">{TARGET_DATE.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</dd>
                       </div>
                       <div className="p-4 rounded-lg bg-white/5 border border-white/6">
                         <dt className="text-xs text-gray-400">Tempat</dt>
