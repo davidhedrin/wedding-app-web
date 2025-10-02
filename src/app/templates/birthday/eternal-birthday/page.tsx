@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/utils";
 
 type FAQItem = { q: string; a: string };
 
-const HERO_BG = "http://localhost:3005/assets/img/2149043983.jpg";
+const HERO_BG = "http://localhost:3005/assets/img/birthday-hero1.jpg";
 
 const faqData: FAQItem[] = [
   { q: "Apakah tamu boleh membawa pendamping?", a: "Tentu, mohon konfirmasi pada form RSVP jumlah pendamping jika membawa." },
@@ -27,9 +27,9 @@ const faqData: FAQItem[] = [
 const galleryImages = [
   HERO_BG,
   // ulangi / tambahkan placeholder lain jika perlu
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
 ];
 
 const TARGET_DATE = new Date();

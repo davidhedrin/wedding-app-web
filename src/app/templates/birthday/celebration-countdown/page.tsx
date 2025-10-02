@@ -19,7 +19,7 @@ TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 const CELEBRANT = {
   name: "Nama yang Berulang Tahun",
   age: 27,
-  photo: "http://localhost:3005/assets/img/2149043983.jpg",
+  photo: "http://localhost:3005/assets/img/birthday-hero1.jpg",
   description:
     "Merayakan perjalanan penuh warna, tawa, dan kenangan. Yuk hadir dan rayakan hari spesial ini bersama!",
 };
@@ -35,10 +35,10 @@ const EVENT = {
 };
 
 const GALLERY_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
   // add more local images if available
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
 ];
 /* -------------------------------------------------------------------- */
 

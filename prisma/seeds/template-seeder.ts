@@ -423,6 +423,24 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         colors: '[{"name": "Soft Mint", "value": "#E6F7F2"},{"name": "Warm Yellow", "value": "#FFD54F"},{"name": "Deep Navy", "value": "#1E293B"}]',
         is_active: true,
         createdBy: "SEEDER"
+      },
+      {
+        slug: "cozy-elegance",
+        name: "Cozy Elegance",
+        price: 149000,
+        disc_price: null,
+        short_desc: "Warm and stylish digital invitation with cozy gradients, elegant details, countdown, and interactive sections for a memorable experience.",
+        desc: "<h1 style=\"text-align: center;\">Cozy Elegance Birthday Celebration</h1><p style=\"text-align: left;\">The <strong>Cozy Elegance</strong> template blends soft gradient tones, refined layouts, and interactive features to create an inviting digital birthday invitation. With a balance of warmth and sophistication, it ensures every guest feels both welcomed and impressed from the very first glance.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Subtle cozy gradients with modern decorative accents</li><li>Interactive countdown timer with dynamic day-of messages</li><li>Smooth scroll navigation across welcome, event details, gallery, and RSVP</li><li>Elegant font pairing — stylish script for highlights and clean sans-serif for readability</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Birthday parties with a cozy yet premium aesthetic</li><li>Hosts who want a balance of warmth, elegance, and interactivity</li><li>Digital-first celebrations with responsive and modern design</li></ol><p style=\"text-align: center;\"><em>“Cozy Elegance made our celebration feel warm, stylish, and unforgettable.”</em> — <strong>Guest Feedback</strong></p>",
+        ctg_key: "bth",
+        ctg_name: "Birthday",
+        url: "templates/birthday/cozy-elegance",
+        flag_name: null,
+        flag_color: null,
+        language: "Indonesia",
+        layouts: "Mobile & Dekstop",
+        colors: '[{"name": "Soft Mint", "value": "#E8F9F4"}, {"name": "Warm Pastel Yellow", "value": "#FFE89C"}, {"name": "Emerald Green", "value": "#34D399"}]',
+        is_active: true,
+        createdBy: "SEEDER"
       }
     ]
     await tx.templates.createMany({
@@ -436,13 +454,13 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
           tmp_id: tempId, 
           index: 1,
           file_name: "",
-          file_path: "http://localhost:3005/template/2149043983.jpg",
+          file_path: `http://localhost:3005/template/${x.slug}-0.jpg`,
         },
         {
           tmp_id: tempId, 
           index: 2,
           file_name: "",
-          file_path: "http://localhost:3005/template/2149043983.jpg",
+          file_path: `http://localhost:3005/template/${x.slug}-1.jpg`,
         }
       ]
     });

@@ -166,7 +166,7 @@ export default function WeddingInvitationPage() {
       </header>
 
       {/* ===== Hero ===== */}
-      <section id="hero" className="relative h-[92svh] min-h-[560px] w-full overflow-hidden">
+      <section id="hero" className="relative h-screen min-h-[560px] w-full overflow-hidden">
         {/* Background Carousel */}
         <div className="absolute inset-0">
           {HERO_IMAGES.map((src, i) => (
@@ -177,7 +177,7 @@ export default function WeddingInvitationPage() {
               aria-hidden={heroIdx !== i}
             >
               {/* pakai Image untuk optimasi; bisa juga pakai div bg-cover */}
-              <img src={src} alt={`Hero ${i + 1}`} className="object-cover h-svh w-full" />
+              <img src={src} alt={`Hero ${i + 1}`} className="object-cover h-screen w-full" />
               <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-slate-950/70 to-slate-950/95" />
             </div>
           ))}

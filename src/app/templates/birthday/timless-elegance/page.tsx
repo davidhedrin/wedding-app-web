@@ -3,7 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import Head from "next/head";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Invitation Type: Birthday
@@ -26,7 +26,7 @@ TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 export default function Invitation() {
   // === CONFIG: ganti tanggal/waktu/nama/gambar sesuai kebutuhan ===
   const BIRTHDAY_NAME = "Alya Putri";
-  const BIRTHDAY_PHOTO = "http://localhost:3005/assets/img/2149043983.jpg";
+  const BIRTHDAY_PHOTO = "http://localhost:3005/assets/img/birthday-hero1.jpg";
   const LOCATION_IFRAME =
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1234567890123!2d106.827153315315!3d-6.175110000000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5e1a1234567%3A0xabcdef1234567890!2sMonas!5e0!3m2!1sen!2sid!4v1690000000000!5m2!1sen!2sid";
 

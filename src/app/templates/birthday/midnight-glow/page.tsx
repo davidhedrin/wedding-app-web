@@ -85,9 +85,9 @@ const Invitation: NextPage = () => {
 
   // gallery images
   const GALLERY = [
-    "http://localhost:3005/assets/img/2149043983.jpg",
-    "http://localhost:3005/assets/img/2149043983.jpg",
-    "http://localhost:3005/assets/img/2149043983.jpg",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg",
   ];
   const [galleryIndex, setGalleryIndex] = useState(0);
 
@@ -234,7 +234,7 @@ const Invitation: NextPage = () => {
                 <div className="reveal reveal-from-right">
                   <div className="inner-card rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-black/30 to-white/5 border border-white/5 shadow-2xl">
                     <div className="flex items-center gap-4">
-                      <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Foto" className="w-20 h-20 object-cover rounded-lg border border-white/10 shadow" />
+                      <img src="http://localhost:3005/assets/img/birthday-hero1.jpg" alt="Foto" className="w-20 h-20 object-cover rounded-lg border border-white/10 shadow" />
                       <div>
                         <div style={{ fontFamily: "Great Vibes, serif" }} className="text-2xl text-amber-300 leading-tight">Nama Yang Berulang Tahun</div>
                         <div className="text-sm text-gray-300">Usia: <span className="font-semibold">25</span></div>
@@ -270,7 +270,7 @@ const Invitation: NextPage = () => {
 
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="col-span-1">
-                    <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Foto utama" className="w-full h-44 object-cover rounded-lg border border-white/6 shadow" />
+                    <img src="http://localhost:3005/assets/img/birthday-hero1.jpg" alt="Foto utama" className="w-full h-44 object-cover rounded-lg border border-white/6 shadow" />
                   </div>
                   <div className="sm:col-span-2">
                     <div className="flex flex-col gap-2">

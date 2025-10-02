@@ -16,10 +16,10 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const carouselImages: string[] = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
   // Tambahkan URL gambar lain jika tersedia
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
 ];
 
 /** Hook: reveal on scroll (adds class 'reveal' when visible) */

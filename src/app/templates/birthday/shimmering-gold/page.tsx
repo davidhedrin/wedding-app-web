@@ -24,7 +24,7 @@ export default function Invitation() {
   const BIRTHDAY_NAME = "Alya Putri";
   const BIRTHDAY_AGE = 25;
   // Set the target date/time for the birthday event (UTC+7 assumed)
-  const BG_IMAGE = "http://localhost:3005/assets/img/2149043983.jpg";
+  const BG_IMAGE = "http://localhost:3005/assets/img/birthday-hero1.jpg";
 
   // === Countdown state ===
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());

@@ -22,10 +22,10 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const HERO_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
   // For demonstration, reuse same image with slight query variations (in production use different images)
-  "http://localhost:3005/assets/img/2149043983.jpg?v=2",
-  "http://localhost:3005/assets/img/2149043983.jpg?v=3",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg?v=2",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg?v=3",
 ];
 
 export default function Invitation(): JSX.Element {
@@ -50,10 +50,10 @@ export default function Invitation(): JSX.Element {
 
   // Gallery slider
   const GALLERY = [
-    "http://localhost:3005/assets/img/2149043983.jpg",
-    "http://localhost:3005/assets/img/2149043983.jpg?v=2",
-    "http://localhost:3005/assets/img/2149043983.jpg?v=3",
-    "http://localhost:3005/assets/img/2149043983.jpg?v=4",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg?v=2",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg?v=3",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg?v=4",
   ];
   const [galleryIndex, setGalleryIndex] = useState(0);
 
@@ -421,7 +421,7 @@ export default function Invitation(): JSX.Element {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center backdrop-blur-sm bg-gray-800/25 p-6 rounded-2xl outline-soft">
               <div className="col-span-1 flex items-center justify-center">
                 <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-white/10 shadow-lg">
-                  <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Foto Raya" className="w-full h-full object-cover" />
+                  <img src="http://localhost:3005/assets/img/birthday-hero1.jpg" alt="Foto Raya" className="w-full h-full object-cover" />
                 </div>
               </div>
 

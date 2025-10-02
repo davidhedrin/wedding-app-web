@@ -24,7 +24,7 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const HERO_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  "http://localhost:3005/assets/img/birthday-hero1.jpg",
   // Anda bisa menambahkan url gambar lain di sini bila tersedia
 ];
 
@@ -65,7 +65,7 @@ export default function InvitationPage() {
   const galleryImages = [
     ...HERO_IMAGES,
     // dummy repeats for demo
-    "http://localhost:3005/assets/img/2149043983.jpg",
+    "http://localhost:3005/assets/img/birthday-hero1.jpg",
   ];
   const [gIdx, setGIdx] = useState(0);
 
@@ -342,7 +342,7 @@ export default function InvitationPage() {
               >
                 <div className="md:col-span-1 flex items-center justify-center">
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src="http://localhost:3005/assets/img/birthday-hero1.jpg"
                     alt="Foto yang berulang tahun"
                     className="w-48 h-48 rounded-xl object-cover ring-4 ring-white shadow"
                   />
