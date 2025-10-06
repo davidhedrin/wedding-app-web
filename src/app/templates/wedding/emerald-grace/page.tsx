@@ -323,8 +323,8 @@ export default function Page() {
       {/* MEMPELAI */}
       <section id="mempelai" className="section">
         <Container>
-          <SectionHeading eyebrow="Assalamu’alaikum Wr. Wb." title="Mempelai">
-            Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan
+          <SectionHeading eyebrow="Kata Sambutan" title="Mempelai">
+            Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan
             pernikahan kami dan berharap kehadiran Bapak/Ibu/Saudara/i untuk memberikan doa
             restu.
           </SectionHeading>
@@ -374,7 +374,7 @@ export default function Page() {
             <div className="rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-6 backdrop-blur-xl">
               <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-4">
                 <InfoRow label="Akad Nikah" value="Minggu, 14 Des 2025 • 10:00 WIB" />
-                <InfoRow label="Resepsi" value="Minggu, 14 Des 2025 • 12:00–15:00 WIB" />
+                <InfoRow label="Resepsi" value="Minggu, 14 Des 2025 • 12:00-15:00 WIB" />
                 <InfoRow label="Lokasi" value="The Emerald Hall, Jl. Anggrek No. 12, Jakarta" />
                 <InfoRow label="Dress Code" value="Formal • Nuansa Emerald & Champagne" />
                 <InfoRow
@@ -389,10 +389,9 @@ export default function Page() {
                 title="Lokasi Acara - Google Maps"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3958.969461437036!2d112.750!3d-7.168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMTAnMDQuOCJTIDExMsKwNDUnMDAuMCJF!5e0!3m2!1sen!2sid!4v1680000000000"
                 width="100%"
-                height="360"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="grayscale hover:grayscale-0 transition"
+                className="grayscale hover:grayscale-0 transition h-full"
               />
             </div>
           </div>

@@ -345,7 +345,7 @@ function Hero({ countDown }: {
   }
 }) {
   return (
-    <section className="relative isolate min-h-[94vh] pt-28">
+    <section className="relative isolate min-h-[94vh] md:pt-44 pt-60">
       {/* Background carousel */}
       <div className="hero-carousel -z-10">
         {[THEME_IMG, THEME_IMG, THEME_IMG].map((src, i) => (
@@ -451,7 +451,7 @@ function Mempelai() {
   return (
     <div className="relative py-16 sm:py-20">
       <SectionTitle
-        overline="Bismillahirrahmanirrahim"
+        overline="Kata Sambutan"
         title="Mempelai"
         subtitle="Dengan penuh rasa syukur, kami bermaksud menyelenggarakan pernikahan kami."
       />
@@ -468,7 +468,7 @@ function Mempelai() {
       </div>
 
       <div className="mx-auto mt-10 max-w-3xl px-6 text-center">
-        <p className="font-script text-2xl text-amber-200/90">Assalamu’alaikum warahmatullahi wabarakatuh,</p>
+        <p className="font-script text-2xl text-amber-200/90">Assalamualaikum/Salam sejahtera,</p>
         <p className="mt-3 text-emerald-100/85">
           Dengan memohon rahmat dan ridha Allah Subhanahu Wa Ta’ala, kami bermaksud mengundang Bapak/Ibu/Saudara/i
           untuk hadir dan memberi doa restu pada pernikahan kami.

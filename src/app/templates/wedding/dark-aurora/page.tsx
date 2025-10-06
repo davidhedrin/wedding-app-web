@@ -238,29 +238,35 @@ export default function WeddingInvitationPage() {
 
       {/* ===== Mempelai ===== */}
       <Section id="mempelai" title="Mempelai">
+        <blockquote className="mb-8 mx-auto max-w-3xl text-center font-[var(--font-lora)] text-slate-200/90 italic">
+          “Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu...” (QS. Ar-Rum: 21)
+        </blockquote>
         <div className="grid gap-6 md:grid-cols-2">
           {[COUPLE.groom, COUPLE.bride].map((p, idx) => (
             <div
               key={p.name}
-              className={`group overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring} p-5 sm:p-6 grid grid-cols-[100px_1fr] sm:grid-cols-[140px_1fr] gap-4`}
+              className={`group overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring} p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4`}
             >
-              <div className="relative aspect-square overflow-hidden rounded-2xl">
-                <img src={PLACEHOLDER_IMG} alt={p.name} className="object-cover transition-transform duration-500 group-hover:scale-[1.05]" />
+              <div className="relative aspect-[3/4] sm:aspect-[4/3] overflow-hidden rounded-2xl">
+                <img
+                  src={PLACEHOLDER_IMG}
+                  alt={p.name}
+                  className="object-cover object-center w-full h-full transition-transform duration-500 group-hover:scale-105"
+                />
               </div>
-              <div className="flex flex-col justify-center">
-                <h3 className={`text-xl sm:text-2xl font-semibold ${THEME.heading}`}>{p.name}</h3>
-                <p className={`mt-1 text-sm ${THEME.body} font-[var(--font-lora)]`}>{p.desc}</p>
-                <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
-                <p className="mt-3 text-sm text-slate-200/80">
-                  “Dengan ridho Allah SWT dan doa restu Bapak/Ibu/Saudara/i, kami akan melangsungkan akad dan resepsi pernikahan.”
+              <div className="flex flex-col justify-center space-y-3">
+                <h3 className={`text-xl sm:text-2xl font-semibold ${THEME.heading}`}>
+                  {p.name}
+                </h3>
+                <p className={`mt-1 text-sm ${THEME.body} font-[var(--font-lora)]`}>
+                  {p.desc}
                 </p>
+                <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
               </div>
             </div>
           ))}
         </div>
-        <blockquote className="mt-8 mx-auto max-w-3xl text-center font-[var(--font-lora)] text-slate-200/90 italic">
-          “Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu...” (QS. Ar-Rum: 21)
-        </blockquote>
+
       </Section>
 
       {/* ===== Acara ===== */}
@@ -513,7 +519,7 @@ export default function WeddingInvitationPage() {
           {[
             { q: "Apakah anak-anak diperbolehkan hadir?", a: "Tentu, mohon pendampingan orang tua selama acara." },
             { q: "Apakah ada parkir di lokasi?", a: "Tersedia area parkir gedung dan valet service." },
-            { q: "Kapan waktu terbaik untuk datang?", a: "Sebaiknya 10–15 menit sebelum acara dimulai." },
+            { q: "Kapan waktu terbaik untuk datang?", a: "Sebaiknya 10-15 menit sebelum acara dimulai." },
             { q: "Apakah wajib RSVP?", a: "Iya, agar kami dapat menyiapkan kursi dan konsumsi dengan optimal." },
           ].map((f, idx) => (
             <div key={idx} className={`rounded-2xl ${THEME.card} ${THEME.ring}`}>
@@ -526,14 +532,17 @@ export default function WeddingInvitationPage() {
                 <span className="text-amber-300">{openFaq === idx ? "−" : "+"}</span>
               </button>
               <div
-                className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${openFaq === idx ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                className={`overflow-hidden transition-all duration-300 ease-out ${openFaq === idx
+                    ? "max-h-[1000px] opacity-100"
+                    : "max-h-0 opacity-0"
                   }`}
               >
-                <div className="overflow-hidden px-4 pb-4 text-slate-200/90">{f.a}</div>
+                <div className="px-4 pb-4 text-slate-200/90">{f.a}</div>
               </div>
             </div>
           ))}
         </div>
+
       </Section>
 
       {/* ===== Footer ===== */}

@@ -254,9 +254,9 @@ export default function WeddingInvitationPage() {
       <section id="mempelai" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Assalamu’alaikum Warahmatullahi Wabarakatuh</h2>
+            <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Kata Sambutan</h2>
             <p className="mt-3 text-white/80">
-              Dengan rahmat Allah SWT, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
+              Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
             </p>
           </div>
 
@@ -265,14 +265,33 @@ export default function WeddingInvitationPage() {
               { name: 'Alya Putri', desc: 'Putri dari Bpk. Ahmad & Ibu Sari' },
               { name: 'Rizky Pratama', desc: 'Putra dari Bpk. Budi & Ibu Rina' },
             ].map((p, idx) => (
-              <div key={idx} className={classNames('group relative overflow-hidden rounded-3xl border p-5 md:p-6', THEME.borderSoft, THEME.cardBg)}>
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
-                  <img src={IMAGES[0]} alt={p.name} className="object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div
+                key={idx}
+                className={classNames(
+                  'group relative overflow-hidden rounded-3xl border p-5 md:p-6',
+                  THEME.borderSoft,
+                  THEME.cardBg,
+                  'min-h-[350px]'
+                )}
+              >
+                <div className="relative w-full h-[250px] overflow-hidden rounded-2xl">
+                  <img
+                    src={IMAGES[0]}
+                    alt={p.name}
+                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                    style={{
+                      objectPosition: 'center',
+                    }}
+                  />
                 </div>
-                <div className="mt-4">
-                  <h3 className={classNames(playfair.className, 'text-2xl text-white')}>{p.name}</h3>
+
+                <div className="mt-4 z-10 relative">
+                  <h3 className={classNames(playfair.className, 'text-2xl text-white')}>
+                    {p.name}
+                  </h3>
                   <p className="text-white/70">{p.desc}</p>
                 </div>
+
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
                   <div className="absolute inset-0 bg-gradient-to-t from-amber-300/10 via-transparent to-transparent" />
                 </div>

@@ -319,9 +319,9 @@ export default function WeddingInvite() {
               </div>
 
               <div className="mt-8 text-slate-300 bg-slate-800/30 rounded-xl p-6 border border-slate-700">
-                <p className="mb-3">Assalamu’alaikum / Salam sejahtera,</p>
+                <p className="mb-1 text-xl font-semibold">Kata Sambutan</p>
                 <p>
-                  Dengan penuh rasa syukur kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu
+                  Assalamu'alaikum / Salam sejahtera, Dengan penuh rasa syukur kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu
                   pada acara pernikahan kami. Kehadiran Anda menjadi berkah bagi kami.
                 </p>
               </div>
@@ -381,7 +381,6 @@ export default function WeddingInvite() {
                     className="flex transition-transform duration-700"
                     style={{
                       transform: `translateX(-${galleryIdx * 100}%)`,
-                      width: `${galleryCount * 100}%`,
                     }}
                   >
                     {Array.from({ length: galleryCount }).map((_, i) => (

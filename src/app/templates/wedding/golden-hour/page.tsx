@@ -107,8 +107,6 @@ export default function WeddingInvitePage(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Undangan Pernikahan — [Nama Mempelai]</title>
-        <meta name="description" content="Undangan pernikahan digital — elegan & interaktif." />
         {/* Fonts: two elegant fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="stylesheet"
@@ -140,7 +138,7 @@ export default function WeddingInvitePage(): JSX.Element {
                     </div>
                     <div className="hidden sm:block">
                       <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--ff-heading)" }}>
-                        [Nama & Nama]
+                        Betrice & Jhonson
                       </h1>
                       <p className="text-xs text-amber-100/60">Undangan Digital</p>
                     </div>
@@ -210,7 +208,7 @@ export default function WeddingInvitePage(): JSX.Element {
                   </p>
 
                   <h2 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-serif" style={{ fontFamily: "var(--ff-heading)" }}>
-                    [Nama Mempelai Wanita] &nbsp;<span className="text-amber-300">•</span>&nbsp; [Nama Mempelai Pria]
+                    Betrice Anastasya &nbsp;<span className="text-amber-300">•</span>&nbsp; Jhonson Derullo
                   </h2>
 
                   <p className="text-slate-200/90 max-w-xl">
@@ -288,12 +286,12 @@ export default function WeddingInvitePage(): JSX.Element {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-xs text-amber-200">Kami</p>
-                          <h3 className="text-lg font-serif" style={{ fontFamily: "var(--ff-heading)" }}>[Nama Mempelai Wanita]</h3>
+                          <h3 className="text-lg font-serif" style={{ fontFamily: "var(--ff-heading)" }}>Betrice Anastasya</h3>
                           <p className="text-xs text-slate-300">Putri dari Bapak ... & Ibu ...</p>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-amber-200">&amp;</p>
-                          <h3 className="text-lg font-serif" style={{ fontFamily: "var(--ff-heading)" }}>[Nama Mempelai Pria]</h3>
+                          <h3 className="text-lg font-serif" style={{ fontFamily: "var(--ff-heading)" }}>Jhonson Derullo</h3>
                           <p className="text-xs text-slate-300">Putra dari Bapak ... & Ibu ...</p>
                         </div>
                       </div>
@@ -520,7 +518,7 @@ export default function WeddingInvitePage(): JSX.Element {
             <div className="max-w-5xl mx-auto px-4">
               <div className="bg-black/20 rounded-2xl p-6 flex flex-col md:flex-row md:justify-between items-start gap-4">
                 <div>
-                  <h3 className="font-serif text-lg" style={{ fontFamily: "var(--ff-heading)" }}>[Nama & Nama]</h3>
+                  <h3 className="font-serif text-lg" style={{ fontFamily: "var(--ff-heading)" }}>Betrice & Jhonson</h3>
                   <p className="text-sm text-slate-300">Terima kasih telah mengunjungi undangan digital kami.</p>
                 </div>
 
