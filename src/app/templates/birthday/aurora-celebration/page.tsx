@@ -223,7 +223,7 @@ export default function InvitationPage(): JSX.Element {
                   }}
                 />
               ))}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-white/60 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/30 to-transparent pointer-events-none" />
             </div>
 
             <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
@@ -251,7 +251,7 @@ export default function InvitationPage(): JSX.Element {
                     <div className="mt-6">
                       <div
                         className={`inline-flex items-center gap-4 p-4 rounded-xl shadow-xl transition-all transform-gpu
-      ${!isToday && !isExpired
+                          ${!isToday && !isExpired
                             ? "bg-gradient-to-r from-emerald-50 via-sky-50 to-indigo-50 border border-white/30"
                             : isToday
                               ? "bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 border border-white/30"

@@ -161,7 +161,7 @@ export default function WeddingInvitePage() {
                   </div>
                   <div className="hidden sm:block">
                     <div className="text-sm font-playfair text-rose-50">Undangan Pernikahan</div>
-                    <div className="text-xs text-rose-200/70">[Nama & Nama]</div>
+                    <div className="text-xs text-rose-200/70">Nadian & Stephen</div>
                   </div>
                 </a>
               </div>
@@ -220,7 +220,6 @@ export default function WeddingInvitePage() {
                 <div className="space-y-6">
                   <div className="inline-flex items-center gap-3 bg-rose-800/40 px-4 py-2 rounded-full shadow-sm animate-fade-in">
                     <span className="text-xs uppercase tracking-wider text-amber-200">Undangan Resmi</span>
-                    <span className="text-xs text-rose-100/80">[Nama & Nama]</span>
                   </div>
 
                   <h1 className="text-4xl sm:text-5xl md:text-6xl leading-tight font-playfair font-semibold">
@@ -729,7 +728,7 @@ export default function WeddingInvitePage() {
                     W
                   </div>
                   <div>
-                    <div className="font-semibold">[Nama & Nama]</div>
+                    <div className="font-semibold">Nadian & Stephen</div>
                     <div className="text-sm text-rose-200/80">10 Oktober 2025</div>
                   </div>
                 </div>

@@ -256,7 +256,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         flag_color: null,
         language: "Indonesia",
         layouts: "Mobile & Dekstop",
-        colors: '[{name:"White", value:"#FFFFFF"}]',
+        colors: '[{"name":"White", "value":"#FFFFFF"}]',
         is_active: true,
         createdBy: "SEEDER"
       },
@@ -294,7 +294,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         flag_color: null,
         language: "Indonesia",
         layouts: "Mobile & Dekstop",
-        colors: '[{name:"White", value:"#FFFFFF"},{"name": "Blue", "value": "#403efe"}]',
+        colors: '[{"name":"White", "value":"#FFFFFF"},{"name": "Blue", "value": "#403efe"}]',
         is_active: true,
         createdBy: "SEEDER"
       },

@@ -17,7 +17,7 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const CELEBRANT = {
-  name: "Nama yang Berulang Tahun",
+  name: "Jesica Zefina",
   age: 27,
   photo: "http://localhost:3005/assets/img/birthday-hero1.jpg",
   description:
@@ -549,7 +549,7 @@ export default function Invitation(): JSX.Element {
                   <iframe
                     title="Lokasi Acara"
                     src={EVENT.mapEmbedSrc}
-                    className="w-full h-80 border-0"
+                    className="w-full h-full border-0"
                     loading="lazy"
                     aria-hidden="false"
                     tabIndex={0}
@@ -732,7 +732,12 @@ export default function Invitation(): JSX.Element {
                     </div>
                     <div className="text-white/80">{openFaq === i ? "−" : "+"}</div>
                   </button>
-                  <div className={`px-4 py-3 transition-all ${openFaq === i ? "max-h-60" : "max-h-0 overflow-hidden"}`}>
+                  <div
+                    className={`
+                      transition-all duration-500 ease-in-out overflow-hidden
+                      ${openFaq === i ? "max-h-full px-4 py-3 opacity-100" : "max-h-0 px-4 py-0 opacity-0"}
+                    `}
+                  >
                     <div className="text-sm text-white/80">{faq.a}</div>
                   </div>
                 </div>

@@ -162,7 +162,7 @@ const Invitation: NextPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 items-center gap-8">
                 <div className="reveal reveal-from-left">
                   <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-black/30 to-white/5 border border-white/5 shadow-xl backdrop-blur-lg">
-                    <h1 style={{ fontFamily: "Great Vibes, serif" }} className="text-4xl sm:text-5xl tracking-tight leading-tight text-amber-300 drop-shadow-lg">Selamat Ulang Tahun, [Nama]!</h1>
+                    <h1 style={{ fontFamily: "Great Vibes, serif" }} className="text-4xl sm:text-5xl tracking-tight leading-tight text-amber-300 drop-shadow-lg">Selamat Ulang Tahun, Felicia!</h1>
                     <p className="mt-2 text-sm text-gray-300 max-w-xl">Undangan resmi untuk merayakan momen spesial — penuh warna, tawa, dan kenangan. Yuk hadir dan rayakan bersama!</p>
 
                     {/* Countdown Card */}
@@ -247,7 +247,7 @@ const Invitation: NextPage = () => {
                       <div className="mt-3 flex flex-wrap gap-2">
                         <span className="px-3 py-1 rounded-full bg-amber-600/20 text-amber-200 text-xs">Tema: Golden Night</span>
                         <span className="px-3 py-1 rounded-full bg-white/5 text-xs">Dress Code: Chic Casual</span>
-                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs">Lokasi: [Nama Tempat]</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 text-xs">Lokasi: Gedung Pertemuan</span>
                       </div>
                     </div>
 
@@ -307,7 +307,7 @@ const Invitation: NextPage = () => {
                       </div>
                       <div className="p-4 rounded-lg bg-white/5 border border-white/6">
                         <dt className="text-xs text-gray-400">Tempat</dt>
-                        <dd className="mt-1 font-semibold">[Nama Lokasi], Jalan Contoh No. 123</dd>
+                        <dd className="mt-1 font-semibold">Jakarta, Jalan Contoh No. 123</dd>
                       </div>
                       <div className="p-4 rounded-lg bg-white/5 border border-white/6">
                         <dt className="text-xs text-gray-400">Dress Code</dt>

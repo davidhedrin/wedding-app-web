@@ -129,7 +129,7 @@ export default function WeddingInvite() {
                 </div>
                 <div className="hidden sm:block">
                   <span className="text-sm font-semibold">Undangan</span>
-                  <div className="text-xs text-white/60">[Nama Mempelai]</div>
+                  <div className="text-xs text-white/60">Nadian &amp; Stephen</div>
                 </div>
               </button>
             </div>
@@ -178,7 +178,7 @@ export default function WeddingInvite() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               {/* Background carousel */}
-              <div className="relative h-[520px] sm:h-[480px] md:h-[420px] lg:h-[520px]">
+              <div className="relative h-screen sm:h-[480px] md:h-[420px] lg:h-[520px]">
                 {heroImages.map((src, i) => (
                   <img
                     key={i}
@@ -199,7 +199,7 @@ export default function WeddingInvite() {
                   <div className="max-w-xl text-center md:text-left text-white/95 space-y-4">
                     <h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl leading-tight drop-shadow-lg">
                       Undangan Pernikahan
-                      <span className="block text-2xl sm:text-3xl font-medium mt-1 opacity-90">[Nama A] &amp; [Nama B]</span>
+                      <span className="block text-2xl sm:text-3xl font-medium mt-1 opacity-90">Nadian Kristel Anisa &amp; Stephen Angga</span>
                     </h1>
 
                     <p className="text-sm sm:text-base text-white/80 max-w-md">
@@ -285,9 +285,9 @@ export default function WeddingInvite() {
                       />
                       <div>
                         <div className="text-sm text-white/80">Kami yang berbahagia</div>
-                        <div className="font-playfair text-lg">[Nama A]</div>
+                        <div className="font-playfair text-lg">Nadian</div>
                         <div className="font-playfair text-lg"> &amp; </div>
-                        <div className="font-playfair text-lg">[Nama B]</div>
+                        <div className="font-playfair text-lg">Stephen</div>
                         <div className="text-xs text-white/60 mt-1">{formattedDate}</div>
                       </div>
                     </div>
@@ -332,7 +332,7 @@ export default function WeddingInvite() {
           </div>
         </section>
 
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 space-y-12 pb-20">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 space-y-12">
           {/* Mempelai */}
           <section id="mempelai" className="pt-4">
             <div className="bg-white/3 rounded-2xl p-5 md:p-8 border border-white/6 shadow-lg">
@@ -343,8 +343,8 @@ export default function WeddingInvite() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
-                  { name: "[Nama A]", role: "Calon Pengantin Wanita / Pria", desc: "Putri/Putra dari keluarga ..." },
-                  { name: "[Nama B]", role: "Calon Pengantin Pria / Wanita", desc: "Putri/Putra dari keluarga ..." },
+                  { name: "Nadian", role: "Calon Pengantin Wanita / Pria", desc: "Putri/Putra dari keluarga ..." },
+                  { name: "Stephen", role: "Calon Pengantin Pria / Wanita", desc: "Putri/Putra dari keluarga ..." },
                 ].map((p, idx) => (
                   <div key={idx} className="bg-white/5 p-4 rounded-xl flex gap-4 items-center">
                     <img src={IMAGE_SRC} alt={p.name} className="w-24 h-24 object-cover rounded-lg ring-1 ring-white/8" />
@@ -707,7 +707,7 @@ export default function WeddingInvite() {
 
           {/* Footer */}
           <footer className="pt-6 pb-12">
-            <div className="bg-white/4 rounded-2xl p-6 md:p-8 border border-white/6 shadow-lg">
+            <div className="bg-[#b8846b] rounded-2xl p-6 md:p-8 border border-white/6 shadow-lg">
               <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-3">
@@ -715,7 +715,7 @@ export default function WeddingInvite() {
                       <span className="font-playfair text-xl">W</span>
                     </div>
                     <div>
-                      <div className="font-semibold text-white">[Nama A] &amp; [Nama B]</div>
+                      <div className="font-semibold text-white">Nadian &amp; Stephen</div>
                       <div className="text-xs text-white/60">Terima kasih telah mengunjungi undangan kami</div>
                     </div>
                   </div>
@@ -739,7 +739,7 @@ export default function WeddingInvite() {
               </div>
 
               <div className="mt-6 text-xs text-white/60 text-center">
-                © {new Date().getFullYear()} [Nama Keluarga] — Dibuat dengan ❤
+                © {new Date().getFullYear()} Nadian &amp; Stephen — Dibuat dengan ❤
               </div>
             </div>
           </footer>

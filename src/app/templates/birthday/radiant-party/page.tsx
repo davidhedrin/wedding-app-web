@@ -364,7 +364,7 @@ export default function InvitationPage() {
 
                   <div className="mt-6 flex items-center gap-3">
                     <a href="#galeri" className="btn-outline">Lihat Galeri</a>
-                    <a href="#rsvp" className="btn-primary">Konfirmasi Sekarang</a>
+                    <a href="#rsvp" className="btn-primary px-3 py-2">Konfirmasi Sekarang</a>
                   </div>
                 </div>
               </div>

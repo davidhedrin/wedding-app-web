@@ -254,7 +254,7 @@ const WeddingInvitationPage: React.FC = () => {
       {/* ===== HERO ===== */}
       <section
         id="hero"
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+        className="relative h-screen flex items-center justify-center overflow-hidden"
       >
         {/* Background carousel */}
         <div className="absolute inset-0">
@@ -429,7 +429,7 @@ const WeddingInvitationPage: React.FC = () => {
                   </Pill>
                 </div>
                 <p className="mt-2 text-neutral-600">
-                  Pukul 10.00 WIB – 11.00 WIB
+                  Pukul 10.00 WIB - 11.00 WIB
                 </p>
                 <p className="mt-1 text-neutral-700">
                   Aula Harmoni, Jl. Merpati No. 1, Jakarta
@@ -468,7 +468,7 @@ const WeddingInvitationPage: React.FC = () => {
             <div className="rounded-3xl overflow-hidden border shadow-sm">
               <iframe
                 src={MAPS_EMBED_SRC}
-                className="w-full h-[420px]"
+                className="w-full h-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />

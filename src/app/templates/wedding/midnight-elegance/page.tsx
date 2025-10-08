@@ -189,7 +189,7 @@ export default function Page() {
             <span className={THEME.accent}>Alya</span> & <span className={THEME.accent}>Raka</span>
           </h1>
           <p className={`mt-4 md:mt-6 max-w-2xl ${THEME.soft}`}>
-            Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk hadir
+            Dengan memohon rahmat Tuhan Yang Maha Esa, kami mengundang Bapak/Ibu/Saudara/i untuk hadir
             dalam acara pernikahan kami.
           </p>
 

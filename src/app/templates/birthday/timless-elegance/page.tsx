@@ -218,7 +218,7 @@ export default function Invitation() {
         <main className="pt-28">
           {/* ================= HOME / HERO ================= */}
           <section id="home" tabIndex={-1} className="reveal relative isolate overflow-hidden">
-            <div className="max-w-6xl mx-auto px-4 py-12 lg:py-20">
+            <div className="max-w-6xl mx-auto px-4 pb-12 lg:pb-20 lg:pt-8">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 {/* left - text & countdown */}
                 <div className="lg:col-span-6 space-y-6">

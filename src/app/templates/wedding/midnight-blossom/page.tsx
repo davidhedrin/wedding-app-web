@@ -374,7 +374,6 @@ export default function UndanganPage() {
               className="flex transition-transform duration-700 ease-in-out"
               style={{
                 transform: `translateX(-${galIndex * 100}%)`,
-                width: `${galleryImages.length * 100}%`,
               }}
             >
               {galleryImages.map((src, i) => (
@@ -536,9 +535,6 @@ export default function UndanganPage() {
               alt="QR / Kartu Ucapan"
               className="rounded-xl aspect-square object-cover"
             />
-            <p className="text-sm text-neutral-300 mt-3">
-              Pindai untuk kartu ucapan/QR pembayaran (opsional).
-            </p>
           </div>
         </div>
       </Section>

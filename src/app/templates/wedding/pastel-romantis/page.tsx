@@ -125,7 +125,7 @@ export default function WeddingInvitationPage() {
               aria-label="Navigasi"
               className="rounded-lg border border-slate-200 px-3 py-2 bg-white/70 backdrop-blur"
               value={active}
-              onChange={(e) => onNavClick(e.target.value)({ preventDefault() {} } as any)}
+              onChange={(e) => onNavClick(e.target.value)({ preventDefault() { } } as any)}
             >
               {NAV_ITEMS.map((n) => (
                 <option value={n.id} key={n.id}>
@@ -140,7 +140,7 @@ export default function WeddingInvitationPage() {
       {/* Hero with Carousel + Countdown */}
       <section
         id="hero"
-        className="relative h-[80vh] md:h-[86vh] overflow-hidden"
+        className="relative h-screen overflow-hidden"
         aria-label="Sampul Undangan"
       >
         {/* Background carousel layers */}
@@ -193,8 +193,8 @@ export default function WeddingInvitationPage() {
             </div>
 
             <a
-              href="#mempelai"
-              onClick={onNavClick("mempelai")}
+              href="#acara"
+              onClick={onNavClick("acara")}
               className="inline-flex items-center gap-2 mt-8 md:mt-10 px-6 py-3 rounded-full bg-white/90 text-slate-800 hover:bg-white shadow-lg transition"
             >
               <ArrowDownIcon className="w-4 h-4" />
@@ -227,10 +227,10 @@ export default function WeddingInvitationPage() {
           <div className="rounded-3xl bg-white shadow-xl/30 shadow-gray-200 border border-white/60 p-6 md:p-8 relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-rose-300/30 to-indigo-300/30 blur-3xl" />
             <p className="font-serif text-2xl md:text-3xl">
-              Bismillāhirraḥmānirraḥīm
+              Kata Sambutan
             </p>
             <p className="mt-4 leading-relaxed text-slate-600">
-              Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud
+              Dengan memohon rahmat Tuhan Yang Maha Esa, kami bermaksud
               mengundang Bapak/Ibu/Saudara/i untuk menghadiri akad dan resepsi
               pernikahan kami. Kehadiran dan doa restu Anda merupakan
               kebahagiaan dan kehormatan bagi kami.
@@ -239,10 +239,6 @@ export default function WeddingInvitationPage() {
               Semoga kehadiran Anda menambah keberkahan di hari bahagia kami.
               Terima kasih atas doa dan perhatiannya.
             </p>
-            <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
-              <SparkleIcon className="w-4 h-4" />
-              <span>Dress code: Formal/Traditional (pastel)</span>
-            </div>
           </div>
         </div>
       </Section>
@@ -628,13 +624,13 @@ function RSVPForm() {
           Mohon isi formulir ini untuk membantu kami menyiapkan tempat terbaik.
         </p>
         <form onSubmit={submit} className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
+          <div>
             <label className="block text-sm text-slate-600">Nama Lengkap</label>
             <input
               required
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
               placeholder="Nama Anda"
             />
           </div>
@@ -644,7 +640,7 @@ function RSVPForm() {
               required
               value={form.contact}
               onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-              className="mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
               placeholder="08xx / email"
             />
           </div>
@@ -653,7 +649,7 @@ function RSVPForm() {
             <select
               value={form.attendance}
               onChange={(e) => setForm((f) => ({ ...f, attendance: e.target.value }))}
-              className="mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
             >
               <option>Hadir</option>
               <option>Tidak Hadir</option>
@@ -669,7 +665,7 @@ function RSVPForm() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, guests: Math.max(1, Number(e.target.value)) }))
               }
-              className="mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
             />
           </div>
           <div className="sm:col-span-2">
@@ -678,7 +674,7 @@ function RSVPForm() {
               rows={4}
               value={form.message}
               onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-              className="mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
               placeholder="Doa & ucapan..."
             />
           </div>
@@ -747,13 +743,14 @@ function GiftSection() {
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
+      {/* Bagian Gift Cards */}
       <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
         <h4 className="font-semibold text-lg">Kado Digital</h4>
         <p className="text-slate-600 mt-2">
           Untuk berbagi kebahagiaan, Anda dapat mengirim hadiah melalui
           rekening/e-wallet berikut:
         </p>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           <GiftCard
             bank="BCA"
             name="AISYAH PUTRI"
@@ -779,8 +776,8 @@ function GiftSection() {
       </div>
 
       {/* QR / Poster */}
-      <div className="rounded-3xl overflow-hidden border bg-white p-0 border-white/60 shadow-xl/30 shadow-gray-200">
-        <div className="relative aspect-[4/3]">
+      <div className="rounded-3xl overflow-hidden border bg-white p-0 border-white/60 shadow-xl/30 shadow-gray-200 flex flex-col justify-between">
+        <div className="relative w-full flex-grow">
           <img
             src={IMG}
             alt="Kartu Ucapan"
@@ -813,7 +810,7 @@ function GiftCard({
   copied: boolean;
 }) {
   return (
-    <div className="rounded-2xl border bg-white p-4 border-slate-200 flex items-center justify-between">
+    <div className="rounded-2xl border bg-white p-4 border-slate-200 flex items-start justify-between">
       <div>
         <div className="font-semibold">{bank}</div>
         <div className="text-sm text-slate-600">{name}</div>
@@ -821,7 +818,7 @@ function GiftCard({
       </div>
       <button
         onClick={onCopy}
-        className="inline-flex items-center gap-2 rounded-lg px-3 py-2 bg-slate-100 hover:bg-slate-200 transition"
+        className="text-sm inline-flex items-center gap-1 transition underline"
       >
         <CopyIcon className="w-4 h-4" />
         {copied ? "Tersalin!" : "Salin"}

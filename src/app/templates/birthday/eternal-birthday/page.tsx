@@ -205,7 +205,6 @@ export default function InvitationPage() {
               <span style={{ fontFamily: '"Great Vibes", cursive' }} className="text-2xl md:text-3xl text-emerald-800">
                 Rayakan
               </span>
-              <span className="hidden md:inline text-sm text-slate-600">Undangan Ulang Tahun</span>
             </button>
           </div>
 
@@ -247,7 +246,7 @@ export default function InvitationPage() {
 
       <main className="pt-28">
         {/* ---------------- HERO / HOME ---------------- */}
-        <section id="home" className="min-h-[80vh] md:min-h-[88vh] relative overflow-hidden flex items-start justify-center">
+        <section id="home" className="min-h-screen md:min-h-[88vh] relative overflow-hidden flex items-center justify-center">
           {/* background carousel */}
           <div className="absolute inset-0 -z-10">
             {bgImages.map((src, idx) => (
@@ -275,7 +274,7 @@ export default function InvitationPage() {
               </div>
 
               <h1 className="hero-title text-3xl md:text-4xl font-extrabold text-slate-900 mb-3" style={{ fontFamily: '"Poppins", "Great Vibes", sans-serif' }}>
-                <span style={{ fontFamily: '"Great Vibes", cursive' }} className="text-4xl md:text-5xl block text-emerald-800">[Nama Panggilan]</span>
+                <span style={{ fontFamily: '"Great Vibes", cursive' }} className="text-4xl md:text-5xl block text-emerald-800">Jovani</span>
                 <span className="text-base md:text-lg block text-slate-700 mt-1">Merayakan Hari Ulang Tahun ke-<span className="font-bold">25</span></span>
               </h1>
 
@@ -418,9 +417,9 @@ export default function InvitationPage() {
                   </div>
                   <div className="sm:col-span-2">
                     <div className="bg-white/80 glass p-4 rounded-xl shadow">
-                      <h3 className="text-lg font-semibold">[Nama Lengkap]</h3>
+                      <h3 className="text-lg font-semibold">Jovani Lumban Dennis</h3>
                       <p className="text-sm text-slate-600 mt-1">Usia: <span className="font-bold">25 tahun</span></p>
-                      <p className="mt-3 text-slate-700">Sedikit tentang [Nama]: dia suka kopi, musik, dan menghargai momen bersama keluarga dan teman. Acara ini adalah kesempatan untuk berkumpul dan merayakan kebersamaan.</p>
+                      <p className="mt-3 text-slate-700">Sedikit tentang Jovani: dia suka kopi, musik, dan menghargai momen bersama keluarga dan teman. Acara ini adalah kesempatan untuk berkumpul dan merayakan kebersamaan.</p>
                       <div className="mt-4 flex gap-3">
                         <button onClick={() => scrollToId("cerita")} className="text-sm px-3 py-1.5 rounded-full border border-emerald-700 text-emerald-700 hover:bg-emerald-50 transition">Lihat Cerita</button>
                         <button onClick={() => scrollToId("galeri")} className="text-sm px-3 py-1.5 rounded-full bg-emerald-700 text-white hover:scale-105 transition">Lihat Galeri</button>
@@ -437,7 +436,7 @@ export default function InvitationPage() {
                   <div className="mt-2 text-sm italic text-slate-700">"Hidup adalah kumpulan momen — mari tambah satu lagi yang tak terlupakan."</div>
                   <div className="mt-3">
                     <span className="text-xs text-slate-500">Hosted by</span>
-                    <div className="text-sm font-semibold">Keluarga [Nama]</div>
+                    <div className="text-sm font-semibold">Keluarga Jovani</div>
                   </div>
                 </div>
               </aside>
@@ -463,7 +462,7 @@ export default function InvitationPage() {
                     </div>
                     <div>
                       <div className="text-xs text-slate-500">Tempat</div>
-                      <div className="font-semibold">Gedung Serbaguna [Nama], Jakarta</div>
+                      <div className="font-semibold">Gedung Serbaguna Jovani, Jakarta</div>
                     </div>
                     <div>
                       <div className="text-xs text-slate-500">Dress Code</div>
@@ -736,7 +735,7 @@ export default function InvitationPage() {
                 <div>
                   <div className="text-sm text-slate-700">Tanggal: <span className="font-semibold">{TARGET_DATE.toLocaleDateString()}</span></div>
                   <div className="text-sm text-slate-700 mt-1">Waktu: <span className="font-semibold">{TARGET_DATE.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></div>
-                  <div className="text-sm text-slate-700 mt-3">Lokasi: <span className="font-semibold">Gedung Serbaguna [Nama]</span></div>
+                  <div className="text-sm text-slate-700 mt-3">Lokasi: <span className="font-semibold">Gedung Serbaguna</span></div>
 
                   <div className="mt-4 flex gap-2">
                     <button onClick={() => { setOpenContent(false); scrollToId("rsvp"); }} className="px-3 py-2 rounded-full bg-emerald-700 text-white">Konfirmasi Sekarang</button>

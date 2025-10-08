@@ -293,7 +293,7 @@ export default function WeddingInvitationPage() {
 
       {/* HERO */}
       <section id="hero" className="relative">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:py-24 md:py-28 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:pb-28 md:pt-16">
           <div className="grid md:grid-cols-2 items-center gap-10">
             <div className="reveal" ref={(el) => {
               if (el) (revealRef.current["hero1"] = el)
@@ -306,7 +306,7 @@ export default function WeddingInvitationPage() {
                 <span className={THEME.accent}>Zidan</span>
               </h1>
               <p className={`mt-4 text-white/80 ${cormorant.className} text-lg`}>
-                Dengan memohon rahmat dan ridha Allah SWT, kami bermaksud
+                Dengan memohon rahmat Tuhan Yang Maha Esa, kami bermaksud
                 menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan
                 bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
               </p>
@@ -636,18 +636,25 @@ export default function WeddingInvitationPage() {
                   if (el) revealRef.current[`story-${i}`] = el
                 }}
               >
-                <div className="absolute w-3 h-3 bg-amber-300 rounded-full -left-1.5 border border-white/30" />
-                <time className="text-sm text-white/70">{item.t}</time>
-                <h3 className={`text-xl mt-1 ${playfair.className}`}>
-                  {item.title}
-                </h3>
-                <p className="text-white/85 mt-1">{item.body}</p>
-                <div className="mt-3">
-                  <img
-                    src={IMAGES[i % IMAGES.length]}
-                    alt={item.title}
-                    className="h-44 w-full object-cover rounded-xl border border-white/10"
-                  />
+                <div className="flex flex-col md:flex-row items-start">
+                  {/* Teks bagian kiri */}
+                  <div className="md:w-2/3 md:pr-4">
+                    <div className="absolute w-3 h-3 bg-amber-300 rounded-full -left-1.5 top-1.5 border border-white/30" />
+                    <time className="text-sm text-white/70 ps-2.5">{item.t}</time>
+                    <h3 className={`text-xl mt-1 ${playfair.className}`}>
+                      {item.title}
+                    </h3>
+                    <p className="text-white/85 mt-1">{item.body}</p>
+                  </div>
+
+                  {/* Gambar bagian kanan */}
+                  <div className="md:w-1/3 mt-3 md:mt-0">
+                    <img
+                      src={IMAGES[i % IMAGES.length]}
+                      alt={item.title}
+                      className="h-44 w-full object-cover rounded-xl border border-white/10"
+                    />
+                  </div>
                 </div>
               </li>
             ))}

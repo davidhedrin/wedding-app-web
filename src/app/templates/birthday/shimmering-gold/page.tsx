@@ -204,7 +204,7 @@ export default function Invitation() {
         </header>
 
         {/* MAIN */}
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* HERO */}
           <section
             id="hero"
@@ -233,7 +233,7 @@ export default function Invitation() {
                 </div>
 
                 {/* Countdown + CTA */}
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                   {/* countdown card */}
                   <div className="rounded-xl p-4 bg-gradient-to-r from-white/3 to-white/6 border border-white/10 shadow-inner">
                     <div className="flex items-center justify-between">
@@ -259,7 +259,7 @@ export default function Invitation() {
                   </div>
 
                   {/* CTA */}
-                  <div className="flex flex-col gap-3 items-start sm:items-end">
+                  <div className="flex flex-col gap-3 items-center sm:items-center">
                     <p className="text-sm md:text-base opacity-90">Klik tombol di bawah untuk membuka undangan penuh.</p>
                     <button
                       onClick={() => {
@@ -276,20 +276,7 @@ export default function Invitation() {
                         style={{ background: "radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08), transparent)" }}
                       />
                     </button>
-
-                    <div className="mt-2 text-xs opacity-80 text-right">
-                      <div>Mode: <span className="font-medium">{isToday ? "Hari-H" : isExpired ? "Sebelum Hari" : "Setelah Hari"}</span></div>
-                    </div>
                   </div>
-                </div>
-
-                {/* mini carousel thumbnails */}
-                <div className="mt-3 flex items-center gap-3 overflow-hidden">
-                  {carouselImages.map((src, i) => (
-                    <div key={i} className={`w-20 h-12 rounded-lg overflow-hidden border ${i === bgIndex ? "ring-2 ring-amber-300" : "opacity-60"}`}>
-                      <img src={src} alt={`bg ${i}`} className="w-full h-full object-cover transform transition hover:scale-105" />
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -570,7 +557,12 @@ export default function Invitation() {
                       </div>
                       <div className={`transform transition ${openFAQ === i ? "rotate-180" : ""}`}>⌄</div>
                     </button>
-                    <div className={`px-4 pb-4 transition-all duration-300 ${openFAQ === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
+                    <div
+                      className={`
+                        transition-all duration-500 ease-in-out overflow-hidden 
+                        ${openFAQ === i ? "max-h-full px-4 pb-4 opacity-100" : "max-h-0 px-4 pb-0 opacity-0"}
+                      `}
+                    >
                       <div className="text-sm opacity-85">{f.a}</div>
                     </div>
                   </div>
