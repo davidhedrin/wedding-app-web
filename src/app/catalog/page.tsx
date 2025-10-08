@@ -172,7 +172,7 @@ export default function CatalogPage() {
 
   return (
     <div className="pb-16">
-      <div className='relative w-full h-[50vh] md:h-[55vh] flex items-end justify-center text-center pb-14'>
+      <div className='relative w-full h-[50vh] flex items-end justify-center text-center pb-14'>
         <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
         <div className="
           absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
@@ -183,12 +183,11 @@ export default function CatalogPage() {
         <div className="absolute -z-30 top-10 left-10 w-60 h-60 md:w-96 md:h-96 rounded-full bg-indigo-400/70 blur-3xl" />
         <div className="absolute -z-30 top-40 right-10 w-60 h-60 md:w-96 md:h-96 rounded-full bg-pink-400/70 blur-3xl" />
 
-
         <div className='max-w-3xl px-4 xl:px-0 mx-auto text-center'>
           <h1 className="text-2xl md:text-4xl font-bold mb-3 drop-shadow-lg">
             Welcome to the {Configs.app_name} Catalog
           </h1>
-          <p className="md:text-lg mb-8">
+          <p className="md:text-base mb-8">
             Choose from our collection of wedding, birthday, party and other event invitation templates that have been specially designed for your special moment.
           </p>
         </div>
