@@ -1,9 +1,19 @@
 import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction } from "@/lib/utils";
+import { userLoginData } from "@/lib/zustand";
+import { RolesEnum } from "@prisma/client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function MainSidebar() {
   const smartLink = useSmartLink();
+  const { userData, statusLogin } = userLoginData();
+
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  useEffect(() => {
+    const setAdmin = userData && statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
+    if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
+  }, [userData]);
 
   return (
     <div id="hs-pro-sidebar" className="hs-overlay [--body-scroll:true] lg:[--overlay-backdrop:false] [--is-layout-affect:true] [--opened:lg] [--auto-close:lg] hs-overlay-open:translate-x-0 lg:hs-overlay-layout-open:translate-x-0 -translate-x-full transition-all duration-300 transform w-60 hidden fixed inset-y-0 z-60 start-0 bg-gray-100 lg:block lg:-translate-x-full lg:end-auto lg:bottom-0" role="dialog" aria-label="Sidebar">
@@ -74,24 +84,26 @@ export default function MainSidebar() {
               </ul>
             </div>
 
-            <div className="flex flex-col first:pt-0 first:mt-0">
-              <span className="block px-0.5 lg:px-2.5 mb-1 font-medium text-xs text-gray-500 hover:text-gray-800">
-                Systems
-              </span>
+            {
+              isAdmin && <div className="flex flex-col first:pt-0 first:mt-0">
+                <span className="block px-0.5 lg:px-2.5 mb-1 font-medium text-xs text-gray-500 hover:text-gray-800">
+                  Systems
+                </span>
 
-              <ul className="flex flex-col">
-                <li>
-                  <Link href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
-                    <i className='bx bx-customize text-lg'></i> Catalog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/client/systems/users-manage" onClick={() => smartLink("/client/systems/users-manage")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
-                    <i className='bx bx-user-pin text-lg'></i> Users Mangement
-                  </Link>
-                </li>
-              </ul>
-            </div>
+                <ul className="flex flex-col">
+                  <li>
+                    <Link href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                      <i className='bx bx-customize text-lg'></i> Catalog
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/client/systems/users-manage" onClick={() => smartLink("/client/systems/users-manage")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                      <i className='bx bx-user-pin text-lg'></i> Users Mangement
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            }
           </div>
         </nav>
 

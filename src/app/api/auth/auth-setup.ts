@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { verifyPassword } from "@/lib/utils"
 import { getUserById } from "@/server/auth"
 import { db } from "../../../../prisma/db-init"
+import { RolesEnum } from "@prisma/client"
 
 class CustomError extends AuthError {
   constructor(name: string, message: string) {
@@ -90,7 +91,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session({ session, token }) {
       session.user.name = token.name;
       session.user.id = token.id as string;
-      session.user.role = token.role;
+      session.user.role = token.role as RolesEnum;
       session.user.email_verified = token.email_verified;
       return session;
     },
