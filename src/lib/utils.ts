@@ -205,3 +205,13 @@ export function calculateRateProduct({rate_1, rate_2, rate_3, rate_4, rate_5}: {
   const average = parseFloat((totalRating / totalVotes).toFixed(2));
   return average;
 };
+
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (error) {
+    console.error("Failed to copy: ", error)
+    return false
+  }
+};

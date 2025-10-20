@@ -38,6 +38,9 @@ export default function AppHeader() {
                   <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                     <i className='bx bx-tachometer text-lg'></i>Dashboard
                   </Link>
+                  <Link href="/client/events" onClick={() => smartLink("/client/events")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
+                    <i className='bx bx-calendar-event text-lg'></i>My Events
+                  </Link>
                   <div onClick={() => signOutAction()} className="flex cursor-pointer items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                     <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="m16 17 5-5-5-5" />

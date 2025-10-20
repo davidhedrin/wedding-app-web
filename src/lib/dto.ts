@@ -1,4 +1,4 @@
-import { RolesEnum } from "@prisma/client";
+import { EventStatusEnum, RolesEnum } from "@prisma/client";
 
 export type DtoSignIn = {
   email: string;
@@ -61,4 +61,13 @@ export type DtoCaptureTemplate = {
   file_name: string | null;
   file_path: string | null;
   idx: number;
+}
+
+export type DtoEvents = {
+  id: number | null;
+  user_id: number | null;
+  tmp_id: number;
+  tmp_status: EventStatusEnum;
+  tmp_ctg: string;
+  tmp_ctg_key: string;
 }

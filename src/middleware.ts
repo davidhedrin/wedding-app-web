@@ -1,8 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-
-const adminMenu = [
-];
+import { RolesEnum } from "@prisma/client";
 
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
@@ -11,8 +9,7 @@ export async function middleware(request: NextRequest) {
   if (!token && !pathname.startsWith("/auth")) return redirectTo(request, "/auth");
   if (token && pathname.startsWith("/auth")) return redirectTo(request, "/");
   
-  // const isAdminPath = adminMenu.some((menu) => pathname.startsWith(menu));
-  // if (isAdminPath && token?.role != RolesEnum.ADMIN) return redirectTo(request, "/");
+  if (pathname.startsWith("/client/systems") && token?.role != RolesEnum.ADMIN) return redirectTo(request, "/");
 
   return NextResponse.next();
 }

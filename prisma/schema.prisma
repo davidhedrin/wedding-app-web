@@ -27,6 +27,14 @@ enum AuthProviderEnum {
   @@map("AuthProviderEnum")
 }
 
+enum EventStatusEnum {
+  PENDING
+  NOT_PAID
+  ACTIVE
+  CANCELED
+  ENDED
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique
@@ -50,6 +58,8 @@ model User {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
+
+  events Events[]
 }
 
 model VerificationToken {
@@ -102,6 +112,7 @@ model Templates {
   rate_count   Int?    @default(0)
 
   captures TemplateCaptures[]
+  events   Events[]
 }
 
 model TemplateCaptures {
@@ -111,5 +122,23 @@ model TemplateCaptures {
   file_name String
   file_path String
 
+  template Templates @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
+}
+
+model Events {
+  id          Int             @id @default(autoincrement())
+  user_id     Int
+  tmp_id      Int
+  tmp_status  EventStatusEnum
+  tmp_code    String          @unique
+  tmp_ctg     String
+  tmp_ctg_key String
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   template Templates @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
 }

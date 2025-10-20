@@ -2,18 +2,23 @@
 
 import BreadcrumbList from '@/components/breadcrumb-list';
 import { useLoading } from '@/components/loading/loading-context';
+import { DtoEvents } from '@/lib/dto';
 import { Color } from '@/lib/model-types';
 import { useSmartLink } from '@/lib/smart-link';
-import { calculateRateProduct } from '@/lib/utils';
+import { calculateRateProduct, toast } from '@/lib/utils';
+import { userLoginData } from '@/lib/zustand';
+import { StoreUpdateDataEvents } from '@/server/event';
 import { GetDataTemplatesBySlug } from '@/server/systems/catalog';
 import { TemplateCaptures, Templates } from '@prisma/client';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function page() {
+  const { push } = useRouter();
   const smartLink = useSmartLink();
   const { setLoading } = useLoading();
+  const { statusLogin } = userLoginData();
 
   const searchParams = useSearchParams();
   const slugTemplate = searchParams.get('name');
@@ -93,6 +98,42 @@ export default function page() {
     const timer = setInterval(nextSlide, 4500);
     return () => clearInterval(timer);
   }, [captureImage.length]);
+
+  const addTemplate = async () => {
+    if(dataTemplate === null) return;
+
+    setLoading(true);
+    if (statusLogin !== "authenticated") {
+      push("/auth");
+      return;
+    }
+
+    const createDto: DtoEvents = {
+      id: null,
+      user_id: null,
+      tmp_id: dataTemplate.id,
+      tmp_status: "PENDING",
+      tmp_ctg: dataTemplate.ctg_name ?? "",
+      tmp_ctg_key: dataTemplate.ctg_key ?? ""
+    };
+
+    try {
+      const eventCode = await StoreUpdateDataEvents(createDto);
+      toast({
+        type: "success",
+        title: "Add successfully",
+        message: "New template has been add to your event."
+      });
+      push(`/client/events/event-detail?code=${eventCode}`);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -245,7 +286,7 @@ export default function page() {
 
                   {/* Tombol Aksi */}
                   <div className="mt-6 flex gap-4">
-                    <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
+                    <button onClick={addTemplate} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
                       Use Template
                     </button>
                     <Link href={`/${dataTemplate.url}`} className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition' target='_blank'>

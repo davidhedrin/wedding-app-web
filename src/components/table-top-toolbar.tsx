@@ -95,7 +95,8 @@ export default function TableTopToolbar({
             </div>
           }
           {
-            openModal && <button onClick={() => openModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+            //py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none
+            openModal && <button onClick={() => openModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
               <i className='bx bx-plus-circle text-lg'></i> New
             </button>
           }

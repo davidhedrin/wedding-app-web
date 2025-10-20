@@ -1,9 +1,14 @@
 "use client";
 
+import { DtoEvents } from "@/lib/dto";
 import { useSmartLink } from "@/lib/smart-link";
-import { calculateRateProduct } from "@/lib/utils";
+import { calculateRateProduct, showConfirm, toast } from "@/lib/utils";
+import { userLoginData } from "@/lib/zustand";
+import { StoreUpdateDataEvents } from "@/server/event";
 import { TemplateCaptures, Templates } from "@prisma/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useLoading } from "./loading/loading-context";
 
 type TemplateCatalogProp = {
   template: Templates & {
@@ -12,7 +17,53 @@ type TemplateCatalogProp = {
 }
 
 export default function TemplateCatalog({ template }: TemplateCatalogProp) {
+  const { push } = useRouter();
+  const { setLoading } = useLoading();
   const smartLink = useSmartLink();
+  const { statusLogin } = userLoginData();
+
+  const addTemplate = async () => {
+    const confirmed = await showConfirm({
+      title: 'Add New Event?',
+      message: 'Your not preview this template detail yet! Are you sure want to add this template to your event?',
+      confirmText: 'Continue',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    if (statusLogin !== "authenticated") {
+      push("/auth");
+      return;
+    }
+
+    const createDto: DtoEvents = {
+      id: null,
+      user_id: null,
+      tmp_id: template.id,
+      tmp_status: "PENDING",
+      tmp_ctg: template.ctg_name ?? "",
+      tmp_ctg_key: template.ctg_key ?? ""
+    };
+
+    try {
+      const eventCode = await StoreUpdateDataEvents(createDto);
+      toast({
+        type: "success",
+        title: "Add successfully",
+        message: "New template has been add to your event."
+      });
+      push(`/client/events/event-detail?code=${eventCode}`);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition transform">
@@ -86,7 +137,7 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
           </div>
 
           <div className="flex items-center gap-1">
-            <button className="bg-indigo-600 text-white px-3 py-1.5 text-xs md:text-sm rounded-lg font-medium hover:bg-indigo-700 transition">
+            <button onClick={addTemplate} className="bg-indigo-600 text-white px-3 py-1.5 text-xs md:text-sm rounded-lg font-medium hover:bg-indigo-700 transition">
               Use
             </button>
             <Link

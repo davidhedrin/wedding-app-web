@@ -72,6 +72,7 @@ export default function CatalogPage() {
           slug: true,
           flag_name: true,
           flag_color: true,
+          ctg_key: true,
           rate_1_count: true,
           rate_2_count: true,
           rate_3_count: true,

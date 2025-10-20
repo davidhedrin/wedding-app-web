@@ -45,14 +45,14 @@ export default function MainSidebar() {
 
             <div className="flex flex-col first:pt-0 first:mt-0">
               <span className="block px-0.5 lg:px-2.5 mb-1 font-medium text-xs text-gray-500 hover:text-gray-800">
-                Pages
+                Modules
               </span>
 
               <ul className="flex flex-col">
                 <li>
-                  <a className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" href="#">
-                    <i className='bx bx-customize text-lg'></i> Posts
-                  </a>
+                  <Link href="/client/events" onClick={() => smartLink("/client/events")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                    <i className='bx bx-calendar-event text-lg'></i> My Events
+                  </Link>
                 </li>
                 {/* <li className="hs-accordion" id="account-accordion">
                 <a className="hs-accordion-toggle w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" aria-expanded="true" aria-controls="account-accordion-sub-1-collapse-1">
