@@ -1,7 +1,8 @@
 import { useSmartLink } from "@/lib/smart-link";
-import { signOutAction } from "@/lib/utils";
+import { signOutAction, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
-import { RolesEnum } from "@prisma/client";
+import { GetDataEvents } from "@/server/event";
+import { Events, RolesEnum, Templates } from "@prisma/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -9,10 +10,46 @@ export default function MainSidebar() {
   const smartLink = useSmartLink();
   const { userData, statusLogin } = userLoginData();
 
+  const [datas, setDatas] = useState<(Events & {
+    template: Templates | null
+  })[] | null>(null);
+  const [totalPage, setTotalPage] = useState(0);
+
+  const fatchDataEvent = async () => {
+    try {
+      const result = await GetDataEvents({
+        curPage: 1,
+        perPage: 10,
+        where: {
+          user_id: Number(userData?.user?.id),
+        },
+        select: {
+          id: true,
+          tmp_code: true,
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      });
+      setTotalPage(result.meta.totalPages);
+      setDatas(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "Failed to fatch sidebar event datas."
+      });
+    }
+  }
+
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   useEffect(() => {
-    const setAdmin = userData && statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
-    if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
+    if (userData) {
+      const setAdmin = statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
+      if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
+
+      fatchDataEvent();
+    }
   }, [userData]);
 
   return (
@@ -45,17 +82,28 @@ export default function MainSidebar() {
 
             <div className="flex flex-col first:pt-0 first:mt-0">
               <span className="block px-0.5 lg:px-2.5 mb-1 font-medium text-xs text-gray-500 hover:text-gray-800">
-                Modules
+                My Events
               </span>
 
               <ul className="flex flex-col">
+                <li className="py-2 px-1 lg:px-2">
+                  <div className="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 text-center p-3">
+                    <p className="text-sm font-semibold text-gray-800 mb-1">No Event Added!</p>
+                    <p className="text-sm italic text-gray-600 mb-2">
+                      Let's create your first online event invitation with <u className="font-semibold">try 3 days</u>!
+                    </p>
+                    <Link href="/catalog" onClick={() => smartLink("/catalog")} type="button" className="w-full py-2 px-4 inline-flex justify-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
+                      Find Template
+                    </Link>
+                  </div>
+                </li>
                 <li>
                   <Link href="/client/events" onClick={() => smartLink("/client/events")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
-                    <i className='bx bx-calendar-event text-lg'></i> My Events
+                    <i className='bx bx-calendar-event text-lg'></i> See All Event...
                   </Link>
                 </li>
                 {/* <li className="hs-accordion" id="account-accordion">
-                <a className="hs-accordion-toggle w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" aria-expanded="true" aria-controls="account-accordion-sub-1-collapse-1">
+                <a className="hs-accordion-toggle w-full flex items-center leading-none gap-x-2 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" aria-expanded="true" aria-controls="account-accordion-sub-1-collapse-1">
                   <i className='bx bx-user-pin text-lg'></i> Account
                   <svg className="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6" /></svg>
                   <svg className="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400 " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
