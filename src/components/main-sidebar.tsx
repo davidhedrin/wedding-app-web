@@ -26,6 +26,12 @@ export default function MainSidebar() {
         select: {
           id: true,
           tmp_code: true,
+          template: {
+            select: {
+              name: true,
+              ctg_name: true
+            }
+          }
         },
         orderBy: {
           createdAt: "desc"
@@ -40,7 +46,7 @@ export default function MainSidebar() {
         message: "Failed to fatch sidebar event datas."
       });
     }
-  }
+  };
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   useEffect(() => {
@@ -86,17 +92,26 @@ export default function MainSidebar() {
               </span>
 
               <ul className="flex flex-col">
-                <li className="py-2 px-1 lg:px-2">
-                  <div className="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 text-center p-3">
-                    <p className="text-sm font-semibold text-gray-800 mb-1">No Event Added!</p>
-                    <p className="text-sm italic text-gray-600 mb-2">
-                      Let's create your first online event invitation with <u className="font-semibold">try 3 days</u>!
-                    </p>
-                    <Link href="/catalog" onClick={() => smartLink("/catalog")} type="button" className="w-full py-2 px-4 inline-flex justify-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
-                      Find Template
-                    </Link>
-                  </div>
-                </li>
+                {
+                  datas && datas.length > 0 ? datas.map((x, i) => (
+                    <li key={i}>
+                      <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="border border-gray-400 border-dashed w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 mb-1 mt-1 text-sm  hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                        {x.template?.ctg_name} - {x.template?.name}
+                      </Link>
+                    </li>
+                  )) : <li className="py-2 px-1 lg:px-2">
+                    <div className="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 text-center p-3">
+                      <p className="text-sm font-semibold text-gray-800 mb-1">No Event Added!</p>
+                      <p className="text-sm italic text-gray-600 mb-2">
+                        Let's create your first online event invitation or <u className="font-semibold">try 3 days</u>!
+                      </p>
+                      <Link href="/catalog" onClick={() => smartLink("/catalog")} type="button" className="w-full py-2 px-4 inline-flex justify-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
+                        Find Template
+                      </Link>
+                    </div>
+                  </li>
+                }
+
                 <li>
                   <Link href="/client/events" onClick={() => smartLink("/client/events")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                     <i className='bx bx-calendar-event text-lg'></i> See All Event...

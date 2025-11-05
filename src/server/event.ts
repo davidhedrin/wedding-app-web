@@ -7,6 +7,7 @@ import { db } from "../../prisma/db-init";
 import { DtoEvents } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
+import { number } from "zod";
 
 type GetDataEventsParams = {
   where?: Prisma.EventsWhereInput;
@@ -86,4 +87,4 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
     }
   });
   return getData;
-}
+};
