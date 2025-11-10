@@ -1,7 +1,7 @@
 "use server";
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
-import { Prisma, Events, Templates } from "@prisma/client";
+import { Prisma, Events, Templates, TemplateCaptures } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { db } from "../../prisma/db-init";
 import { DtoEvents } from "@/lib/dto";
@@ -15,7 +15,7 @@ type GetDataEventsParams = {
   select?: Prisma.EventsSelect<DefaultArgs> | undefined;
 } & CommonParams;
 export async function GetDataEvents(params: GetDataEventsParams): Promise<PaginateResult<Events & {
-  template: Templates | null
+  template: (Templates & { captures?: TemplateCaptures[] | null }) | null
 }>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
@@ -42,6 +42,50 @@ export async function GetDataEvents(params: GetDataEventsParams): Promise<Pagina
       totalPages: Math.ceil(total/perPage)
     }
   };
+  
+  // const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  // const skip = (curPage - 1) * perPage;
+
+  // const finalSelect: Prisma.EventsSelect = {
+  //   ...(select || {}),
+  // };
+
+  // if (select?.template) {
+  //   const userTemplateSelect =
+  //     typeof select.template === "object" && "select" in select.template ? select.template.select : {};
+
+  //   finalSelect.template = {
+  //     select: {
+  //       ...userTemplateSelect,
+  //       captures: {
+  //         take: 1,
+  //         orderBy: { index: "asc" },
+  //         select: { file_path: true },
+  //       },
+  //     },
+  //   };
+  // }
+
+  // const [data, total] = await Promise.all([
+  //   db.events.findMany({
+  //     skip,
+  //     take: perPage,
+  //     where,
+  //     orderBy,
+  //     select: finalSelect,
+  //   }),
+  //   db.events.count({ where }),
+  // ]);
+
+  // return {
+  //   data,
+  //   meta: {
+  //     page: curPage,
+  //     limit: perPage,
+  //     total,
+  //     totalPages: Math.ceil(total / perPage),
+  //   },
+  // };
 };
 
 export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string | null> {
@@ -79,11 +123,19 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
   }
 };
 
-export async function GetDataEventByCode(code: string): Promise<Events & { template: Templates | null } | null> {
+export async function GetDataEventByCode(code: string): Promise<Events & { template: Templates & { captures: { file_path: string }[] | null } | null } | null> {
   const getData = await db.events.findUnique({
     where: { tmp_code: code },
     include: {
-      template: true
+      template: {
+        include: {
+          captures: {
+            take: 1,
+            orderBy: { index: "asc" },
+            select: { file_path: true },
+          }
+        }
+      }
     }
   });
   return getData;

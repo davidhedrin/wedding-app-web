@@ -95,8 +95,14 @@ export default function MainSidebar() {
                 {
                   datas && datas.length > 0 ? datas.map((x, i) => (
                     <li key={i}>
-                      <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="border border-gray-400 border-dashed w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 mb-1 mt-1 text-sm  hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
-                        {x.template?.ctg_name} - {x.template?.name}
+                      <Link
+                        href={`/client/events/event-detail?code=${x.tmp_code}`}
+                        onClick={() => smartLink("/client/events/event-detail")}
+                        className="border border-gray-400 border-dashed w-full flex items-center leading-none gap-x-2 py-1.5 px-0.5 lg:px-2.5 mb-1 mt-1 text-sm hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800"
+                      >
+                        <span className="truncate block max-w-[180px] leading-normal" title={`${x.template?.ctg_name} - ${x.template?.name}`}>
+                          {x.template?.ctg_name} - {x.template?.name}
+                        </span>
                       </Link>
                     </li>
                   )) : <li className="py-2 px-1 lg:px-2">

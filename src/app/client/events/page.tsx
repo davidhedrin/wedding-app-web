@@ -9,7 +9,7 @@ import { useSmartLink } from "@/lib/smart-link";
 import { copyToClipboard, formatDate, normalizeSelectObj, sortListToOrderBy, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { GetDataEvents } from "@/server/event";
-import { Events, Templates } from "@prisma/client";
+import { Events, TemplateCaptures, Templates } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -30,7 +30,7 @@ export default function Page() {
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [datas, setDatas] = useState<(Events & {
-    template: Templates | null
+    template: (Templates & { captures?: TemplateCaptures[] | null }) | null
   })[]>([]);
   const [inputSearch, setInputSearch] = useState("");
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
@@ -40,11 +40,22 @@ export default function Page() {
     { name: "Category", key: "tmp_ctg", key_sort: "tmp_ctg", IsVisible: true },
     { name: "Price", key: "template[price]", key_sort: "template.price", IsVisible: true },
     { name: "Status", key: "tmp_status", key_sort: "tmp_status", IsVisible: true },
-    { name: "Created At", key: "createdAt", key_sort: "createdAt", IsVisible: true },
+    { name: "Added At", key: "createdAt", key_sort: "createdAt", IsVisible: true },
   ]);
   const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
     const selectObj = normalizeSelectObj(tblThColomns);
     const orderObj = sortListToOrderBy(tblSortList);
+
+    selectObj.template = {
+      select: {
+        ...(selectObj.template?.select || {}),
+        captures: {
+          take: 1,
+          orderBy: { index: "asc" },
+          select: { file_path: true },
+        },
+      }
+    };
 
     try {
       const result = await GetDataEvents({
@@ -140,6 +151,7 @@ export default function Page() {
                       <thead className="bg-gray-50">
                         <tr>
                           <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">#</th>
+                          <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">Picture</th>
                           {
                             tblThColomns.map((x, i) => {
                               if (x.IsVisible) return <th key={x.key} scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">{x.name}</th>
@@ -153,6 +165,9 @@ export default function Page() {
                           datas.map((data, i) => (
                             <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
                               <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">
+                                <img src={data.template?.captures ? data.template?.captures[0].file_path : ""} alt="Capture" className="w-48" />
+                              </td>
 
                               {'tmp_code' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                                 <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
@@ -170,7 +185,7 @@ export default function Page() {
                               </td>}
                               {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-[180px]">{data.template.name}</div></td>}
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
-                              {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.template.price.toLocaleString("id-ID")}</td>}
+                              {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}
                               {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_status || "-"}</td>}
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
