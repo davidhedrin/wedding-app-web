@@ -9,13 +9,19 @@ import { GetDataEventByCode } from "@/server/event";
 import { Events, Templates } from "@prisma/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import Script from "next/script";
 import { useEffect, useState } from "react";
+
+declare global {
+  interface Window {
+    snap: any;
+  }
+};
 
 export default function Page() {
   const router = useRouter();
   const smartLink = useSmartLink();
   const listBr: BreadcrumbType[] = [
-    { name: "Modules", url: null },
     { name: "My Events", url: "/client/events" },
     { name: "Event Detail", url: null },
   ];
@@ -45,14 +51,13 @@ export default function Page() {
 
   return (
     <>
+      <Script src={process.env.NEXT_PUBLIC_MT_SNAP_URL} data-client-key={process.env.NEXT_PUBLIC_MT_CLIENT_KEY} strategy="afterInteractive"></Script>
+
       <div className="py-1 px-4 flex flex-wrap justify-between items-center gap-2 bg-white border-b border-gray-200">
         <div className="flex items-center gap-x-2">
           <button type="button" onClick={() => router.back()} className='p-1 inline-flex items-center rounded-full border border-transparent text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none'>
             <i className='bx bx-arrow-back text-lg'></i>
           </button>
-          {/* <Link href="/client/events" onClick={() => smartLink("/client/events")} className='p-1 inline-flex items-center rounded-full border border-transparent text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none'>
-            <i className='bx bx-arrow-back text-lg'></i>
-          </Link> */}
           <h1 className="text-sm font-medium text-muted">
             Event Detail
           </h1>

@@ -59,7 +59,8 @@ model User {
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
 
-  events Events[]
+  events  Events[]
+  user_tr Tr[]
 }
 
 model VerificationToken {
@@ -126,7 +127,7 @@ model TemplateCaptures {
 }
 
 model Events {
-  id          Int             @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   user_id     Int
   tmp_id      Int
   tmp_status  EventStatusEnum
@@ -141,4 +142,32 @@ model Events {
 
   user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   template Templates @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
+  tr       Tr[]
+}
+
+model Tr {
+  tr_id     String    @id
+  user_id   Int
+  event_id  Int
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  pay_type        String
+  pay_key         String
+  pay_fee_percent Int?
+  pay_fee_amount  Int?
+  pay_status      Boolean   @default(false)
+  pay_at          DateTime?
+  pay_va          String?
+  pay_expiry_time DateTime?
+  pay_bill_key    String?
+  pay_bill_code   String?
+  qris_url        String?
+
+  subtotal     Int
+  disc_value   Int?
+  total_amount Int
+
+  user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
 }

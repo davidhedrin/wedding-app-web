@@ -17,8 +17,8 @@ import { useEffect, useState } from "react";
 export default function Page() {
   const smartLink = useSmartLink();
   const listBr: BreadcrumbType[] = [
-    { name: "Modules", url: null },
-    { name: "My Events", url: "/client/events" },
+    { name: "My Events", url: null },
+    { name: "All Events", url: "/client/events" },
   ];
   const { setLoading } = useLoading();
   const { data, status } = useSession();
