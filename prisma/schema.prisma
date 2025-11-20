@@ -152,8 +152,8 @@ model Tr {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  pay_type        String
-  pay_key         String
+  pay_type        String?
+  pay_key         String?
   pay_fee_percent Int?
   pay_fee_amount  Int?
   pay_status      Boolean   @default(false)

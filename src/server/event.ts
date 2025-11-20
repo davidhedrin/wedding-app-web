@@ -1,13 +1,14 @@
 "use server";
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
-import { Prisma, Events, Templates, TemplateCaptures } from "@prisma/client";
+import { Prisma, Events, Templates, TemplateCaptures, EventStatusEnum } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { db } from "../../prisma/db-init";
-import { DtoEvents } from "@/lib/dto";
+import { DtoEvents, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
-import { number } from "zod";
+import { ulid } from "ulid";
+import midtrans from "@/lib/midtrans-init";
 
 type GetDataEventsParams = {
   where?: Prisma.EventsWhereInput;
@@ -140,3 +141,52 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
   });
   return getData;
 };
+
+export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapResponse | undefined> {
+  const getDataEvent = await db.events.findUnique({
+    where: { id: eventId },
+    include: {
+      template: true
+    }
+  });
+
+  if(getDataEvent){
+    let dataPriceInit = 0;
+    if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
+
+    const transDb: MidtransSnapResponse = await db.$transaction(async (tx) => {
+      const trData = await tx.tr.create({
+        data: {
+          tr_id: ulid(),
+          user_id: getDataEvent.user_id,
+          event_id: eventId,
+
+          subtotal: getDataEvent.template.price,
+          disc_value: getDataEvent.template.disc_price,
+          total_amount: dataPriceInit
+        }
+      });
+      
+      await tx.events.update({
+        where: { id: eventId },
+        data: {
+          tmp_status: EventStatusEnum.NOT_PAID,
+        }
+      });
+      
+      const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction({
+        transaction_details: {
+          order_id: trData.tr_id,
+          gross_amount: dataPriceInit
+        },
+      });
+
+      return createSnap;
+    }, {
+      maxWait: 3000,
+      timeout: 5000,
+    });
+
+    return transDb;
+  }
+}

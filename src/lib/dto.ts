@@ -61,7 +61,7 @@ export type DtoCaptureTemplate = {
   file_name: string | null;
   file_path: string | null;
   idx: number;
-}
+};
 
 export type DtoEvents = {
   id: number | null;
@@ -70,4 +70,9 @@ export type DtoEvents = {
   tmp_status: EventStatusEnum;
   tmp_ctg: string;
   tmp_ctg_key: string;
-}
+};
+
+export type MidtransSnapResponse = {
+  token: string;
+  redirect_url: string;
+};
