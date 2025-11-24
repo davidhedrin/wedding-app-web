@@ -56,7 +56,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "ngrok": "^5.0.0-beta.2",
-    "prisma": "^6.19.0",
+    "prisma": "^7.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.4",
     "typescript": "^5"

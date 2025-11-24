@@ -143,14 +143,29 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
 };
 
 export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapResponse | undefined> {
-  const getDataEvent = await db.events.findUnique({
-    where: { id: eventId },
-    include: {
-      template: true
-    }
-  });
+  try{
+    const getDataEvent = await db.events.findUnique({
+      where: { id: eventId },
+      include: {
+        template: true
+      }
+    });
+    if(!getDataEvent) throw new Error("Event data not found!");
 
-  if(getDataEvent){
+    const findIsTr = await db.tr.findFirst({
+      where: {
+        user_id: getDataEvent.user_id,
+        event_id: eventId
+      }
+    });
+    if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
+      const dataExistTr: MidtransSnapResponse = {
+        token: findIsTr.pay_token,
+        redirect_url: findIsTr.pay_redirect_url
+      };
+      return dataExistTr;
+    };
+  
     let dataPriceInit = 0;
     if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
 
@@ -167,19 +182,28 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         }
       });
       
-      await tx.events.update({
-        where: { id: eventId },
-        data: {
-          tmp_status: EventStatusEnum.NOT_PAID,
-        }
-      });
-      
       const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction({
         transaction_details: {
           order_id: trData.tr_id,
           gross_amount: dataPriceInit
         },
       });
+      
+      await Promise.all([
+        tx.events.update({
+          where: { id: eventId },
+          data: {
+            tmp_status: EventStatusEnum.NOT_PAID,
+          }
+        }),
+        tx.tr.update({
+          where: { tr_id: trData.tr_id },
+          data: {
+            pay_token: createSnap.token,
+            pay_redirect_url: createSnap.redirect_url
+          }
+        })
+      ]);
 
       return createSnap;
     }, {
@@ -188,5 +212,7 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
     });
 
     return transDb;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 }

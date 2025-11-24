@@ -127,7 +127,7 @@ model TemplateCaptures {
 }
 
 model Events {
-  id          Int          @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   user_id     Int
   tmp_id      Int
   tmp_status  EventStatusEnum
@@ -152,17 +152,19 @@ model Tr {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  pay_type        String?
-  pay_key         String?
-  pay_fee_percent Int?
-  pay_fee_amount  Int?
-  pay_status      Boolean   @default(false)
-  pay_at          DateTime?
-  pay_va          String?
-  pay_expiry_time DateTime?
-  pay_bill_key    String?
-  pay_bill_code   String?
-  qris_url        String?
+  pay_token        String?
+  pay_redirect_url String?
+  pay_type         String?
+  pay_key          String?
+  pay_fee_percent  Int?
+  pay_fee_amount   Int?
+  pay_status       Boolean   @default(false)
+  pay_at           DateTime?
+  pay_va           String?
+  pay_expiry_time  DateTime?
+  pay_bill_key     String?
+  pay_bill_code    String?
+  qris_url         String?
 
   subtotal     Int
   disc_value   Int?

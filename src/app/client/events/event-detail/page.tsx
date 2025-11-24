@@ -4,7 +4,7 @@ import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
 import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
-import { formatDate } from "@/lib/utils";
+import { eventStatusLabels, formatDate, toast } from "@/lib/utils";
 import { GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
 import { Events, Templates } from "@prisma/client";
 import Link from "next/link";
@@ -35,26 +35,77 @@ export default function Page() {
   const [priceInit, setPriceInit] = useState<Number>(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
 
+  const fatchOrderEvent = async () => {
+    if (tmpCode && tmpCode.trim() !== '') {
+      const data = await GetDataEventByCode(tmpCode);
+      if (data) {
+        setDataEvent(data);
+
+        if (data.template) {
+          setTemplateColor(data.template.colors ? JSON.parse(data.template.colors) : []);
+
+          const dataPriceInit = data.template.disc_price ? data.template.price - data.template.disc_price : data.template.price;
+          setPriceInit(dataPriceInit);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     const firstInit = async () => {
       setLoading(false);
-      if (tmpCode && tmpCode.trim() !== '') {
-        const data = await GetDataEventByCode(tmpCode);
-        if (data) {
-          setDataEvent(data);
-
-          if(data.template) {
-            setTemplateColor(data.template.colors ? JSON.parse(data.template.colors) : []);
-  
-            const dataPriceInit = data.template.disc_price ? data.template.price - data.template.disc_price : data.template.price;
-            setPriceInit(dataPriceInit);
-          }
-        }
-      }
+      fatchOrderEvent();
     };
 
     firstInit();
   }, [tmpCode]);
+
+  const orderProses = async (eventId: number) => {
+    try {
+      setLoading(true);
+      const snapRes = await StoreSnapMidtrans(eventId);
+      if (snapRes !== undefined && snapRes.token) handleCheckoutPayment(snapRes.token);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: error?.message ?? "We can't proccess your request, Please try again"
+      });
+    }
+  };
+
+  const handleCheckoutPayment = async (tr_token: string) => {
+    await window.snap.pay(tr_token, {
+      onSuccess: async function (result: any) {
+        toast({
+          type: "success",
+          title: "Payment Successful!",
+          message: "Thank you! Your payment has been received. And confirmation email has been sent!"
+        });
+        setLoading(false);
+        return;
+      },
+      onPending: function (result: any) {
+        setLoading(false);
+        return;
+      },
+      onError: function (result: any) {
+        setLoading(false);
+        toast({
+          type: "warning",
+          title: "Payment Error!",
+          message: "Looks like there was a problem with your payment!"
+        });
+        return;
+      },
+      onClose: function () {
+        setLoading(false);
+        return;
+      }
+    });
+
+    await fatchOrderEvent();
+  };
 
   return (
     <>
@@ -95,7 +146,7 @@ export default function Page() {
                     <div className="flex items-center gap-4">
                       <div className="text-sm text-muted flex items-center gap-2">
                         <span>
-                          Status: {dataEvent.tmp_status}
+                          Status: {eventStatusLabels[dataEvent.tmp_status]}
                         </span>
                         <span>•</span>
                         <span>Order At: {dataEvent.createdAt ? formatDate(dataEvent.createdAt, "medium") : "-"}</span>
@@ -186,7 +237,7 @@ export default function Page() {
                         </div>
                         <div className="ms-3">
                           <p className="text-sm text-gray-700">
-                            Your order template are currently <span className="font-semibold">{dataEvent.tmp_status}</span> righ now! Continue process the order to activate the template.
+                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status]}</span> righ now! Continue process the order to activate the template.
                           </p>
                         </div>
                       </div>
@@ -194,7 +245,7 @@ export default function Page() {
 
                     {/* Tombol Aksi */}
                     <div className="mt-4 flex gap-4">
-                      <button onClick={() => StoreSnapMidtrans(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
+                      <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
                         Process Order
                       </button>
                       <Link href="#" className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition' target='_blank'>

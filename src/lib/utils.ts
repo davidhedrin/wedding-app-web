@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { TableShortList, TableThModel } from "./model-types";
-import { RolesEnum } from "@prisma/client";
+import { EventStatusEnum, RolesEnum } from "@prisma/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,6 +13,14 @@ export function cn(...inputs: ClassValue[]) {
 export const roleLabels: Record<RolesEnum, string> = {
   ADMIN: 'Admin',
   CLIENT: 'Client',
+};
+
+export const eventStatusLabels: Record<EventStatusEnum, string> = {
+  PENDING: "Pending",
+  NOT_PAID: "Waiting Payment",
+  ACTIVE: "Activated",
+  CANCELED: "Canceled",
+  ENDED: "Ended",
 };
 
 export async function verifyPassword(password: string, hashed: string): Promise<boolean> {
