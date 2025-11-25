@@ -144,6 +144,9 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
 
 export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapResponse | undefined> {
   try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+
     const getDataEvent = await db.events.findUnique({
       where: { id: eventId },
       include: {
@@ -212,6 +215,30 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
     });
 
     return transDb;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function CancelOrderEvent(eventId: number) {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const findIsTr = await db.tr.findFirst({
+      where: {
+        user_id: Number(user?.id),
+        event_id: eventId
+      }
+    });
+    if(findIsTr) {
+      try{
+      await midtrans.snap.transaction.cancel(findIsTr.tr_id);
+      }catch(errMt: any){}
+    }
+
+    await db.events.delete({ where: { id: eventId } });
   } catch (error: any) {
     throw new Error(error.message);
   }

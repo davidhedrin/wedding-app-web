@@ -57,7 +57,7 @@ export type ConfirmProps = {
   icon?: string;
   confirmText?: string;
   cancelText?: string;
-}
+};
 type ConfirmState = ConfirmProps & {
   isOpen: boolean;
   open: (props: ConfirmProps) => Promise<boolean>;

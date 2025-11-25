@@ -4,8 +4,8 @@ import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
 import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
-import { eventStatusLabels, formatDate, toast } from "@/lib/utils";
-import { GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
+import { eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
+import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
 import { Events, Templates } from "@prisma/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -54,7 +54,16 @@ export default function Page() {
   useEffect(() => {
     const firstInit = async () => {
       setLoading(false);
-      fatchOrderEvent();
+      if (tmpCode && tmpCode.trim() !== '') {
+        fatchOrderEvent();
+      } else {
+        toast({
+          type: "warning",
+          title: "Invalid Code",
+          message: "Looks like something gone wrong with your event. Please try again!"
+        });
+        router.push("/client/events");
+      }
     };
 
     firstInit();
@@ -105,6 +114,35 @@ export default function Page() {
     });
 
     await fatchOrderEvent();
+  };
+
+
+  const handleCancelOrder = async (eventId: number) => {
+    const confirmed = await showConfirm({
+      title: 'Cancel Confirmation!',
+      message: 'Are your sure want to cancel your order? You will not abel to undo this action!',
+      confirmText: 'Yes, Canceled',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-cart bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await CancelOrderEvent(eventId);
+      toast({
+        type: "success",
+        title: "Cancel Finish!",
+        message: "Your order has been canceled successfuly!"
+      });
+      router.push("/client/events");
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong!",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
   };
 
   return (
@@ -248,9 +286,9 @@ export default function Page() {
                       <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
                         Process Order
                       </button>
-                      <Link href="#" className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition' target='_blank'>
+                      <button onClick={() => handleCancelOrder(dataEvent.id)} className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition'>
                         Cancel Order
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>

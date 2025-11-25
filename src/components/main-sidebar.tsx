@@ -50,12 +50,16 @@ export default function MainSidebar() {
 
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   useEffect(() => {
-    if (userData) {
-      const setAdmin = statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
-      if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
-
-      fatchDataEvent();
+    const firstInit = async () => {
+      if (userData) {
+        const setAdmin = statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
+        if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
+  
+        fatchDataEvent();
+      }
     }
+
+    firstInit();
   }, [userData]);
 
   return (

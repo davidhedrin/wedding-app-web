@@ -6,7 +6,7 @@ import TablePagination from "@/components/table-pagination";
 import TableTopToolbar from "@/components/table-top-toolbar";
 import { BreadcrumbType, TableShortList, TableThModel } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
-import { copyToClipboard, formatDate, normalizeSelectObj, sortListToOrderBy, toast } from "@/lib/utils";
+import { copyToClipboard, eventStatusLabels, formatDate, normalizeSelectObj, sortListToOrderBy, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { GetDataEvents } from "@/server/event";
 import { Events, TemplateCaptures, Templates } from "@prisma/client";
@@ -186,7 +186,7 @@ export default function Page() {
                               {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-[180px]">{data.template.name}</div></td>}
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
                               {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}
-                              {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_status || "-"}</td>}
+                              {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_status ? eventStatusLabels[data.tmp_status] : "-"}</td>}
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
