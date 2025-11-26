@@ -58,7 +58,6 @@ export default function page() {
 
           setTotalVotes(totalVoteRate);
           setTotalRates(totalRates);
-          console.log(data);
         }
       }
     };
@@ -391,7 +390,7 @@ function ShapeBackground({ templateColor }: { templateColor: Color[] }) {
   ];
 
   return (
-    <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/30 to-transparent backdrop-blur-xs pointer-events-none">
+    <div className="absolute -z-30 inset-0 bg-linear-to-b from-gray-800/30 to-transparent backdrop-blur-xs pointer-events-none">
       {templateColor.map((x, i) => {
         const pos = positions[i % positions.length];
 

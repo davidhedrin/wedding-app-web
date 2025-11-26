@@ -15,13 +15,13 @@ export default function MainSidebar() {
   })[] | null>(null);
   const [totalPage, setTotalPage] = useState(0);
 
-  const fatchDataEvent = async () => {
+  const fatchDataEvent = async (userId: number) => {
     try {
       const result = await GetDataEvents({
         curPage: 1,
         perPage: 10,
         where: {
-          user_id: Number(userData?.user?.id),
+          user_id: userId,
         },
         select: {
           id: true,
@@ -54,13 +54,24 @@ export default function MainSidebar() {
       if (userData) {
         const setAdmin = statusLogin === "authenticated" && userData.user && userData.user.role && userData.user.role && userData.user.role === RolesEnum.ADMIN;
         if (setAdmin !== undefined && setAdmin !== null) setIsAdmin(setAdmin);
-  
-        fatchDataEvent();
+
+        fatchDataEvent(Number(userData.user?.id));
       }
     }
 
     firstInit();
   }, [userData]);
+
+  // === LISTENER AUTO REFRESH ===
+  useEffect(() => {
+    const handler = (event: CustomEvent) => {
+      fatchDataEvent(event.detail.user_id);
+    };
+
+    window.addEventListener("sidebar:refresh", handler as EventListener);
+    return () =>
+      window.removeEventListener("sidebar:refresh", handler as EventListener);
+  }, []);
 
   return (
     <div id="hs-pro-sidebar" className="hs-overlay [--body-scroll:true] lg:[--overlay-backdrop:false] [--is-layout-affect:true] [--opened:lg] [--auto-close:lg] hs-overlay-open:translate-x-0 lg:hs-overlay-layout-open:translate-x-0 -translate-x-full transition-all duration-300 transform w-60 hidden fixed inset-y-0 z-60 start-0 bg-gray-100 lg:block lg:-translate-x-full lg:end-auto lg:bottom-0" role="dialog" aria-label="Sidebar">

@@ -130,6 +130,12 @@ export default function Page() {
     setLoading(true);
     try {
       await CancelOrderEvent(eventId);
+      window.dispatchEvent(new CustomEvent("sidebar:refresh", {
+        detail: {
+          user_id: dataEvent?.user_id
+        }
+      }));
+
       toast({
         type: "success",
         title: "Cancel Finish!",

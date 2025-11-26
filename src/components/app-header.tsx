@@ -14,7 +14,7 @@ export default function AppHeader() {
       <nav className="relative max-w-6xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-3 md:py-0.5 mx-2 lg:mx-auto">
         <div className="flex items-center">
           <Link href="/" onClick={() => smartLink("/")}>
-            <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-[144px]" />
+            <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-36" />
           </Link>
         </div>
 
