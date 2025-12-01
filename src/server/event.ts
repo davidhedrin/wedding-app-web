@@ -1,14 +1,14 @@
 "use server";
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
-import { Prisma, Events, Templates, TemplateCaptures, EventStatusEnum } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
-import { db } from "../../prisma/db-init";
+import db from "../../prisma/db-init";
 import { DtoEvents, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
+import { DefaultArgs } from "@prisma/client/runtime/client";
+import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
 
 type GetDataEventsParams = {
   where?: Prisma.EventsWhereInput;
@@ -161,18 +161,27 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         event_id: eventId
       }
     });
+    const nowDate = new Date();
+
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
+      if(nowDate > findIsTr.pay_expiry_time){
+
+      }
+
       const dataExistTr: MidtransSnapResponse = {
         token: findIsTr.pay_token,
         redirect_url: findIsTr.pay_redirect_url
       };
+
+      // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
+
       return dataExistTr;
     };
   
     let dataPriceInit = 0;
     if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
 
-    const transDb: MidtransSnapResponse = await db.$transaction(async (tx) => {
+    const transDb: MidtransSnapResponse = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const trData = await tx.tr.create({
         data: {
           tr_id: ulid(),
@@ -191,6 +200,8 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
           gross_amount: dataPriceInit
         },
       });
+
+      const expiredPay = new Date(nowDate.getTime() + 86400000); 
       
       await Promise.all([
         tx.events.update({
@@ -202,6 +213,7 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         tx.tr.update({
           where: { tr_id: trData.tr_id },
           data: {
+            pay_expiry_time: expiredPay,
             pay_token: createSnap.token,
             pay_redirect_url: createSnap.redirect_url
           }
@@ -234,7 +246,7 @@ export async function CancelOrderEvent(eventId: number) {
     });
     if(findIsTr) {
       try{
-      await midtrans.snap.transaction.cancel(findIsTr.tr_id);
+        await midtrans.snap.transaction.cancel(findIsTr.tr_id);
       }catch(errMt: any){}
     }
 

@@ -1,6 +1,6 @@
 import { User as NextAuthUser } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import { RolesEnum } from '@prisma/client';
+import { RolesEnum } from '@/generated/prisma';
 
 declare module "next-auth" {
   interface User {

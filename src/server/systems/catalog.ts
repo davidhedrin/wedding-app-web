@@ -1,14 +1,14 @@
 "use server";
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
-import { Prisma, TemplateCaptures, Templates } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
-import { db } from "../../../prisma/db-init";
+import { Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
+import db from "../../../prisma/db-init";
 import { DtoTemplates } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { genSlugify } from "@/lib/utils";
 import Configs, { CategoryKeys } from "@/lib/config";
 import { DeleteFile, UploadFile } from "../common";
+import { DefaultArgs } from "@prisma/client/runtime/client";
 
 type GetDataTemplatesParams = {
   where?: Prisma.TemplatesWhereInput;
@@ -70,15 +70,15 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     const fatchDbCapture = await db.templateCaptures.findMany({
       where: { tmp_id: data_id }
     });
-    const deletedCaptures = fatchDbCapture.filter((old) => !formData.captures.some((cur) =>
+    const deletedCaptures = fatchDbCapture.filter((old: any) => !formData.captures.some((cur) =>
       old.id != null && cur.id === old.id ? true : old.file_name && cur.file_name === old.file_name
     ));
-    await Promise.all(deletedCaptures.map(async (x) => {
+    await Promise.all(deletedCaptures.map(async (x: any) => {
       if (x.file_name) await DeleteFile(directoryImg, x.file_name);
       await db.templateCaptures.delete({ where: { id: x.id } });
     }));
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const templateData = await tx.templates.upsert({
         where: { id: data_id },
         update: {

@@ -12,9 +12,9 @@ import { ZodErrors } from '@/components/zod-errors';
 import Configs, { CategoryKeys } from '@/lib/config';
 import { DtoCaptureTemplate, DtoTemplates } from '@/lib/dto';
 import { BreadcrumbType, Color, FormState, TableShortList, TableThModel } from '@/lib/model-types';
-import { formatDate, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
+import { inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
 import { DeleteDataTemplates, GetDataTemplates, GetDataTemplatesById, StoreUpdateDataTemplates } from '@/server/systems/catalog';
-import { Templates } from '@prisma/client';
+import { Templates } from '@/generated/prisma';
 import Link from 'next/link';
 import { useEffect, useState } from 'react'
 import z from 'zod';
@@ -243,7 +243,7 @@ export default function Page() {
         const colorsParse: Color[] = data.colors !== null ? JSON.parse(data.colors) : [];
         setTemplateColors(colorsParse);
 
-        const setCaptures: DtoCaptureTemplate[] = data.captures.map((x, i) => ({
+        const setCaptures: DtoCaptureTemplate[] = data.captures.map((x: DtoCaptureTemplate, i: number) => ({
           id: x.id, file: null, file_name: x.file_name, file_path: x.file_path, idx: i
         }));
         setFilesCapture(setCaptures);

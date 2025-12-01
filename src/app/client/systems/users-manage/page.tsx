@@ -14,7 +14,7 @@ import { DtoUser } from '@/lib/dto';
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
 import { formatDate, modalAction, normalizeSelectObj, roleLabels, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
 import { DeleteDataUser, GetDataUser, GetDataUserById, UpdateDataUser } from '@/server/systems/user-manage';
-import { RolesEnum, User } from '@prisma/client';
+import { RolesEnum, User } from '@/generated/prisma';
 import React, { useEffect, useState } from 'react'
 import z from 'zod';
 
@@ -454,7 +454,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                       {
                         urlPrevPP !== undefined && urlPrevPP !== null ? <img src={urlPrevPP} alt="profile" /> : <i className="bx bx-user text-2xl text-gray-500" />

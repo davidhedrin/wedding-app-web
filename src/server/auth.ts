@@ -1,8 +1,7 @@
 "use server";
 
-import { AuthProviderEnum, Prisma, RolesEnum, User } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
-import { db } from "../../prisma/db-init";
+import { AuthProviderEnum, Prisma, RolesEnum, User } from "@/generated/prisma";
+import db from "../../prisma/db-init";
 import { auth, signIn, signOut } from "@/app/api/auth/auth-setup";
 import { generateOtp, hashPassword } from "@/lib/utils";
 import { randomUUID } from "crypto";
@@ -10,6 +9,7 @@ import { EmailVerification } from "./email";
 import { handlePrismaUniqueError } from "@/lib/prisma-handle-error";
 import Configs from "@/lib/config";
 import { DtoOtpVerify, DtoResetPassword, DtoSignIn, DtoSignUp } from "@/lib/dto";
+import { DefaultArgs } from "@prisma/client/runtime/client";
 
 type GetUserByIdParams = {
   id: number,
@@ -52,7 +52,7 @@ export async function signUpAction(formData: DtoSignUp) {
     const password = formData.password;
     const hashPass = await hashPassword(password, 15);
   
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const user = await tx.user.create({
         data: {
           fullname,
@@ -116,7 +116,7 @@ export async function emailVerify(formData: DtoOtpVerify) {
     });
     if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.user.update({
         where: {
           id: findToken.userId
@@ -203,7 +203,7 @@ export async function resetPassword(formData: DtoResetPassword) {
     if(!findToken) throw new Error("We couldn't verify. The token may be incorrect or no longer valid.");
 
     const hashPass = await hashPassword(formData.password, 15);
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.user.update({
         where: {
           id: findToken.userId

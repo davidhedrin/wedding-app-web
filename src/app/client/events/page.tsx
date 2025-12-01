@@ -6,10 +6,9 @@ import TablePagination from "@/components/table-pagination";
 import TableTopToolbar from "@/components/table-top-toolbar";
 import { BreadcrumbType, TableShortList, TableThModel } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
-import { copyToClipboard, eventStatusLabels, formatDate, normalizeSelectObj, sortListToOrderBy, toast } from "@/lib/utils";
-import { userLoginData } from "@/lib/zustand";
-import { GetDataEvents } from "@/server/event";
-import { Events, TemplateCaptures, Templates } from "@prisma/client";
+import { copyToClipboard, eventStatusLabels, formatDate, normalizeSelectObj, showConfirm, sortListToOrderBy, toast } from "@/lib/utils";
+import { CancelOrderEvent, GetDataEvents } from "@/server/event";
+import { Events, TemplateCaptures, Templates } from "@/generated/prisma";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -69,6 +68,7 @@ export default function Page() {
         },
         select: {
           id: true,
+          user_id: true,
           ...selectObj
         },
         orderBy: orderObj
@@ -114,6 +114,41 @@ export default function Page() {
     if (data) firstInit();
   }, [data]);
   // End Master
+
+  const deleteRow = async (id: number, userId: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await CancelOrderEvent(id);
+      window.dispatchEvent(new CustomEvent("sidebar:refresh", {
+        detail: {
+          user_id: userId
+        }
+      }));
+      await fatchDatas();
+
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
+  };
 
   return (
     <>
@@ -193,7 +228,7 @@ export default function Page() {
                                 <Link href={`/client/events/event-detail?code=${data.tmp_code}`} onClick={() => smartLink("/client/events/event-detail")}>
                                   <i className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
                                 </Link>
-                                <i className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                                <i onClick={() => deleteRow(data.id, data.user_id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>
                             </tr>
                           ))

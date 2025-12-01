@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/generated/prisma';
 
 /**
  * Handles Prisma unique constraint errors (P2002)

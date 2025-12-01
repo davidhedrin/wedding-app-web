@@ -1,4 +1,4 @@
-import { EventStatusEnum, RolesEnum } from "@prisma/client";
+import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
 
 export type DtoSignIn = {
   email: string;

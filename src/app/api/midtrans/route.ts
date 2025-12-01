@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../../prisma/db-init';
+import db from '../../../../prisma/db-init';
 import crypto from "crypto";
-import { EventStatusEnum } from '@prisma/client';
+import { EventStatusEnum, Prisma } from '@/generated/prisma';
 
 export async function POST(req: NextRequest) {
   try{
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     
     const payAt = new Date(reqData.transaction_time);
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       if (reqData.transaction_status == 'capture'){
         if (reqData.fraud_status == 'accept'){
           // TODO set transaction status on your database to 'success'

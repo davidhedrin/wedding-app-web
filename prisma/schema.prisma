@@ -6,12 +6,12 @@
 
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 enum RolesEnum {
@@ -161,7 +161,7 @@ model Tr {
   pay_status       Boolean   @default(false)
   pay_at           DateTime?
   pay_va           String?
-  pay_expiry_time  DateTime?
+  pay_expiry_time  DateTime @default(now())
   pay_bill_key     String?
   pay_bill_code    String?
   qris_url         String?

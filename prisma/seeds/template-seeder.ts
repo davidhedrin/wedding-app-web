@@ -1,8 +1,8 @@
-import { AuthProviderEnum, Prisma, PrismaClient, RolesEnum } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
+import { Prisma, PrismaClient } from '@/generated/prisma';
+import { DefaultArgs } from '@prisma/client/runtime/client';
 
 export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) => {
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.$executeRawUnsafe(`TRUNCATE TABLE "Templates" RESTART IDENTITY CASCADE;`);
     await tx.$executeRawUnsafe(`TRUNCATE TABLE "TemplateCaptures" RESTART IDENTITY CASCADE;`);
   

@@ -2,7 +2,7 @@ import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { GetDataEvents } from "@/server/event";
-import { Events, RolesEnum, Templates } from "@prisma/client";
+import { Events, RolesEnum, Templates } from "@/generated/prisma";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 

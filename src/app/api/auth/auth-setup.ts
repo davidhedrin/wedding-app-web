@@ -5,8 +5,8 @@ import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { verifyPassword } from "@/lib/utils"
 import { getUserById } from "@/server/auth"
-import { db } from "../../../../prisma/db-init"
-import { RolesEnum } from "@prisma/client"
+import db from "../../../../prisma/db-init"
+import { RolesEnum } from "@/generated/prisma"
 
 class CustomError extends AuthError {
   constructor(name: string, message: string) {

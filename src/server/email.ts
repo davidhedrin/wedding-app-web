@@ -2,11 +2,11 @@
 
 import { Resend } from 'resend';
 import Configs from "@/lib/config";
-import { generateOtp } from '@/lib/utils';
-import { db } from '../../prisma/db-init';
+import db from '../../prisma/db-init';
 import { randomUUID } from 'crypto';
 import EmailVerifyTemplate from '@/components/email/email-verify';
 import ResetPasswordTemplate from '@/components/email/reset-password';
+import { Prisma } from '@/generated/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = Configs.base_url;
@@ -68,7 +68,7 @@ export async function EmailForgotPassword(email: string) {
       if (timeDifference < 1000 * 60 * Configs.valid_reset_pass) throw new Error("An email has already been sent. Please wait a minutes before requesting again.");
     };
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.passwordResetToken.updateMany({
         data: { usingAt: new Date() }
       });

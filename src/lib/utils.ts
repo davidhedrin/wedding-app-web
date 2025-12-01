@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { TableShortList, TableThModel } from "./model-types";
-import { EventStatusEnum, RolesEnum } from "@prisma/client";
+import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -5,7 +5,7 @@ import { useSmartLink } from "@/lib/smart-link";
 import { calculateRateProduct, showConfirm, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { StoreUpdateDataEvents } from "@/server/event";
-import { TemplateCaptures, Templates } from "@prisma/client";
+import { TemplateCaptures, Templates } from "@/generated/prisma";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoading } from "./loading/loading-context";
@@ -68,7 +68,7 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition transform">
       {/* Gambar dengan aspect ratio */}
-      <div className="relative w-full aspect-[4/3]">
+      <div className="relative w-full aspect-4/3">
         <Link href={`/template-detail?name=${template.slug}`} onClick={() => smartLink(`/template-detail?name=${template.slug}`)}>
           <img
             src={template.captures ? template.captures[0].file_path : ""}

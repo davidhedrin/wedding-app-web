@@ -9,7 +9,7 @@ import { calculateRateProduct, toast } from '@/lib/utils';
 import { userLoginData } from '@/lib/zustand';
 import { StoreUpdateDataEvents } from '@/server/event';
 import { GetDataTemplatesBySlug } from '@/server/systems/catalog';
-import { TemplateCaptures, Templates } from '@prisma/client';
+import { TemplateCaptures, Templates } from '@/generated/prisma';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';

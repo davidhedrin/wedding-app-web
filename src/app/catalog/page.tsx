@@ -9,7 +9,7 @@ import Configs, { CategoryKeys } from "@/lib/config";
 import { TableShortList, TableThModel } from "@/lib/model-types";
 import { normalizeSelectObj, sortListToOrderBy, toast } from "@/lib/utils";
 import { GetDataTemplates } from "@/server/systems/catalog";
-import { Prisma, TemplateCaptures, Templates } from "@prisma/client";
+import { Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
 import { useEffect, useRef, useState } from "react";
 
 type RateType = "Price" | "Choosen" | "Rating";
@@ -174,7 +174,7 @@ export default function CatalogPage() {
   return (
     <div className="pb-16">
       <div className='relative w-full h-[50vh] flex items-end justify-center text-center pb-14'>
-        <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
+        <div className="absolute -z-30 inset-0 bg-linear-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
         <div className="
           absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
           w-[280px] h-[280px] sm:w-[300px] sm:h-[300px] lg:w-[650px] lg:h-[650px]
