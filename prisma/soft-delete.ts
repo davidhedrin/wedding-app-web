@@ -1,5 +1,5 @@
 // lib/prisma/extensions/softDelete.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/prisma";
 
 type SoftDeleteOptions = {
   models: string[];

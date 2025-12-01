@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma';
 const prisma = new PrismaClient();
 
 import usersSeeder from "./seeds/user-seeder";
@@ -11,10 +11,10 @@ async function main(){
   console.log('Seeding finished.');
 };
 
-main().then(async () => {
-  await prisma.$disconnect();
-}).catch(async (e) => {
+main().catch(async (e) => {
   console.error(e);
   await prisma.$disconnect();
   process.exit(1);
+}).finally(async () => {
+  await prisma.$disconnect();
 });
