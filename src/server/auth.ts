@@ -1,7 +1,7 @@
 "use server";
 
 import { AuthProviderEnum, Prisma, RolesEnum, User } from "@/generated/prisma";
-import db from "../../prisma/db-init";
+import { db } from "../../prisma/db-init";
 import { auth, signIn, signOut } from "@/app/api/auth/auth-setup";
 import { generateOtp, hashPassword } from "@/lib/utils";
 import { randomUUID } from "crypto";

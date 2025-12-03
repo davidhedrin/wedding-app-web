@@ -2,7 +2,7 @@
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
-import db from "../../../prisma/db-init";
+import { db } from "../../../prisma/db-init";
 import { DtoTemplates } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { genSlugify } from "@/lib/utils";

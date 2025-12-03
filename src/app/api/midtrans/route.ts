@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '../../../../prisma/db-init';
+import { db } from '../../../../prisma/db-init';
 import crypto from "crypto";
 import { EventStatusEnum, Prisma } from '@/generated/prisma';
 

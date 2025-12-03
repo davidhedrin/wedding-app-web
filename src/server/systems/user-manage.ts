@@ -2,7 +2,7 @@
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { Prisma, User } from "@/generated/prisma";
-import db from "../../../prisma/db-init";
+import { db } from "../../../prisma/db-init";
 import { auth } from "@/app/api/auth/auth-setup";
 import { DtoUser } from "@/lib/dto";
 import { DeleteFile, UploadFile } from "../common";

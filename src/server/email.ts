@@ -2,7 +2,7 @@
 
 import { Resend } from 'resend';
 import Configs from "@/lib/config";
-import db from '../../prisma/db-init';
+import { db } from '../../prisma/db-init';
 import { randomUUID } from 'crypto';
 import EmailVerifyTemplate from '@/components/email/email-verify';
 import ResetPasswordTemplate from '@/components/email/reset-password';

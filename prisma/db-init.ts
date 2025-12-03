@@ -2,20 +2,22 @@ import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL
-})
+  connectionString: process.env.DATABASE_URL!,
+});
 
-const prismaClientSingleton = () => {
-  return new PrismaClient({adapter})
+function createPrismaClient() {
+  return new PrismaClient({ adapter });
+}
+
+declare global {
+  var prismaGlobal: PrismaClient | undefined;
+}
+
+export const db = global.prismaGlobal ?? createPrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  global.prismaGlobal = db;
 };
-
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
-
-export default prisma
-if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 // Soft Delete
 // const softModels = ['User', 'Templates'];

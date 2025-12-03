@@ -1,7 +1,7 @@
 "use server";
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
-import db from "../../prisma/db-init";
+import { db } from "../../prisma/db-init";
 import { DtoEvents, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
