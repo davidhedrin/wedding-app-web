@@ -68,7 +68,7 @@ export async function EmailForgotPassword(email: string) {
       if (timeDifference < 1000 * 60 * Configs.valid_reset_pass) throw new Error("An email has already been sent. Please wait a minutes before requesting again.");
     };
 
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       await tx.passwordResetToken.updateMany({
         data: { usingAt: new Date() }
       });

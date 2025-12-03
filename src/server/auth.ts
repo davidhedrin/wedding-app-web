@@ -52,7 +52,7 @@ export async function signUpAction(formData: DtoSignUp) {
     const password = formData.password;
     const hashPass = await hashPassword(password, 15);
   
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
           fullname,
@@ -116,7 +116,7 @@ export async function emailVerify(formData: DtoOtpVerify) {
     });
     if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
 
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       await tx.user.update({
         where: {
           id: findToken.userId
@@ -203,7 +203,7 @@ export async function resetPassword(formData: DtoResetPassword) {
     if(!findToken) throw new Error("We couldn't verify. The token may be incorrect or no longer valid.");
 
     const hashPass = await hashPassword(formData.password, 15);
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       await tx.user.update({
         where: {
           id: findToken.userId

@@ -10,6 +10,8 @@ import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
 
+// const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
+
 type GetDataEventsParams = {
   where?: Prisma.EventsWhereInput;
   orderBy?: Prisma.EventsOrderByWithRelationInput | Prisma.EventsOrderByWithRelationInput[];
@@ -165,7 +167,35 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
 
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
       if(nowDate > findIsTr.pay_expiry_time){
+        const createNewTr: MidtransSnapResponse = await db.$transaction(async (tx) => {
+          const updateTr = await tx.tr.update({
+            where: { tr_id: findIsTr.tr_id },
+            data: {
+              tr_id: ulid()
+            }
+          })
 
+          const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction({
+            transaction_details: {
+              order_id: updateTr.tr_id,
+              gross_amount: dataPriceInit
+            },
+          });
+
+          const expiredPay = new Date(nowDate.getTime() + 86400000);
+          tx.tr.update({
+            where: { tr_id: updateTr.tr_id },
+            data: {
+              pay_expiry_time: expiredPay,
+              pay_token: createSnap.token,
+              pay_redirect_url: createSnap.redirect_url
+            }
+          });
+
+          return createSnap;
+        });
+
+        return createNewTr;
       }
 
       const dataExistTr: MidtransSnapResponse = {
@@ -173,15 +203,13 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         redirect_url: findIsTr.pay_redirect_url
       };
 
-      // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
-
       return dataExistTr;
     };
   
     let dataPriceInit = 0;
     if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
 
-    const transDb: MidtransSnapResponse = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    const transDb: MidtransSnapResponse = await db.$transaction(async (tx) => {
       const trData = await tx.tr.create({
         data: {
           tr_id: ulid(),

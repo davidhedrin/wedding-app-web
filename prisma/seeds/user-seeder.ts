@@ -2,7 +2,7 @@ import { AuthProviderEnum, Prisma, PrismaClient, RolesEnum } from '@/generated/p
 import { DefaultArgs } from '@prisma/client/runtime/client';
 
 export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) => {
-  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  await prisma.$transaction(async (tx) => {
     await tx.$executeRawUnsafe(`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;`);
   
     await tx.user.createMany({

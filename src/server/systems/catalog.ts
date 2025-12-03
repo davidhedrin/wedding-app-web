@@ -78,7 +78,7 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
       await db.templateCaptures.delete({ where: { id: x.id } });
     }));
 
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       const templateData = await tx.templates.upsert({
         where: { id: data_id },
         update: {

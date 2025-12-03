@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     
     const payAt = new Date(reqData.transaction_time);
 
-    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await db.$transaction(async (tx) => {
       if (reqData.transaction_status == 'capture'){
         if (reqData.fraud_status == 'accept'){
           // TODO set transaction status on your database to 'success'
