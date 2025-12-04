@@ -163,10 +163,17 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         event_id: eventId
       }
     });
+
     const nowDate = new Date();
+    let dataPriceInit = 0;
+    if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
 
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
       if(nowDate > findIsTr.pay_expiry_time){
+        try{
+          midtrans.snap.transaction.cancel(findIsTr.tr_id);
+        }catch(errMt: any){}
+        
         const createNewTr: MidtransSnapResponse = await db.$transaction(async (tx) => {
           const updateTr = await tx.tr.update({
             where: { tr_id: findIsTr.tr_id },
@@ -183,7 +190,7 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
           });
 
           const expiredPay = new Date(nowDate.getTime() + 86400000);
-          tx.tr.update({
+          await tx.tr.update({
             where: { tr_id: updateTr.tr_id },
             data: {
               pay_expiry_time: expiredPay,
@@ -205,9 +212,6 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
 
       return dataExistTr;
     };
-  
-    let dataPriceInit = 0;
-    if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
 
     const transDb: MidtransSnapResponse = await db.$transaction(async (tx) => {
       const trData = await tx.tr.create({

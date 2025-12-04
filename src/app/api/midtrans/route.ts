@@ -31,21 +31,23 @@ export async function POST(req: NextRequest) {
           // and response with 200 OK
           // PAID
   
-          tx.tr.update({
-            where: { tr_id },
-            data: {
-              pay_status: true,
-              pay_at: payAt,
-            }
-          });
+          await Promise.all([
+            tx.tr.update({
+              where: { tr_id },
+              data: {
+                pay_status: true,
+                pay_at: payAt,
+              }
+            }),
+
+            tx.events.update({
+              where: { id: getTrData.event_id },
+              data: {
+                tmp_status: EventStatusEnum.ACTIVE
+              }
+            })
+          ]);
           
-          tx.events.update({
-            where: { id: getTrData.event_id },
-            data: {
-              tmp_status: EventStatusEnum.ACTIVE
-            }
-          });
-  
           // EmailOrderTransaction(tr_id);
         }
       } else if (reqData.transaction_status == 'settlement'){
@@ -53,20 +55,22 @@ export async function POST(req: NextRequest) {
         // and response with 200 OK
         // PAID
         
-        tx.tr.update({
-          where: { tr_id },
-          data: {
-            pay_status: true,
-            pay_at: payAt,
-          }
-        });
-          
-        tx.events.update({
-          where: { id: getTrData.event_id },
-          data: {
-            tmp_status: EventStatusEnum.ACTIVE
-          }
-        });
+          await Promise.all([
+            tx.tr.update({
+              where: { tr_id },
+              data: {
+                pay_status: true,
+                pay_at: payAt,
+              }
+            }),
+              
+            tx.events.update({
+              where: { id: getTrData.event_id },
+              data: {
+                tmp_status: EventStatusEnum.ACTIVE
+              }
+            }),
+          ]);
   
         // EmailOrderTransaction(tr_id);
       }
