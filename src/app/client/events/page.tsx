@@ -221,7 +221,11 @@ export default function Page() {
                               {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-[180px]">{data.template.name}</div></td>}
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
                               {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}
-                              {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_status ? eventStatusLabels[data.tmp_status] : "-"}</td>}
+                              {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                                {data.tmp_status ? <span className={`inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-${eventStatusLabels[data.tmp_status].color}-100 text-${eventStatusLabels[data.tmp_status].color}-800`}>
+                                  {eventStatusLabels[data.tmp_status].name}
+                                </span> : "-"}
+                              </td>}
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">

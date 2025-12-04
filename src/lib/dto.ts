@@ -72,6 +72,26 @@ export type DtoEvents = {
   tmp_ctg_key: string;
 };
 
+export type DtoSnapMidtrans = {
+  transaction_details: {
+    order_id: string;
+    gross_amount: number;
+  };
+  customer_details: {
+    first_name: string | null;
+    email: string;
+    phone: string | null;
+  };
+  item_details: {
+    id: number | null;
+    price: number;
+    quantity: number;
+    name: string;
+    category: string | null;
+    merchant_name: string | null;
+  }[];
+};
+
 export type MidtransSnapResponse = {
   token: string;
   redirect_url: string;

@@ -15,12 +15,27 @@ export const roleLabels: Record<RolesEnum, string> = {
   CLIENT: 'Client',
 };
 
-export const eventStatusLabels: Record<EventStatusEnum, string> = {
-  PENDING: "Pending",
-  NOT_PAID: "Waiting Payment",
-  ACTIVE: "Activated",
-  CANCELED: "Canceled",
-  ENDED: "Ended",
+export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: string }> = {
+  PENDING: {
+    name: "Pending",
+    color: "yellow" //warning
+  },
+  NOT_PAID: {
+    name: "Waiting Payment",
+    color: "blue" //primary
+  },
+  ACTIVE: {
+    name: "Activated",
+    color: "teal" //success
+  },
+  CANCELED: {
+    name: "Canceled",
+    color: "gray" //secondary
+  },
+  ENDED: {
+    name: "Ended",
+    color: "gray" //secondary
+  },
 };
 
 export async function verifyPassword(password: string, hashed: string): Promise<boolean> {

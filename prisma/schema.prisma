@@ -156,8 +156,6 @@ model Tr {
   pay_redirect_url String?
   pay_type         String?
   pay_key          String?
-  pay_fee_percent  Int?
-  pay_fee_amount   Int?
   pay_status       Boolean   @default(false)
   pay_at           DateTime?
   pay_va           String?

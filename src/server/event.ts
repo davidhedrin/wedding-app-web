@@ -2,13 +2,13 @@
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
-import { DtoEvents, MidtransSnapResponse } from "@/lib/dto";
+import { DtoEvents, DtoSnapMidtrans, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
-import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates } from "@/generated/prisma";
+import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, User } from "@/generated/prisma";
 
 // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
 
@@ -144,6 +144,29 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
   return getData;
 };
 
+function ParamSnapMidtrans({ orderId, amount, event }: { orderId: string, amount: number, event: Events & {template: Templates, user: User} }): DtoSnapMidtrans {
+  const params: DtoSnapMidtrans = {
+    transaction_details: {
+      order_id: orderId,
+      gross_amount: amount
+    },
+    customer_details: {
+      first_name: event.user.fullname,
+      email: event.user.email,
+      phone: event.user.no_phone
+    },
+    item_details: [{
+      id: event.tmp_id,
+      price: amount,
+      quantity: 1,
+      name: event.template.name,
+      category: event.tmp_ctg,
+      merchant_name: "Wedlyvite",
+    }]
+  };
+
+  return params;
+};
 export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapResponse | undefined> {
   try{
     const session = await auth();
@@ -152,7 +175,8 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
     const getDataEvent = await db.events.findUnique({
       where: { id: eventId },
       include: {
-        template: true
+        template: true,
+        user: true
       }
     });
     if(!getDataEvent) throw new Error("Event data not found!");
@@ -173,21 +197,22 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         try{
           midtrans.snap.transaction.cancel(findIsTr.tr_id);
         }catch(errMt: any){}
-        
+
         const createNewTr: MidtransSnapResponse = await db.$transaction(async (tx) => {
           const updateTr = await tx.tr.update({
             where: { tr_id: findIsTr.tr_id },
             data: {
               tr_id: ulid()
             }
-          })
-
-          const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction({
-            transaction_details: {
-              order_id: updateTr.tr_id,
-              gross_amount: dataPriceInit
-            },
           });
+
+          const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction(
+            ParamSnapMidtrans({
+              orderId: updateTr.tr_id,
+              amount: dataPriceInit,
+              event: getDataEvent
+            })
+          );
 
           const expiredPay = new Date(nowDate.getTime() + 86400000);
           await tx.tr.update({
@@ -226,12 +251,13 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         }
       });
       
-      const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction({
-        transaction_details: {
-          order_id: trData.tr_id,
-          gross_amount: dataPriceInit
-        },
-      });
+      const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction(
+        ParamSnapMidtrans({
+          orderId: trData.tr_id,
+          amount: dataPriceInit,
+          event: getDataEvent
+        })
+      );
 
       const expiredPay = new Date(nowDate.getTime() + 86400000); 
       

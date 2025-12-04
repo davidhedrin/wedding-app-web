@@ -85,6 +85,7 @@ export default function Page() {
   const handleCheckoutPayment = async (tr_token: string) => {
     await window.snap.pay(tr_token, {
       onSuccess: async function (result: any) {
+        await fatchOrderEvent();
         toast({
           type: "success",
           title: "Payment Successful!",
@@ -93,11 +94,13 @@ export default function Page() {
         setLoading(false);
         return;
       },
-      onPending: function (result: any) {
+      onPending: async function (result: any) {
+        await fatchOrderEvent();
         setLoading(false);
         return;
       },
-      onError: function (result: any) {
+      onError: async function (result: any) {
+        await fatchOrderEvent();
         setLoading(false);
         toast({
           type: "warning",
@@ -106,13 +109,12 @@ export default function Page() {
         });
         return;
       },
-      onClose: function () {
+      onClose: async function () {
+        await fatchOrderEvent();
         setLoading(false);
         return;
       }
     });
-
-    await fatchOrderEvent();
   };
 
 
@@ -189,7 +191,9 @@ export default function Page() {
                     <div className="flex items-center gap-4">
                       <div className="text-sm text-muted flex items-center gap-2">
                         <span>
-                          Status: {eventStatusLabels[dataEvent.tmp_status]}
+                          Status: <span className={`inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-${eventStatusLabels[dataEvent.tmp_status].color}-100 text-${eventStatusLabels[dataEvent.tmp_status].color}-800`}>
+                            {eventStatusLabels[dataEvent.tmp_status].name}
+                          </span>
                         </span>
                         <span>•</span>
                         <span>Order At: {dataEvent.createdAt ? formatDate(dataEvent.createdAt, "medium") : "-"}</span>
@@ -265,11 +269,11 @@ export default function Page() {
                       </table>
                     </div>
 
-                    <div className="bg-blue-50 border-s-4 border-blue-500 p-3 mt-3" role="alert">
+                    <div className={`bg-${eventStatusLabels[dataEvent.tmp_status].color}-50 border-s-4 border-${eventStatusLabels[dataEvent.tmp_status].color}-500 p-3 mt-3`} role="alert">
                       <div className="flex items-center">
                         <div className="shrink-0">
                           {/* Icon */}
-                          <span className="inline-flex justify-center items-center size-9 rounded-full border-4 border-blue-100 bg-blue-200 text-blue-800">
+                          <span className={`inline-flex justify-center items-center size-9 rounded-full border-4 border-${eventStatusLabels[dataEvent.tmp_status].color}-100 bg-${eventStatusLabels[dataEvent.tmp_status].color}-200 text-${eventStatusLabels[dataEvent.tmp_status].color}-800`}>
                             <svg className="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
                               <path d="M12 9v4"></path>
@@ -280,21 +284,33 @@ export default function Page() {
                         </div>
                         <div className="ms-3">
                           <p className="text-sm text-gray-700">
-                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status]}</span> righ now! Continue process the order to activate the template.
+                            {
+                              dataEvent.tmp_status === "ACTIVE" ? <span>
+                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating something beautiful for your special moment ✨.
+                              </span> : dataEvent.tmp_status === "ENDED" ? <span>
+                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
+                              </span> : <span>
+                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Continue process the order to activate the template.
+                              </span>
+                            }
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Tombol Aksi */}
-                    <div className="mt-4 flex gap-4">
-                      <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
-                        Process Order
-                      </button>
-                      <button onClick={() => handleCancelOrder(dataEvent.id)} className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition'>
-                        Cancel Order
-                      </button>
-                    </div>
+                    {
+                      (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div>
+                        {/* Tombol Aksi */}
+                        <div className="mt-4 flex gap-4">
+                          <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
+                            Process Order
+                          </button>
+                          <button onClick={() => handleCancelOrder(dataEvent.id)} className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition'>
+                            Cancel Order
+                          </button>
+                        </div>
+                      </div>
+                    }
                   </div>
                 </div>
 

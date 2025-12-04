@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../../prisma/db-init';
 import crypto from "crypto";
-import { EventStatusEnum, Prisma } from '@/generated/prisma';
+import { EventStatusEnum } from '@/generated/prisma';
+
+export async function GET(req: NextRequest) {
+  return NextResponse.json(
+    { status: 'success', message: "API Midtrans Ready" },
+    { status: 200 }
+  );
+};
 
 export async function POST(req: NextRequest) {
   try{
@@ -23,6 +30,30 @@ export async function POST(req: NextRequest) {
     if(createHash !== reqData.signature_key) throw new Error("Signature key not match!");
     
     const payAt = new Date(reqData.transaction_time);
+    const paymentType = reqData.payment_type;
+
+    let trUpdateData: any = {
+      pay_status: true,
+      pay_at: payAt,
+    };
+
+    if (paymentType == "bank_transfer"){
+      const vaNumber = reqData.va_numbers !== undefined && reqData.va_numbers !== null ? reqData.va_numbers[0] : null;
+      const permataVa = reqData.permata_va_number ?? null;
+
+      if(vaNumber !== null) {
+        trUpdateData.pay_type = vaNumber.bank;
+        trUpdateData.pay_va = vaNumber.va_number;
+      } else {
+        trUpdateData.pay_type = permataVa ? "Permata" : null;
+        trUpdateData.pay_va = permataVa;
+      }
+    } else if (paymentType == "echannel") {
+      trUpdateData.pay_type = "Mandiri";
+      trUpdateData.pay_bill_key = reqData.bill_key ?? null;
+      trUpdateData.pay_bill_code = reqData.biller_code ?? null;
+    } else if (paymentType == "gopay") trUpdateData.pay_type = "Gopay";
+    else if (paymentType == "qris") trUpdateData.pay_type = "Qris";
 
     await db.$transaction(async (tx) => {
       if (reqData.transaction_status == 'capture'){
@@ -32,20 +63,17 @@ export async function POST(req: NextRequest) {
           // PAID
   
           await Promise.all([
-            tx.tr.update({
-              where: { tr_id },
-              data: {
-                pay_status: true,
-                pay_at: payAt,
-              }
-            }),
-
             tx.events.update({
               where: { id: getTrData.event_id },
               data: {
                 tmp_status: EventStatusEnum.ACTIVE
               }
-            })
+            }),
+
+            tx.tr.update({
+              where: { tr_id },
+              data: trUpdateData
+            }),
           ]);
           
           // EmailOrderTransaction(tr_id);
@@ -56,19 +84,16 @@ export async function POST(req: NextRequest) {
         // PAID
         
           await Promise.all([
-            tx.tr.update({
-              where: { tr_id },
-              data: {
-                pay_status: true,
-                pay_at: payAt,
-              }
-            }),
-              
             tx.events.update({
               where: { id: getTrData.event_id },
               data: {
                 tmp_status: EventStatusEnum.ACTIVE
               }
+            }),
+
+            tx.tr.update({
+              where: { tr_id },
+              data: trUpdateData
             }),
           ]);
   
