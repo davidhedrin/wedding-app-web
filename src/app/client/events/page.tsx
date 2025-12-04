@@ -232,7 +232,9 @@ export default function Page() {
                                 <Link href={`/client/events/event-detail?code=${data.tmp_code}`} onClick={() => smartLink("/client/events/event-detail")}>
                                   <i className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
                                 </Link>
-                                <i onClick={() => deleteRow(data.id, data.user_id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                                {
+                                  (data.tmp_status && (data.tmp_status === "NOT_PAID" || data.tmp_status === "PENDING")) && <i onClick={() => deleteRow(data.id, data.user_id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                                }
                               </td>
                             </tr>
                           ))
