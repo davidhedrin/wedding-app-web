@@ -1,5 +1,7 @@
 import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
 
+export type StatusType = | "secondary" | "primary" | "success" | "warning" | "danger";
+
 export type DtoSignIn = {
   email: string;
   password: string;

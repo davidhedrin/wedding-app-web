@@ -5,6 +5,7 @@ import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData
 import { signOutAuth } from "@/server/auth";
 import { TableShortList, TableThModel } from "./model-types";
 import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
+import { StatusType } from "./dto";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,26 +16,26 @@ export const roleLabels: Record<RolesEnum, string> = {
   CLIENT: 'Client',
 };
 
-export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: string }> = {
+export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: StatusType }> = {
   PENDING: {
     name: "Pending",
-    color: "yellow" //warning
+    color: "warning"
   },
   NOT_PAID: {
     name: "Waiting Payment",
-    color: "blue" //primary
+    color: "primary"
   },
   ACTIVE: {
     name: "Activated",
-    color: "teal" //success
+    color: "success"
   },
   CANCELED: {
     name: "Canceled",
-    color: "gray" //secondary
+    color: "secondary"
   },
   ENDED: {
     name: "Ended",
-    color: "gray" //secondary
+    color: "secondary"
   },
 };
 

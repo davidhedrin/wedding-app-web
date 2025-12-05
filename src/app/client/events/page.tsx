@@ -12,6 +12,8 @@ import { Events, TemplateCaptures, Templates } from "@/generated/prisma";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import clsx from "clsx";
+import Badge from "@/components/ui/badge";
 
 export default function Page() {
   const smartLink = useSmartLink();
@@ -222,9 +224,7 @@ export default function Page() {
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
                               {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}
                               {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                                {data.tmp_status ? <span className={`inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-${eventStatusLabels[data.tmp_status].color}-100 text-${eventStatusLabels[data.tmp_status].color}-800`}>
-                                  {eventStatusLabels[data.tmp_status].name}
-                                </span> : "-"}
+                                {data.tmp_status ? <Badge label={eventStatusLabels[data.tmp_status].name} status={eventStatusLabels[data.tmp_status].color} /> : "-"}
                               </td>}
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 

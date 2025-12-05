@@ -10,6 +10,8 @@ import { Events, Templates } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import Badge from "@/components/ui/badge";
+import Alert from "@/components/ui/alert";
 
 declare global {
   interface Window {
@@ -117,7 +119,6 @@ export default function Page() {
     });
   };
 
-
   const handleCancelOrder = async (eventId: number) => {
     const confirmed = await showConfirm({
       title: 'Cancel Confirmation!',
@@ -191,9 +192,7 @@ export default function Page() {
                     <div className="flex items-center gap-4">
                       <div className="text-sm text-muted flex items-center gap-2">
                         <span>
-                          Status: <span className={`inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-${eventStatusLabels[dataEvent.tmp_status].color}-100 text-${eventStatusLabels[dataEvent.tmp_status].color}-800`}>
-                            {eventStatusLabels[dataEvent.tmp_status].name}
-                          </span>
+                          Status: <Badge label={eventStatusLabels[dataEvent.tmp_status].name} status={eventStatusLabels[dataEvent.tmp_status].color} />
                         </span>
                         <span>•</span>
                         <span>Order At: {dataEvent.createdAt ? formatDate(dataEvent.createdAt, "medium") : "-"}</span>
@@ -269,34 +268,19 @@ export default function Page() {
                       </table>
                     </div>
 
-                    <div className={`bg-${eventStatusLabels[dataEvent.tmp_status].color}-50 border-s-4 border-${eventStatusLabels[dataEvent.tmp_status].color}-500 p-3 mt-3`} role="alert">
-                      <div className="flex items-center">
-                        <div className="shrink-0">
-                          {/* Icon */}
-                          <span className={`inline-flex justify-center items-center size-9 rounded-full border-4 border-${eventStatusLabels[dataEvent.tmp_status].color}-100 bg-${eventStatusLabels[dataEvent.tmp_status].color}-200 text-${eventStatusLabels[dataEvent.tmp_status].color}-800`}>
-                            <svg className="shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                              <path d="M12 9v4"></path>
-                              <path d="M12 17h.01"></path>
-                            </svg>
+                    <Alert status={eventStatusLabels[dataEvent.tmp_status].color}>
+                      <p className="text-sm text-gray-700">
+                        {
+                          dataEvent.tmp_status === "ACTIVE" ? <span>
+                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating something beautiful for your special moment ✨.
+                          </span> : dataEvent.tmp_status === "ENDED" ? <span>
+                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
+                          </span> : <span>
+                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Continue process the order to activate the template.
                           </span>
-                          {/* End Icon */}
-                        </div>
-                        <div className="ms-3">
-                          <p className="text-sm text-gray-700">
-                            {
-                              dataEvent.tmp_status === "ACTIVE" ? <span>
-                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating something beautiful for your special moment ✨.
-                              </span> : dataEvent.tmp_status === "ENDED" ? <span>
-                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
-                              </span> : <span>
-                                Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Continue process the order to activate the template.
-                              </span>
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                        }
+                      </p>
+                    </Alert>
 
                     {
                       (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div>
@@ -315,25 +299,79 @@ export default function Page() {
                 </div>
 
                 <div className="relative overflow-hidden min-h-[300px] mt-6">
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-2">Konten Eksklusif</h2>
-                    <p className="text-gray-500">
-                      Konten ini akan muncul setelah event diaktifkan.
+                  <div>
+                    <div className="font-semibold">Event Details</div>
+                    <p className="text-gray-500 text-sm">
+                      Here's you can costumize your event detail design. Choose the section tab information to modified your event.
                     </p>
                   </div>
 
-                  {/* Overlay blur + terkunci */}
-                  <div className="absolute inset-0 bg-white/10 backdrop-blur-xs flex flex-col items-center justify-center z-10">
-                    <div className="flex flex-col items-center text-center">
-                      <i className='bx bx-lock text-4xl mb-3'></i>
-                      <p className="text-gray-700 font-medium">
-                        This section is locked!
-                      </p>
-                      <p className="text-gray-500 text-sm mt-1">
-                        Please complete your order to unlock full access for customize your event invitation.
-                      </p>
+                  <hr className="my-3 text-gray-300" />
+
+                  <div className="flex flex-wrap">
+                    <div className="border-e border-gray-200">
+                      <nav className="flex flex-col space-y-2" aria-label="Tabs" role="tablist" aria-orientation="vertical">
+                        <button type="button" id="main-info-item" aria-selected="true" data-hs-tab="#main-info-tab" aria-controls="main-info-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none active" role="tab">
+                          Main Info
+                        </button>
+                        <button type="button" id="scheduler-tab-item" aria-selected="false" data-hs-tab="#scheduler-tab" aria-controls="scheduler-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
+                          Schedule
+                        </button>
+                        <button type="button" id="gift-tab-item" aria-selected="false" data-hs-tab="#gift-tab" aria-controls="gift-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
+                          Gift
+                        </button>
+                        <button type="button" id="rsvp-tab-item" aria-selected="false" data-hs-tab="#rsvp-tab" aria-controls="rsvp-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
+                          RSVP
+                        </button>
+                        <button type="button" id="faq-tab-item" aria-selected="false" data-hs-tab="#faq-tab" aria-controls="faq-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
+                          FAQ
+                        </button>
+                      </nav>
+                    </div>
+
+                    <div className="ms-3">
+                      <div id="main-info-tab" role="tabpanel" aria-labelledby="main-info-item">
+                        <p className="text-gray-500 text-sm">
+                          This is the <em className="font-semibold text-gray-800">Main Info</em> item's tab body.
+                        </p>
+                      </div>
+                      <div id="scheduler-tab" className="hidden" role="tabpanel" aria-labelledby="scheduler-tab-item">
+                        <p className="text-gray-500 text-sm">
+                          This is the <em className="font-semibold text-gray-800">Schedule</em> item's tab body.
+                        </p>
+                      </div>
+                      <div id="gift-tab" className="hidden" role="tabpanel" aria-labelledby="gift-tab-item">
+                        <p className="text-gray-500 text-sm">
+                          This is the <em className="font-semibold text-gray-800">Gift</em> item's tab body.
+                        </p>
+                      </div>
+                      <div id="rsvp-tab" className="hidden" role="tabpanel" aria-labelledby="rsvp-tab-item">
+                        <p className="text-gray-500 text-sm">
+                          This is the <em className="font-semibold text-gray-800">RSVP</em> item's tab body.
+                        </p>
+                      </div>
+                      <div id="faq-tab" className="hidden" role="tabpanel" aria-labelledby="faq-tab-item">
+                        <p className="text-gray-500 text-sm">
+                          This is the <em className="font-semibold text-gray-800">FAQ</em> item's tab body.
+                        </p>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Overlay blur + terkunci */}
+                  {
+                    (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div className="absolute inset-0 bg-white/10 backdrop-blur-xs flex flex-col items-center justify-center z-10">
+                      <div className="flex flex-col items-center text-center">
+                        <i className='bx bx-lock text-4xl mb-3'></i>
+                        <p className="text-gray-700 font-medium">
+                          This section is locked!
+                        </p>
+                        <p className="text-gray-500 text-sm mt-1">
+                          Please complete your order to unlock full access for customize your event invitation.
+                        </p>
+                      </div>
+                    </div>
+                  }
                 </div>
               </div> : <div className="animate-pulse h-full w-full bg-gray-200 rounded-xl dark:bg-neutral-700"></div>
             }
