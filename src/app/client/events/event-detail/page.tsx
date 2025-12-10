@@ -299,64 +299,110 @@ export default function Page() {
                 </div>
 
                 <div className="relative overflow-hidden min-h-[300px] mt-6">
-                  <div>
-                    <div className="font-semibold">Event Details</div>
-                    <p className="text-gray-500 text-sm">
-                      Here's you can costumize your event detail design. Choose the section tab information to modified your event.
-                    </p>
-                  </div>
+                  <div className="p-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+                      {/* Text Section */}
+                      <div>
+                        <div className="font-semibold text-lg">Event Details</div>
+                        <p className="text-gray-500 text-sm">
+                          Customize and manage your event detail design. Choose the section tab information to modify your event.
+                        </p>
+                      </div>
 
-                  <hr className="my-3 text-gray-300" />
-
-                  <div className="flex flex-wrap">
-                    <div className="border-e border-gray-200">
-                      <nav className="flex flex-col space-y-2" aria-label="Tabs" role="tablist" aria-orientation="vertical">
-                        <button type="button" id="main-info-item" aria-selected="true" data-hs-tab="#main-info-tab" aria-controls="main-info-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none active" role="tab">
-                          Main Info
-                        </button>
-                        <button type="button" id="scheduler-tab-item" aria-selected="false" data-hs-tab="#scheduler-tab" aria-controls="scheduler-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
-                          Schedule
-                        </button>
-                        <button type="button" id="gift-tab-item" aria-selected="false" data-hs-tab="#gift-tab" aria-controls="gift-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
-                          Gift
-                        </button>
-                        <button type="button" id="rsvp-tab-item" aria-selected="false" data-hs-tab="#rsvp-tab" aria-controls="rsvp-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
-                          RSVP
-                        </button>
-                        <button type="button" id="faq-tab-item" aria-selected="false" data-hs-tab="#faq-tab" aria-controls="faq-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-1 pe-4 inline-flex items-center gap-x-2 border-e-2 border-transparent text-sm whitespace-nowrap text-gray-500 hover:text-blue-600 focus:outline-hidden focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none" role="tab">
-                          FAQ
-                        </button>
-                      </nav>
+                      {/* Preview Button */}
+                      <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                        Preview
+                      </button>
                     </div>
 
-                    <div className="ms-3">
-                      <div id="main-info-tab" role="tabpanel" aria-labelledby="main-info-item">
-                        <p className="text-gray-500 text-sm">
-                          This is the <em className="font-semibold text-gray-800">Main Info</em> item's tab body.
-                        </p>
-                      </div>
-                      <div id="scheduler-tab" className="hidden" role="tabpanel" aria-labelledby="scheduler-tab-item">
-                        <p className="text-gray-500 text-sm">
-                          This is the <em className="font-semibold text-gray-800">Schedule</em> item's tab body.
-                        </p>
-                      </div>
-                      <div id="gift-tab" className="hidden" role="tabpanel" aria-labelledby="gift-tab-item">
-                        <p className="text-gray-500 text-sm">
-                          This is the <em className="font-semibold text-gray-800">Gift</em> item's tab body.
-                        </p>
-                      </div>
-                      <div id="rsvp-tab" className="hidden" role="tabpanel" aria-labelledby="rsvp-tab-item">
-                        <p className="text-gray-500 text-sm">
-                          This is the <em className="font-semibold text-gray-800">RSVP</em> item's tab body.
-                        </p>
-                      </div>
-                      <div id="faq-tab" className="hidden" role="tabpanel" aria-labelledby="faq-tab-item">
-                        <p className="text-gray-500 text-sm">
-                          This is the <em className="font-semibold text-gray-800">FAQ</em> item's tab body.
-                        </p>
+                    <hr className="my-3 text-gray-300" />
+
+                    <div className="w-full">
+                      <div className="flex flex-col sm:flex-row gap-4">
+
+                        {/* TAB LIST */}
+                        <div className="w-full sm:w-auto border-b sm:border-b-0 sm:border-e border-gray-200">
+                          <nav className="flex flex-wrap justify-center sm:flex-col gap-2" aria-label="Tabs" role="tablist" aria-orientation="vertical">
+                            <button type="button" id="main-info-item" aria-selected="true" data-hs-tab="#main-info-tab" aria-controls="main-info-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden active" role="tab">
+                              <i className="bx bx-info-circle text-lg"></i>
+                              Main Info
+                            </button>
+
+                            <button type="button" id="scheduler-tab-item" aria-selected="false" data-hs-tab="#scheduler-tab" aria-controls="scheduler-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-calendar-star text-lg"></i>
+                              Schedule
+                            </button>
+
+                            <button type="button" id="gallery-tab-item" aria-selected="false" data-hs-tab="#gallery-tab" aria-controls="gallery-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-photo-album text-lg"></i>
+                              Gallery
+                            </button>
+
+                            <button type="button" id="history-tab-item" aria-selected="false" data-hs-tab="#history-tab" aria-controls="history-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-book-heart text-lg"></i>
+                              History
+                            </button>
+
+                            <button type="button" id="gift-tab-item" aria-selected="false" data-hs-tab="#gift-tab" aria-controls="gift-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-gift text-lg"></i>
+                              Gift
+                            </button>
+
+                            <button type="button" id="rsvp-tab-item" aria-selected="false" data-hs-tab="#rsvp-tab" aria-controls="rsvp-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-envelope text-lg"></i>
+                              RSVP
+                            </button>
+
+                            <button type="button" id="faq-tab-item" aria-selected="false" data-hs-tab="#faq-tab" aria-controls="faq-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
+                              <i className="bx bx-help-circle text-lg"></i>
+                              FAQ
+                            </button>
+                          </nav>
+                        </div>
+
+                        {/* TAB CONTENT */}
+                        <div className="w-full">
+
+                          {/* MAIN INFO */}
+                          <div id="main-info-tab" role="tabpanel" aria-labelledby="main-info-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Main Info</em> tab body.</p>
+                          </div>
+
+                          {/* SCHEDULE */}
+                          <div id="scheduler-tab" className="hidden" role="tabpanel" aria-labelledby="scheduler-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Schedule</em> tab body.</p>
+                          </div>
+
+                          {/* GALLERY */}
+                          <div id="gallery-tab" className="hidden" role="tabpanel" aria-labelledby="gallery-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Gallery</em> tab body.</p>
+                          </div>
+
+                          {/* HISTORY */}
+                          <div id="history-tab" className="hidden" role="tabpanel" aria-labelledby="history-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">History</em> tab body.</p>
+                          </div>
+
+                          {/* GIFT */}
+                          <div id="gift-tab" className="hidden" role="tabpanel" aria-labelledby="gift-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Gift</em> tab body.</p>
+                          </div>
+
+                          {/* RSVP */}
+                          <div id="rsvp-tab" className="hidden" role="tabpanel" aria-labelledby="rsvp-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">RSVP</em> tab body.</p>
+                          </div>
+
+                          {/* FAQ */}
+                          <div id="faq-tab" className="hidden" role="tabpanel" aria-labelledby="faq-tab-item">
+                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">FAQ</em> tab body.</p>
+                          </div>
+
+                        </div>
                       </div>
                     </div>
                   </div>
+
 
                   {/* Overlay blur + terkunci */}
                   {
