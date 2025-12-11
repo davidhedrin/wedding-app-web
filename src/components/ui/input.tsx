@@ -56,8 +56,8 @@ export default function Input({
               sufixGroup && !prefixGroup && "rounded-s-md", // kalau ada sufixGroup → rounded kiri saja
               prefixGroup && sufixGroup && "rounded-none",  // kalau ada dua2nya → rata
               !prefixGroup && !sufixGroup && "rounded-md",  // default
-              prefixIcon && "ps-9",
-              sufixIcon && "pe-9"
+              prefixIcon && "ps-10",
+              sufixIcon && "pe-10"
             )}
             {...props}
           />

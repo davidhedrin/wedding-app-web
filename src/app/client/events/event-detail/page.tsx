@@ -12,6 +12,7 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
+import Input from "@/components/ui/input";
 
 declare global {
   interface Window {
@@ -177,18 +178,20 @@ export default function Page() {
           <div className="flex-1 min-w-0 flex flex-col border-e border-gray-200 p-4">
             {
               dataEvent && dataEvent.template ? <div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
+                <div className="grid grid-cols-12 gap-6">
                   {/* Carousel */}
-                  <div className="relative w-full md:h-[420px] h-[300px] overflow-hidden rounded-xl shadow-lg">
-                    <img
-                      src={dataEvent.template.captures ? dataEvent.template.captures[0].file_path : ""}
-                      alt="Capture"
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100`}
-                    />
+                  <div className="col-span-12 md:col-span-5">
+                    <div className="relative w-full md:h-[370px] h-[280px] overflow-hidden rounded-xl shadow-lg">
+                      <img
+                        src={dataEvent.template.captures ? dataEvent.template.captures[0].file_path : ""}
+                        alt="Capture"
+                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100`}
+                      />
+                    </div>
                   </div>
 
                   {/* Detail Info */}
-                  <div className="flex flex-col justify-center">
+                  <div className="col-span-12 md:col-span-4 flex flex-col justify-center">
                     <div className="flex items-center gap-4">
                       <div className="text-sm text-muted flex items-center gap-2">
                         <span>
@@ -229,18 +232,18 @@ export default function Page() {
                       <table className="w-full border border-gray-200 text-sm text-gray-600">
                         <tbody>
                           <tr className="bg-gray-50">
-                            <td className="px-4 py-2 font-medium text-gray-700 w-1/3">
+                            <td className="px-4 py-1.5 font-medium text-gray-700 w-1/3">
                               Category
                             </td>
                             <td>: </td>
-                            <td className="px-4 py-2">{dataEvent.template.ctg_name}</td>
+                            <td className="px-4 py-1.5">{dataEvent.template.ctg_name}</td>
                           </tr>
                           <tr className="bg-white">
-                            <td className="px-4 py-2 font-medium text-gray-700 w-1/3">
+                            <td className="px-4 py-1.5 font-medium text-gray-700 w-1/3">
                               Colors
                             </td>
                             <td>: </td>
-                            <td className="flex items-center px-4 py-2 gap-2">
+                            <td className="flex items-center px-4 py-1.5 gap-2">
                               {templateColor.length > 0 ? templateColor.map((x, i) => (
                                 <div
                                   key={i}
@@ -251,18 +254,18 @@ export default function Page() {
                             </td>
                           </tr>
                           <tr className="bg-gray-50">
-                            <td className="px-4 py-2 font-medium text-gray-700 w-1/3">
+                            <td className="px-4 py-1.5 font-medium text-gray-700 w-1/3">
                               Language
                             </td>
                             <td>: </td>
-                            <td className="px-4 py-2">{dataEvent.template.language}</td>
+                            <td className="px-4 py-1.5">{dataEvent.template.language}</td>
                           </tr>
                           <tr className="bg-white">
-                            <td className="px-4 py-2 font-medium text-gray-700 w-1/3">
+                            <td className="px-4 py-1.5 font-medium text-gray-700 w-1/3">
                               Layouts
                             </td>
                             <td>: </td>
-                            <td className="px-4 py-2">{dataEvent.template.layouts}</td>
+                            <td className="px-4 py-1.5">{dataEvent.template.layouts}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -272,7 +275,7 @@ export default function Page() {
                       <p className="text-sm text-gray-700">
                         {
                           dataEvent.tmp_status === "ACTIVE" ? <span>
-                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating something beautiful for your special moment ✨.
+                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating your special moment ✨.
                           </span> : dataEvent.tmp_status === "ENDED" ? <span>
                             Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
                           </span> : <span>
@@ -281,16 +284,84 @@ export default function Page() {
                         }
                       </p>
                     </Alert>
+                  </div>
+
+                  {/* Checkout */}
+                  <div className="col-span-12 md:col-span-3">
+                    <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+                      <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-1.5 px-3">
+                        <div className="text-sm font-bold text-gray-800">
+                          Order Summary
+                        </div>
+                      </div>
+                      <div className="px-3 py-2">
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span>Subtotal:</span>
+                            <span>Rp 159.000</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Extra's History:</span>
+                            <span>Rp 24.000</span>
+                          </div>
+                          <div className="flex justify-between text-green-600">
+                            <span>Voucher: XYZ</span>
+                            <span>-Rp 159.000</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Grand Total:</span>
+                            <span>Rp 159.000</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium mb-1 dark:text-white">
+                        Add On
+                      </label>
+                      <div className="flex items-center gap-x-3">
+                        <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
+                          <input type="checkbox" id="hs-xs-switch" className="peer sr-only" />
+                          <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                          <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                        </label>
+                        <label htmlFor="hs-xs-switch" className="text-sm text-gray-500">Extra's History (IDR 24.000)</label>
+                      </div>
+                      <p className="text-xs text-muted mt-2 italic">
+                        <i className='bx bx-info-circle'></i>&nbsp;Activing the Extra's History to make your event can be opened Lifetime after event ended.
+                      </p>
+                    </div>
+
+                    <div className="mt-3">
+                      <label htmlFor="inpVoucherCode" className="block text-sm font-medium mb-1 dark:text-white">
+                        Voucher Code
+                      </label>
+                      <div className="flex w-full">
+                        <div className="relative flex-1">
+                          <Input
+                            id="inpVoucherCode"
+                            style={{ borderStartEndRadius: "0px", borderEndEndRadius: "0px" }}
+                            prefixIcon={<i className='bx bxs-discount text-lg text-muted'></i>}
+                            placeholder="Enter voucher here..."
+                          />
+                        </div>
+
+                        <button className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                          Apply
+                        </button>
+                      </div>
+                    </div>
 
                     {
                       (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div>
                         {/* Tombol Aksi */}
                         <div className="mt-4 flex gap-4">
                           <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
-                            Process Order
+                            Order Now
                           </button>
                           <button onClick={() => handleCancelOrder(dataEvent.id)} className='text-center w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-sm px-3 py-2 rounded-lg transition'>
-                            Cancel Order
+                            Cancel
                           </button>
                         </div>
                       </div>
