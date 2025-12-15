@@ -34,8 +34,12 @@ export default function Page() {
   const [dataEvent, setDataEvent] = useState<Events & {
     template: Templates & { captures: { file_path: string }[] | null } | null
   } | null>(null);
-  const [priceInit, setPriceInit] = useState<Number>(0);
+  const [priceInit, setPriceInit] = useState(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
+
+  const [initPriceAddOn, setInitPriceAddOn] = useState(24000);
+  const [isCheckedAddOn, setIsCheckedAddOn] = useState(false);
+  const [grandTotalOrder, setGrandTotalOrder] = useState(0);
 
   const fatchOrderEvent = async () => {
     if (tmpCode && tmpCode.trim() !== '') {
@@ -48,6 +52,7 @@ export default function Page() {
 
           const dataPriceInit = data.template.disc_price ? data.template.price - data.template.disc_price : data.template.price;
           setPriceInit(dataPriceInit);
+          setGrandTotalOrder(dataPriceInit);
         }
       }
     }
@@ -70,6 +75,15 @@ export default function Page() {
 
     firstInit();
   }, [tmpCode]);
+
+  const handleChangeAddOn = (e: any) => {
+    const value: boolean = e.target.checked;
+
+    if(value) setGrandTotalOrder(priceInit + initPriceAddOn);
+    else setGrandTotalOrder(grandTotalOrder - initPriceAddOn);
+
+    setIsCheckedAddOn(value);
+  };
 
   const orderProses = async (eventId: number) => {
     try {
@@ -298,11 +312,13 @@ export default function Page() {
                         <div className="space-y-1 text-sm">
                           <div className="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>Rp 159.000</span>
+                            <span>Rp {priceInit.toLocaleString("id-ID")}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Extra's History:</span>
-                            <span>Rp 24.000</span>
+                            {
+                              isCheckedAddOn ? <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span> :  <span>Rp 0</span>
+                            }
                           </div>
                           <div className="flex justify-between text-green-600">
                             <span>Voucher: XYZ</span>
@@ -310,7 +326,7 @@ export default function Page() {
                           </div>
                           <div className="flex justify-between">
                             <span>Grand Total:</span>
-                            <span>Rp 159.000</span>
+                            <span>Rp {grandTotalOrder.toLocaleString("id-ID")}</span>
                           </div>
                         </div>
                       </div>
@@ -322,7 +338,7 @@ export default function Page() {
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
-                          <input type="checkbox" id="hs-xs-switch" className="peer sr-only" />
+                          <input checked={isCheckedAddOn} onChange={handleChangeAddOn} type="checkbox" id="hs-xs-switch" className="peer sr-only" />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>

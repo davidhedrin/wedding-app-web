@@ -176,6 +176,11 @@ export default function MainSidebar() {
 
                 <ul className="flex flex-col">
                   <li>
+                    <Link href="/client/systems/voucher" onClick={() => smartLink("/client/systems/voucher")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                      <i className='bx bxs-coupon text-lg'></i> Vouchers
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                       <i className='bx bx-customize text-lg'></i> Catalog
                     </Link>

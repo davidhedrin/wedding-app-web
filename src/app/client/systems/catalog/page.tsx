@@ -243,7 +243,7 @@ export default function Page() {
         const colorsParse: Color[] = data.colors !== null ? JSON.parse(data.colors) : [];
         setTemplateColors(colorsParse);
 
-        const setCaptures: DtoCaptureTemplate[] = data.captures.map((x: DtoCaptureTemplate, i: number) => ({
+        const setCaptures: DtoCaptureTemplate[] = data.captures.map((x, i) => ({
           id: x.id, file: null, file_name: x.file_name, file_path: x.file_path, idx: i
         }));
         setFilesCapture(setCaptures);

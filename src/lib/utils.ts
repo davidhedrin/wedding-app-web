@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { TableShortList, TableThModel } from "./model-types";
-import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, RolesEnum } from "@/generated/prisma";
 import { StatusType } from "./dto";
 
 export function cn(...inputs: ClassValue[]) {
@@ -37,6 +37,11 @@ export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: S
     name: "Ended",
     color: "secondary"
   },
+};
+
+export const discTypeLabels: Record<DiscTypeEnum, string> = {
+  AMOUNT: 'Amount',
+  PERCENT: 'Percent',
 };
 
 export async function verifyPassword(password: string, hashed: string): Promise<boolean> {
