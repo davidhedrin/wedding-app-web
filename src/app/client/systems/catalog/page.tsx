@@ -505,13 +505,13 @@ export default function Page() {
                 </button>
               </div>
               <div className="py-3 px-4 overflow-y-auto">
-                <div className="grid grid-cols-12 gap-3">
+                <div className="grid grid-cols-12 gap-2">
                   <div className='col-span-12'>
-                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='name' label='Name' placeholder='Enter template name' mandatory />
+                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' id='name' label='Name' placeholder='Enter template name' mandatory />
                     {stateFormAddEdit.errors?.name && <ZodErrors err={stateFormAddEdit.errors?.name} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select template status' mandatory
+                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} id='is_active' label='Status' placeholder='Select template status' mandatory
                       options={[
                         { label: "Active", value: "true" },
                         { label: "Inactive", value: "false" },
@@ -520,23 +520,23 @@ export default function Page() {
                     {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Select value={txtCategory} onChange={(e) => setTxtCategory(e.target.value)} className='py-1.5' id='category' label='Category' placeholder='Select template category' mandatory
+                    <Select value={txtCategory} onChange={(e) => setTxtCategory(e.target.value)} id='category' label='Category' placeholder='Select template category' mandatory
                       options={categoryTemplate.map(x => ({ label: x.name, value: x.key }))}
                     />
                     {stateFormAddEdit.errors?.category && <ZodErrors err={stateFormAddEdit.errors?.category} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input value={txtPrice} onChange={(e) => setTxtPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='py-1.5 input-no-spinner' id='price' label='Price' placeholder='Enter template price' mandatory />
+                    <Input value={txtPrice} onChange={(e) => setTxtPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='input-no-spinner' id='price' label='Price' placeholder='Enter template price' mandatory />
                     {stateFormAddEdit.errors?.price && <ZodErrors err={stateFormAddEdit.errors?.price} />}
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input value={txtDiscPrice} onChange={(e) => setTxtDiscPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='py-1.5 input-no-spinner' id='disc_price' label='Discount' placeholder='Enter discount price' />
+                    <Input value={txtDiscPrice} onChange={(e) => setTxtDiscPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='input-no-spinner' id='disc_price' label='Discount' placeholder='Enter discount price' />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input value={txtFlagName} onChange={(e) => setTxtFlagName(e.target.value)} type='text' className='py-1.5' id='flag_name' label='Flag Name' placeholder='Enter flag information' />
+                    <Input value={txtFlagName} onChange={(e) => setTxtFlagName(e.target.value)} type='text' id='flag_name' label='Flag Name' placeholder='Enter flag information' />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Select value={txtFlagColor} onChange={(e) => setTxtFlagColor(e.target.value)} className='py-1.5' id='flag_color' label='Flag Color' placeholder='Select flag color'
+                    <Select value={txtFlagColor} onChange={(e) => setTxtFlagColor(e.target.value)} id='flag_color' label='Flag Color' placeholder='Select flag color'
                       options={[
                         { label: "Success", value: "bg-green-500" },
                         { label: "Warning", value: "bg-yellow-500" },
@@ -547,13 +547,13 @@ export default function Page() {
                     />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input value={txtLanguage} onChange={(e) => setTxtLanguage(e.target.value)} type='text' className='py-1.5' id='language' label='Language' placeholder='Enter template language' />
+                    <Input value={txtLanguage} onChange={(e) => setTxtLanguage(e.target.value)} type='text' id='language' label='Language' placeholder='Enter template language' />
                   </div>
                   <div className='col-span-12 md:col-span-6'>
-                    <Input value={txtLayouts} onChange={(e) => setTxtLayouts(e.target.value)} type='text' className='py-1.5' id='layouts' label='Layouts' placeholder='Enter template layout' />
+                    <Input value={txtLayouts} onChange={(e) => setTxtLayouts(e.target.value)} type='text' id='layouts' label='Layouts' placeholder='Enter template layout' />
                   </div>
                   <div className='col-span-12'>
-                    <Input value={newColor.name} onChange={(e) => setNewColor({ ...newColor, name: e.target.value })} id='color_name' label='Colors' type='text' className='py-1.5' placeholder='Enter name and select the color'
+                    <Input value={newColor.name} onChange={(e) => setNewColor({ ...newColor, name: e.target.value })} id='color_name' label='Colors' type='text' placeholder='Enter name and select the color'
                       sufixGroup={<>
                         <input
                           type="color"
@@ -581,11 +581,11 @@ export default function Page() {
                     ))}
                   </div>
                   <div className='col-span-12'>
-                    <Input value={txtPrevUrl} onChange={(e) => setTxtPrevUrl(e.target.value)} prefixGroup={<span>{Configs.base_url + "/"}</span>} type='text' className='py-1.5' id='url_preview' label='Preview URL' placeholder='Enter preview url template' mandatory />
+                    <Input value={txtPrevUrl} onChange={(e) => setTxtPrevUrl(e.target.value)} prefixGroup={<span>{Configs.base_url + "/"}</span>} type='text' id='url_preview' label='Preview URL' placeholder='Enter preview url template' mandatory />
                     {stateFormAddEdit.errors?.url_preview && <ZodErrors err={stateFormAddEdit.errors?.url_preview} />}
                   </div>
                   <div className='col-span-12'>
-                    <Input value={txtShortDesc} onChange={(e) => setTxtShortDesc(e.target.value)} type='text' className='py-1.5' id='short_desc' label='Short Desc' placeholder='Enter short descripion if any' />
+                    <Input value={txtShortDesc} onChange={(e) => setTxtShortDesc(e.target.value)} type='text' id='short_desc' label='Short Desc' placeholder='Enter short descripion if any' />
                   </div>
                   <div className='col-span-12'>
                     <Tiptap content={txtDesc || ""} setContent={setTxtDesc} label='Description' placeholder="Enter template description if any" className="min-h-24" />

@@ -1,4 +1,4 @@
-import { EventStatusEnum, RolesEnum } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, RolesEnum } from "@/generated/prisma";
 
 export type StatusType = | "secondary" | "primary" | "success" | "warning" | "danger";
 
@@ -97,4 +97,17 @@ export type DtoSnapMidtrans = {
 export type MidtransSnapResponse = {
   token: string;
   redirect_url: string;
+};
+
+export type DtoVouchers = {
+  id: number | null;
+  code: string,
+  disc_type: DiscTypeEnum,
+  disc_amount: number,
+  valid_from: string,
+  valid_to: string,
+  total_qty: number,
+  is_one_use: boolean,
+  desc: string | null,
+  is_active: boolean | null;
 };
