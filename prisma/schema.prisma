@@ -159,11 +159,6 @@ model Events {
   tmp_ctg     String
   tmp_ctg_key String
 
-  voucher_code String?
-  voucher_slug String?
-  disc_type    DiscTypeEnum?
-  disc_amount  Int?
-
   createdBy String?
   updatedBy String?
   createdAt DateTime? @default(now())
@@ -193,9 +188,14 @@ model Tr {
   pay_bill_code    String?
   qris_url         String?
 
-  subtotal     Int
-  disc_value   Int?
-  total_amount Int
+  subtotal             Int
+  voucher_code         String?
+  voucher_slug         String?
+  voucher_type         DiscTypeEnum?
+  voucher_amount       Int?
+  extra_history        Boolean?
+  extra_history_amount Int?
+  total_amount         Int
 
   user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)

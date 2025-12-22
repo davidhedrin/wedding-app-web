@@ -6,13 +6,14 @@ import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
 import { eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
 import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
-import { Events, Templates } from "@/generated/prisma";
+import { DiscTypeEnum, Events, Templates, Vouchers } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
+import { CheckVoucherCode } from "@/server/systems/voucher";
 
 declare global {
   interface Window {
@@ -40,6 +41,11 @@ export default function Page() {
   const [initPriceAddOn, setInitPriceAddOn] = useState(24000);
   const [isCheckedAddOn, setIsCheckedAddOn] = useState(false);
   const [grandTotalOrder, setGrandTotalOrder] = useState(0);
+
+  const [isApplyVoucher, setIsApplyVoucher] = useState(false);
+  const [voucherInputVal, setVoucherInputVal] = useState("");
+  const [voucherData, setVoucherData] = useState<Vouchers | null>(null);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   const fatchOrderEvent = async () => {
     if (tmpCode && tmpCode.trim() !== '') {
@@ -76,16 +82,80 @@ export default function Page() {
     firstInit();
   }, [tmpCode]);
 
-  const handleChangeAddOn = (e: any) => {
-    const value: boolean = e.target.checked;
+  const didFetchGrandTotal = useRef(false);
+  useEffect(() => {
+    if (!didFetchGrandTotal.current) {
+      didFetchGrandTotal.current = true;
+      return;
+    }
 
-    if(value) setGrandTotalOrder(priceInit + initPriceAddOn);
-    else setGrandTotalOrder(grandTotalOrder - initPriceAddOn);
+    let adjTotalAmount = priceInit;
+    let priceAddOn = 0;
+    let dicAmountResult = 0;
 
-    setIsCheckedAddOn(value);
+    if (isCheckedAddOn) priceAddOn = initPriceAddOn;
+    else priceAddOn = 0;
+
+    if (voucherData !== null) {
+      if (voucherData.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucherData.disc_amount);
+      if (voucherData.disc_type === DiscTypeEnum.PERCENT) {
+        const dicsPerAmount = Math.ceil(adjTotalAmount * (voucherData.disc_amount / 100));
+        dicAmountResult = dicsPerAmount;
+      };
+      dicAmountResult = Math.min(dicAmountResult, priceInit);
+    };
+
+    const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
+    setDiscountAmount(dicAmountResult);
+    setGrandTotalOrder(grandTotalAmount);
+  }, [voucherData, isCheckedAddOn]);
+
+  const applyVoucherCode = async () => {
+    if (voucherInputVal.trim() === "") return;
+
+    setIsApplyVoucher(true);
+    setTimeout(async () => {
+      try {
+        const dataVoucher = await CheckVoucherCode(voucherInputVal);
+        if (dataVoucher !== null) {
+          setVoucherData(dataVoucher);
+          toast({
+            type: "success",
+            title: "Voucher Applied!",
+            message: "Your discount has been successfully applied"
+          });
+        } else {
+          setDiscountAmount(0);
+          setVoucherData(null);
+          toast({
+            type: "warning",
+            title: "Voucher Failed!",
+            message: "Oops! That promotion voucher code doesn't exist."
+          });
+        }
+      } catch (error: any) {
+        setDiscountAmount(0);
+        setVoucherData(null);
+        toast({
+          type: "warning",
+          title: "Voucher Failed!",
+          message: error.message || "We can't proccess your request, Please try again."
+        });
+      };
+    }, 100);
+    setIsApplyVoucher(false);
   };
 
   const orderProses = async (eventId: number) => {
+    const confirmed = await showConfirm({
+      title: 'Order Confirmation!',
+      message: 'Are your sure want to process your order? Please double-check before proceeding!',
+      confirmText: 'Order Now',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-cart bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
     try {
       setLoading(true);
       const snapRes = await StoreSnapMidtrans(eventId);
@@ -195,7 +265,7 @@ export default function Page() {
                 <div className="grid grid-cols-12 gap-6">
                   {/* Carousel */}
                   <div className="col-span-12 md:col-span-5">
-                    <div className="relative w-full md:h-[370px] h-[280px] overflow-hidden rounded-xl shadow-lg">
+                    <div className="relative w-full md:h-[355] h-70 overflow-hidden rounded-xl shadow-lg">
                       <img
                         src={dataEvent.template.captures ? dataEvent.template.captures[0].file_path : ""}
                         alt="Capture"
@@ -317,13 +387,15 @@ export default function Page() {
                           <div className="flex justify-between">
                             <span>Extra's History:</span>
                             {
-                              isCheckedAddOn ? <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span> :  <span>Rp 0</span>
+                              isCheckedAddOn ? <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span> : <span>Rp 0</span>
                             }
                           </div>
-                          <div className="flex justify-between text-green-600">
-                            <span>Voucher: XYZ</span>
-                            <span>-Rp 159.000</span>
-                          </div>
+                          {
+                            discountAmount > 0 && <div className="flex justify-between text-green-600">
+                              <span>Voucher: ({voucherData?.code})</span>
+                              <span>-Rp {discountAmount.toLocaleString('id-ID')}</span>
+                            </div>
+                          }
                           <div className="flex justify-between">
                             <span>Grand Total:</span>
                             <span>Rp {grandTotalOrder.toLocaleString("id-ID")}</span>
@@ -338,7 +410,7 @@ export default function Page() {
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
-                          <input checked={isCheckedAddOn} onChange={handleChangeAddOn} type="checkbox" id="hs-xs-switch" className="peer sr-only" />
+                          <input checked={isCheckedAddOn} onChange={(e) => setIsCheckedAddOn(e.target.checked)} type="checkbox" id="hs-xs-switch" className="peer sr-only" />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
@@ -349,13 +421,20 @@ export default function Page() {
                       </p>
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-2">
                       <label htmlFor="inpVoucherCode" className="block text-sm font-medium mb-1 dark:text-white">
                         Voucher Code
                       </label>
-                      <div className="flex w-full">
+                      <form action={() => applyVoucherCode()} className="flex w-full">
                         <div className="relative flex-1">
                           <Input
+                            value={voucherInputVal}
+                            onChange={(e) => {
+                              setDiscountAmount(0);
+                              setVoucherData(null);
+                              setVoucherInputVal(e.target.value);
+                            }}
+                            type="search"
                             id="inpVoucherCode"
                             style={{ borderStartEndRadius: "0px", borderEndEndRadius: "0px" }}
                             prefixIcon={<i className='bx bxs-discount text-lg text-muted'></i>}
@@ -363,16 +442,16 @@ export default function Page() {
                           />
                         </div>
 
-                        <button className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
-                          Apply
+                        <button disabled={isApplyVoucher} type="submit" className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                          {isApplyVoucher ? <i className='bx bx-loader-alt bx-spin text-lg'></i> : "Apply"}
                         </button>
-                      </div>
+                      </form>
                     </div>
 
                     {
                       (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div>
                         {/* Tombol Aksi */}
-                        <div className="mt-4 flex gap-4">
+                        <div className="mt-3 flex gap-4">
                           <button onClick={() => orderProses(dataEvent.id)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-3 py-2 rounded-lg transition">
                             Order Now
                           </button>
@@ -385,7 +464,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden min-h-[300px] mt-6">
+                <div className="relative overflow-hidden min-h-75 mt-6">
                   <div className="p-1.5">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                       {/* Text Section */}

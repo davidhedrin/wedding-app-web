@@ -220,7 +220,7 @@ export default function Page() {
                                   }} className='bx bx-copy-alt text-base text-blue-600 cursor-pointer'></i>
                                 </span>
                               </td>}
-                              {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-[180px]">{data.template.name}</div></td>}
+                              {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-45">{data.template.name}</div></td>}
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
                               {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}
                               {'tmp_status' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
@@ -247,7 +247,7 @@ export default function Page() {
                         {
                           isFirstRender === true && <tr>
                             <td className="text-center p-0" colSpan={tblThColomns.length + 3}>
-                              <div className="animate-pulse h-[250px] w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
+                              <div className="animate-pulse h-62.5 w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
                             </td>
                           </tr>
                         }

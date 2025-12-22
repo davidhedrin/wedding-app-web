@@ -2,7 +2,7 @@
 
 import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
-import { DtoEvents, DtoSnapMidtrans, MidtransSnapResponse } from "@/lib/dto";
+import { DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
@@ -167,13 +167,13 @@ function ParamSnapMidtrans({ orderId, amount, event }: { orderId: string, amount
 
   return params;
 };
-export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapResponse | undefined> {
+export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapResponse | undefined> {
   try{
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
 
     const getDataEvent = await db.events.findUnique({
-      where: { id: eventId },
+      where: { id: formData.event_id },
       include: {
         template: true,
         user: true
@@ -184,7 +184,7 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
     const findIsTr = await db.tr.findFirst({
       where: {
         user_id: getDataEvent.user_id,
-        event_id: eventId
+        event_id: formData.event_id
       }
     });
 
@@ -243,10 +243,15 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
         data: {
           tr_id: ulid(),
           user_id: getDataEvent.user_id,
-          event_id: eventId,
+          event_id: formData.event_id,
 
           subtotal: getDataEvent.template.price,
-          disc_value: getDataEvent.template.disc_price,
+          voucher_code: null,
+          voucher_slug: null,
+          voucher_type: null,
+          voucher_amount: null,
+          extra_history: formData.extra_history,
+          extra_history_amount: formData.extra_history ? formData.extra_history_amount : null,
           total_amount: dataPriceInit
         }
       });
@@ -263,7 +268,7 @@ export async function StoreSnapMidtrans(eventId:number): Promise<MidtransSnapRes
       
       await Promise.all([
         tx.events.update({
-          where: { id: eventId },
+          where: { id: formData.event_id },
           data: {
             tmp_status: EventStatusEnum.NOT_PAID,
           }

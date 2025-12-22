@@ -111,3 +111,10 @@ export type DtoVouchers = {
   desc: string | null,
   is_active: boolean | null;
 };
+
+export type DtoTr = {
+  event_id: number;
+  voucher_id: number | null;
+  extra_history: boolean | null;
+  extra_history_amount: number | null;
+}

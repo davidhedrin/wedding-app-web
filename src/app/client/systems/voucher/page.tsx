@@ -349,7 +349,7 @@ export default function Page() {
                         {
                           isFirstRender === true && <tr>
                             <td className="text-center p-0" colSpan={tblThColomns.length + 3}>
-                              <div className="animate-pulse h-[250px] w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
+                              <div className="animate-pulse h-62.5 w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
                             </td>
                           </tr>
                         }
