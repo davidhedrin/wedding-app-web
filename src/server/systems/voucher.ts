@@ -59,7 +59,7 @@ export async function StoreUpdateDataVouchers(formData: DtoVouchers) {
         updatedBy: user?.email
       },
       create: {
-        slug: stringWithTimestamp(5),
+        slug: stringWithTimestamp(5, true),
         code: formData.code,
         disc_type: formData.disc_type,
         disc_amount: formData.disc_amount,
@@ -107,6 +107,28 @@ export async function CheckVoucherCode(code:string): Promise<Vouchers | null> {
     const now = new Date();
     const voucher = await db.vouchers.findUnique({
       where: { code },
+    });
+
+    if (!voucher) throw new Error("Oops! That promotion voucher code doesn't exist.");
+    if (now < voucher.valid_from) throw new Error("This voucher isn't valid at the moment.");
+    if (now > voucher.valid_to) throw new Error("The promotion period is already expired.");
+    if (voucher.total_qty === 0) throw new Error("Sorry, This voucher is no longer available.");
+
+    return voucher;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function CheckVoucherById(id:number): Promise<Vouchers | null> {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    const now = new Date();
+    const voucher = await db.vouchers.findUnique({
+      where: { id },
     });
 
     if (!voucher) throw new Error("Oops! That promotion voucher code doesn't exist.");

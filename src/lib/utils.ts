@@ -4,8 +4,9 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { TableShortList, TableThModel } from "./model-types";
-import { DiscTypeEnum, EventStatusEnum, RolesEnum } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, RolesEnum, Vouchers } from "@/generated/prisma";
 import { StatusType } from "./dto";
+import Configs from "./config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -255,4 +256,36 @@ export function toDatetimeLocalString(date: Date): string {
   const minutes = pad(date.getMinutes());
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+export function CartCheckoutProps({
+  subTotal,
+  addOns,
+  voucher
+} : {
+  subTotal: number;
+  addOns: boolean | null;
+  voucher: Vouchers | null;
+}) {
+  console.log(123)
+  let priceAddOn = 0;
+  let dicAmountResult = 0;
+
+  if (addOns) priceAddOn = Configs.priceAddOn;
+  else priceAddOn = 0;
+
+  if (voucher !== null) {
+    if (voucher.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucher.disc_amount);
+    if (voucher.disc_type === DiscTypeEnum.PERCENT) {
+      const dicsPerAmount = Math.ceil(subTotal * (voucher.disc_amount / 100));
+      dicAmountResult = dicsPerAmount;
+    };
+    dicAmountResult = Math.min(dicAmountResult, subTotal);
+  };
+
+  const grandTotalAmount = (subTotal + priceAddOn) - dicAmountResult;
+  return {
+    dicAmountResult,
+    totalAmount: grandTotalAmount
+  };
 };

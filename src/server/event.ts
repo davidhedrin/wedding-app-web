@@ -4,11 +4,12 @@ import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
-import { stringWithTimestamp } from "@/lib/utils";
+import { CartCheckoutProps, stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
-import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, User } from "@/generated/prisma";
+import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
+import { CheckVoucherById } from "./systems/voucher";
 
 // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
 
@@ -126,7 +127,10 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
   }
 };
 
-export async function GetDataEventByCode(code: string): Promise<Events & { template: Templates & { captures: { file_path: string }[] | null } | null } | null> {
+export async function GetDataEventByCode(code: string): Promise<Events & { 
+  template: Templates & { captures: { file_path: string }[] | null } | null,
+  tr: Tr | null 
+} | null> {
   const getData = await db.events.findUnique({
     where: { tmp_code: code },
     include: {
@@ -138,7 +142,8 @@ export async function GetDataEventByCode(code: string): Promise<Events & { templ
             select: { file_path: true },
           }
         }
-      }
+      },
+      tr: true
     }
   });
   return getData;
@@ -189,8 +194,33 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
     });
 
     const nowDate = new Date();
+    let checkVoucher: Vouchers | null = null;
+    if(formData.voucher_id && !checkVoucher) try{
+      checkVoucher = await CheckVoucherById(formData.voucher_id);
+    }catch(errCv: any){
+      throw new Error(errCv.message);
+    };
+
     let dataPriceInit = 0;
     if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
+    
+    // let priceAddOn = 0;
+    // let dicAmountResult = 0;
+    
+    // if (formData.extra_history) priceAddOn = Configs.priceAddOn;
+    // else priceAddOn = 0;
+
+    // if (checkVoucher !== null) {
+    //   if (checkVoucher.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(checkVoucher.disc_amount);
+    //   if (checkVoucher.disc_type === DiscTypeEnum.PERCENT) {
+    //     const dicsPerAmount = Math.ceil(dataPriceInit * (checkVoucher.disc_amount / 100));
+    //     dicAmountResult = dicsPerAmount;
+    //   };
+    //   dicAmountResult = Math.min(dicAmountResult, dataPriceInit);
+    // };
+    // const grandTotalAmount = (dataPriceInit + priceAddOn) - dicAmountResult;
+    
+    const allPropsCheckout = CartCheckoutProps({subTotal: dataPriceInit, addOns: formData.extra_history, voucher: checkVoucher});
 
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
       if(nowDate > findIsTr.pay_expiry_time){
@@ -209,7 +239,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
           const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction(
             ParamSnapMidtrans({
               orderId: updateTr.tr_id,
-              amount: dataPriceInit,
+              amount: updateTr.total_amount,
               event: getDataEvent
             })
           );
@@ -246,20 +276,20 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
           event_id: formData.event_id,
 
           subtotal: getDataEvent.template.price,
-          voucher_code: null,
-          voucher_slug: null,
-          voucher_type: null,
-          voucher_amount: null,
+          voucher_code: checkVoucher && checkVoucher.code,
+          voucher_slug: checkVoucher && checkVoucher.slug,
+          voucher_type: checkVoucher && checkVoucher.disc_type,
+          voucher_amount: checkVoucher && checkVoucher.disc_amount,
           extra_history: formData.extra_history,
           extra_history_amount: formData.extra_history ? formData.extra_history_amount : null,
-          total_amount: dataPriceInit
+          total_amount: allPropsCheckout.totalAmount
         }
       });
       
       const createSnap: MidtransSnapResponse = await midtrans.snap.createTransaction(
         ParamSnapMidtrans({
           orderId: trData.tr_id,
-          amount: dataPriceInit,
+          amount: allPropsCheckout.totalAmount,
           event: getDataEvent
         })
       );

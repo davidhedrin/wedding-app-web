@@ -4,9 +4,9 @@ import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
 import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
-import { eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
+import { CartCheckoutProps, eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
 import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
-import { DiscTypeEnum, Events, Templates, Vouchers } from "@/generated/prisma";
+import { DiscTypeEnum, Events, Templates, Tr, Vouchers } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +14,7 @@ import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
 import { CheckVoucherCode } from "@/server/systems/voucher";
+import Configs from "@/lib/config";
 
 declare global {
   interface Window {
@@ -33,12 +34,13 @@ export default function Page() {
   const tmpCode = searchParams.get('code');
 
   const [dataEvent, setDataEvent] = useState<Events & {
-    template: Templates & { captures: { file_path: string }[] | null } | null
+    template: Templates & { captures: { file_path: string }[] | null } | null,
+    tr: Tr | null
   } | null>(null);
   const [priceInit, setPriceInit] = useState(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
 
-  const [initPriceAddOn, setInitPriceAddOn] = useState(24000);
+  const [initPriceAddOn, setInitPriceAddOn] = useState(Configs.priceAddOn);
   const [isCheckedAddOn, setIsCheckedAddOn] = useState(false);
   const [grandTotalOrder, setGrandTotalOrder] = useState(0);
 
@@ -59,6 +61,14 @@ export default function Page() {
           const dataPriceInit = data.template.disc_price ? data.template.price - data.template.disc_price : data.template.price;
           setPriceInit(dataPriceInit);
           setGrandTotalOrder(dataPriceInit);
+        }
+
+        if (data.tr) {
+          setIsCheckedAddOn(data.tr.extra_history !== null ? data.tr.extra_history : false);
+          setInitPriceAddOn(data.tr.extra_history_amount !== null ? data.tr.extra_history_amount : Configs.priceAddOn);
+
+          setVoucherInputVal(data.tr.voucher_code ? data.tr.voucher_code : "");
+          setDiscountAmount(data.tr.voucher_amount ? data.tr.voucher_amount : 0);
         }
       }
     }
@@ -89,25 +99,28 @@ export default function Page() {
       return;
     }
 
-    let adjTotalAmount = priceInit;
-    let priceAddOn = 0;
-    let dicAmountResult = 0;
+    // let adjTotalAmount = priceInit;
+    // let priceAddOn = 0;
+    // let dicAmountResult = 0;
 
-    if (isCheckedAddOn) priceAddOn = initPriceAddOn;
-    else priceAddOn = 0;
+    // if (isCheckedAddOn) priceAddOn = initPriceAddOn;
+    // else priceAddOn = 0;
 
-    if (voucherData !== null) {
-      if (voucherData.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucherData.disc_amount);
-      if (voucherData.disc_type === DiscTypeEnum.PERCENT) {
-        const dicsPerAmount = Math.ceil(adjTotalAmount * (voucherData.disc_amount / 100));
-        dicAmountResult = dicsPerAmount;
-      };
-      dicAmountResult = Math.min(dicAmountResult, priceInit);
-    };
+    // if (voucherData !== null) {
+    //   if (voucherData.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucherData.disc_amount);
+    //   if (voucherData.disc_type === DiscTypeEnum.PERCENT) {
+    //     const dicsPerAmount = Math.ceil(adjTotalAmount * (voucherData.disc_amount / 100));
+    //     dicAmountResult = dicsPerAmount;
+    //   };
+    //   dicAmountResult = Math.min(dicAmountResult, priceInit);
+    // };
 
-    const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
-    setDiscountAmount(dicAmountResult);
-    setGrandTotalOrder(grandTotalAmount);
+    // const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
+    
+    const allPropsCheckout = CartCheckoutProps({subTotal: priceInit, addOns: isCheckedAddOn, voucher: voucherData});
+
+    setDiscountAmount(allPropsCheckout.dicAmountResult);
+    setGrandTotalOrder(allPropsCheckout.totalAmount);
   }, [voucherData, isCheckedAddOn]);
 
   const applyVoucherCode = async () => {
@@ -158,7 +171,12 @@ export default function Page() {
 
     try {
       setLoading(true);
-      const snapRes = await StoreSnapMidtrans(eventId);
+      const snapRes = await StoreSnapMidtrans({
+        event_id: eventId,
+        voucher_id: voucherData ? voucherData.id : null,
+        extra_history: isCheckedAddOn,
+        extra_history_amount: isCheckedAddOn ? initPriceAddOn : null
+      });
       if (snapRes !== undefined && snapRes.token) handleCheckoutPayment(snapRes.token);
     } catch (error: any) {
       toast({
@@ -410,7 +428,12 @@ export default function Page() {
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
-                          <input checked={isCheckedAddOn} onChange={(e) => setIsCheckedAddOn(e.target.checked)} type="checkbox" id="hs-xs-switch" className="peer sr-only" />
+                          <input 
+                            disabled={dataEvent.tr === null ? false : true}
+                            checked={isCheckedAddOn}
+                            onChange={(e) => setIsCheckedAddOn(e.target.checked)} 
+                            type="checkbox" id="hs-xs-switch" className="peer sr-only"
+                          />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
@@ -429,6 +452,7 @@ export default function Page() {
                         <div className="relative flex-1">
                           <Input
                             value={voucherInputVal}
+                            disabled={dataEvent.tr === null ? false : true}
                             onChange={(e) => {
                               setDiscountAmount(0);
                               setVoucherData(null);
@@ -442,7 +466,7 @@ export default function Page() {
                           />
                         </div>
 
-                        <button disabled={isApplyVoucher} type="submit" className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                        <button disabled={isApplyVoucher || (dataEvent.tr === null ? false : true)} type="submit" className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
                           {isApplyVoucher ? <i className='bx bx-loader-alt bx-spin text-lg'></i> : "Apply"}
                         </button>
                       </form>
