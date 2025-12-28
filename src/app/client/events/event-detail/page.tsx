@@ -47,6 +47,7 @@ export default function Page() {
   const [isApplyVoucher, setIsApplyVoucher] = useState(false);
   const [voucherInputVal, setVoucherInputVal] = useState("");
   const [voucherData, setVoucherData] = useState<Vouchers | null>(null);
+  const [voucherActiveCode, setVoucherActiveCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   const fatchOrderEvent = async () => {
@@ -54,27 +55,51 @@ export default function Page() {
       const data = await GetDataEventByCode(tmpCode);
       if (data) {
         setDataEvent(data);
+        let setGrandTotal = 0;
 
         if (data.template) {
           setTemplateColor(data.template.colors ? JSON.parse(data.template.colors) : []);
 
           const dataPriceInit = data.template.disc_price ? data.template.price - data.template.disc_price : data.template.price;
           setPriceInit(dataPriceInit);
-          setGrandTotalOrder(dataPriceInit);
+          setGrandTotal = dataPriceInit;
         }
 
         if (data.tr) {
           setIsCheckedAddOn(data.tr.extra_history !== null ? data.tr.extra_history : false);
-          setInitPriceAddOn(data.tr.extra_history_amount !== null ? data.tr.extra_history_amount : Configs.priceAddOn);
+          setInitPriceAddOn(data.tr.extra_history_amount ?? Configs.priceAddOn);
 
-          setVoucherInputVal(data.tr.voucher_code ? data.tr.voucher_code : "");
-          setDiscountAmount(data.tr.voucher_amount ? data.tr.voucher_amount : 0);
+          setVoucherInputVal(data.tr.voucher_code ?? "");
+          setDiscountAmount(data.tr.voucher_amount ?? 0);
+          setVoucherActiveCode(data.tr.voucher_code ?? "");
+          setGrandTotal = data.tr.total_amount;
         }
+
+        setGrandTotalOrder(setGrandTotal);
       }
     }
   };
 
+  const resetAllState = () => {
+    setPriceInit(0);
+    setTemplateColor([]);
+
+    setInitPriceAddOn(Configs.priceAddOn);
+    setIsCheckedAddOn(false);
+
+    setVoucherInputVal("");
+    setDiscountAmount(0);
+    setVoucherActiveCode("");
+
+    setGrandTotalOrder(0);
+    setVoucherInputVal("");
+    setVoucherData(null);
+    setVoucherActiveCode("");
+    setDiscountAmount(0);
+  };
+
   useEffect(() => {
+    resetAllState();
     const firstInit = async () => {
       setLoading(false);
       if (tmpCode && tmpCode.trim() !== '') {
@@ -94,6 +119,7 @@ export default function Page() {
 
   const didFetchGrandTotal = useRef(false);
   useEffect(() => {
+    if (dataEvent?.tr !== null) return;
     if (!didFetchGrandTotal.current) {
       didFetchGrandTotal.current = true;
       return;
@@ -116,8 +142,8 @@ export default function Page() {
     // };
 
     // const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
-    
-    const allPropsCheckout = CartCheckoutProps({subTotal: priceInit, addOns: isCheckedAddOn, voucher: voucherData});
+
+    const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, addOns: isCheckedAddOn, voucher: voucherData });
 
     setDiscountAmount(allPropsCheckout.dicAmountResult);
     setGrandTotalOrder(allPropsCheckout.totalAmount);
@@ -132,6 +158,7 @@ export default function Page() {
         const dataVoucher = await CheckVoucherCode(voucherInputVal);
         if (dataVoucher !== null) {
           setVoucherData(dataVoucher);
+          setVoucherActiveCode(dataVoucher.code);
           toast({
             type: "success",
             title: "Voucher Applied!",
@@ -140,6 +167,7 @@ export default function Page() {
         } else {
           setDiscountAmount(0);
           setVoucherData(null);
+          setVoucherActiveCode("");
           toast({
             type: "warning",
             title: "Voucher Failed!",
@@ -149,6 +177,7 @@ export default function Page() {
       } catch (error: any) {
         setDiscountAmount(0);
         setVoucherData(null);
+        setVoucherActiveCode("");
         toast({
           type: "warning",
           title: "Voucher Failed!",
@@ -160,14 +189,16 @@ export default function Page() {
   };
 
   const orderProses = async (eventId: number) => {
-    const confirmed = await showConfirm({
-      title: 'Order Confirmation!',
-      message: 'Are your sure want to process your order? Please double-check before proceeding!',
-      confirmText: 'Order Now',
-      cancelText: 'No, Go Back',
-      icon: 'bx bx-cart bx-tada text-red-500'
-    });
-    if (!confirmed) return;
+    if (dataEvent?.tr === null) {
+      const confirmed = await showConfirm({
+        title: 'Order Confirmation!',
+        message: 'Are your sure want to process your order? Please double-check before proceeding!',
+        confirmText: 'Order Now',
+        cancelText: 'No, Go Back',
+        icon: 'bx bx-cart bx-tada text-red-500'
+      });
+      if (!confirmed) return;
+    }
 
     try {
       setLoading(true);
@@ -377,11 +408,11 @@ export default function Page() {
                       <p className="text-sm text-gray-700">
                         {
                           dataEvent.tmp_status === "ACTIVE" ? <span>
-                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating your special moment ✨.
+                            Your order are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Let's start creating your special moment ✨.
                           </span> : dataEvent.tmp_status === "ENDED" ? <span>
-                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
+                            Your order are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Thank's for your trust in using our Wedlyvite for your precious moments.
                           </span> : <span>
-                            Your order template are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Continue process the order to activate the template.
+                            Your order are currently <span className="font-semibold">{eventStatusLabels[dataEvent.tmp_status].name}</span> righ now! Continue process the order to activate the template.
                           </span>
                         }
                       </p>
@@ -410,7 +441,7 @@ export default function Page() {
                           </div>
                           {
                             discountAmount > 0 && <div className="flex justify-between text-green-600">
-                              <span>Voucher: ({voucherData?.code})</span>
+                              <span>Voucher: ({voucherActiveCode})</span>
                               <span>-Rp {discountAmount.toLocaleString('id-ID')}</span>
                             </div>
                           }
@@ -428,10 +459,10 @@ export default function Page() {
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
-                          <input 
+                          <input
                             disabled={dataEvent.tr === null ? false : true}
                             checked={isCheckedAddOn}
-                            onChange={(e) => setIsCheckedAddOn(e.target.checked)} 
+                            onChange={(e) => setIsCheckedAddOn(e.target.checked)}
                             type="checkbox" id="hs-xs-switch" className="peer sr-only"
                           />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
@@ -456,6 +487,7 @@ export default function Page() {
                             onChange={(e) => {
                               setDiscountAmount(0);
                               setVoucherData(null);
+                              setVoucherActiveCode("");
                               setVoucherInputVal(e.target.value);
                             }}
                             type="search"
@@ -466,9 +498,12 @@ export default function Page() {
                           />
                         </div>
 
-                        <button disabled={isApplyVoucher || (dataEvent.tr === null ? false : true)} type="submit" className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
-                          {isApplyVoucher ? <i className='bx bx-loader-alt bx-spin text-lg'></i> : "Apply"}
-                        </button>
+                        {
+                          dataEvent.tr === null && <button disabled={isApplyVoucher} type="submit" className="px-3 inline-flex items-center rounded-e-md min-w-fit bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                            {isApplyVoucher ? <i className='bx bx-loader-alt bx-spin text-lg'></i> : "Apply"}
+                          </button>
+                        }
+
                       </form>
                     </div>
 

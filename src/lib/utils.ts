@@ -267,7 +267,6 @@ export function CartCheckoutProps({
   addOns: boolean | null;
   voucher: Vouchers | null;
 }) {
-  console.log(123)
   let priceAddOn = 0;
   let dicAmountResult = 0;
 
