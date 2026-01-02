@@ -270,7 +270,7 @@ export function CartCheckoutProps({
   let priceAddOn = 0;
   let dicAmountResult = 0;
 
-  if (addOns) priceAddOn = Configs.priceAddOn;
+  if (addOns) priceAddOn = Configs.priceAddOn1;
   else priceAddOn = 0;
 
   if (voucher !== null) {

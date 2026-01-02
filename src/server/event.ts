@@ -220,7 +220,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
     // };
     // const grandTotalAmount = (dataPriceInit + priceAddOn) - dicAmountResult;
     
-    const allPropsCheckout = CartCheckoutProps({subTotal: dataPriceInit, addOns: formData.extra_history, voucher: checkVoucher});
+    const allPropsCheckout = CartCheckoutProps({subTotal: dataPriceInit, addOns: formData.add_ons1, voucher: checkVoucher});
 
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
       if(nowDate > findIsTr.pay_expiry_time){
@@ -280,8 +280,8 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
           voucher_slug: checkVoucher && checkVoucher.slug,
           voucher_type: checkVoucher && checkVoucher.disc_type,
           voucher_amount: checkVoucher && checkVoucher.disc_amount,
-          extra_history: formData.extra_history,
-          extra_history_amount: formData.extra_history ? formData.extra_history_amount : null,
+          add_ons1: formData.add_ons1,
+          add_ons1_amount: formData.add_ons1 ? formData.add_ons1_amount : null,
           total_amount: allPropsCheckout.totalAmount
         }
       });

@@ -14,7 +14,7 @@ const Configs = {
   nameBtnSubmit: "submitType",
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
-  priceAddOn: 24000,
+  priceAddOn1: 49000,
 
   tryDays: 3,
   toastDuration: 4000 // In second

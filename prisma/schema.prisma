@@ -179,6 +179,7 @@ model Tr {
   pay_token        String?
   pay_redirect_url String?
   pay_type         String?
+  pay_acquirer     String?
   pay_key          String?
   pay_status       Boolean   @default(false)
   pay_at           DateTime?
@@ -188,14 +189,17 @@ model Tr {
   pay_bill_code    String?
   qris_url         String?
 
-  subtotal             Int
-  voucher_code         String?
-  voucher_slug         String?
-  voucher_type         DiscTypeEnum?
-  voucher_amount       Int?
-  extra_history        Boolean?
-  extra_history_amount Int?
-  total_amount         Int
+  subtotal       Int
+  voucher_code   String?
+  voucher_slug   String?
+  voucher_type   DiscTypeEnum?
+  voucher_amount Int?
+
+  /// Add-on fields smart barcode
+  add_ons1        Boolean?
+  add_ons1_amount Int?
+
+  total_amount Int
 
   user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)

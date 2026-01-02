@@ -52,8 +52,11 @@ export async function POST(req: NextRequest) {
       trUpdateData.pay_type = "Mandiri";
       trUpdateData.pay_bill_key = reqData.bill_key ?? null;
       trUpdateData.pay_bill_code = reqData.biller_code ?? null;
-    } else if (paymentType == "gopay") trUpdateData.pay_type = "Gopay";
-    else if (paymentType == "qris") trUpdateData.pay_type = "Qris";
+    } else if (paymentType == "gopay") trUpdateData.pay_type = "gopay";
+    else if (paymentType == "qris") {
+      trUpdateData.pay_type = "qris";
+      trUpdateData.pay_acquirer = reqData.acquirer ?? null;
+    }
 
     await db.$transaction(async (tx) => {
       if (reqData.transaction_status == 'capture'){

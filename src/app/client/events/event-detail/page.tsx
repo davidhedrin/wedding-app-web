@@ -15,6 +15,8 @@ import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
 import { CheckVoucherCode } from "@/server/systems/voucher";
 import Configs from "@/lib/config";
+import TabListWedding from "../components/wedding/tab-list";
+import TabContentWedding from "../components/wedding/tab-content";
 
 declare global {
   interface Window {
@@ -40,8 +42,8 @@ export default function Page() {
   const [priceInit, setPriceInit] = useState(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
 
-  const [initPriceAddOn, setInitPriceAddOn] = useState(Configs.priceAddOn);
-  const [isCheckedAddOn, setIsCheckedAddOn] = useState(false);
+  const [initPriceAddOn, setInitPriceAddOn] = useState(Configs.priceAddOn1);
+  const [isCheckedAddOn1, setIsCheckedAddOn1] = useState(false);
   const [grandTotalOrder, setGrandTotalOrder] = useState(0);
 
   const [isApplyVoucher, setIsApplyVoucher] = useState(false);
@@ -66,8 +68,8 @@ export default function Page() {
         }
 
         if (data.tr) {
-          setIsCheckedAddOn(data.tr.extra_history !== null ? data.tr.extra_history : false);
-          setInitPriceAddOn(data.tr.extra_history_amount ?? Configs.priceAddOn);
+          setIsCheckedAddOn1(data.tr.add_ons1 !== null ? data.tr.add_ons1 : false);
+          setInitPriceAddOn(data.tr.add_ons1_amount ?? Configs.priceAddOn1);
 
           setVoucherInputVal(data.tr.voucher_code ?? "");
           setDiscountAmount(data.tr.voucher_amount ?? 0);
@@ -84,8 +86,8 @@ export default function Page() {
     setPriceInit(0);
     setTemplateColor([]);
 
-    setInitPriceAddOn(Configs.priceAddOn);
-    setIsCheckedAddOn(false);
+    setInitPriceAddOn(Configs.priceAddOn1);
+    setIsCheckedAddOn1(false);
 
     setVoucherInputVal("");
     setDiscountAmount(0);
@@ -117,14 +119,8 @@ export default function Page() {
     firstInit();
   }, [tmpCode]);
 
-  const didFetchGrandTotal = useRef(false);
   useEffect(() => {
     if (dataEvent?.tr !== null) return;
-    if (!didFetchGrandTotal.current) {
-      didFetchGrandTotal.current = true;
-      return;
-    }
-
     // let adjTotalAmount = priceInit;
     // let priceAddOn = 0;
     // let dicAmountResult = 0;
@@ -143,11 +139,11 @@ export default function Page() {
 
     // const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
 
-    const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, addOns: isCheckedAddOn, voucher: voucherData });
+    const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, addOns: isCheckedAddOn1, voucher: voucherData });
 
     setDiscountAmount(allPropsCheckout.dicAmountResult);
     setGrandTotalOrder(allPropsCheckout.totalAmount);
-  }, [voucherData, isCheckedAddOn]);
+  }, [voucherData, isCheckedAddOn1]);
 
   const applyVoucherCode = async () => {
     if (voucherInputVal.trim() === "") return;
@@ -205,8 +201,8 @@ export default function Page() {
       const snapRes = await StoreSnapMidtrans({
         event_id: eventId,
         voucher_id: voucherData ? voucherData.id : null,
-        extra_history: isCheckedAddOn,
-        extra_history_amount: isCheckedAddOn ? initPriceAddOn : null
+        add_ons1: isCheckedAddOn1,
+        add_ons1_amount: isCheckedAddOn1 ? initPriceAddOn : null
       });
       if (snapRes !== undefined && snapRes.token) handleCheckoutPayment(snapRes.token);
     } catch (error: any) {
@@ -324,7 +320,7 @@ export default function Page() {
                   </div>
 
                   {/* Detail Info */}
-                  <div className="col-span-12 md:col-span-4 flex flex-col justify-center">
+                  <div className="col-span-12 md:col-span-4 flex flex-col">
                     <div className="flex items-center gap-4">
                       <div className="text-sm text-muted flex items-center gap-2">
                         <span>
@@ -420,7 +416,7 @@ export default function Page() {
                   </div>
 
                   {/* Checkout */}
-                  <div className="col-span-12 md:col-span-3">
+                  <div className="col-span-12 md:col-span-3 border border-gray-200 rounded-xl p-3 h-fit">
                     <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
                       <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-1.5 px-3">
                         <div className="text-sm font-bold text-gray-800">
@@ -433,12 +429,12 @@ export default function Page() {
                             <span>Subtotal:</span>
                             <span>Rp {priceInit.toLocaleString("id-ID")}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Extra's History:</span>
-                            {
-                              isCheckedAddOn ? <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span> : <span>Rp 0</span>
-                            }
-                          </div>
+                          {
+                            isCheckedAddOn1 && <div className="flex justify-between">
+                              <span>Smart Barcode</span>
+                              <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span>
+                            </div>
+                          }
                           {
                             discountAmount > 0 && <div className="flex justify-between text-green-600">
                               <span>Voucher: ({voucherActiveCode})</span>
@@ -452,30 +448,30 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
-
+                    
                     <div className="mt-3">
                       <label className="block text-sm font-medium mb-1 dark:text-white">
-                        Add On
+                        Add On Barcode
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
                           <input
                             disabled={dataEvent.tr === null ? false : true}
-                            checked={isCheckedAddOn}
-                            onChange={(e) => setIsCheckedAddOn(e.target.checked)}
+                            checked={isCheckedAddOn1}
+                            onChange={(e) => setIsCheckedAddOn1(e.target.checked)}
                             type="checkbox" id="hs-xs-switch" className="peer sr-only"
                           />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
-                        <label htmlFor="hs-xs-switch" className="text-sm text-gray-500">Extra's History (IDR 24.000)</label>
+                        <label htmlFor="hs-xs-switch" className="text-sm text-gray-500">Smart Barcode (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
                       </div>
-                      <p className="text-xs text-muted mt-2 italic">
-                        <i className='bx bx-info-circle'></i>&nbsp;Activing the Extra's History to make your event can be opened Lifetime after event ended.
-                      </p>
+                      {/* <p className="text-xs text-muted mt-1.5 italic">
+                        <i className='bx bx-info-circle'></i>&nbsp;Enabling the Smart Barcode, you can create barcode-based invitations.
+                      </p> */}
                     </div>
 
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <label htmlFor="inpVoucherCode" className="block text-sm font-medium mb-1 dark:text-white">
                         Voucher Code
                       </label>
@@ -492,9 +488,9 @@ export default function Page() {
                             }}
                             type="search"
                             id="inpVoucherCode"
-                            style={{ borderStartEndRadius: "0px", borderEndEndRadius: "0px" }}
+                            style={dataEvent.tr === null ? { borderStartEndRadius: "0px", borderEndEndRadius: "0px" } : {}}
                             prefixIcon={<i className='bx bxs-discount text-lg text-muted'></i>}
-                            placeholder="Enter voucher here..."
+                            placeholder={dataEvent.tr === null ? "Enter voucher here..." : "Voucher not applicable"}
                           />
                         </div>
 
@@ -544,90 +540,18 @@ export default function Page() {
 
                     <div className="w-full">
                       <div className="flex flex-col sm:flex-row gap-4">
-
                         {/* TAB LIST */}
                         <div className="w-full sm:w-auto border-b sm:border-b-0 sm:border-e border-gray-200">
-                          <nav className="flex flex-wrap justify-center sm:flex-col gap-2" aria-label="Tabs" role="tablist" aria-orientation="vertical">
-                            <button type="button" id="main-info-item" aria-selected="true" data-hs-tab="#main-info-tab" aria-controls="main-info-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden active" role="tab">
-                              <i className="bx bx-info-circle text-lg"></i>
-                              Main Info
-                            </button>
-
-                            <button type="button" id="scheduler-tab-item" aria-selected="false" data-hs-tab="#scheduler-tab" aria-controls="scheduler-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-calendar-star text-lg"></i>
-                              Schedule
-                            </button>
-
-                            <button type="button" id="gallery-tab-item" aria-selected="false" data-hs-tab="#gallery-tab" aria-controls="gallery-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-photo-album text-lg"></i>
-                              Gallery
-                            </button>
-
-                            <button type="button" id="history-tab-item" aria-selected="false" data-hs-tab="#history-tab" aria-controls="history-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-book-heart text-lg"></i>
-                              History
-                            </button>
-
-                            <button type="button" id="gift-tab-item" aria-selected="false" data-hs-tab="#gift-tab" aria-controls="gift-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-gift text-lg"></i>
-                              Gift
-                            </button>
-
-                            <button type="button" id="rsvp-tab-item" aria-selected="false" data-hs-tab="#rsvp-tab" aria-controls="rsvp-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-envelope text-lg"></i>
-                              RSVP
-                            </button>
-
-                            <button type="button" id="faq-tab-item" aria-selected="false" data-hs-tab="#faq-tab" aria-controls="faq-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden" role="tab">
-                              <i className="bx bx-help-circle text-lg"></i>
-                              FAQ
-                            </button>
-                          </nav>
+                          <TabListWedding />
                         </div>
 
                         {/* TAB CONTENT */}
                         <div className="w-full">
-
-                          {/* MAIN INFO */}
-                          <div id="main-info-tab" role="tabpanel" aria-labelledby="main-info-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Main Info</em> tab body.</p>
-                          </div>
-
-                          {/* SCHEDULE */}
-                          <div id="scheduler-tab" className="hidden" role="tabpanel" aria-labelledby="scheduler-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Schedule</em> tab body.</p>
-                          </div>
-
-                          {/* GALLERY */}
-                          <div id="gallery-tab" className="hidden" role="tabpanel" aria-labelledby="gallery-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Gallery</em> tab body.</p>
-                          </div>
-
-                          {/* HISTORY */}
-                          <div id="history-tab" className="hidden" role="tabpanel" aria-labelledby="history-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">History</em> tab body.</p>
-                          </div>
-
-                          {/* GIFT */}
-                          <div id="gift-tab" className="hidden" role="tabpanel" aria-labelledby="gift-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">Gift</em> tab body.</p>
-                          </div>
-
-                          {/* RSVP */}
-                          <div id="rsvp-tab" className="hidden" role="tabpanel" aria-labelledby="rsvp-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">RSVP</em> tab body.</p>
-                          </div>
-
-                          {/* FAQ */}
-                          <div id="faq-tab" className="hidden" role="tabpanel" aria-labelledby="faq-tab-item">
-                            <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">FAQ</em> tab body.</p>
-                          </div>
-
+                          <TabContentWedding />
                         </div>
                       </div>
                     </div>
                   </div>
-
 
                   {/* Overlay blur + terkunci */}
                   {

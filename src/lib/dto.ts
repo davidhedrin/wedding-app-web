@@ -115,6 +115,6 @@ export type DtoVouchers = {
 export type DtoTr = {
   event_id: number;
   voucher_id: number | null;
-  extra_history: boolean | null;
-  extra_history_amount: number | null;
+  add_ons1: boolean | null;
+  add_ons1_amount: number | null;
 }
