@@ -1,9 +1,34 @@
+import DatePicker from "@/components/ui/date-picker";
+import Input from "@/components/ui/input";
+import Textarea from "@/components/ui/textarea";
+import { useState } from "react";
+
 export default function TabContentWedding() {
+  const [eventDate, setDateRange] = useState<Date | undefined>(undefined);
+
   return (
     <>
       {/* MAIN INFO */}
       <div id="main-info-tab" role="tabpanel" aria-labelledby="main-info-item">
-        
+        <div className="grid grid-cols-12 gap-2">
+          <div className="col-span-12 md:col-span-6">
+            <label className="block text-sm font-medium mb-1 dark:text-white">
+              Event Date<span className="text-red-500">*</span>
+            </label>
+            <DatePicker placeholder="Choose event date" mode='range' onChange={(date) => setDateRange(date as Date)} />
+            {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
+          </div>
+          <div className="col-span-12 md:col-span-6">
+            <Input type='time' className='py-1.5' id='event_time' label='Event Time' mandatory />
+          </div>
+          <div className="col-span-12">
+            <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
+          </div>
+          <div className="col-span-12 md:col-span-6">
+          </div>
+          <div className="col-span-12 md:col-span-6">
+          </div>
+        </div>
       </div>
 
       {/* SCHEDULE */}

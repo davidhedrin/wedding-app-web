@@ -16,6 +16,7 @@ type DatePickerProps = {
   value?: Date | Date[] | DateRange;
   onChange?: (date: Date | Date[] | DateRange | undefined) => void;
   position?: 'start' | 'end';
+  placeholder?: string;
 };
 
 export default function DatePicker({
@@ -25,6 +26,7 @@ export default function DatePicker({
   value,
   onChange,
   position = 'start',
+  placeholder = 'Choose Date',
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -33,22 +35,22 @@ export default function DatePicker({
 
   const getFormattedDate = () => {
     if (mode === 'single') {
-      return value instanceof Date ? format(value, 'dd MMMM yyyy') : 'Choose Date';
+      return value instanceof Date ? format(value, 'dd MMMM yyyy') : placeholder;
     }
 
     if (mode === 'multiple') {
-      if (!Array.isArray(value) || value.length === 0) return 'Choose Date';
+      if (!Array.isArray(value) || value.length === 0) return placeholder;
       return value.map((date) => format(date, 'dd MMM')).join(', ');
     }
 
     if (mode === 'range') {
       const range = value as DateRange;
-      if (!range?.from) return 'Choose Date';
+      if (!range?.from) return placeholder;
       if (range.to) return `${formatDate(range.from)} - ${formatDate(range.to)}`;
       return `${formatDate(range.from)} - ...`;
     }
 
-    return 'Choose Date';
+    return placeholder;
   };
 
   const getPositionClass = () => {

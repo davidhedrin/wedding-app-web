@@ -494,9 +494,7 @@ export default function Page() {
                     <label className="block text-sm font-medium mb-1 dark:text-white">
                       Disposable Voucher
                     </label>
-                    <div>
-
-                    </div>
+                    
                     <div className="flex items-center gap-x-3">
                       <label htmlFor="spa_detault_address" className="relative inline-block w-9 h-5 cursor-pointer">
                         <input checked={isOneUse} onChange={(e) => setIsOneUse(e.target.checked)} type="checkbox" id="spa_detault_address" className="peer sr-only" />
