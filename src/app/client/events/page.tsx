@@ -12,8 +12,9 @@ import { Events, TemplateCaptures, Templates } from "@/generated/prisma";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import clsx from "clsx";
 import Badge from "@/components/ui/badge";
+import { DateRange } from "react-day-picker";
+import { endOfDay, endOfMonth, startOfMonth } from "date-fns";
 
 export default function Page() {
   const smartLink = useSmartLink();
@@ -43,6 +44,11 @@ export default function Page() {
     { name: "Status", key: "tmp_status", key_sort: "tmp_status", IsVisible: true },
     { name: "Added At", key: "createdAt", key_sort: "createdAt", IsVisible: true },
   ]);
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
+  });
   const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
     const selectObj = normalizeSelectObj(tblThColomns);
     const orderObj = sortListToOrderBy(tblSortList);
@@ -66,7 +72,11 @@ export default function Page() {
           user_id: Number(data?.user?.id),
           OR: [
             { tmp_code: { contains: inputSearch.trim(), mode: "insensitive" } },
-          ]
+          ],
+          createdAt: {
+            gte: dateRange?.from,
+            lte: dateRange?.to ? endOfDay(dateRange.to) : undefined,
+          }
         },
         select: {
           id: true,
@@ -104,7 +114,7 @@ export default function Page() {
       fatchDatas(1);
     }, 400);
     return () => clearTimeout(timer);
-  }, [inputSearch]);
+  }, [inputSearch, dateRange]);
 
   const [isFirstRender, setIsFirstRender] = useState(true);
   useEffect(() => {
@@ -178,6 +188,10 @@ export default function Page() {
               setTblSortList={setTblSortList}
               setInputSearch={setInputSearch}
               fatchData={() => fatchDatas(pageTable)}
+
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              datePlaceholder="Choose event date"
             />
 
             <div className="flex flex-col pt-5 pb-4 px-1.5">

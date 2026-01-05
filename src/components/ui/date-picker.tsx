@@ -101,7 +101,7 @@ export default function DatePicker({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full truncate justify-between hs-dropdown-toggle inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-800 focus:ring-gray-800 focus:outline-none"
       >
-        <span className="truncate overflow-hidden whitespace-nowrap">{getFormattedDate()}</span>
+        <span className="truncate overflow-hidden whitespace-nowrap text-black text-sm">{getFormattedDate()}</span>
         <svg
           className="w-4 h-4 text-gray-400"
           fill="none"
