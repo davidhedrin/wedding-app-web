@@ -23,7 +23,7 @@ export default function AuthPage() {
       <div className="flex w-full max-w-sm flex-col gap-4">
         <div className="flex items-center gap-2 self-center font-medium mb-1">
           <Link href="/" onClick={() => smartLink("/")}>
-            <img src="/assets/img/logo/wedlyvite-basic.png" className="h-[70px] w-auto" />
+            <img src="/assets/img/logo/wedlyvite-basic.png" className="h-17.5 w-auto" />
           </Link>
         </div>
 

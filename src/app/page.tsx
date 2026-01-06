@@ -18,7 +18,7 @@ export default function Page() {
       {/* Create Your Own */}
       <div className="relative h-screen w-full">
         <img src="/assets/img/2149043983.jpg" className="h-full w-full object-cover" alt="background" />
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-500/30 to-gray-100 backdrop-blur-xs pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-gray-500/30 to-gray-100 backdrop-blur-xs pointer-events-none" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center px-4 mt-12">
           <div className="inline-flex items-center space-x-1 bg-color-app-50 text-muted px-4 py-2 rounded-full text-sm font-medium mb-5">

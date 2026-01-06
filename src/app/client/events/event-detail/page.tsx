@@ -6,17 +6,17 @@ import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
 import { CartCheckoutProps, eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
 import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
-import { DiscTypeEnum, Events, Templates, Tr, Vouchers } from "@/generated/prisma";
+import { Events, Templates, Tr, Vouchers } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
 import { CheckVoucherCode } from "@/server/systems/voucher";
 import Configs from "@/lib/config";
-import TabListWedding from "../components/wedding/tab-list";
-import TabContentWedding from "../components/wedding/tab-content";
+import TabListWraper from "../components/wraper-list";
+import TabContentWraper from "../components/wraper-content";
 
 declare global {
   interface Window {
@@ -121,24 +121,6 @@ export default function Page() {
 
   useEffect(() => {
     if (dataEvent?.tr !== null) return;
-    // let adjTotalAmount = priceInit;
-    // let priceAddOn = 0;
-    // let dicAmountResult = 0;
-
-    // if (isCheckedAddOn) priceAddOn = initPriceAddOn;
-    // else priceAddOn = 0;
-
-    // if (voucherData !== null) {
-    //   if (voucherData.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucherData.disc_amount);
-    //   if (voucherData.disc_type === DiscTypeEnum.PERCENT) {
-    //     const dicsPerAmount = Math.ceil(adjTotalAmount * (voucherData.disc_amount / 100));
-    //     dicAmountResult = dicsPerAmount;
-    //   };
-    //   dicAmountResult = Math.min(dicAmountResult, priceInit);
-    // };
-
-    // const grandTotalAmount = (priceInit + priceAddOn) - dicAmountResult;
-
     const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, addOns: isCheckedAddOn1, voucher: voucherData });
 
     setDiscountAmount(allPropsCheckout.dicAmountResult);
@@ -282,6 +264,8 @@ export default function Page() {
       });
     }
   };
+
+  const [activeTab, setActiveTab] = useState("main-info");
 
   return (
     <>
@@ -448,7 +432,7 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="mt-3">
                       <label className="block text-sm font-medium mb-1 dark:text-white">
                         Add On Barcode
@@ -519,7 +503,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden min-h-75 mt-6">
+                <div className="relative min-h-75 mt-6">
                   <div className="p-1.5">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                       {/* Text Section */}
@@ -539,17 +523,20 @@ export default function Page() {
                     <hr className="my-3 text-gray-300" />
 
                     <div className="w-full">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        {/* TAB LIST */}
-                        <div className="w-full sm:w-auto border-b sm:border-b-0 sm:border-e border-gray-200">
-                          <TabListWedding />
-                        </div>
+                      {
+                        (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") &&
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          {/* TAB LIST */}
+                          <div className="w-full sm:w-48 border-b sm:border-b-0 sm:border-e border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
+                            <TabListWraper event_type={dataEvent.tmp_ctg_key} />
+                          </div>
 
-                        {/* TAB CONTENT */}
-                        <div className="w-full">
-                          <TabContentWedding />
+                          {/* TAB CONTENT */}
+                          <div className="w-full">
+                            <TabContentWraper event_type={dataEvent.tmp_ctg_key} />
+                          </div>
                         </div>
-                      </div>
+                      }
                     </div>
                   </div>
 
