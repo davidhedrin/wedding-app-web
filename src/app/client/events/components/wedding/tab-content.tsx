@@ -12,8 +12,8 @@ export default function TabContentWedding() {
     { id: "scheduler", content: SchedulerTabContent() },
     { id: "gallery", content: GalleryTabContent() },
     { id: "history", content: HistoryTabContent() },
-    { id: "gift", content:  GiftTabContent() },
-    { id: "rsvp", content:  RSVPTabContent() },
+    { id: "gift", content: GiftTabContent() },
+    { id: "rsvp", content: RSVPTabContent() },
     { id: "faq", content: FAQTabContent() },
   ];
 
@@ -82,16 +82,16 @@ function MainTabContent() {
 
   return (
     <div className="grid grid-cols-12 gap-3">
-      <div className="col-span-12 md:col-span-6">
+      {/* <div className="col-span-12 md:col-span-6">
         <label className="block text-sm font-medium mb-1 dark:text-white">
           Event Date<span className="text-red-500">*</span>
         </label>
         <DatePicker placeholder="Choose event date" mode='single' value={eventDate} onChange={(date) => setDateRange(date as Date)} />
-        {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
+        {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />}
       </div>
       <div className="col-span-12 md:col-span-6">
         <Input type='time' className='py-1.5' id='event_time' label='Event Time' mandatory />
-      </div>
+      </div> */}
       <div className="col-span-12">
         <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
       </div>
@@ -350,10 +350,216 @@ function MainTabContent() {
 };
 
 function SchedulerTabContent() {
+  // Marriage Blessing Props
+  const [eventDateMb, setDateRangeMb] = useState<Date | undefined>(undefined);
+  const [noteListMb, setNoteListMb] = useState<string[]>([""]);
+
+  // Traditional Reception Props
+  const [eventDateTr, setDateRangeTr] = useState<Date | undefined>(undefined);
+  const [noteListTr, setNoteListTr] = useState<string[]>([""]);
+  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<string>("Traditional");
+
   return (
-    <p className="text-gray-500 text-sm">
-      This is the <em className="font-semibold text-gray-800">Schedule</em> tab body.
-    </p>
+    <div>
+      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mb-5">
+        <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+          <div className="text-muted font-semibold">
+            <i className='bx bx-donate-heart text-xl'></i> Marriage Blessing Ceremony
+          </div>
+        </div>
+        <div className="p-3">
+          <div className="grid grid-cols-12 gap-3">
+            <div className="col-span-12 md:col-span-4">
+              <label className="block text-sm font-medium mb-1 dark:text-white">
+                Event Date<span className="text-red-500">*</span>
+              </label>
+              <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
+              {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
+            </div>
+            <div className="col-span-12 md:col-span-4">
+              <Input type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+            </div>
+            <div className="col-span-12 md:col-span-4">
+              <Input type='time' className='py-1.5' id='mb_end_time' label='End Time' />
+            </div>
+            <div className="col-span-12">
+              <Input label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
+            </div>
+            <div className="col-span-12">
+              <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+            </div>
+            <div className="col-span-12">
+              <label className="block text-sm font-medium mb-2 dark:text-white">
+                Notes
+                <p className="text-sm text-muted">
+                  Add important short notes regarding the marriage event if any.
+                </p>
+              </label>
+
+              <div className="grid grid-cols-12 gap-2">
+                {noteListMb.map((note, i) => (
+                  <div key={i} className="col-span-12 md:col-span-3">
+                    <Input
+                      value={note}
+                      onChange={(e) => {
+                        const newNotes = [...noteListMb];
+                        newNotes[i] = e.target.value;
+                        setNoteListMb(newNotes);
+                      }}
+                      id={`mb_label_${i}`}
+                      placeholder="Additional note"
+                      className="py-1.5 w-full"
+                      sufixGroup={
+                        <i
+                          onClick={() => {
+                            const newNotes = [...noteListMb];
+                            newNotes.splice(i, 1);
+                            setNoteListMb(newNotes);
+                          }}
+                          className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                        />
+                      }
+                    />
+                  </div>
+                ))}
+
+                <div className=" col-span-12 md:col-span-3">
+                  <button
+                    onClick={() => {
+                      setNoteListMb([...noteListMb, ""]);
+                    }}
+                    type="button"
+                    className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
+                    <i className="bx bx-plus text-lg"></i>
+                    {noteListMb.length === 0 ? "Add Note" : "More"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+        <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+          <div className="text-muted font-semibold">
+            <i className='bx bx-party text-xl'></i> Traditional or Reception Ceremony
+          </div>
+        </div>
+        <div className="p-3">
+          <div className="grid grid-cols-12 gap-3">
+            <div className="col-span-12">
+              <label className="block text-sm font-medium dark:text-white mb-1">
+                Ceremony Type
+              </label>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <span className="text-sm text-gray-500">Traditional Ceremony</span>
+                    <input
+                      checked={radioSelectTypeTr === "Traditional"}
+                      onChange={() => setRadioSelectTypeTr("Traditional")}
+                      type="radio" name="hs-radio-tr-type"
+                      className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <span className="text-sm text-gray-500">Reception Ceremony</span>
+                    <input
+                      checked={radioSelectTypeTr === "Reception"}
+                      onChange={() => setRadioSelectTypeTr("Reception")}
+                      type="radio"
+                      name="hs-radio-tr-type"
+                      className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-span-12 md:col-span-4">
+              <label className="block text-sm font-medium mb-1 dark:text-white">
+                Event Date<span className="text-red-500">*</span>
+              </label>
+              <DatePicker placeholder="Choose event date" mode='single' value={eventDateTr} onChange={(date) => setDateRangeTr(date as Date)} />
+              {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
+            </div>
+            <div className="col-span-12 md:col-span-4">
+              <Input type='time' className='py-1.5' id='tr_start_time' label='Start Time' mandatory />
+            </div>
+            <div className="col-span-12 md:col-span-4">
+              <Input type='time' className='py-1.5' id='tr_end_time' label='End Time' />
+            </div>
+            <div className="col-span-12">
+              <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+            </div>
+            <div className="col-span-12">
+              <Textarea label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
+
+              <div className="flex items-center gap-x-3 mt-2">
+                <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
+                  <input type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
+                  <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                  <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                </label>
+                <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
+              </div>
+            </div>
+            <div className="col-span-12">
+              <label className="block text-sm font-medium mb-2 dark:text-white">
+                Notes
+                <p className="text-sm text-muted">
+                  Add important short notes regarding the marriage event if any.
+                </p>
+              </label>
+
+              <div className="grid grid-cols-12 gap-2">
+                {noteListTr.map((note, i) => (
+                  <div key={i} className="col-span-12 md:col-span-3">
+                    <Input
+                      value={note}
+                      onChange={(e) => {
+                        const newNotes = [...noteListTr];
+                        newNotes[i] = e.target.value;
+                        setNoteListTr(newNotes);
+                      }}
+                      id={`tr_label_${i}`}
+                      placeholder="Additional note"
+                      className="py-1.5 w-full"
+                      sufixGroup={
+                        <i
+                          onClick={() => {
+                            const newNotes = [...noteListTr];
+                            newNotes.splice(i, 1);
+                            setNoteListTr(newNotes);
+                          }}
+                          className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                        />
+                      }
+                    />
+                  </div>
+                ))}
+
+                <div className=" col-span-12 md:col-span-3">
+                  <button
+                    onClick={() => {
+                      setNoteListTr([...noteListTr, ""]);
+                    }}
+                    type="button"
+                    className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
+                    <i className="bx bx-plus text-lg"></i>
+                    {noteListTr.length === 0 ? "Add Note" : "More"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 };
 

@@ -438,17 +438,17 @@ export default function Page() {
                         Add On Barcode
                       </label>
                       <div className="flex items-center gap-x-3">
-                        <label htmlFor="hs-xs-switch" className="relative inline-block w-9 h-5 cursor-pointer">
+                        <label htmlFor="hs-xs-switch-add-ons" className="relative inline-block w-9 h-5 cursor-pointer">
                           <input
                             disabled={dataEvent.tr === null ? false : true}
                             checked={isCheckedAddOn1}
                             onChange={(e) => setIsCheckedAddOn1(e.target.checked)}
-                            type="checkbox" id="hs-xs-switch" className="peer sr-only"
+                            type="checkbox" id="hs-xs-switch-add-ons" className="peer sr-only"
                           />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
-                        <label htmlFor="hs-xs-switch" className="text-sm text-gray-500">Smart Barcode (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
+                        <label htmlFor="hs-xs-switch-add-ons" className="text-sm text-gray-500">Smart Barcode (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
                       </div>
                       {/* <p className="text-xs text-muted mt-1.5 italic">
                         <i className='bx bx-info-circle'></i>&nbsp;Enabling the Smart Barcode, you can create barcode-based invitations.
@@ -525,14 +525,14 @@ export default function Page() {
                     <div className="w-full">
                       {
                         (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") &&
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col sm:flex-row ">
                           {/* TAB LIST */}
-                          <div className="w-full sm:w-48 border-b sm:border-b-0 sm:border-e border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
+                          <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
                             <TabListWraper event_type={dataEvent.tmp_ctg_key} />
                           </div>
 
                           {/* TAB CONTENT */}
-                          <div className="w-full">
+                          <div className="w-full sm:border-s border-gray-200 sm:ps-4 pt-3 sm:pt-0">
                             <TabContentWraper event_type={dataEvent.tmp_ctg_key} />
                           </div>
                         </div>

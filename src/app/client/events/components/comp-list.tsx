@@ -26,7 +26,7 @@ export default function ListComponent({ tabs }: ListCompProps) {
             hs-tab-active:border-blue-500
             hs-tab-active:text-blue-600
             py-2 pe-3 inline-flex items-center gap-x-2
-            border-b-2 sm:border-b-0 sm:border-e-2 border-transparent
+            border-b-2 sm:border-b-0 sm:border-e-4 border-transparent
             text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden
             ${index === 0 ? "active" : ""}
           `}
