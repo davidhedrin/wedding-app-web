@@ -6,6 +6,11 @@ import { toast, toOrdinal } from "@/lib/utils";
 import { useState } from "react";
 import ContentComponent from "../comp-content";
 
+enum TradRecepType {
+  Traditional,
+  Reception
+}
+
 export default function TabContentWedding() {
   const tabContents = [
     { id: "main-info", content: MainTabContent() },
@@ -351,13 +356,13 @@ function MainTabContent() {
 
 function SchedulerTabContent() {
   // Marriage Blessing Props
-  const [eventDateMb, setDateRangeMb] = useState<Date | undefined>(undefined);
+  const [eventDateMb, setDateRangeMb] = useState<Date | undefined>();
   const [noteListMb, setNoteListMb] = useState<string[]>([""]);
 
   // Traditional Reception Props
-  const [eventDateTr, setDateRangeTr] = useState<Date | undefined>(undefined);
+  const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
-  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<string>("Traditional");
+  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
   return (
     <div>
@@ -440,7 +445,7 @@ function SchedulerTabContent() {
         </div>
       </div>
 
-      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mb-3">
         <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
           <div className="text-muted font-semibold">
             <i className='bx bx-party text-xl'></i> Traditional or Reception Ceremony
@@ -458,8 +463,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-gray-500">Traditional Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === "Traditional"}
-                      onChange={() => setRadioSelectTypeTr("Traditional")}
+                      checked={radioSelectTypeTr === TradRecepType.Traditional}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
                       type="radio" name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
                     />
@@ -469,8 +474,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-gray-500">Reception Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === "Reception"}
-                      onChange={() => setRadioSelectTypeTr("Reception")}
+                      checked={radioSelectTypeTr === TradRecepType.Reception}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
                       type="radio"
                       name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"
@@ -559,6 +564,8 @@ function SchedulerTabContent() {
           </div>
         </div>
       </div>
+
+      <Textarea label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
     </div>
   )
 };
