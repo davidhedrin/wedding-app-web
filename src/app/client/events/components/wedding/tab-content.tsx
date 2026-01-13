@@ -5,6 +5,7 @@ import Configs from "@/lib/config";
 import { toast, toOrdinal } from "@/lib/utils";
 import { useState } from "react";
 import ContentComponent from "../comp-content";
+import MapPicker from "@/components/map/MapPicker";
 
 enum TradRecepType {
   Traditional,
@@ -363,6 +364,9 @@ function SchedulerTabContent() {
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
+  
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
 
   return (
     <div>
@@ -392,6 +396,9 @@ function SchedulerTabContent() {
             </div>
             <div className="col-span-12">
               <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+            </div>
+            <div className="col-span-12">
+              <MapPicker />
             </div>
             <div className="col-span-12">
               <label className="block text-sm font-medium mb-2 dark:text-white">
