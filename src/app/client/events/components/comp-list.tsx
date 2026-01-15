@@ -1,3 +1,5 @@
+import { useTabEventDetail } from "@/lib/zustand";
+
 type ListCompProps = {
   tabs: {
     id: string;
@@ -7,6 +9,8 @@ type ListCompProps = {
 }
 
 export default function ListComponent({ tabs }: ListCompProps) {
+  const { setActiveIdxTab } = useTabEventDetail();
+
   return (
     <nav
       className="flex flex-wrap justify-center sm:flex-col gap-2"
@@ -17,6 +21,7 @@ export default function ListComponent({ tabs }: ListCompProps) {
       {tabs.map((tab, index) => (
         <button
           key={tab.id}
+          onClick={() => setActiveIdxTab(index)}
           type="button"
           id={`${tab.id}-item`}
           aria-selected={index === 0 ? "true" : "false"}

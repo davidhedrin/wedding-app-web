@@ -100,3 +100,12 @@ export const useConfirmStore = create<ConfirmState>((set, get) => ({
     get().close();
   },
 }));
+
+type TabEventDetail = {
+  activeIdxTab: number;
+  setActiveIdxTab: (i: number) => void;
+};
+export const useTabEventDetail = create<TabEventDetail>((set) => ({
+  activeIdxTab: 0,
+  setActiveIdxTab: (i: number) => set({ activeIdxTab: i }),
+}));

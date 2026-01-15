@@ -5,7 +5,13 @@ import Configs from "@/lib/config";
 import { toast, toOrdinal } from "@/lib/utils";
 import { useState } from "react";
 import ContentComponent from "../comp-content";
-import MapPicker from "@/components/map/MapPicker";
+import { useTabEventDetail } from "@/lib/zustand";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(
+  () => import("@/components/MapPicker"),
+  { ssr: false }
+);
 
 enum TradRecepType {
   Traditional,
@@ -356,6 +362,8 @@ function MainTabContent() {
 };
 
 function SchedulerTabContent() {
+  const { activeIdxTab } = useTabEventDetail();
+
   // Marriage Blessing Props
   const [eventDateMb, setDateRangeMb] = useState<Date | undefined>();
   const [noteListMb, setNoteListMb] = useState<string[]>([""]);
@@ -365,8 +373,8 @@ function SchedulerTabContent() {
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
   
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
+  const [latLangMb, setLatLangMb] = useState<number[]>([]);
+  const [latLangTr, setLatLangTr] = useState<number[]>([]);
 
   return (
     <div>
@@ -398,7 +406,13 @@ function SchedulerTabContent() {
               <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
             </div>
             <div className="col-span-12">
-              <MapPicker />
+              <label className="block text-sm font-medium mb-2 dark:text-white">
+                Choose Location<span className="text-red-500">*</span>
+                <p className="text-sm text-muted">
+                  Click to choose your event location on maps to show direction in your invitaion.
+                </p>
+              </label>
+              {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
             </div>
             <div className="col-span-12">
               <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -506,12 +520,7 @@ function SchedulerTabContent() {
               <Input type='time' className='py-1.5' id='tr_end_time' label='End Time' />
             </div>
             <div className="col-span-12">
-              <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
-            </div>
-            <div className="col-span-12">
-              <Textarea label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
-
-              <div className="flex items-center gap-x-3 mt-2">
+              <div className="flex items-center gap-x-3 mb-3 mt-2">
                 <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
                   <input type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
                   <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
@@ -519,6 +528,20 @@ function SchedulerTabContent() {
                 </label>
                 <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
               </div>
+
+              <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+            </div>
+            <div className="col-span-12">
+              <Textarea label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
+            </div>
+            <div className="col-span-12">
+              <label className="block text-sm font-medium mb-2 dark:text-white">
+                Choose Location<span className="text-red-500">*</span>
+                <p className="text-sm text-muted">
+                  Click to choose your event location on maps to show direction in your invitaion.
+                </p>
+              </label>
+              {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangTr([lat, lng])} />}
             </div>
             <div className="col-span-12">
               <label className="block text-sm font-medium mb-2 dark:text-white">
