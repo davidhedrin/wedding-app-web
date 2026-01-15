@@ -3,10 +3,11 @@ import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs from "@/lib/config";
 import { toast, toOrdinal } from "@/lib/utils";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const MapPicker = dynamic(
   () => import("@/components/MapPicker"),
@@ -76,13 +77,11 @@ function MainTabContent() {
     e.stopPropagation();
     e.currentTarget.classList.add('bg-gray-100', 'rounded-xl');
   };
-
   const handleDragLeaveCapture = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
   };
-
   const handleDropCapture = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -94,16 +93,6 @@ function MainTabContent() {
 
   return (
     <div className="grid grid-cols-12 gap-3">
-      {/* <div className="col-span-12 md:col-span-6">
-        <label className="block text-sm font-medium mb-1 dark:text-white">
-          Event Date<span className="text-red-500">*</span>
-        </label>
-        <DatePicker placeholder="Choose event date" mode='single' value={eventDate} onChange={(date) => setDateRange(date as Date)} />
-        {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />}
-      </div>
-      <div className="col-span-12 md:col-span-6">
-        <Input type='time' className='py-1.5' id='event_time' label='Event Time' mandatory />
-      </div> */}
       <div className="col-span-12">
         <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
       </div>
@@ -286,7 +275,7 @@ function MainTabContent() {
           <p className='text-sm text-muted'>Choose your couple photo will be displayed as the main cover on the homepage.</p>
         </label>
 
-        <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture}>
+        <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture} className="hover:bg-gray-100 rounded-xl">
           {!previewUrl ? (
             // Drag & Drop UI
             <label htmlFor="file-upload" className="cursor-pointer px-6 h-64 md:h-72 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
@@ -372,7 +361,7 @@ function SchedulerTabContent() {
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
-  
+
   const [latLangMb, setLatLangMb] = useState<number[]>([]);
   const [latLangTr, setLatLangTr] = useState<number[]>([]);
 
@@ -600,11 +589,178 @@ function SchedulerTabContent() {
   )
 };
 
+type UploadedImage = {
+  id: string;
+  url: string;
+  file?: File;
+};
 function GalleryTabContent() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [images, setImages] = useState<UploadedImage[]>([]);
+
+  const handleFileCaptureChange = (e: { target: { files: FileList | null } }) => {
+    const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
+    const maxSizeInMB = Configs.maxSizePictureInMB;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages: UploadedImage[] = [];
+    let invalidType = false;
+    let invalidSize = false;
+
+    Array.from(files).map((file) => {
+      if (!allowedTypes.includes(file.type)) {
+        invalidType = true;
+        return;
+      };
+
+      if (file.size > maxSizeInBytes) {
+        invalidSize = true;
+        return;
+      };
+
+      newImages.push({
+        id: crypto.randomUUID(),
+        url: URL.createObjectURL(file),
+        file,
+      });
+    });
+
+    let message = '';
+    if (invalidType) {
+      message += 'Some files an invalid file type are allowed';
+    }
+    if (invalidSize) {
+      if (message) message += ' and, ';
+      message += `Some files too large, They must be less than ${maxSizeInMB}MB.`;
+    }
+    if (invalidType || invalidSize) toast({
+      type: "warning",
+      title: "Invalid File",
+      message: message
+    });
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleDragOverCapture = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.add('bg-gray-100', 'rounded-xl');
+  };
+  const handleDragLeaveCapture = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
+  };
+  const handleDropCapture = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
+
+    const files = e.dataTransfer.files;
+    handleFileCaptureChange({ target: { files } });
+  };
+
   return (
-    <p className="text-gray-500 text-sm">
-      This is the <em className="font-semibold text-gray-800">Gallery</em> tab body.
-    </p>
+    <div>
+      <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture} className="hover:bg-gray-100 rounded-xl">
+        <label htmlFor="file-upload-gallery" className="cursor-pointer px-6 h-64 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
+          <div className="text-center">
+            <span className="inline-flex justify-center items-center">
+              <svg className="shrink-0 w-11 h-auto" width="71" height="51" viewBox="0 0 71 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.55172 8.74547L17.7131 6.88524V40.7377L12.8018 41.7717C9.51306 42.464 6.29705 40.3203 5.67081 37.0184L1.64319 15.7818C1.01599 12.4748 3.23148 9.29884 6.55172 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
+                <path d="M64.4483 8.74547L53.2869 6.88524V40.7377L58.1982 41.7717C61.4869 42.464 64.703 40.3203 65.3292 37.0184L69.3568 15.7818C69.984 12.4748 67.7685 9.29884 64.4483 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
+                <g filter="url(#filter4)">
+                  <rect x="17.5656" y="1" width="35.8689" height="42.7541" rx="5" stroke="currentColor" strokeWidth="2" className="stroke-blue-600" shapeRendering="crispEdges"></rect>
+                </g>
+                <path d="M39.4826 33.0893C40.2331 33.9529 41.5385 34.0028 42.3537 33.2426L42.5099 33.0796L47.7453 26.976L53.4347 33.0981V38.7544C53.4346 41.5156 51.1959 43.7542 48.4347 43.7544H22.5656C19.8043 43.7544 17.5657 41.5157 17.5656 38.7544V35.2934L29.9728 22.145L39.4826 33.0893Z" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></path>
+                <circle cx="40.0902" cy="14.3443" r="4.16393" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></circle>
+              </svg>
+            </span>
+
+            <div className="flex flex-wrap justify-center text-sm/6 text-gray-600 mt-2">
+              <span className="pe-1 font-medium text-gray-800">
+                Drop file here or click to
+              </span>
+              <span className="font-semibold text-blue-600 hover:underline">
+                browse
+              </span>
+            </div>
+
+            <p className="text-xs text-gray-400 mt-0">
+              Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB
+            </p>
+
+            <input
+              ref={inputRef}
+              type="file"
+              onChange={handleFileCaptureChange}
+              multiple
+              id="file-upload-gallery"
+              className="hidden"
+              accept="image/*"
+            />
+          </div>
+        </label>
+      </div>
+
+      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3 mt-4">
+        {images.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-rose-100 flex items-center justify-center">
+              <svg
+                className="h-7 w-7 text-rose-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path d="M4 16l4-4a3 3 0 014 0l4 4M2 20h20M6 4h12v6H6z" />
+              </svg>
+            </div>
+
+            <div className="text-sm font-medium text-gray-700">
+              No photos uploaded yet
+            </div>
+            <p className="text-sm/6 text-gray-500">
+              Add your beautiful moments to be displayed on the invitation
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
+              >
+                <Image
+                  src={img.url}
+                  alt="Uploaded"
+                  fill
+                  className="object-cover"
+                />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImages((prev) => prev.filter((i) => i.id !== img.id));
+                  }}
+                  className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
+                  aria-label="Hapus foto"
+                >
+                  <i className="bx bx-x text-xl"></i>
+                </button>
+              </div>
+            ))}
+
+          </div>
+        )}
+      </div>
+    </div>
   )
 };
 
