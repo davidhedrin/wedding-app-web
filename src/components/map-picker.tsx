@@ -10,9 +10,9 @@ import L from "leaflet";
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
 const markerIcon = L.icon({
-  iconUrl: "/assets/img/logo/wedlyvite-logo-web.png", // 👉 simpan di /public/marker.png
-  iconSize: [30, 30],
-  iconAnchor: [16, 30],
+  iconUrl: "/assets/img/logo/wedlyvite-location.png", // 👉 simpan di /public/marker.png
+  iconSize: [40, 50],
+  iconAnchor: [20, 53],
 });
 
 function LocationMarker({
