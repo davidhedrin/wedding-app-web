@@ -40,6 +40,12 @@ enum EventStatusEnum {
   ENDED
 }
 
+enum ScheduleWeddingEnum {
+  MB
+  TOR
+  CST
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique

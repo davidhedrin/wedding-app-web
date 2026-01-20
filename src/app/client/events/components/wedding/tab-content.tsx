@@ -8,6 +8,10 @@ import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import TableTopToolbar from "@/components/table-top-toolbar";
+import { TableShortList, TableThModel } from "@/lib/model-types";
+import TablePagination from "@/components/table-pagination";
+import { ScheduleWeddingEnum } from "@/generated/prisma";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -37,6 +41,11 @@ function MainTabContent() {
   const [birthOrderGroom, setBirthOrderGroom] = useState<number | "">(1);
   const [birthOrderBride, setBirthOrderBride] = useState<number | "">(1);
   const [eventDate, setDateRange] = useState<Date | undefined>(undefined);
+
+  const [imageFileGroom, setImageFileGroom] = useState<File | null>(null);
+  const [previewUrlGroom, setPreviewUrlGroom] = useState<string | null>(null);
+  const [imageFileBride, setImageFileBride] = useState<File | null>(null);
+  const [previewUrlBride, setPreviewUrlBride] = useState<string | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -94,7 +103,7 @@ function MainTabContent() {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-0.5 text-lg font-semibold text-gray-800">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-info-circle text-xl"></i> Main Information
         </div>
         <p className="text-sm text-gray-500">
@@ -113,11 +122,23 @@ function MainTabContent() {
           </div>
           <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
             <div className="relative w-full h-48 md:h-64">
-              <img
-                className="w-full h-full object-cover"
-                src="https://images.unsplash.com/photo-1680868543815-b8666dba60f7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=320&q=80"
-                alt="Card Image"
-              />
+              {
+                previewUrlGroom ? (
+                  <img
+                    className="w-full h-full object-cover"
+                    src={previewUrlGroom}
+                    alt="Card Image"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
+                    <i className="bx bx-image text-5xl"></i>
+                    <div className="flex items-center gap-1 text-sm">
+                      <i className="bx bx-upload text-lg"></i>
+                      No image selected
+                    </div>
+                  </div>
+                )
+              }
 
               <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
                 <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
@@ -199,11 +220,23 @@ function MainTabContent() {
           </div>
           <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
             <div className="relative w-full h-48 md:h-64">
-              <img
-                className="w-full h-full object-cover"
-                src="https://images.unsplash.com/photo-1680868543815-b8666dba60f7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=320&q=80"
-                alt="Card Image"
-              />
+              {
+                previewUrlBride ? (
+                  <img
+                    className="w-full h-full object-cover"
+                    src={previewUrlBride}
+                    alt="Card Image"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
+                    <i className="bx bx-image text-5xl"></i>
+                    <div className="flex items-center gap-1 text-sm">
+                      <i className="bx bx-upload text-lg"></i>
+                      No image selected
+                    </div>
+                  </div>
+                )
+              }
 
               <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
                 <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
@@ -361,6 +394,18 @@ function MainTabContent() {
   )
 };
 
+type SchedulerDto = {
+  name: string;
+  date: Date | undefined;
+  start_time: string;
+  end_time: string;
+  loc_name: string;
+  loc_address: string;
+  is_mb_loc: boolean;
+  notes: string[];
+  latitude: number[];
+  longitude: number[];
+};
 function SchedulerTabContent() {
   const { activeIdxTab } = useTabEventDetail();
 
@@ -376,10 +421,25 @@ function SchedulerTabContent() {
   const [latLangMb, setLatLangMb] = useState<number[]>([]);
   const [latLangTr, setLatLangTr] = useState<number[]>([]);
 
+  const [schedulerDtoData, setSchedulerDtoData] = useState<SchedulerDto[]>([
+    // {
+    //   name: "Traditional or Reception Ceremony",
+    //   date: eventDateTr,
+    //   start_time: "",
+    //   end_time: "",
+    //   loc_name: "",
+    //   loc_address: "",
+    //   is_mb_loc: false,
+    //   notes: [],
+    //   latitude: [],
+    //   longitude: [],
+    // }
+  ]);
+
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-0.5 text-lg font-semibold text-gray-800">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-calendar-star text-xl"></i> Event Scheduler
         </div>
         <p className="text-sm text-gray-500">
@@ -400,7 +460,6 @@ function SchedulerTabContent() {
                 Event Date<span className="text-red-500">*</span>
               </label>
               <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
-              {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
             </div>
             <div className="col-span-12 md:col-span-4">
               <Input type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
@@ -491,7 +550,7 @@ function SchedulerTabContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
-                    <span className="text-sm text-gray-500">Traditional Ceremony</span>
+                    <span className="text-sm text-black">Traditional Ceremony</span>
                     <input
                       checked={radioSelectTypeTr === TradRecepType.Traditional}
                       onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
@@ -502,7 +561,7 @@ function SchedulerTabContent() {
                 </div>
                 <div>
                   <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
-                    <span className="text-sm text-gray-500">Reception Ceremony</span>
+                    <span className="text-sm text-black">Reception Ceremony</span>
                     <input
                       checked={radioSelectTypeTr === TradRecepType.Reception}
                       onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
@@ -520,7 +579,6 @@ function SchedulerTabContent() {
                 Event Date<span className="text-red-500">*</span>
               </label>
               <DatePicker placeholder="Choose event date" mode='single' value={eventDateTr} onChange={(date) => setDateRangeTr(date as Date)} />
-              {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
             </div>
             <div className="col-span-12 md:col-span-4">
               <Input type='time' className='py-1.5' id='tr_start_time' label='Start Time' mandatory />
@@ -603,6 +661,108 @@ function SchedulerTabContent() {
           </div>
         </div>
       </div>
+
+      {
+        schedulerDtoData.map((sced, i) => (
+          <div key={i} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mt-5 mb-3">
+            <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+              <div className="text-muted font-semibold">
+                <i className='bx bx-donate-heart text-xl'></i> Additionals Event {i + 1}
+              </div>
+            </div>
+            <div className="p-3">
+              <div className="grid grid-cols-12 gap-3">
+                <div className="col-span-12 md:col-span-4">
+                  <label className="block text-sm font-medium mb-1 dark:text-white">
+                    Event Date<span className="text-red-500">*</span>
+                  </label>
+                  <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
+                  {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
+                </div>
+                <div className="col-span-12 md:col-span-4">
+                  <Input type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+                </div>
+                <div className="col-span-12 md:col-span-4">
+                  <Input type='time' className='py-1.5' id='mb_end_time' label='End Time' />
+                </div>
+
+                <div className="col-span-12">
+                  <div className="flex items-center gap-x-3 mb-3 mt-1">
+                    <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
+                      <input type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
+                      <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                      <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                    </label>
+                    <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
+                  </div>
+
+                  <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+                </div>
+                <div className="col-span-12">
+                  <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+                </div>
+                <div className="col-span-12">
+                  <label className="block text-sm font-medium mb-2 dark:text-white">
+                    Choose Location<span className="text-red-500">*</span>
+                    <p className="text-sm text-muted">
+                      Click to choose your event location on maps to show direction in your invitaion.
+                    </p>
+                  </label>
+                  {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
+                </div>
+                <div className="col-span-12">
+                  <label className="block text-sm font-medium mb-2 dark:text-white">
+                    Notes
+                    <p className="text-sm text-muted">
+                      Add important short notes regarding the marriage event if any.
+                    </p>
+                  </label>
+
+                  <div className="grid grid-cols-12 gap-2">
+                    {noteListMb.map((note, i) => (
+                      <div key={i} className="col-span-12 md:col-span-3">
+                        <Input
+                          value={note}
+                          onChange={(e) => {
+                            const newNotes = [...noteListMb];
+                            newNotes[i] = e.target.value;
+                            setNoteListMb(newNotes);
+                          }}
+                          id={`mb_label_${i}`}
+                          placeholder="Additional note"
+                          className="py-1.5 w-full"
+                          sufixGroup={
+                            <i
+                              onClick={() => {
+                                const newNotes = [...noteListMb];
+                                newNotes.splice(i, 1);
+                                setNoteListMb(newNotes);
+                              }}
+                              className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                            />
+                          }
+                        />
+                      </div>
+                    ))}
+
+                    <div className=" col-span-12 md:col-span-3">
+                      <button
+                        onClick={() => {
+                          setNoteListMb([...noteListMb, ""]);
+                        }}
+                        type="button"
+                        className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
+                        <i className="bx bx-plus text-lg"></i>
+                        {noteListMb.length === 0 ? "Add Note" : "More"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
 
       <Textarea label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
     </div>
@@ -687,7 +847,7 @@ function GalleryTabContent() {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-0.5 text-lg font-semibold text-gray-800">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-photo-album text-xl"></i> Memories Gallery
         </div>
         <p className="text-sm text-gray-500">
@@ -797,15 +957,15 @@ function HistoryTabContent() {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-0.5 text-lg font-semibold text-gray-800">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-book-heart text-xl"></i> Journey of Love
         </div>
-        <p className="text-sm text-gray-500 mb-2">
+        <p className="text-sm text-gray-500">
           Share your love story and memorable moments leading up to your wedding day.
         </p>
 
-        <button type="button" className="py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
-          Add Story <i className='bx bx-plus text-lg'></i>
+        <button type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+          <i className='bx bx-plus text-lg'></i> Add Story
         </button>
       </div>
 
@@ -868,7 +1028,7 @@ function GiftTabContent() {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-0.5 text-lg font-semibold text-gray-800">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-gift text-xl"></i> Gift Registry
         </div>
         <p className="text-sm text-gray-500">
@@ -877,23 +1037,27 @@ function GiftTabContent() {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-credit-card text-xl text-blue-600"></i>
               Transfer Gift
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 max-w-md">
               Add bank accounts or e-wallets for guests to send their gifts.
             </p>
           </div>
 
-          <button type="button" className="py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
-            Add Account <i className='bx bx-plus text-lg'></i>
+          <button
+            type="button"
+            className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
+          >
+            <i className="bx bx-plus text-lg"></i>
+            Add Account
           </button>
         </div>
 
-        <div className="mt-4 rounded-lg border border-dashed border-gray-200 p-6 text-center">
+        <div className="mt-6 rounded-lg border border-dashed border-gray-200 p-6 text-center">
           <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
           <p className="text-sm text-gray-500">
             No bank accounts added yet.
@@ -902,23 +1066,27 @@ function GiftTabContent() {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3 mt-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-gift text-xl text-pink-600"></i>
               Wishlist Gift
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 max-w-md">
               Create a wishlist of gifts that guests can choose from.
             </p>
           </div>
 
-          <button type="button" className="py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-pink-100 text-pink-800 hover:bg-pink-200 focus:outline-hidden focus:bg-pink-200 disabled:opacity-50 disabled:pointer-events-none">
-            Add Wishlist <i className='bx bx-plus text-lg'></i>
+          <button
+            type="button"
+            className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 focus:outline-none focus:bg-pink-200 disabled:opacity-50 disabled:pointer-events-none"
+          >
+            <i className="bx bx-plus text-lg"></i>
+            Add Wishlist
           </button>
         </div>
 
-        <div className="mt-4 rounded-lg border border-dashed border-gray-200 p-6 text-center">
+        <div className="mt-6 rounded-lg border border-dashed border-gray-200 p-6 text-center">
           <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
           <p className="text-sm text-gray-500">
             Your wishlist is still empty.
@@ -930,17 +1098,223 @@ function GiftTabContent() {
 };
 
 function RSVPTabContent() {
+  const [inputPage, setInputPage] = useState("1");
+  const [pageTable, setPageTable] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [inputSearch, setInputSearch] = useState("");
+  const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
+  const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
+    { name: "Slug", key: "code", key_sort: "code", IsVisible: true },
+    { name: "Name", key: "disc_amount", key_sort: "disc_amount", IsVisible: true },
+    { name: "No Phone", key: "total_qty", key_sort: "total_qty", IsVisible: true },
+    { name: "Attandance", key: "valid_from", key_sort: "valid_from", IsVisible: true },
+    { name: "URI", key: "valid_to", key_sort: "valid_to", IsVisible: true },
+  ]);
+
   return (
-    <p className="text-gray-500 text-sm">
-      This is the <em className="font-semibold text-gray-800">RSVP</em> tab body.
-    </p>
+    <div>
+      <div className="mb-6 mt-3 text-center">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+          <i className="bx bx-envelope text-xl"></i> RSVP Management
+        </div>
+        <p className="text-sm text-gray-500">
+          Create invitations and manage guest attendance confirmation for your wedding invitations.
+        </p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-3">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <TableTopToolbar
+            inputSearch={inputSearch}
+            tblSortList={tblSortList}
+            thColomn={tblThColomns}
+            setTblThColomns={setTblThColomns}
+            setTblSortList={setTblSortList}
+            setInputSearch={setInputSearch}
+          // fatchData={() => fatchDatas(pageTable)}
+
+          // openModal={openModalAddEdit}
+          />
+
+          <div className="flex flex-col pt-5 pb-4 px-1.5">
+            <div className="-m-1.5 overflow-x-auto">
+              <div className="min-w-full inline-block align-middle">
+                <div className="border border-gray-200 rounded-lg shadow-xs overflow-hidden">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">#</th>
+                        {
+                          tblThColomns.map((x, i) => {
+                            if (x.IsVisible) return <th key={x.key} scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">{x.name}</th>
+                          })
+                        }
+                        <th scope="col" className="px-3 py-2.5 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-3 py-2.5 text-center text-muted text-sm" colSpan={tblThColomns.length + 3}><i>No data found!</i></td>
+                      </tr>
+
+                      {/* {
+                          datas.map((data, i) => (
+                            <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
+
+                              {'code' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.code}</td>}
+                              {'disc_amount' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                                {
+                                  data.disc_type === DiscTypeEnum.AMOUNT ? `Rp ${data.disc_amount.toLocaleString('id-ID')}` : data.disc_type === DiscTypeEnum.PERCENT ? `${data.disc_amount}%` : "-"
+                                }
+                              </td>}
+                              {'total_qty' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.total_qty} Voucher</td>}
+                              {'valid_from' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{formatDate(data.valid_from, "medium", "short")}</td>}
+                              {'valid_to' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{formatDate(data.valid_to, "medium", "short")}</td>}
+                              {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
+                              {
+                                'is_active' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.is_active === true ? "text-green-600" : "text-red-600"}`}>
+                                  {data.is_active === true ? "Active" : "Inactive"}
+                                </td>
+                              }
+
+                              <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
+                                <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
+                                <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                              </td>
+                            </tr>
+                          ))
+                        }
+                        {
+                          isFirstRender === false && datas.length === 0 && <tr>
+                            <td className="px-3 py-2.5 text-center text-muted text-sm" colSpan={tblThColomns.length + 3}><i>No data found!</i></td>
+                          </tr>
+                        }
+                        {
+                          isFirstRender === true && <tr>
+                            <td className="text-center p-0" colSpan={tblThColomns.length + 3}>
+                              <div className="animate-pulse h-62.5 w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
+                            </td>
+                          </tr>
+                        } */}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <TablePagination
+            perPage={perPage}
+            pageTable={pageTable}
+            totalPage={totalPage}
+            totalCount={totalCount}
+            setPerPage={setPerPage}
+            setPageTable={setPageTable}
+            // fatchData={fatchDatas}
+
+            inputPage={inputPage}
+            setInputPage={setInputPage}
+          />
+        </div>
+      </div>
+    </div>
   )
 };
 
 function FAQTabContent() {
   return (
-    <p className="text-gray-500 text-sm">
-      This is the <em className="font-semibold text-gray-800">FAQ</em> tab body.
-    </p>
+    <div>
+      <div className="mb-6 mt-3 text-center">
+        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+          <i className="bx bx-help-circle text-xl"></i> Frequently Asked Questions
+        </div>
+        <p className="text-sm text-gray-500">
+          Create and manage FAQ for your wedding, so your guests can find important information easily.
+        </p>
+
+        <button type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+          <i className='bx bx-plus text-lg'></i> Add FAQ
+        </button>
+      </div>
+
+
+      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
+        <div className="min-h-52 flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center">
+            <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
+              <i className="bx bx-folder-open text-2xl text-gray-400"></i>
+            </div>
+            <div className="text-sm font-medium text-gray-700">
+              Your FAQ list is empty!
+            </div>
+            <p className="text-sm/6 text-gray-500">
+              Add questions and answers here so your guests can easily find important information.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="hs-accordion-group">
+        <div className="hs-accordion active bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-one">
+          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="true" aria-controls="accordion-collapse-one">
+            <div className="text-sm">Accordion #1</div>
+            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
+          <div id="accordion-collapse-one" className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-one">
+            <div className="pb-4 px-5">
+              <p className="text-gray-800">
+                <em>This is the first item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-two">
+          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="false" aria-controls="accordion-hs-two">
+            <div className="text-sm">Accordion #2</div>
+            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
+          <div id="accordion-hs-two" className="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-two">
+            <div className="pb-4 px-5">
+              <p className="text-gray-800">
+                <em>This is the second item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-three">
+          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="false" aria-controls="accordion-hs-three">
+            <div className="text-sm">Accordion #3</div>
+            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
+          <div id="accordion-hs-three" className="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-three">
+            <div className="pb-4 px-5">
+              <p className="text-gray-800">
+                <em>This is the third item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div> */}
+    </div>
   )
 };
