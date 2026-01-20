@@ -11,7 +11,6 @@ import Image from "next/image";
 import TableTopToolbar from "@/components/table-top-toolbar";
 import { TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
-import { ScheduleWeddingEnum } from "@/generated/prisma";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
