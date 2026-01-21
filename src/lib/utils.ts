@@ -55,7 +55,7 @@ export function modalAction(btnId: string) {
 };
 
 export function toast(params: ToastProps) {
-  useToastStore.getState().add(params);
+  useToastStore.getState().add({...params, duration: 4500});
 };
 
 export function showConfirm(props: ConfirmProps): Promise<boolean> {

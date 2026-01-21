@@ -52,7 +52,7 @@ export default function MapPicker({
       <MapContainer
         center={[-6.2000, 106.8166]}
         zoom={15}
-        className="h-full w-full"
+        className="h-full w-full z-0"
       >
         <TileLayer
           attribution="© OpenStreetMap contributors"

@@ -201,7 +201,7 @@ model Tr {
   voucher_type   DiscTypeEnum?
   voucher_amount Int?
 
-  /// Add-on fields smart barcode
+  /// Add-on fields RSVP
   add_ons1        Boolean?
   add_ons1_amount Int?
 

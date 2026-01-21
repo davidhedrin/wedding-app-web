@@ -415,7 +415,7 @@ export default function Page() {
                           </div>
                           {
                             isCheckedAddOn1 && <div className="flex justify-between">
-                              <span>Smart Barcode</span>
+                              <span>WA-Invitation:</span>
                               <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span>
                             </div>
                           }
@@ -433,9 +433,9 @@ export default function Page() {
                       </div>
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-2.5">
                       <label className="block text-sm font-medium mb-1 dark:text-white">
-                        Add On Barcode
+                        Add-On
                       </label>
                       <div className="flex items-center gap-x-3">
                         <label htmlFor="hs-xs-switch-add-ons" className="relative inline-block w-9 h-5 cursor-pointer">
@@ -448,14 +448,14 @@ export default function Page() {
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                           <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
-                        <label htmlFor="hs-xs-switch-add-ons" className="text-sm text-gray-500">Smart Barcode (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
+                        <label htmlFor="hs-xs-switch-add-ons" className="text-sm text-gray-500">WA-Invitation (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
                       </div>
-                      {/* <p className="text-xs text-muted mt-1.5 italic">
-                        <i className='bx bx-info-circle'></i>&nbsp;Enabling the Smart Barcode, you can create barcode-based invitations.
-                      </p> */}
+                      <p className="text-xs text-muted mt-1.5 italic">
+                        <i className='bx bx-info-circle'></i>&nbsp;Enable this feature to automatically send invitations to your WhatsApp guests.
+                      </p>
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-2">
                       <label htmlFor="inpVoucherCode" className="block text-sm font-medium mb-1 dark:text-white">
                         Voucher Code
                       </label>
@@ -474,7 +474,7 @@ export default function Page() {
                             id="inpVoucherCode"
                             style={dataEvent.tr === null ? { borderStartEndRadius: "0px", borderEndEndRadius: "0px" } : {}}
                             prefixIcon={<i className='bx bxs-discount text-lg text-muted'></i>}
-                            placeholder={dataEvent.tr === null ? "Enter voucher here..." : "Voucher not applicable"}
+                            placeholder={dataEvent.tr === null ? "Enter voucher here..." : "No voucher applied"}
                           />
                         </div>
 

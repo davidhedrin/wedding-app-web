@@ -402,8 +402,7 @@ type SchedulerDto = {
   loc_address: string;
   is_mb_loc: boolean;
   notes: string[];
-  latitude: number[];
-  longitude: number[];
+  langLat: number[];
 };
 function SchedulerTabContent() {
   const { activeIdxTab } = useTabEventDetail();
@@ -420,20 +419,23 @@ function SchedulerTabContent() {
   const [latLangMb, setLatLangMb] = useState<number[]>([]);
   const [latLangTr, setLatLangTr] = useState<number[]>([]);
 
-  const [schedulerDtoData, setSchedulerDtoData] = useState<SchedulerDto[]>([
-    // {
-    //   name: "Traditional or Reception Ceremony",
-    //   date: eventDateTr,
-    //   start_time: "",
-    //   end_time: "",
-    //   loc_name: "",
-    //   loc_address: "",
-    //   is_mb_loc: false,
-    //   notes: [],
-    //   latitude: [],
-    //   longitude: [],
-    // }
-  ]);
+  const [schedulerDtoData, setSchedulerDtoData] = useState<SchedulerDto[]>([]);
+  const addMoreCeremony = () => {
+    setSchedulerDtoData(prev => [
+      ...prev,
+      {
+        name: "",
+        date: undefined,
+        start_time: "",
+        end_time: "",
+        loc_name: "",
+        loc_address: "",
+        is_mb_loc: false,
+        notes: [""],
+        langLat: [],
+      }
+    ]);
+  };
 
   return (
     <div>
@@ -661,44 +663,51 @@ function SchedulerTabContent() {
         </div>
       </div>
 
-      {
+      {/* {
         schedulerDtoData.map((sced, i) => (
           <div key={i} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mt-5 mb-3">
-            <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+            <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-4">
               <div className="text-muted font-semibold">
-                <i className='bx bx-donate-heart text-xl'></i> Additionals Event {i + 1}
+                <i className='bx bx-party text-xl'></i> Additionals Event - {i + 1}
+              </div>
+              <div>
+                <button type="button" className=" text-muted-foreground hover:text-red-500 cursor-pointer transition p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                  <i className="bx bx-trash text-lg" />
+                </button>
               </div>
             </div>
             <div className="p-3">
               <div className="grid grid-cols-12 gap-3">
-                <div className="col-span-12 md:col-span-4">
+                <div className="col-span-12 md:col-span-6">
+                  <Input label="Ceremony Name" className='py-1.5' id={`cst_event_name_${i}`} placeholder="Enter Ceremony Name" mandatory />
+                </div>
+                <div className="col-span-12 md:col-span-6">
                   <label className="block text-sm font-medium mb-1 dark:text-white">
                     Event Date<span className="text-red-500">*</span>
                   </label>
                   <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
-                  {/* {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />} */}
                 </div>
-                <div className="col-span-12 md:col-span-4">
-                  <Input type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+                <div className="col-span-12 md:col-span-6">
+                  <Input type='time' className='py-1.5' id={`cst_start_time_${i}`} label='Start Time' mandatory />
                 </div>
-                <div className="col-span-12 md:col-span-4">
-                  <Input type='time' className='py-1.5' id='mb_end_time' label='End Time' />
+                <div className="col-span-12 md:col-span-6">
+                  <Input type='time' className='py-1.5' id={`cst_end_time_${i}`} label='End Time' />
                 </div>
 
                 <div className="col-span-12">
                   <div className="flex items-center gap-x-3 mb-3 mt-1">
-                    <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
-                      <input type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
+                    <label htmlFor={`hs-xs-switch-loc-cst-${i}`} className="relative inline-block w-9 h-5 cursor-pointer">
+                      <input type="checkbox" id={`hs-xs-switch-loc-cst-${i}`} className="peer sr-only" />
                       <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                       <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                     </label>
-                    <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
+                    <label htmlFor={`hs-xs-switch-loc-cst-${i}`} className="text-sm text-gray-500">Use Marriage Blessing Location</label>
                   </div>
 
-                  <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+                  <Input label="Location Name" className='py-1.5' id={`cst_loc_name_${i}`} placeholder="Enter Location Name" mandatory />
                 </div>
                 <div className="col-span-12">
-                  <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+                  <Textarea label="Location Address" id={`cst_loc_address_${i}`} placeholder="Enter Location Address" rows={3} />
                 </div>
                 <div className="col-span-12">
                   <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -707,7 +716,7 @@ function SchedulerTabContent() {
                       Click to choose your event location on maps to show direction in your invitaion.
                     </p>
                   </label>
-                  {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
+                  {activeIdxTab === 1 && <MapPicker />}
                 </div>
                 <div className="col-span-12">
                   <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -718,41 +727,29 @@ function SchedulerTabContent() {
                   </label>
 
                   <div className="grid grid-cols-12 gap-2">
-                    {noteListMb.map((note, i) => (
-                      <div key={i} className="col-span-12 md:col-span-3">
-                        <Input
-                          value={note}
-                          onChange={(e) => {
-                            const newNotes = [...noteListMb];
-                            newNotes[i] = e.target.value;
-                            setNoteListMb(newNotes);
-                          }}
-                          id={`mb_label_${i}`}
-                          placeholder="Additional note"
-                          className="py-1.5 w-full"
-                          sufixGroup={
-                            <i
-                              onClick={() => {
-                                const newNotes = [...noteListMb];
-                                newNotes.splice(i, 1);
-                                setNoteListMb(newNotes);
-                              }}
-                              className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
-                            />
-                          }
-                        />
-                      </div>
-                    ))}
+                    {
+                      sced.notes.map((note, j) => (
+                        <div key={j} className="col-span-12 md:col-span-3">
+                          <Input
+                            id={`cst_label_${i}_${j}`}
+                            placeholder="Additional note"
+                            className="py-1.5 w-full"
+                            sufixGroup={
+                              <i
+                                className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                              />
+                            }
+                          />
+                        </div>
+                      ))
+                    }
 
                     <div className=" col-span-12 md:col-span-3">
                       <button
-                        onClick={() => {
-                          setNoteListMb([...noteListMb, ""]);
-                        }}
                         type="button"
                         className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
                         <i className="bx bx-plus text-lg"></i>
-                        {noteListMb.length === 0 ? "Add Note" : "More"}
+                        {sced.notes.length === 0 ? "Add Note" : "More"}
                       </button>
                     </div>
                   </div>
@@ -761,7 +758,11 @@ function SchedulerTabContent() {
             </div>
           </div>
         ))
-      }
+      } */}
+
+      {/* <button onClick={() => addMoreCeremony()} type="button" className="w-full mb-3 mt-1 py-2 px-3 inline-flex justify-center items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+        <i className='bx bx-plus text-lg'></i> More Ceremony
+      </button> */}
 
       <Textarea label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
     </div>
