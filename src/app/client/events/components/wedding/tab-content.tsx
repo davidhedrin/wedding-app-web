@@ -389,6 +389,13 @@ function MainTabContent() {
           <Input type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
         </div>
       </div>
+
+      <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">
+        <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+      </div>
+      <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+        Submit
+      </button>
     </div>
   )
 };
@@ -765,6 +772,13 @@ function SchedulerTabContent() {
       </button> */}
 
       <Textarea label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
+
+      <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">
+        <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+      </div>
+      <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+        Submit
+      </button>
     </div>
   )
 };
