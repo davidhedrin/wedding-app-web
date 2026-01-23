@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
   if (!token && !pathname.startsWith("/auth")) return redirectTo(request, "/auth");
   if (token && pathname.startsWith("/auth")) return redirectTo(request, "/");
   
-  if (pathname.startsWith("/client/systems") && token?.role != RolesEnum.ADMIN) return redirectTo(request, "/");
+  if (pathname.startsWith("/client/systems") && token?.role != RolesEnum.Admin) return redirectTo(request, "/");
 
   return NextResponse.next();
 }

@@ -12,7 +12,7 @@ import { ZodErrors } from '@/components/zod-errors';
 import Configs from '@/lib/config';
 import { DtoUser } from '@/lib/dto';
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from '@/lib/model-types';
-import { formatDate, modalAction, normalizeSelectObj, roleLabels, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
+import { formatDate, modalAction, normalizeSelectObj, showConfirm, sortListToOrderBy, toast } from '@/lib/utils';
 import { DeleteDataUser, GetDataUser, GetDataUserById, UpdateDataUser } from '@/server/systems/user-manage';
 import { RolesEnum, User } from '@/generated/prisma';
 import React, { useEffect, useState } from 'react'
@@ -483,7 +483,7 @@ export default function Page() {
                   </div>
                   <div>
                     <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
-                      options={Object.values(RolesEnum).map(x => ({ label: roleLabels[x], value: x }))}
+                      options={Object.values(RolesEnum).map(x => ({ label: x, value: x }))}
                     />
                     {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
                   </div>

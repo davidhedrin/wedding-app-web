@@ -15,19 +15,19 @@ datasource db {
 }
 
 enum RolesEnum {
-  ADMIN
-  CLIENT
+  Admin
+  Client
 }
 
 enum DiscTypeEnum {
-  AMOUNT
-  PERCENT
+  Amount
+  Percent
 }
 
 enum AuthProviderEnum {
-  CREDENTIAL
-  GOOGLE
-  FACEBOOK
+  Credential
+  Google
+  Facebook
 
   @@map("AuthProviderEnum")
 }
@@ -41,8 +41,8 @@ enum EventStatusEnum {
 }
 
 enum TradRecepType {
-  TRADITIONAL
-  RECEPTION
+  Traditional
+  Reception
 }
 
 enum ScheduleWeddingEnum {
@@ -52,8 +52,8 @@ enum ScheduleWeddingEnum {
 }
 
 enum GroomBrideEnum {
-  GROOM
-  BRIDE
+  Groom
+  Bride
 }
 
 model User {

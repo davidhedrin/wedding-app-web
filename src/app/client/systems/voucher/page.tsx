@@ -12,7 +12,7 @@ import { ZodErrors } from "@/components/zod-errors";
 import { DiscTypeEnum, Vouchers } from "@/generated/prisma";
 import { DtoVouchers } from "@/lib/dto";
 import { BreadcrumbType, FormState, TableShortList, TableThModel } from "@/lib/model-types";
-import { discTypeLabels, formatDate, formatToIDR, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast, toDatetimeLocalString } from "@/lib/utils";
+import { formatDate, formatToIDR, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, showConfirm, sortListToOrderBy, toast, toDatetimeLocalString } from "@/lib/utils";
 import { DeleteDataVouchers, GetDataVouchers, GetDataVouchersById, StoreUpdateDataVouchers } from "@/server/systems/voucher";
 import { useEffect, useState } from "react";
 import z from "zod";
@@ -132,7 +132,7 @@ export default function Page() {
 
         setVoucherCode(data.code);
         setDiscType(data.disc_type);
-        setDiscValue(data.disc_type === DiscTypeEnum.AMOUNT ? formatToIDR(data.disc_amount) : data.disc_type === DiscTypeEnum.PERCENT ? data.disc_amount.toString() : "");
+        setDiscValue(data.disc_type === DiscTypeEnum.Amount ? formatToIDR(data.disc_amount) : data.disc_type === DiscTypeEnum.Percent ? data.disc_amount.toString() : "");
         setVoucherQty(data.total_qty);
         setDateFrom(toDatetimeLocalString(data.valid_from));
         setDateTo(toDatetimeLocalString(data.valid_to));
@@ -160,7 +160,7 @@ export default function Page() {
     const newData: DtoVouchers = {
       id: addEditId,
       code: voucherCode.trim(),
-      disc_type: discType || DiscTypeEnum.AMOUNT,
+      disc_type: discType || DiscTypeEnum.Amount,
       disc_amount: 0,
       valid_from: dateFrom,
       valid_to: dateTo,
@@ -169,10 +169,10 @@ export default function Page() {
       desc: voucehrDesc.trim() != "" ? voucehrDesc.trim() : null,
       is_active: isActive === "true" ? true : false,
     };
-    if (newData.disc_type === DiscTypeEnum.AMOUNT) {
+    if (newData.disc_type === DiscTypeEnum.Amount) {
       newData.disc_amount = parseFromIDR(discValue);
     }
-    else if (newData.disc_type === DiscTypeEnum.PERCENT) {
+    else if (newData.disc_type === DiscTypeEnum.Percent) {
       newData.disc_amount = Number(discValue);
     };
     return newData;
@@ -321,7 +321,7 @@ export default function Page() {
                               {'code' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.code}</td>}
                               {'disc_amount' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                                 {
-                                  data.disc_type === DiscTypeEnum.AMOUNT ? `Rp ${data.disc_amount.toLocaleString('id-ID')}` : data.disc_type === DiscTypeEnum.PERCENT ? `${data.disc_amount}%` : "-"
+                                  data.disc_type === DiscTypeEnum.Amount ? `Rp ${data.disc_amount.toLocaleString('id-ID')}` : data.disc_type === DiscTypeEnum.Percent ? `${data.disc_amount}%` : "-"
                                 }
                               </td>}
                               {'total_qty' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.total_qty} Voucher</td>}
@@ -442,7 +442,7 @@ export default function Page() {
                       setDiscValue("");
                     }} id='disc_type' label='Discount Type' placeholder='Select discount type' mandatory
                       options={
-                        Object.values(DiscTypeEnum).map(x => ({ label: discTypeLabels[x], value: x }))
+                        Object.values(DiscTypeEnum).map(x => ({ label: x, value: x }))
                       }
                     />
                     {stateFormAddEdit.errors?.disc_type && <ZodErrors err={stateFormAddEdit.errors?.disc_type} />}
@@ -457,9 +457,9 @@ export default function Page() {
                         let result = val;
 
                         if (discType != null) {
-                          if (discType === DiscTypeEnum.AMOUNT) {
+                          if (discType === DiscTypeEnum.Amount) {
                             result = inputFormatPriceIdr(val) || "";
-                          } else if (discType === DiscTypeEnum.PERCENT) {
+                          } else if (discType === DiscTypeEnum.Percent) {
                             const num = Number(val);
                             if (num > 100) {
                               return
@@ -471,11 +471,11 @@ export default function Page() {
 
                         setDiscValue(result);
                       }}
-                      type={discType != null ? (discType === DiscTypeEnum.AMOUNT ? "text" : discType === DiscTypeEnum.PERCENT ? "number" : "text") : "text"}
+                      type={discType != null ? (discType === DiscTypeEnum.Amount ? "text" : discType === DiscTypeEnum.Percent ? "number" : "text") : "text"}
                       id="disc_value" placeholder="Enter discount value"
-                      className={discType != null ? (discType === DiscTypeEnum.PERCENT ? "input-no-spinner" : "") : ""}
-                      max={discType === DiscTypeEnum.PERCENT ? "100" : undefined}
-                      min={discType === DiscTypeEnum.PERCENT ? "0" : undefined}
+                      className={discType != null ? (discType === DiscTypeEnum.Percent ? "input-no-spinner" : "") : ""}
+                      max={discType === DiscTypeEnum.Percent ? "100" : undefined}
+                      min={discType === DiscTypeEnum.Percent ? "0" : undefined}
                       mandatory
                     />
                     {stateFormAddEdit.errors?.disc_value && <ZodErrors err={stateFormAddEdit.errors?.disc_value} />}

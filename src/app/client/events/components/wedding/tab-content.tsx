@@ -439,7 +439,7 @@ function SchedulerTabContent() {
   // Traditional Reception Props
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
-  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.TRADITIONAL);
+  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
   const [latLangMb, setLatLangMb] = useState<number[]>([]);
   const [latLangTr, setLatLangTr] = useState<number[]>([]);
@@ -578,8 +578,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-black">Traditional Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === TradRecepType.TRADITIONAL}
-                      onChange={() => setRadioSelectTypeTr(TradRecepType.TRADITIONAL)}
+                      checked={radioSelectTypeTr === TradRecepType.Traditional}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
                       type="radio" name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
                     />
@@ -589,8 +589,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-black">Reception Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === TradRecepType.RECEPTION}
-                      onChange={() => setRadioSelectTypeTr(TradRecepType.RECEPTION)}
+                      checked={radioSelectTypeTr === TradRecepType.Reception}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
                       type="radio"
                       name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"

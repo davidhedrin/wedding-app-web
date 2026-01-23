@@ -60,8 +60,8 @@ export async function signUpAction(formData: DtoSignUp) {
           password: hashPass,
           is_active: true,
           createdBy: email,
-          provider: AuthProviderEnum.CREDENTIAL,
-          role: RolesEnum.CLIENT
+          provider: AuthProviderEnum.Credential,
+          role: RolesEnum.Client
         }
       });
       

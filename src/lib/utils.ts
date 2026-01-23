@@ -4,16 +4,11 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { StatusType, TableShortList, TableThModel } from "./model-types";
-import { DiscTypeEnum, EventStatusEnum, RolesEnum, Vouchers } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, Vouchers } from "@/generated/prisma";
 import Configs from "./config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-};
-
-export const roleLabels: Record<RolesEnum, string> = {
-  ADMIN: 'Admin',
-  CLIENT: 'Client',
 };
 
 export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: StatusType }> = {
@@ -37,11 +32,6 @@ export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: S
     name: "Ended",
     color: "secondary"
   },
-};
-
-export const discTypeLabels: Record<DiscTypeEnum, string> = {
-  AMOUNT: 'Amount',
-  PERCENT: 'Percent',
 };
 
 export async function verifyPassword(password: string, hashed: string): Promise<boolean> {
@@ -273,8 +263,8 @@ export function CartCheckoutProps({
   else priceAddOn = 0;
 
   if (voucher !== null) {
-    if (voucher.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(voucher.disc_amount);
-    if (voucher.disc_type === DiscTypeEnum.PERCENT) {
+    if (voucher.disc_type === DiscTypeEnum.Amount) dicAmountResult = Number(voucher.disc_amount);
+    if (voucher.disc_type === DiscTypeEnum.Percent) {
       const dicsPerAmount = Math.ceil(subTotal * (voucher.disc_amount / 100));
       dicAmountResult = dicsPerAmount;
     };
