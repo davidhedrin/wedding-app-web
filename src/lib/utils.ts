@@ -3,9 +3,8 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
-import { TableShortList, TableThModel } from "./model-types";
+import { StatusType, TableShortList, TableThModel } from "./model-types";
 import { DiscTypeEnum, EventStatusEnum, RolesEnum, Vouchers } from "@/generated/prisma";
-import { StatusType } from "./dto";
 import Configs from "./config";
 
 export function cn(...inputs: ClassValue[]) {
@@ -307,4 +306,28 @@ export function toOrdinal(n: number): string {
     default:
       return `${n}th`;
   }
-}
+};
+
+let audio: HTMLAudioElement | null = null;
+export const playMusic = (url: string) => {
+  if (!url) return;
+
+  if (audio) {
+    audio.pause();
+    audio.src = url;
+  } else {
+    audio = new Audio(url);
+  }
+
+  audio.loop = true;
+  audio.play().catch(err => {
+    console.log("Autoplay error:", err);
+  });
+};
+
+export const stopMusic = () => {
+  if (audio) {
+    audio.pause();
+    audio.src = "";
+  }
+};

@@ -1,7 +1,5 @@
 import { DiscTypeEnum, EventStatusEnum, RolesEnum } from "@/generated/prisma";
 
-export type StatusType = | "secondary" | "primary" | "success" | "warning" | "danger";
-
 export type DtoSignIn = {
   email: string;
   password: string;
@@ -117,4 +115,4 @@ export type DtoTr = {
   voucher_id: number | null;
   add_ons1: boolean | null;
   add_ons1_amount: number | null;
-}
+};

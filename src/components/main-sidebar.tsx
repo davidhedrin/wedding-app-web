@@ -115,7 +115,7 @@ export default function MainSidebar() {
                         onClick={() => smartLink("/client/events/event-detail")}
                         className="border border-gray-400 border-dashed w-full flex items-center leading-none gap-x-2 py-1.5 px-0.5 lg:px-2.5 mb-1 mt-1 text-sm hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800"
                       >
-                        <span className="truncate block max-w-[180px] leading-normal" title={`${x.template?.ctg_name} - ${x.template?.name}`}>
+                        <span className="truncate block max-w-45 leading-normal" title={`${x.template?.ctg_name} - ${x.template?.name}`}>
                           {x.template?.ctg_name} - {x.template?.name}
                         </span>
                       </Link>

@@ -1,4 +1,4 @@
-import { StatusType } from "@/lib/dto";
+import { StatusType } from "@/lib/model-types";
 
 const statusStyles: Record<StatusType, string> = {
   secondary: "bg-gray-50 border-gray-500",

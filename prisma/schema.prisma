@@ -40,10 +40,20 @@ enum EventStatusEnum {
   ENDED
 }
 
+enum TradRecepType {
+  TRADITIONAL
+  RECEPTION
+}
+
 enum ScheduleWeddingEnum {
   MB
   TOR
   CST
+}
+
+enum GroomBrideEnum {
+  GROOM
+  BRIDE
 }
 
 model User {
@@ -165,14 +175,25 @@ model Events {
   tmp_ctg     String
   tmp_ctg_key String
 
+  greeting_msg    String?
+  couple_img_url  String?
+  couple_img_path String?
+  contact_email   String?
+  contact_phone   String?
+  music_url       String?
+
+  schedule_note String?
+
   createdBy String?
   updatedBy String?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  template Templates @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
-  tr       Tr?
+  user          User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  template      Templates        @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
+  tr            Tr?
+  gb_info       GroomBrideInfo[]
+  schedule_info ScheduleInfo[]
 }
 
 model Tr {
@@ -208,5 +229,53 @@ model Tr {
   total_amount Int
 
   user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model GroomBrideInfo {
+  id           Int            @id @default(autoincrement())
+  event_id     Int
+  type         GroomBrideEnum
+  fullname     String
+  shortname    String
+  birth_place  String
+  birth_date   DateTime
+  birth_order  Int
+  father_name  String?
+  mother_name  String?
+  place_origin String?
+  occupation   String?
+  personal_msg String?
+  img_url      String?
+  img_path     String?
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model ScheduleInfo {
+  id            Int                 @id @default(autoincrement())
+  event_id      Int
+  type          ScheduleWeddingEnum
+  date          DateTime
+  start_time    String
+  end_time      String?
+  location      String?
+  address       String?
+  latitude      String?
+  longitude     String?
+  notes         String[]
+  ceremony_type TradRecepType?
+  use_mb_loc    Boolean             @default(false)
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
 }

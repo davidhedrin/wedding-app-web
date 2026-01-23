@@ -1,5 +1,6 @@
-import { CategoryKeyProps } from "./model-types";
+import { CategoryKeyProps, MusicGroupProps } from "./model-types";
 import categoryKeys from "@/json/template-key.json";
+import musicThemeKeys from "@/json/music-theme.json";
 
 const Configs = {
   app_name: "Wedlyvite",
@@ -22,3 +23,4 @@ const Configs = {
 export default Configs;
 
 export const CategoryKeys: CategoryKeyProps[] = categoryKeys;
+export const MusicThemeKeys: MusicGroupProps[] = musicThemeKeys;

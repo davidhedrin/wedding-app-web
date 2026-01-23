@@ -8,6 +8,8 @@ export type Color = {
   value: string;
 };
 
+export type StatusType = | "secondary" | "primary" | "success" | "warning" | "danger";
+
 export type ToastType = 'success' | 'info' | 'warning' | 'danger';
 
 export type FormState = {
@@ -57,4 +59,14 @@ export type CategoryKeyProps = {
   key: string;
   name: string;
   status: boolean;
+};
+
+export type MusicGroupProps = {
+  key: string;
+  items: MusicThemeProps[];
+};
+
+export type MusicThemeProps = {
+  name: string;
+  url: string;
 };

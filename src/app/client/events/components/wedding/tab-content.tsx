@@ -1,8 +1,8 @@
 import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
-import Configs from "@/lib/config";
-import { toast, toOrdinal } from "@/lib/utils";
+import Configs, { MusicThemeKeys } from "@/lib/config";
+import { playMusic, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -11,16 +11,13 @@ import Image from "next/image";
 import TableTopToolbar from "@/components/table-top-toolbar";
 import { TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
+import Select from "@/components/ui/select";
+import { TradRecepType } from "@/generated/prisma";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
   { ssr: false }
 );
-
-enum TradRecepType {
-  Traditional,
-  Reception
-}
 
 export default function TabContentWedding() {
   const tabContents = [
@@ -37,6 +34,9 @@ export default function TabContentWedding() {
 }
 
 function MainTabContent() {
+  const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
+
+  const [musicTheme, setMusicTheme] = useState<string>("");
   const [birthOrderGroom, setBirthOrderGroom] = useState<number | "">(1);
   const [birthOrderBride, setBirthOrderBride] = useState<number | "">(1);
   const [eventDate, setDateRange] = useState<Date | undefined>(undefined);
@@ -382,11 +382,29 @@ function MainTabContent() {
             )}
           </div>
         </div>
-        <div className="col-span-12 md:col-span-6">
+        <div className="col-span-12 md:col-span-4">
           <Input type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
         </div>
-        <div className="col-span-12 md:col-span-6">
+        <div className="col-span-12 md:col-span-4">
           <Input type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
+        </div>
+        <div className="col-span-12 md:col-span-4">
+          <Select value={musicTheme}
+            onChange={(e) => {
+              const url = e.target.value;
+              if (!url){
+                setMusicTheme("");
+                return;
+              }
+              setMusicTheme(e.target.value);
+              playMusic(url);
+            }}
+            onBlur={() => {
+              stopMusic();
+            }}
+            id='music_theme' label='Music Theme' placeholder='Select music theme'
+            options={musicThemeWedding?.items.map(x => ({ value: x.url, label: x.name })) || []}
+          />
         </div>
       </div>
 
@@ -421,7 +439,7 @@ function SchedulerTabContent() {
   // Traditional Reception Props
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
-  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
+  const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.TRADITIONAL);
 
   const [latLangMb, setLatLangMb] = useState<number[]>([]);
   const [latLangTr, setLatLangTr] = useState<number[]>([]);
@@ -560,8 +578,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-black">Traditional Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === TradRecepType.Traditional}
-                      onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
+                      checked={radioSelectTypeTr === TradRecepType.TRADITIONAL}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.TRADITIONAL)}
                       type="radio" name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
                     />
@@ -571,8 +589,8 @@ function SchedulerTabContent() {
                   <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
                     <span className="text-sm text-black">Reception Ceremony</span>
                     <input
-                      checked={radioSelectTypeTr === TradRecepType.Reception}
-                      onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
+                      checked={radioSelectTypeTr === TradRecepType.RECEPTION}
+                      onChange={() => setRadioSelectTypeTr(TradRecepType.RECEPTION)}
                       type="radio"
                       name="hs-radio-tr-type"
                       className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"
