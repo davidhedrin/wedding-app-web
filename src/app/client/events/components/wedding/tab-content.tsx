@@ -110,260 +110,244 @@ function MainTabContent() {
         </p>
       </div>
 
-      <div className="grid grid-cols-12 gap-3">
-        <div className="col-span-12">
-          <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <div className="font-semibold text-gray-800 mb-1.5">
-            <i className='bx bx-male-sign text-xl'></i> Groom Information
-            <p className="text-sm text-muted font-medium">Fill in the groom's information with an <span className="text-red-500">*</span> as a mandatory field.</p>
+      <form>
+        <div className="grid grid-cols-12 gap-3">
+          <div className="col-span-12">
+            <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
           </div>
-          <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
-            <div className="relative w-full h-48 md:h-64">
-              {
-                previewUrlGroom ? (
-                  <img
-                    className="w-full h-full object-cover"
-                    src={previewUrlGroom}
-                    alt="Card Image"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
-                    <i className="bx bx-image text-5xl"></i>
-                    <div className="flex items-center gap-1 text-sm">
-                      <i className="bx bx-upload text-lg"></i>
-                      No image selected
+          <div className="col-span-12 md:col-span-6">
+            <div className="font-semibold text-gray-800 mb-1.5">
+              <i className='bx bx-male-sign text-xl'></i> Groom Information
+              <p className="text-sm text-muted font-medium">Fill in the groom's information with an <span className="text-red-500">*</span> as a mandatory field.</p>
+            </div>
+            <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
+              <div className="relative w-full h-48 md:h-64">
+                {
+                  previewUrlGroom ? (
+                    <img
+                      className="w-full h-full object-cover"
+                      src={previewUrlGroom}
+                      alt="Card Image"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
+                      <i className="bx bx-image text-5xl"></i>
+                      <div className="flex items-center gap-1 text-sm">
+                        <i className="bx bx-upload text-lg"></i>
+                        No image selected
+                      </div>
                     </div>
+                  )
+                }
+
+                <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
+                  <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
+                    <i className='bx bx-image-add text-lg'></i>
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png"
+                      className="hidden"
+                    />
+                  </label>
+
+                  <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+                    <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
                   </div>
-                )
-              }
-
-              <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
-                <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
-                  <i className='bx bx-image-add text-lg'></i>
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png"
-                    className="hidden"
-                  />
-                </label>
-
-                <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                  <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
                 </div>
               </div>
-            </div>
 
-            <div className="p-3">
-              <div className="grid grid-cols-12 gap-2">
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='date' className='py-1.5' id='groom_birth_date' label='Birth Date' mandatory />
-                </div>
-                <div className="col-span-12 ">
-                  <Input type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_short_name' label='Short Name' placeholder='Enter short name' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input
-                    value={birthOrderGroom}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "") {
-                        setBirthOrderGroom("");
-                        return;
-                      }
+              <div className="p-3">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='date' className='py-1.5' id='groom_birth_date' label='Birth Date' mandatory />
+                  </div>
+                  <div className="col-span-12 ">
+                    <Input type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_short_name' label='Short Name' placeholder='Enter short name' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input
+                      value={birthOrderGroom}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          setBirthOrderGroom("");
+                          return;
+                        }
 
-                      const num = Number(value);
-                      if (num < 1) return;
+                        const num = Number(value);
+                        if (num < 1) return;
 
-                      setBirthOrderGroom(num);
-                    }}
-                    onBlur={() => {
-                      if (birthOrderGroom === "") {
-                        setBirthOrderGroom(1);
-                      }
-                    }}
-                    sufixGroup={<span>{typeof birthOrderGroom === "number" ? `${toOrdinal(birthOrderGroom)} Child` : "- Child"}</span>}
-                    type='number' min={1} className='py-1.5' id='groom_birth_order' label='Birth Order' placeholder='Order' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
-                </div>
-                <div className="col-span-12">
-                  <Textarea label="Personality Tagline" id="groom_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                        setBirthOrderGroom(num);
+                      }}
+                      onBlur={() => {
+                        if (birthOrderGroom === "") {
+                          setBirthOrderGroom(1);
+                        }
+                      }}
+                      sufixGroup={<span>{typeof birthOrderGroom === "number" ? `${toOrdinal(birthOrderGroom)} Child` : "- Child"}</span>}
+                      type='number' min={1} className='py-1.5' id='groom_birth_order' label='Birth Order' placeholder='Order' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea label="Personality Tagline" id="groom_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <div className="font-semibold text-gray-800 mb-1.5">
-            <i className='bx bx-female-sign text-xl'></i> Bride Information
-            <p className="text-sm text-muted font-medium">Fill in the bride's information with an <span className="text-red-500">*</span> as a mandatory field.</p>
-          </div>
-          <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
-            <div className="relative w-full h-48 md:h-64">
-              {
-                previewUrlBride ? (
-                  <img
-                    className="w-full h-full object-cover"
-                    src={previewUrlBride}
-                    alt="Card Image"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
-                    <i className="bx bx-image text-5xl"></i>
-                    <div className="flex items-center gap-1 text-sm">
-                      <i className="bx bx-upload text-lg"></i>
-                      No image selected
+          <div className="col-span-12 md:col-span-6">
+            <div className="font-semibold text-gray-800 mb-1.5">
+              <i className='bx bx-female-sign text-xl'></i> Bride Information
+              <p className="text-sm text-muted font-medium">Fill in the bride's information with an <span className="text-red-500">*</span> as a mandatory field.</p>
+            </div>
+            <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl overflow-hidden">
+              <div className="relative w-full h-48 md:h-64">
+                {
+                  previewUrlBride ? (
+                    <img
+                      className="w-full h-full object-cover"
+                      src={previewUrlBride}
+                      alt="Card Image"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
+                      <i className="bx bx-image text-5xl"></i>
+                      <div className="flex items-center gap-1 text-sm">
+                        <i className="bx bx-upload text-lg"></i>
+                        No image selected
+                      </div>
                     </div>
+                  )
+                }
+
+                <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
+                  <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
+                    <i className='bx bx-image-add text-lg'></i>
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png"
+                      className="hidden"
+                    />
+                  </label>
+
+                  <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+                    <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
                   </div>
-                )
-              }
-
-              <div className="absolute bottom-0 left-0 p-3 w-fit space-y-1">
-                <label className="bg-white bg-opacity-80 hover:bg-opacity-100 transition px-3 py-1 rounded-md text-sm cursor-pointer shadow-md flex items-center gap-1 w-fit">
-                  <i className='bx bx-image-add text-lg'></i>
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png"
-                    className="hidden"
-                  />
-                </label>
-
-                <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                  <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
                 </div>
               </div>
-            </div>
 
-            <div className="p-3">
-              <div className="grid grid-cols-12 gap-2">
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='date' className='py-1.5' id='bride_birth_date' label='Birth Date' mandatory />
-                </div>
-                <div className="col-span-12 ">
-                  <Input type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_short_name' label='Short Name' placeholder='Enter short name' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input
-                    value={birthOrderBride}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "") {
-                        setBirthOrderBride("");
-                        return;
-                      }
+              <div className="p-3">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='date' className='py-1.5' id='bride_birth_date' label='Birth Date' mandatory />
+                  </div>
+                  <div className="col-span-12 ">
+                    <Input type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_short_name' label='Short Name' placeholder='Enter short name' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input
+                      value={birthOrderBride}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "") {
+                          setBirthOrderBride("");
+                          return;
+                        }
 
-                      const num = Number(value);
-                      if (num < 1) return;
+                        const num = Number(value);
+                        if (num < 1) return;
 
-                      setBirthOrderBride(num);
-                    }}
-                    onBlur={() => {
-                      if (birthOrderBride === "") {
-                        setBirthOrderBride(1);
-                      }
-                    }}
-                    sufixGroup={<span>{typeof birthOrderBride === "number" ? `${toOrdinal(birthOrderBride)} Child` : "- Child"}</span>}
-                    type='number' min={1} className='py-1.5' id='bride_birth_order' label='Birth Order' placeholder='Order' mandatory />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
-                </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input type='text' className='py-1.5' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
-                </div>
-                <div className="col-span-12">
-                  <Textarea label="Personality Tagline" id="bride_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                        setBirthOrderBride(num);
+                      }}
+                      onBlur={() => {
+                        if (birthOrderBride === "") {
+                          setBirthOrderBride(1);
+                        }
+                      }}
+                      sufixGroup={<span>{typeof birthOrderBride === "number" ? `${toOrdinal(birthOrderBride)} Child` : "- Child"}</span>}
+                      type='number' min={1} className='py-1.5' id='bride_birth_order' label='Birth Order' placeholder='Order' mandatory />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea label="Personality Tagline" id="bride_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="col-span-12">
-          <label className="block text-sm font-medium mb-1 dark:text-white">
-            Couple Photo<span className="text-red-500">*</span>
-            <p className='text-sm text-muted'>Choose your couple photo will be displayed as the main cover on the homepage.</p>
-          </label>
+          <div className="col-span-12">
+            <label className="block text-sm font-medium mb-1 dark:text-white">
+              Couple Photo<span className="text-red-500">*</span>
+              <p className='text-sm text-muted'>Choose your couple photo will be displayed as the main cover on the homepage.</p>
+            </label>
 
-          <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture} className="hover:bg-gray-100 rounded-xl">
-            {!previewUrl ? (
-              // Drag & Drop UI
-              <label htmlFor="file-upload" className="cursor-pointer px-6 h-64 md:h-72 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
-                <div className="text-center">
-                  <span className="inline-flex justify-center items-center">
-                    <svg className="shrink-0 w-11 h-auto" width="71" height="51" viewBox="0 0 71 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6.55172 8.74547L17.7131 6.88524V40.7377L12.8018 41.7717C9.51306 42.464 6.29705 40.3203 5.67081 37.0184L1.64319 15.7818C1.01599 12.4748 3.23148 9.29884 6.55172 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
-                      <path d="M64.4483 8.74547L53.2869 6.88524V40.7377L58.1982 41.7717C61.4869 42.464 64.703 40.3203 65.3292 37.0184L69.3568 15.7818C69.984 12.4748 67.7685 9.29884 64.4483 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
-                      <g filter="url(#filter4)">
-                        <rect x="17.5656" y="1" width="35.8689" height="42.7541" rx="5" stroke="currentColor" strokeWidth="2" className="stroke-blue-600" shapeRendering="crispEdges"></rect>
-                      </g>
-                      <path d="M39.4826 33.0893C40.2331 33.9529 41.5385 34.0028 42.3537 33.2426L42.5099 33.0796L47.7453 26.976L53.4347 33.0981V38.7544C53.4346 41.5156 51.1959 43.7542 48.4347 43.7544H22.5656C19.8043 43.7544 17.5657 41.5157 17.5656 38.7544V35.2934L29.9728 22.145L39.4826 33.0893Z" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></path>
-                      <circle cx="40.0902" cy="14.3443" r="4.16393" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></circle>
-                    </svg>
-                  </span>
-
-                  <div className="flex flex-wrap justify-center text-sm/6 text-gray-600 mt-2">
-                    <span className="pe-1 font-medium text-gray-800">
-                      Drop file here or click to
+            <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture} className="hover:bg-gray-100 rounded-xl">
+              {!previewUrl ? (
+                // Drag & Drop UI
+                <label htmlFor="file-upload" className="cursor-pointer px-6 h-64 md:h-72 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
+                  <div className="text-center">
+                    <span className="inline-flex justify-center items-center">
+                      <svg className="shrink-0 w-11 h-auto" width="71" height="51" viewBox="0 0 71 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.55172 8.74547L17.7131 6.88524V40.7377L12.8018 41.7717C9.51306 42.464 6.29705 40.3203 5.67081 37.0184L1.64319 15.7818C1.01599 12.4748 3.23148 9.29884 6.55172 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
+                        <path d="M64.4483 8.74547L53.2869 6.88524V40.7377L58.1982 41.7717C61.4869 42.464 64.703 40.3203 65.3292 37.0184L69.3568 15.7818C69.984 12.4748 67.7685 9.29884 64.4483 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-blue-600"></path>
+                        <g filter="url(#filter4)">
+                          <rect x="17.5656" y="1" width="35.8689" height="42.7541" rx="5" stroke="currentColor" strokeWidth="2" className="stroke-blue-600" shapeRendering="crispEdges"></rect>
+                        </g>
+                        <path d="M39.4826 33.0893C40.2331 33.9529 41.5385 34.0028 42.3537 33.2426L42.5099 33.0796L47.7453 26.976L53.4347 33.0981V38.7544C53.4346 41.5156 51.1959 43.7542 48.4347 43.7544H22.5656C19.8043 43.7544 17.5657 41.5157 17.5656 38.7544V35.2934L29.9728 22.145L39.4826 33.0893Z" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></path>
+                        <circle cx="40.0902" cy="14.3443" r="4.16393" className="fill-blue-50 stroke-blue-600" fill="currentColor" stroke="currentColor" strokeWidth="2"></circle>
+                      </svg>
                     </span>
-                    <span className="font-semibold text-blue-600 hover:underline">
-                      browse
-                    </span>
-                  </div>
 
-                  <p className="text-xs text-gray-400 mt-0">
-                    Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB
-                  </p>
+                    <div className="flex flex-wrap justify-center text-sm/6 text-gray-600 mt-2">
+                      <span className="pe-1 font-medium text-gray-800">
+                        Drop file here or click to
+                      </span>
+                      <span className="font-semibold text-blue-600 hover:underline">
+                        browse
+                      </span>
+                    </div>
 
-                  <input
-                    type="file"
-                    onChange={handleFileCaptureChange}
-                    id="file-upload"
-                    className="hidden"
-                    accept="image/jpeg,image/png,image/jpg"
-                  />
-                </div>
-              </label>
-            ) : (
-              // Image UI
-              <div className="relative w-full">
-                <img src={previewUrl} alt="Preview" className="w-full h-64 md:h-72 object-cover rounded-xl" />
+                    <p className="text-xs text-gray-400 mt-0">
+                      Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB
+                    </p>
 
-                <div className="absolute bottom-0 right-0 p-3 flex flex-col items-end gap-1">
-                  <label htmlFor="file-upload" className="bg-white/90 hover:bg-white px-3 py-1.5 rounded-md shadow text-sm cursor-pointer transition">
-                    <i className='bx bx-upload text-lg'></i> Change Photo
                     <input
                       type="file"
                       onChange={handleFileCaptureChange}
@@ -371,49 +355,67 @@ function MainTabContent() {
                       className="hidden"
                       accept="image/jpeg,image/png,image/jpg"
                     />
-                  </label>
+                  </div>
+                </label>
+              ) : (
+                // Image UI
+                <div className="relative w-full">
+                  <img src={previewUrl} alt="Preview" className="w-full h-64 md:h-72 object-cover rounded-xl" />
 
-                  <span className="text-xs text-white bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm">
-                    <p>Drop or click change button to browse.</p>
-                    <p>Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB</p>
-                  </span>
+                  <div className="absolute bottom-0 right-0 p-3 flex flex-col items-end gap-1">
+                    <label htmlFor="file-upload" className="bg-white/90 hover:bg-white px-3 py-1.5 rounded-md shadow text-sm cursor-pointer transition">
+                      <i className='bx bx-upload text-lg'></i> Change Photo
+                      <input
+                        type="file"
+                        onChange={handleFileCaptureChange}
+                        id="file-upload"
+                        className="hidden"
+                        accept="image/jpeg,image/png,image/jpg"
+                      />
+                    </label>
+
+                    <span className="text-xs text-white bg-black/60 px-2 py-1 rounded-md backdrop-blur-sm">
+                      <p>Drop or click change button to browse.</p>
+                      <p>Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB</p>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+          <div className="col-span-12 md:col-span-4">
+            <Input type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
+          </div>
+          <div className="col-span-12 md:col-span-4">
+            <Input type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
+          </div>
+          <div className="col-span-12 md:col-span-4">
+            <Select value={musicTheme}
+              onChange={(e) => {
+                const url = e.target.value;
+                if (!url) {
+                  setMusicTheme("");
+                  return;
+                }
+                setMusicTheme(e.target.value);
+                playMusic(url);
+              }}
+              onBlur={() => {
+                stopMusic();
+              }}
+              id='music_theme' label='Music Theme' placeholder='Select music theme'
+              options={musicThemeWedding?.items.map(x => ({ value: x.url, label: x.name })) || []}
+            />
           </div>
         </div>
-        <div className="col-span-12 md:col-span-4">
-          <Input type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
-        </div>
-        <div className="col-span-12 md:col-span-4">
-          <Input type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
-        </div>
-        <div className="col-span-12 md:col-span-4">
-          <Select value={musicTheme}
-            onChange={(e) => {
-              const url = e.target.value;
-              if (!url){
-                setMusicTheme("");
-                return;
-              }
-              setMusicTheme(e.target.value);
-              playMusic(url);
-            }}
-            onBlur={() => {
-              stopMusic();
-            }}
-            id='music_theme' label='Music Theme' placeholder='Select music theme'
-            options={musicThemeWedding?.items.map(x => ({ value: x.url, label: x.name })) || []}
-          />
-        </div>
-      </div>
 
-      <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">
-        <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
-      </div>
-      <button type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-        Submit
-      </button>
+        <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">
+          <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+        </div>
+        <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+          Submit
+        </button>
+      </form>
     </div>
   )
 };
