@@ -45,10 +45,10 @@ enum TradRecepType {
   Reception
 }
 
-enum ScheduleWeddingEnum {
-  MB
-  TOR
-  CST
+enum ScheduleEnum {
+  WED_MB
+  WED_TOR
+  WED_CST
 }
 
 enum GroomBrideEnum {
@@ -260,7 +260,7 @@ model GroomBrideInfo {
 model ScheduleInfo {
   id            Int                 @id @default(autoincrement())
   event_id      Int
-  type          ScheduleWeddingEnum
+  type          ScheduleEnum
   date          DateTime
   start_time    String
   end_time      String?

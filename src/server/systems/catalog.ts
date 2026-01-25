@@ -7,7 +7,7 @@ import { DtoTemplates } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { genSlugify } from "@/lib/utils";
 import Configs, { CategoryKeys } from "@/lib/config";
-import { DeleteFile, UploadFile } from "../common";
+import { DeleteFile, UploadFileCompress } from "../common";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 
 type GetDataTemplatesParams = {
@@ -58,7 +58,7 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     await Promise.all(
       formData.captures.map(async (x) => {
         if (x.file !== null) {
-          const upFile = await UploadFile(x.file, directoryImg);
+          var upFile = await UploadFileCompress(x.file, "webp", directoryImg);
           if (upFile?.status) {
             x.file_name = upFile.filename;
             x.file_path = `${Configs.base_url}/template/${upFile.filename}`;

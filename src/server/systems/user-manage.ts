@@ -5,7 +5,7 @@ import { Prisma, User } from "@/generated/prisma";
 import { db } from "../../../prisma/db-init";
 import { auth } from "@/app/api/auth/auth-setup";
 import { DtoUser } from "@/lib/dto";
-import { DeleteFile, UploadFile } from "../common";
+import { DeleteFile, UploadFileCompress } from "../common";
 import Configs from "@/lib/config";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 
@@ -54,7 +54,8 @@ export async function UpdateDataUser(formData: DtoUser) {
     if(findUserData && findUserData.image && formData.img_url === null) await DeleteFile(directoryImg, findUserData.image);
     if(formData.file_img !== null) {
       if(findUserData && findUserData.image) await DeleteFile(directoryImg, findUserData.image);
-      var upFile = await UploadFile(formData.file_img, directoryImg);
+
+      var upFile = await UploadFileCompress(formData.file_img, "webp", directoryImg);
       if(upFile != null && upFile.status == true) {
         formData.img_name = upFile.filename;
         formData.img_url = `${Configs.base_url}/upload/profile/${upFile.filename}`;

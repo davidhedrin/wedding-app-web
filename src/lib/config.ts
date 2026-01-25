@@ -11,7 +11,7 @@ const Configs = {
   valid_reset_pass: 5, // Minute
   valid_email_verify: 5, // Minute
 
-  maxSizePictureInMB: 1,
+  maxSizePictureInMB: 5,
   nameBtnSubmit: "submitType",
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
