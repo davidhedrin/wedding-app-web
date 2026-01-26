@@ -119,12 +119,13 @@ export type DtoTr = {
 
 export type DtoMainInfoWedding = {
   greeting_msg: string | null,
+  couple_img_name: string | null,
   couple_img_url: string | null,
-  couple_img_path: string | null,
   couple_file_img: File | null;
   contact_email: string | null,
   contact_phone: string | null,
   music_url: string | null,
+  groom_bride: DtoGroomBride[];
 };
 
 export type DtoGroomBride = {
@@ -140,7 +141,7 @@ export type DtoGroomBride = {
   place_origin: string | null,
   occupation: string | null,
   personal_msg: string | null,
+  img_name: string | null,
   img_url: string | null,
-  img_path: string | null,
   file_img: File | null;
 };

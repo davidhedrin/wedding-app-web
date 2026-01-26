@@ -4,7 +4,8 @@ import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
+import { DtoMainInfoWedding } from "@/lib/dto";
 
-export async function StoreUpdateMainInfoWedding() {
+export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
   
 }

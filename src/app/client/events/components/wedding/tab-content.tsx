@@ -2,17 +2,20 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys } from "@/lib/config";
-import { playMusic, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { playMusic, showConfirm, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import TableTopToolbar from "@/components/table-top-toolbar";
-import { TableShortList, TableThModel } from "@/lib/model-types";
+import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { TradRecepType } from "@/generated/prisma";
+import { GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import z from "zod";
+import { useLoading } from "@/components/loading/loading-context";
+import { DtoMainInfoWedding } from "@/lib/dto";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -34,20 +37,48 @@ export default function TabContentWedding() {
 }
 
 function MainTabContent() {
+  const { setLoading } = useLoading();
+
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
+  const [stateFormMainInfo, setStateFormMainInfo] = useState<FormState>({ success: false, errors: {} });
 
+  const [greetingMessage, setGreetingMessage] = useState<string>("");
+  const [contactEmail, setContactEmail] = useState<string>("");
+  const [contactPhone, setContactPhone] = useState<string>("");
   const [musicTheme, setMusicTheme] = useState<string>("");
-  const [birthOrderGroom, setBirthOrderGroom] = useState<number | "">(1);
-  const [birthOrderBride, setBirthOrderBride] = useState<number | "">(1);
-  const [eventDate, setDateRange] = useState<Date | undefined>(undefined);
+  const [imageFileCouple, setImageFileCouple] = useState<File | null>(null);
+  const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(null);
 
+  // Groom Info
+  const [groomId, setGroomId] = useState<number | null>(null);
+  const [groomFullname, setGroomFullname] = useState<string>("");
+  const [groomShortname, setGroomShortname] = useState<string>("");
+  const [groomBirthDate, setGroomBirthDate] = useState<Date>(new Date());
+  const [groomBirthPlace, setGroomBirthPlace] = useState("");
+  const [groomFathername, setGroomFathername] = useState<string>("");
+  const [groomMothername, setGroomMothername] = useState<string>("");
+  const [groomPlaceOrigin, setGroomPlaceOrigin] = useState<string>("");
+  const [groomOccupation, setGroomOccupation] = useState<string>("");
+  const [groomPersonalMsg, setGroomPersonalMsg] = useState<string>("");
+  const [birthOrderGroom, setBirthOrderGroom] = useState<number | "">(1);
   const [imageFileGroom, setImageFileGroom] = useState<File | null>(null);
   const [previewUrlGroom, setPreviewUrlGroom] = useState<string | null>(null);
+
+  // Bride Info
+  const [brideId, setBrideId] = useState<number | null>(null);
+  const [brideFullname, setBrideFullname] = useState<string>("");
+  const [brideShortname, setBrideShortname] = useState<string>("");
+  const [brideBirthDate, setBrideBirthDate] = useState<Date>(new Date());
+  const [brideBirthPlace, setBrideBirthPlace] = useState("");
+  const [brideFathername, setBrideFathername] = useState<string>("");
+  const [brideMothername, setBrideMothername] = useState<string>("");
+  const [bridePlaceOrigin, setBridePlaceOrigin] = useState<string>("");
+  const [brideOccupation, setBrideOccupation] = useState<string>("");
+  const [bridePersonalMsg, setBridePersonalMsg] = useState<string>("");
+  const [birthOrderBride, setBirthOrderBride] = useState<number | "">(1);
   const [imageFileBride, setImageFileBride] = useState<File | null>(null);
   const [previewUrlBride, setPreviewUrlBride] = useState<string | null>(null);
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const handleFileCaptureChange = (e: { target: { files: FileList | null } }) => {
     const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
     const maxSizeInMB = Configs.maxSizePictureInMB;
@@ -76,8 +107,8 @@ function MainTabContent() {
       return;
     };
 
-    setImageFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    setImageFileCouple(file);
+    setPreviewUrlCouple(URL.createObjectURL(file));
   };
 
   const handleDragOverCapture = (e: React.DragEvent<HTMLDivElement>) => {
@@ -99,6 +130,108 @@ function MainTabContent() {
     handleFileCaptureChange({ target: { files } });
   };
 
+
+  const createDtoData = (): DtoMainInfoWedding => {
+    const newData: DtoMainInfoWedding = {
+      greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
+      contact_email: contactEmail.trim() != "" ? contactEmail : null,
+      contact_phone: contactPhone.trim() != "" ? contactPhone : null,
+      music_url: musicTheme.trim() != "" ? musicTheme : null,
+      groom_bride: [
+        {
+          id: groomId,
+          type: GroomBrideEnum.Groom,
+          fullname: groomFullname,
+          shortname: groomShortname,
+          birth_place: groomBirthPlace,
+          birth_date: groomBirthDate,
+          birth_order: birthOrderGroom === "" ? 1 : birthOrderGroom,
+          father_name: groomFathername.trim() != "" ? groomFathername : null,
+          mother_name: groomMothername.trim() != "" ? groomMothername : null,
+          place_origin: groomPlaceOrigin.trim() != "" ? groomPlaceOrigin : null,
+          occupation: groomOccupation.trim() != "" ? groomOccupation : null,
+          personal_msg: groomPersonalMsg.trim() != "" ? groomPersonalMsg : null,
+          img_name: null,
+          img_url: previewUrlGroom ?? null,
+          file_img: imageFileGroom,
+        },
+        {
+          id: brideId,
+          type: GroomBrideEnum.Bride,
+          fullname: brideFullname,
+          shortname: brideShortname,
+          birth_place: brideBirthPlace,
+          birth_date: brideBirthDate,
+          birth_order: birthOrderBride === "" ? 1 : birthOrderBride,
+          father_name: brideFathername.trim() != "" ? brideFathername : null,
+          mother_name: brideMothername.trim() != "" ? brideMothername : null,
+          place_origin: bridePlaceOrigin.trim() != "" ? bridePlaceOrigin : null,
+          occupation: brideOccupation.trim() != "" ? brideOccupation : null,
+          personal_msg: bridePersonalMsg.trim() != "" ? bridePersonalMsg : null,
+          img_name: null,
+          img_url: previewUrlBride ?? null,
+          file_img: imageFileBride,
+        }
+      ],
+
+      couple_img_name: null,
+      couple_img_url: previewUrlCouple ?? null,
+      couple_file_img: imageFileCouple,
+    };
+
+
+
+    return newData;
+  };
+
+  const FormSchemaMainInfo = z.object({
+    is_active: z.string().min(1, { message: 'Status is required field.' }).trim(),
+  });
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaMainInfo.safeParse(data);
+    if (!valResult.success) {
+      setStateFormMainInfo({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormMainInfo({ success: true, errors: {} });
+
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      // await StoreUpdateDataVouchers(createDtoData());
+      // await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+    }
+    setLoading(false);
+  };
+
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -110,7 +243,7 @@ function MainTabContent() {
         </p>
       </div>
 
-      <form>
+      <form onSubmit={handleSubmitForm}>
         <div className="grid grid-cols-12 gap-3">
           <div className="col-span-12">
             <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
@@ -319,7 +452,7 @@ function MainTabContent() {
             </label>
 
             <div onDragOver={handleDragOverCapture} onDrop={handleDropCapture} onDragLeave={handleDragLeaveCapture} className="hover:bg-gray-100 rounded-xl">
-              {!previewUrl ? (
+              {!previewUrlCouple ? (
                 // Drag & Drop UI
                 <label htmlFor="file-upload" className="cursor-pointer px-6 h-64 md:h-72 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
                   <div className="text-center">
@@ -360,7 +493,7 @@ function MainTabContent() {
               ) : (
                 // Image UI
                 <div className="relative w-full">
-                  <img src={previewUrl} alt="Preview" className="w-full h-64 md:h-72 object-cover rounded-xl" />
+                  <img src={previewUrlCouple} alt="Preview" className="w-full h-64 md:h-72 object-cover rounded-xl" />
 
                   <div className="absolute bottom-0 right-0 p-3 flex flex-col items-end gap-1">
                     <label htmlFor="file-upload" className="bg-white/90 hover:bg-white px-3 py-1.5 rounded-md shadow text-sm cursor-pointer transition">

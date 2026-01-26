@@ -176,7 +176,7 @@ model Events {
   tmp_ctg_key String
 
   greeting_msg    String?
-  couple_img_url  String?
+  couple_img_name String?
   couple_img_path String?
   contact_email   String?
   contact_phone   String?
@@ -246,7 +246,7 @@ model GroomBrideInfo {
   place_origin String?
   occupation   String?
   personal_msg String?
-  img_url      String?
+  img_name      String?
   img_path     String?
 
   createdBy String?
@@ -258,7 +258,7 @@ model GroomBrideInfo {
 }
 
 model ScheduleInfo {
-  id            Int                 @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   event_id      Int
   type          ScheduleEnum
   date          DateTime
@@ -270,7 +270,7 @@ model ScheduleInfo {
   longitude     String?
   notes         String[]
   ceremony_type TradRecepType?
-  use_mb_loc    Boolean             @default(false)
+  use_mb_loc    Boolean        @default(false)
 
   createdBy String?
   updatedBy String?
