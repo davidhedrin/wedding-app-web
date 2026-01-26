@@ -16,6 +16,7 @@ import { GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoMainInfoWedding } from "@/lib/dto";
+import { ZodErrors } from "@/components/zod-errors";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -131,6 +132,43 @@ function MainTabContent() {
   };
 
 
+  const handleFileGroomBride = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
+      const maxSizeInMB = Configs.maxSizePictureInMB;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          type: "warning",
+          title: "Invalid File Type",
+          message: "Only JPG, JPEG, or PNG files are allowed."
+        });
+        e.target.value = "";
+        return;
+      };
+      if (file.size > maxSizeInBytes) {
+        toast({
+          type: "warning",
+          title: "File Too Large",
+          message: `The file size must be less than ${maxSizeInMB}MB.`
+        });
+        e.target.value = "";
+        return;
+      };
+
+      const objectUrl = URL.createObjectURL(file);
+      // setUrlPrevPP(objectUrl);
+      // setFilePP(file);
+    } else {
+      // setUrlPrevPP(undefined);
+      // setFilePP(null);
+    }
+  };
+
   const createDtoData = (): DtoMainInfoWedding => {
     const newData: DtoMainInfoWedding = {
       greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
@@ -179,19 +217,50 @@ function MainTabContent() {
       couple_file_img: imageFileCouple,
     };
 
-
-
     return newData;
   };
 
   const FormSchemaMainInfo = z.object({
-    is_active: z.string().min(1, { message: 'Status is required field.' }).trim(),
+    greeting_message: z.string().min(1, { message: "Greeting message is required field." }).trim(),
+
+    groom_img_prev: z.string().min(1, { message: "Groom's photo is required field." }).trim(),
+    groom_birth_place: z.string().min(1, { message: 'Birth place is required field.' }).trim(),
+    groom_birth_date: z.string().min(1, { message: 'Birth date is required field.' }).trim().refine(
+      (date) => {
+        if (!date) return true
+        return new Date(date) <= new Date()
+      },
+      { message: 'Birth date cannot be in the future.' }
+    ),
+    groom_full_name: z.string().min(1, { message: 'Full name is required field.' }).trim(),
+    groom_short_name: z.string().min(1, { message: 'Short name is required field.' }).trim(),
+    // groom_birth_order: z.coerce.number().min(1, { message: 'Birth order must be at least 1.' }),
+
+    bride_img_prev: z.string().min(1, { message: "Bride's photo is required field." }).trim(),
+    bride_birth_place: z.string().min(1, { message: 'Birth place is required field.' }).trim(),
+    bride_birth_date: z.string().min(1, { message: 'Birth date is required field.' }).trim().refine(
+      (date) => {
+        if (!date) return true
+        return new Date(date) <= new Date()
+      },
+      { message: 'Birth date cannot be in the future.' }
+    ),
+    bride_full_name: z.string().min(1, { message: 'Full name is required field.' }).trim(),
+    bride_short_name: z.string().min(1, { message: 'Short name is required field.' }).trim(),
+
+    couple_img_prev: z.string().min(1, { message: "Couple's photo is required field." }).trim(),
   });
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
+    formData.append("groom_img_prev", "");
+    formData.append("bride_img_prev", "");
+    formData.append("couple_img_prev", "");
+    if (previewUrlGroom) formData.append("groom_img_prev", previewUrlGroom.toString());
+    if (previewUrlBride) formData.append("bride_img_prev", previewUrlBride.toString());
+    if (previewUrlCouple) formData.append("couple_img_prev", previewUrlCouple.toString());
 
     const data = Object.fromEntries(formData);
     const valResult = FormSchemaMainInfo.safeParse(data);
@@ -246,7 +315,8 @@ function MainTabContent() {
       <form onSubmit={handleSubmitForm}>
         <div className="grid grid-cols-12 gap-3">
           <div className="col-span-12">
-            <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} />
+            <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} mandatory />
+            {stateFormMainInfo.errors?.greeting_message && <ZodErrors err={stateFormMainInfo.errors?.greeting_message} />}
           </div>
           <div className="col-span-12 md:col-span-6">
             <div className="font-semibold text-gray-800 mb-1.5">
@@ -278,6 +348,7 @@ function MainTabContent() {
                     <i className='bx bx-image-add text-lg'></i>
                     Upload
                     <input
+                      id="groom_file_input"
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
                       className="hidden"
@@ -286,6 +357,7 @@ function MainTabContent() {
 
                   <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
                     <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
+                    {stateFormMainInfo.errors?.groom_img_prev && <ZodErrors err={stateFormMainInfo.errors?.groom_img_prev} />}
                   </div>
                 </div>
               </div>
@@ -294,15 +366,19 @@ function MainTabContent() {
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
                     <Input type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    {stateFormMainInfo.errors?.groom_birth_place && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input type='date' className='py-1.5' id='groom_birth_date' label='Birth Date' mandatory />
+                    {stateFormMainInfo.errors?.groom_birth_date && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_date} />}
                   </div>
                   <div className="col-span-12 ">
                     <Input type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    {stateFormMainInfo.errors?.groom_full_name && <ZodErrors err={stateFormMainInfo.errors?.groom_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input type='text' className='py-1.5' id='groom_short_name' label='Short Name' placeholder='Enter short name' mandatory />
+                    {stateFormMainInfo.errors?.groom_short_name && <ZodErrors err={stateFormMainInfo.errors?.groom_short_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input
@@ -376,6 +452,7 @@ function MainTabContent() {
                     <i className='bx bx-image-add text-lg'></i>
                     Upload
                     <input
+                      id="groom_file_input"
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
                       className="hidden"
@@ -384,6 +461,7 @@ function MainTabContent() {
 
                   <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
                     <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
+                    {stateFormMainInfo.errors?.groom_img_prev && <ZodErrors err={stateFormMainInfo.errors?.groom_img_prev} />}
                   </div>
                 </div>
               </div>
@@ -392,15 +470,19 @@ function MainTabContent() {
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
                     <Input type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    {stateFormMainInfo.errors?.bride_birth_order && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_order} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input type='date' className='py-1.5' id='bride_birth_date' label='Birth Date' mandatory />
+                    {stateFormMainInfo.errors?.bride_birth_date && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_date} />}
                   </div>
                   <div className="col-span-12 ">
                     <Input type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    {stateFormMainInfo.errors?.bride_full_name && <ZodErrors err={stateFormMainInfo.errors?.bride_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input type='text' className='py-1.5' id='bride_short_name' label='Short Name' placeholder='Enter short name' mandatory />
+                    {stateFormMainInfo.errors?.bride_short_name && <ZodErrors err={stateFormMainInfo.errors?.bride_short_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input
@@ -515,6 +597,7 @@ function MainTabContent() {
                 </div>
               )}
             </div>
+            {stateFormMainInfo.errors?.couple_img_prev && <ZodErrors err={stateFormMainInfo.errors?.couple_img_prev} />}
           </div>
           <div className="col-span-12 md:col-span-4">
             <Input type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
