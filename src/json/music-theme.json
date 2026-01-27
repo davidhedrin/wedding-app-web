@@ -4,7 +4,7 @@
     "items": [
       {
         "name": "Wedding 1",
-        "url": "https://gae4w7dvfcvfkeeu.public.blob.vercel-storage.com/music-1.mp3"
+        "url": "https://pub-cc4d35e253f14cad975dc2e6d39dbee6.r2.dev/music-1.mp3"
       }
     ]
   },
@@ -13,7 +13,7 @@
     "items": [
       {
         "name": "Birthday 1",
-        "url": "https://gae4w7dvfcvfkeeu.public.blob.vercel-storage.com/music-1.mp3"
+        "url": "https://pub-cc4d35e253f14cad975dc2e6d39dbee6.r2.dev/music-1.mp3"
       }
     ]
   }

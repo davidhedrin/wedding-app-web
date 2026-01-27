@@ -531,7 +531,7 @@ export default function Page() {
                           </div>
 
                           <div className="w-full sm:border-s border-gray-200 sm:ps-4 pt-3 sm:pt-0">
-                            <TabContentWraper event_type={dataEvent.tmp_ctg_key} />
+                            <TabContentWraper event_type={dataEvent.tmp_ctg_key} event_id={dataEvent.id} />
                           </div>
 
                           {/* <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">

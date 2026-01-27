@@ -7,7 +7,7 @@ import { DtoTemplates } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { genSlugify } from "@/lib/utils";
 import Configs, { CategoryKeys } from "@/lib/config";
-import { DeleteFile, UploadFileCompress } from "../common";
+import { CloudflareDeleteFile, CloudflareUploadFile } from "../common";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 
 type GetDataTemplatesParams = {
@@ -54,14 +54,13 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     const data_id = formData.id ?? 0;
     const findCategory = CategoryKeys.find(x => x.key === formData.ctg_key);
 
-    const directoryImg = "public/template";
     await Promise.all(
       formData.captures.map(async (x) => {
         if (x.file !== null) {
-          var upFile = await UploadFileCompress(x.file, "webp", directoryImg);
+          var upFile = await CloudflareUploadFile(x.file, "webp", Configs.s3_bucket, "template");
           if (upFile?.status) {
             x.file_name = upFile.filename;
-            x.file_path = `${Configs.base_url}/template/${upFile.filename}`;
+            x.file_path = upFile.path;
           }
         }
       })
@@ -74,7 +73,7 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
       old.id != null && cur.id === old.id ? true : old.file_name && cur.file_name === old.file_name
     ));
     await Promise.all(deletedCaptures.map(async (x: any) => {
-      if (x.file_name) await DeleteFile(directoryImg, x.file_name);
+      if (x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
       await db.templateCaptures.delete({ where: { id: x.id } });
     }));
 
@@ -151,6 +150,14 @@ export async function DeleteDataTemplates(id: number) {
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
+
+    const getAllCaptureTemp = await db.templateCaptures.findMany({
+      where: { tmp_id: id }
+    });
+    
+    getAllCaptureTemp.forEach((x: any) => {
+      if (x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
+    });
     
     await db.templates.update({
       where: { id },

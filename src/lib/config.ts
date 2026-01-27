@@ -18,7 +18,9 @@ const Configs = {
   priceAddOn1: 49000,
 
   tryDays: 3,
-  toastDuration: 4000 // In second
+  toastDuration: 4000, // In second
+
+  s3_bucket: "wedlyvite",
 };
 export default Configs;
 

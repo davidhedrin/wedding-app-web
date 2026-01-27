@@ -5,7 +5,7 @@ import { Prisma, User } from "@/generated/prisma";
 import { db } from "../../../prisma/db-init";
 import { auth } from "@/app/api/auth/auth-setup";
 import { DtoUser } from "@/lib/dto";
-import { DeleteFile, UploadFileCompress } from "../common";
+import { CloudflareDeleteFile, CloudflareUploadFile, DeleteFile, UploadFileCompress } from "../common";
 import Configs from "@/lib/config";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 
@@ -50,15 +50,27 @@ export async function UpdateDataUser(formData: DtoUser) {
       where: { id: data_id }
     });
 
-    const directoryImg = "public/upload/profile";
-    if(findUserData && findUserData.image && formData.img_url === null) await DeleteFile(directoryImg, findUserData.image);
-    if(formData.file_img !== null) {
-      if(findUserData && findUserData.image) await DeleteFile(directoryImg, findUserData.image);
+    // *** To local storage version ***
+    // const directoryImg = "public/upload/profile";
+    // if(findUserData && findUserData.image && formData.img_url === null) await DeleteFile(directoryImg, findUserData.image);
+    // if(formData.file_img !== null) {
+    //   if(findUserData && findUserData.image) await DeleteFile(directoryImg, findUserData.image);
 
-      var upFile = await UploadFileCompress(formData.file_img, "webp", directoryImg);
+    //   var upFile = await UploadFileCompress(formData.file_img, "webp", directoryImg);
+    //   if(upFile != null && upFile.status == true) {
+    //     formData.img_name = upFile.filename;
+    //     formData.img_url = `${Configs.base_url}/upload/profile/${upFile.filename}`;
+    //   };
+    // };
+
+    if(findUserData && findUserData.image && formData.img_url === null) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+    if(formData.file_img !== null) {
+      if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+
+      var upFile = await CloudflareUploadFile(formData.file_img, "webp", Configs.s3_bucket, "user-profile");
       if(upFile != null && upFile.status == true) {
         formData.img_name = upFile.filename;
-        formData.img_url = `${Configs.base_url}/upload/profile/${upFile.filename}`;
+        formData.img_url = upFile.path;
       };
     };
     
@@ -95,6 +107,11 @@ export async function DeleteDataUser(id: number) {
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
     
+    const findUserData = await db.user.findUnique({
+      where: { id }
+    });
+    if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+
     await db.user.update({
       where: { id },
       data: {

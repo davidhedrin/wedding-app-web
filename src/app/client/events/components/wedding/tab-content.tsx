@@ -17,27 +17,28 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoMainInfoWedding } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
+import { StoreUpdateMainInfoWedding } from "@/server/event-detail";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
   { ssr: false }
 );
 
-export default function TabContentWedding() {
+export default function TabContentWedding({event_id}: {event_id: number}) {
   const tabContents = [
-    { id: "main-info", content: MainTabContent() },
-    { id: "scheduler", content: SchedulerTabContent() },
-    { id: "gallery", content: GalleryTabContent() },
-    { id: "history", content: HistoryTabContent() },
-    { id: "gift", content: GiftTabContent() },
-    { id: "rsvp", content: RSVPTabContent() },
-    { id: "faq", content: FAQTabContent() },
+    { id: "main-info", content: MainTabContent(event_id) },
+    { id: "scheduler", content: SchedulerTabContent(event_id) },
+    { id: "gallery", content: GalleryTabContent(event_id) },
+    { id: "history", content: HistoryTabContent(event_id) },
+    { id: "gift", content: GiftTabContent(event_id) },
+    { id: "rsvp", content: RSVPTabContent(event_id) },
+    { id: "faq", content: FAQTabContent(event_id) },
   ];
 
   return <ContentComponent tabContents={tabContents} />;
 }
 
-function MainTabContent() {
+function MainTabContent(event_id: number) {
   const { setLoading } = useLoading();
 
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
@@ -133,6 +134,7 @@ function MainTabContent() {
 
 
   const handleFileGroomBride = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputId = e.currentTarget.id;
     if (e.target.files) {
       const file = e.target.files[0];
       if (!file) return;
@@ -161,16 +163,27 @@ function MainTabContent() {
       };
 
       const objectUrl = URL.createObjectURL(file);
-      // setUrlPrevPP(objectUrl);
-      // setFilePP(file);
+      if (inputId === "groom_file_input") {
+        setPreviewUrlGroom(objectUrl);
+        setImageFileGroom(file);
+      } else if (inputId === "bride_file_input") {
+        setPreviewUrlBride(objectUrl);
+        setImageFileBride(file);
+      }
     } else {
-      // setUrlPrevPP(undefined);
-      // setFilePP(null);
+      if (inputId === "groom_file_input") {
+        setPreviewUrlGroom(null);
+        setImageFileGroom(null);
+      } else if (inputId === "bride_file_input") {
+        setPreviewUrlBride(null);
+        setImageFileBride(null);
+      }
     }
   };
 
   const createDtoData = (): DtoMainInfoWedding => {
     const newData: DtoMainInfoWedding = {
+      id: event_id,
       greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
@@ -284,7 +297,7 @@ function MainTabContent() {
 
     setLoading(true);
     try {
-      // await StoreUpdateDataVouchers(createDtoData());
+      await StoreUpdateMainInfoWedding(createDtoData());
       // await fatchDatas();
       toast({
         type: "success",
@@ -348,6 +361,7 @@ function MainTabContent() {
                     <i className='bx bx-image-add text-lg'></i>
                     Upload
                     <input
+                      onChange={handleFileGroomBride}
                       id="groom_file_input"
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
@@ -452,7 +466,8 @@ function MainTabContent() {
                     <i className='bx bx-image-add text-lg'></i>
                     Upload
                     <input
-                      id="groom_file_input"
+                      onChange={handleFileGroomBride}
+                      id="bride_file_input"
                       type="file"
                       accept="image/jpeg,image/jpg,image/png"
                       className="hidden"
@@ -461,7 +476,7 @@ function MainTabContent() {
 
                   <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
                     <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
-                    {stateFormMainInfo.errors?.groom_img_prev && <ZodErrors err={stateFormMainInfo.errors?.groom_img_prev} />}
+                    {stateFormMainInfo.errors?.bride_img_prev && <ZodErrors err={stateFormMainInfo.errors?.bride_img_prev} />}
                   </div>
                 </div>
               </div>
@@ -470,7 +485,7 @@ function MainTabContent() {
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
                     <Input type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
-                    {stateFormMainInfo.errors?.bride_birth_order && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_order} />}
+                    {stateFormMainInfo.errors?.bride_birth_place && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input type='date' className='py-1.5' id='bride_birth_date' label='Birth Date' mandatory />
@@ -647,7 +662,7 @@ type SchedulerDto = {
   notes: string[];
   langLat: number[];
 };
-function SchedulerTabContent() {
+function SchedulerTabContent(event_id: number) {
   const { activeIdxTab } = useTabEventDetail();
 
   // Marriage Blessing Props
@@ -1024,7 +1039,7 @@ type UploadedImage = {
   url: string;
   file?: File;
 };
-function GalleryTabContent() {
+function GalleryTabContent(event_id: number) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<UploadedImage[]>([]);
 
@@ -1203,7 +1218,7 @@ function GalleryTabContent() {
   )
 };
 
-function HistoryTabContent() {
+function HistoryTabContent(event_id: number) {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -1274,7 +1289,7 @@ function HistoryTabContent() {
   )
 };
 
-function GiftTabContent() {
+function GiftTabContent(event_id: number) {
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -1347,7 +1362,7 @@ function GiftTabContent() {
   )
 };
 
-function RSVPTabContent() {
+function RSVPTabContent(event_id: number) {
   const [inputPage, setInputPage] = useState("1");
   const [pageTable, setPageTable] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -1474,7 +1489,7 @@ function RSVPTabContent() {
   )
 };
 
-function FAQTabContent() {
+function FAQTabContent(event_id: number) {
   return (
     <div>
       <div className="mb-6 mt-3 text-center">

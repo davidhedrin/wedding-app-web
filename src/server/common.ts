@@ -6,6 +6,7 @@ import { mkdirSync, existsSync, unlinkSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import path from "path";
 import sharp from 'sharp';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export async function UploadFile(file: File, loc: string, prefix?: string): Promise<UploadFileRespons> {
   try {
@@ -31,58 +32,6 @@ export async function UploadFile(file: File, loc: string, prefix?: string): Prom
       status: true,
       filename: fileName,
       message: "File upload successfully",
-      path: filePath
-    };
-  } catch (err: any) {
-    return {
-      status: false,
-      message: err.message,
-      filename: null,
-      path: null
-    };
-  }
-};
-
-function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo): string {
-  if (typeof format === "string") return format.toLowerCase();
-  if ("id" in format) return format.id;
-  throw new Error("Invalid image format");
-}
-export async function UploadFileCompress(
-  file: File,
-  to_format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo,
-  loc: string,
-  prefix?: string,
-
-  quality: number = 75, // 75 for webp, 60 for avif
-  effort: number = 4, // 4 for webp, 5 for avif
-): Promise<UploadFileRespons> {
-  try {
-    const arrayFileBuffer = await file.arrayBuffer();
-    const fileBuffer = Buffer.from(arrayFileBuffer);
-
-    const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
-      quality,
-      effort
-    }).toBuffer();
-
-    const uploadsDir = path.join(process.cwd(), loc);
-
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true });
-    }
-
-    const randomName = stringWithTimestamp(5, true);
-    const ext = getExtSharp(to_format);
-    const fileName = `${prefix ? prefix + '-' : ''}${randomName}.${ext}`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    await writeFile(filePath, compressedBuffer);
-
-    return {
-      status: true,
-      message: "File upload successfully",
-      filename: fileName,
       path: filePath
     };
   } catch (err: any) {
@@ -138,3 +87,147 @@ export async function compressImage(
     effort
   }).toBuffer();
 };
+
+function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo): string {
+  if (typeof format === "string") return format.toLowerCase();
+  if ("id" in format) return format.id;
+  throw new Error("Invalid image format");
+};
+function getCompressionParams(sizeMB: number) {
+  if (sizeMB >= 4) {
+    return { quality: 8, effort: 5 };
+  }
+  if (sizeMB >= 2) {
+    return { quality: 10, effort: 5 };
+  }
+  return { quality: 15, effort: 5 };
+}
+
+export async function UploadFileCompress(
+  file: File,
+  to_format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo,
+  loc: string,
+  prefix?: string,
+): Promise<UploadFileRespons> {
+  try {
+    const arrayFileBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayFileBuffer);
+
+    const sizeMB = fileBuffer.length / (1024 * 1024);
+    let { quality, effort } = getCompressionParams(sizeMB);
+
+    const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
+      quality,
+      effort,
+      chromaSubsampling: "4:2:0"
+    }).toBuffer();
+
+    const uploadsDir = path.join(process.cwd(), loc);
+
+    if (!existsSync(uploadsDir)) {
+      mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const randomName = stringWithTimestamp(5, true);
+    const ext = getExtSharp(to_format);
+    const fileName = `${prefix ? prefix + '-' : ''}${randomName}.${ext}`;
+    const filePath = path.join(uploadsDir, fileName);
+
+    await writeFile(filePath, compressedBuffer);
+
+    return {
+      status: true,
+      message: "File upload successfully",
+      filename: fileName,
+      path: filePath
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.message,
+      filename: null,
+      path: null
+    };
+  }
+};
+
+const cloudflare_s3 = new S3Client({
+  region: "auto",
+  endpoint: process.env.NEXT_PUBLIC_CLOUDFLARE_URL_S3,
+  credentials: {
+    accessKeyId: process.env.NEXT_PUBLIC_CLOUDFLARE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.NEXT_PUBLIC_CLOUDFLARE_SECRET_ACCESS_KEY!,
+  },
+});
+export async function CloudflareUploadFile(
+  file: File,
+  to_format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo,
+  bucket: string,
+  prefix?: string,
+): Promise<UploadFileRespons> {
+  try {
+    const arrayFileBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayFileBuffer);
+
+    const sizeMB = fileBuffer.length / (1024 * 1024);
+    let { quality, effort } = getCompressionParams(sizeMB);
+
+    const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
+      quality,
+      effort,
+      chromaSubsampling: "4:2:0"
+    }).toBuffer();
+
+    const randomName = stringWithTimestamp(5, true);
+    const ext = getExtSharp(to_format);
+    const fileName = `${prefix ? prefix + '-' : ''}${randomName}.${ext}`;
+
+    const putObjectCmd = new PutObjectCommand({
+      Bucket: bucket,
+      Key: fileName,
+      Body: compressedBuffer,
+      ContentType: `image/${ext}`,
+    });
+    
+    const res = await cloudflare_s3.send(putObjectCmd);
+    const fileUrl = `${process.env.NEXT_PUBLIC_CLOUDFLARE_ENDPOINT}/${fileName}`;
+    return {
+      status: true,
+      message: "File upload successfully",
+      filename: fileName,
+      path: fileUrl
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.message,
+      filename: null,
+      path: null
+    };
+  }
+};
+
+export async function CloudflareDeleteFile(bucket: string, filename: string): Promise<UploadFileRespons> {
+  try{
+    const deleteCmd = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: filename,
+    });
+
+    await cloudflare_s3.send(deleteCmd);
+
+    return {
+      status: true,
+      message: "File deleted successfully.",
+      filename: filename,
+      path: null
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.message,
+      filename: null,
+      path: null
+    };
+  }
+}

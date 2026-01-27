@@ -118,6 +118,7 @@ export type DtoTr = {
 };
 
 export type DtoMainInfoWedding = {
+  id: number | null;
   greeting_msg: string | null,
   couple_img_name: string | null,
   couple_img_url: string | null,
