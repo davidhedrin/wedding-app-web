@@ -93,15 +93,14 @@ function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo)
   if ("id" in format) return format.id;
   throw new Error("Invalid image format");
 };
-function getCompressionParams(sizeMB: number) {
-  if (sizeMB >= 4) {
-    return { quality: 8, effort: 5 };
-  }
-  if (sizeMB >= 2) {
-    return { quality: 10, effort: 5 };
-  }
-  return { quality: 15, effort: 5 };
-}
+function getCompressionParams(sizeKB: number) {
+  if (sizeKB >= 4096) return { quality: 8, effort: 5 };
+  if (sizeKB >= 2048) return { quality: 10, effort: 5 };
+  if (sizeKB >= 1024) return { quality: 55, effort: 4 };
+  if (sizeKB >= 500) return { quality: 70, effort: 3 };
+  // < 500 KB
+  return { quality: 95, effort: 0 };
+};
 
 export async function UploadFileCompress(
   file: File,
@@ -113,8 +112,8 @@ export async function UploadFileCompress(
     const arrayFileBuffer = await file.arrayBuffer();
     const fileBuffer = Buffer.from(arrayFileBuffer);
 
-    const sizeMB = fileBuffer.length / (1024 * 1024);
-    let { quality, effort } = getCompressionParams(sizeMB);
+    const sizeKb = fileBuffer.length / 1024;
+    let { quality, effort } = getCompressionParams(sizeKb);
 
     const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
       quality,
@@ -169,8 +168,8 @@ export async function CloudflareUploadFile(
     const arrayFileBuffer = await file.arrayBuffer();
     const fileBuffer = Buffer.from(arrayFileBuffer);
 
-    const sizeMB = fileBuffer.length / (1024 * 1024);
-    let { quality, effort } = getCompressionParams(sizeMB);
+    const sizeKb = fileBuffer.length / 1024;
+    let { quality, effort } = getCompressionParams(sizeKb);
 
     const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
       quality,

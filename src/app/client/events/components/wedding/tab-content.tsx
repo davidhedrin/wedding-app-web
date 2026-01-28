@@ -24,7 +24,7 @@ const MapPicker = dynamic(
   { ssr: false }
 );
 
-export default function TabContentWedding({event_id}: {event_id: number}) {
+export default function TabContentWedding({ event_id }: { event_id: number }) {
   const tabContents = [
     { id: "main-info", content: MainTabContent(event_id) },
     { id: "scheduler", content: SchedulerTabContent(event_id) },
@@ -54,8 +54,7 @@ function MainTabContent(event_id: number) {
   // Groom Info
   const [groomId, setGroomId] = useState<number | null>(null);
   const [groomFullname, setGroomFullname] = useState<string>("");
-  const [groomShortname, setGroomShortname] = useState<string>("");
-  const [groomBirthDate, setGroomBirthDate] = useState<Date>(new Date());
+  const [groomBirthDate, setGroomBirthDate] = useState<Date | null>(null);
   const [groomBirthPlace, setGroomBirthPlace] = useState("");
   const [groomFathername, setGroomFathername] = useState<string>("");
   const [groomMothername, setGroomMothername] = useState<string>("");
@@ -69,8 +68,7 @@ function MainTabContent(event_id: number) {
   // Bride Info
   const [brideId, setBrideId] = useState<number | null>(null);
   const [brideFullname, setBrideFullname] = useState<string>("");
-  const [brideShortname, setBrideShortname] = useState<string>("");
-  const [brideBirthDate, setBrideBirthDate] = useState<Date>(new Date());
+  const [brideBirthDate, setBrideBirthDate] = useState<Date | null>(null);
   const [brideBirthPlace, setBrideBirthPlace] = useState("");
   const [brideFathername, setBrideFathername] = useState<string>("");
   const [brideMothername, setBrideMothername] = useState<string>("");
@@ -132,7 +130,6 @@ function MainTabContent(event_id: number) {
     handleFileCaptureChange({ target: { files } });
   };
 
-
   const handleFileGroomBride = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputId = e.currentTarget.id;
     if (e.target.files) {
@@ -182,6 +179,9 @@ function MainTabContent(event_id: number) {
   };
 
   const createDtoData = (): DtoMainInfoWedding => {
+    const shortNameGroom = groomFullname?.trim().match(/^\S+/)?.[0] ?? "";
+    const shortNameBride= brideFullname?.trim().match(/^\S+/)?.[0] ?? "";
+
     const newData: DtoMainInfoWedding = {
       id: event_id,
       greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
@@ -193,9 +193,9 @@ function MainTabContent(event_id: number) {
           id: groomId,
           type: GroomBrideEnum.Groom,
           fullname: groomFullname,
-          shortname: groomShortname,
+          shortname: shortNameGroom,
           birth_place: groomBirthPlace,
-          birth_date: groomBirthDate,
+          birth_date: groomBirthDate ?? new Date(),
           birth_order: birthOrderGroom === "" ? 1 : birthOrderGroom,
           father_name: groomFathername.trim() != "" ? groomFathername : null,
           mother_name: groomMothername.trim() != "" ? groomMothername : null,
@@ -210,9 +210,9 @@ function MainTabContent(event_id: number) {
           id: brideId,
           type: GroomBrideEnum.Bride,
           fullname: brideFullname,
-          shortname: brideShortname,
+          shortname: shortNameBride,
           birth_place: brideBirthPlace,
-          birth_date: brideBirthDate,
+          birth_date: brideBirthDate ?? new Date(),
           birth_order: birthOrderBride === "" ? 1 : birthOrderBride,
           father_name: brideFathername.trim() != "" ? brideFathername : null,
           mother_name: brideMothername.trim() != "" ? brideMothername : null,
@@ -246,7 +246,6 @@ function MainTabContent(event_id: number) {
       { message: 'Birth date cannot be in the future.' }
     ),
     groom_full_name: z.string().min(1, { message: 'Full name is required field.' }).trim(),
-    groom_short_name: z.string().min(1, { message: 'Short name is required field.' }).trim(),
     // groom_birth_order: z.coerce.number().min(1, { message: 'Birth order must be at least 1.' }),
 
     bride_img_prev: z.string().min(1, { message: "Bride's photo is required field." }).trim(),
@@ -259,7 +258,6 @@ function MainTabContent(event_id: number) {
       { message: 'Birth date cannot be in the future.' }
     ),
     bride_full_name: z.string().min(1, { message: 'Full name is required field.' }).trim(),
-    bride_short_name: z.string().min(1, { message: 'Short name is required field.' }).trim(),
 
     couple_img_prev: z.string().min(1, { message: "Couple's photo is required field." }).trim(),
   });
@@ -274,6 +272,9 @@ function MainTabContent(event_id: number) {
     if (previewUrlGroom) formData.append("groom_img_prev", previewUrlGroom.toString());
     if (previewUrlBride) formData.append("bride_img_prev", previewUrlBride.toString());
     if (previewUrlCouple) formData.append("couple_img_prev", previewUrlCouple.toString());
+
+    formData.append("groom_birth_date", groomBirthDate ? groomBirthDate.toString() : "");
+    formData.append("bride_birth_date", brideBirthDate ? brideBirthDate.toString() : "");
 
     const data = Object.fromEntries(formData);
     const valResult = FormSchemaMainInfo.safeParse(data);
@@ -328,7 +329,7 @@ function MainTabContent(event_id: number) {
       <form onSubmit={handleSubmitForm}>
         <div className="grid grid-cols-12 gap-3">
           <div className="col-span-12">
-            <Textarea label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} mandatory />
+            <Textarea value={greetingMessage} onChange={(e) => setGreetingMessage(e.target.value)} label="Greeting Message" id="greeting_message" placeholder="Enter greeting message" rows={3} mandatory />
             {stateFormMainInfo.errors?.greeting_message && <ZodErrors err={stateFormMainInfo.errors?.greeting_message} />}
           </div>
           <div className="col-span-12 md:col-span-6">
@@ -379,20 +380,16 @@ function MainTabContent(event_id: number) {
               <div className="p-3">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    <Input value={groomBirthPlace} onChange={(e) => setGroomBirthPlace(e.target.value)} type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
                     {stateFormMainInfo.errors?.groom_birth_place && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='date' className='py-1.5' id='groom_birth_date' label='Birth Date' mandatory />
+                    <DatePicker mode='single' value={groomBirthDate || undefined} onChange={(date) => setGroomBirthDate(date as Date)} label='Birth Date' mandatory />
                     {stateFormMainInfo.errors?.groom_birth_date && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_date} />}
                   </div>
-                  <div className="col-span-12 ">
-                    <Input type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
-                    {stateFormMainInfo.errors?.groom_full_name && <ZodErrors err={stateFormMainInfo.errors?.groom_full_name} />}
-                  </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_short_name' label='Short Name' placeholder='Enter short name' mandatory />
-                    {stateFormMainInfo.errors?.groom_short_name && <ZodErrors err={stateFormMainInfo.errors?.groom_short_name} />}
+                    <Input value={groomFullname} onChange={(e) => setGroomFullname(e.target.value)} type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    {stateFormMainInfo.errors?.groom_full_name && <ZodErrors err={stateFormMainInfo.errors?.groom_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input
@@ -418,19 +415,19 @@ function MainTabContent(event_id: number) {
                       type='number' min={1} className='py-1.5' id='groom_birth_order' label='Birth Order' placeholder='Order' mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
+                    <Input value={groomFathername} onChange={(e) => setGroomFathername(e.target.value)} type='text' className='py-1.5' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                    <Input value={groomMothername} onChange={(e) => setGroomMothername(e.target.value)} type='text' className='py-1.5' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                    <Input value={groomPlaceOrigin} onChange={(e) => setGroomPlaceOrigin(e.target.value)} type='text' className='py-1.5' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                    <Input value={groomOccupation} onChange={(e) => setGroomOccupation(e.target.value)} type='text' className='py-1.5' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
                   </div>
                   <div className="col-span-12">
-                    <Textarea label="Personality Tagline" id="groom_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                    <Textarea value={groomPersonalMsg} onChange={(e) => setGroomPersonalMsg(e.target.value)} label="Personality Tagline" id="groom_tagline" placeholder="Enter personality tagline if any" rows={2} />
                   </div>
                 </div>
               </div>
@@ -484,20 +481,16 @@ function MainTabContent(event_id: number) {
               <div className="p-3">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    <Input value={brideBirthPlace} onChange={(e) => setBrideBirthPlace(e.target.value)} type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
                     {stateFormMainInfo.errors?.bride_birth_place && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='date' className='py-1.5' id='bride_birth_date' label='Birth Date' mandatory />
+                    <DatePicker mode='single' value={brideBirthDate || undefined} onChange={(date) => setBrideBirthDate(date as Date)} label='Birth Date' mandatory />
                     {stateFormMainInfo.errors?.bride_birth_date && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_date} />}
                   </div>
-                  <div className="col-span-12 ">
-                    <Input type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
-                    {stateFormMainInfo.errors?.bride_full_name && <ZodErrors err={stateFormMainInfo.errors?.bride_full_name} />}
-                  </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_short_name' label='Short Name' placeholder='Enter short name' mandatory />
-                    {stateFormMainInfo.errors?.bride_short_name && <ZodErrors err={stateFormMainInfo.errors?.bride_short_name} />}
+                    <Input value={brideFullname} onChange={(e) => setBrideFullname(e.target.value)} type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    {stateFormMainInfo.errors?.bride_full_name && <ZodErrors err={stateFormMainInfo.errors?.bride_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <Input
@@ -523,19 +516,19 @@ function MainTabContent(event_id: number) {
                       type='number' min={1} className='py-1.5' id='bride_birth_order' label='Birth Order' placeholder='Order' mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
+                    <Input value={brideFathername} onChange={(e) => setBrideFathername(e.target.value)} type='text' className='py-1.5' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                    <Input value={brideMothername} onChange={(e) => setBrideMothername(e.target.value)} type='text' className='py-1.5' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                    <Input value={bridePlaceOrigin} onChange={(e) => setBridePlaceOrigin(e.target.value)} type='text' className='py-1.5' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                    <Input value={brideOccupation} onChange={(e) => setBrideOccupation(e.target.value)} type='text' className='py-1.5' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
                   </div>
                   <div className="col-span-12">
-                    <Textarea label="Personality Tagline" id="bride_tagline" placeholder="Enter personality tagline if any" rows={2} />
+                    <Textarea value={bridePersonalMsg} onChange={(e) => setBridePersonalMsg(e.target.value)} label="Personality Tagline" id="bride_tagline" placeholder="Enter personality tagline if any" rows={2} />
                   </div>
                 </div>
               </div>
@@ -615,10 +608,10 @@ function MainTabContent(event_id: number) {
             {stateFormMainInfo.errors?.couple_img_prev && <ZodErrors err={stateFormMainInfo.errors?.couple_img_prev} />}
           </div>
           <div className="col-span-12 md:col-span-4">
-            <Input type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
+            <Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
           </div>
           <div className="col-span-12 md:col-span-4">
-            <Input type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
+            <Input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
           </div>
           <div className="col-span-12 md:col-span-4">
             <Select value={musicTheme}

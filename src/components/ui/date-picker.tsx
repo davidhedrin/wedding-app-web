@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 type DatePickerProps = {
   label?: string;
-  required?: boolean;
+  mandatory?: boolean;
   mode?: 'single' | 'multiple' | 'range';
   value?: Date | Date[] | DateRange;
   onChange?: (date: Date | Date[] | DateRange | undefined) => void;
@@ -21,7 +21,7 @@ type DatePickerProps = {
 
 export default function DatePicker({
   label,
-  required,
+  mandatory,
   mode = 'single',
   value,
   onChange,
@@ -92,7 +92,7 @@ export default function DatePicker({
       {label && (
         <label className="block text-sm font-medium mb-1 dark:text-white">
           {label}
-          {required && <span className="text-red-500">*</span>}
+          {mandatory && <span className="text-red-500">*</span>}
         </label>
       )}
 
