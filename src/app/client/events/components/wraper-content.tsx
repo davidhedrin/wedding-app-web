@@ -1,9 +1,8 @@
 import { CategoryKeys } from "@/lib/config";
 import TabContentWedding from "./wedding/tab-content";
+import { Events } from "@/generated/prisma";
 
-type EventType = typeof CategoryKeys[number]["key"];
-
-export default function TabContentWraper({event_type, event_id}: { event_type: EventType, event_id: number }) {
-  if(event_type === "wed") return <TabContentWedding event_id={event_id} />;
+export default function TabContentWraper({dataEvent}: { dataEvent: Events}) {
+  if(dataEvent.tmp_ctg_key === "wed") return <TabContentWedding dataEvent={dataEvent} />;
   return null;
 }

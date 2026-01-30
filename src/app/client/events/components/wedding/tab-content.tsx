@@ -3,7 +3,7 @@ import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys } from "@/lib/config";
 import { playMusic, showConfirm, stopMusic, toast, toOrdinal } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
@@ -12,44 +12,45 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoMainInfoWedding } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { StoreUpdateMainInfoWedding } from "@/server/event-detail";
+import { GetGroomBrideDataByEventId, StoreUpdateMainInfoWedding } from "@/server/event-detail";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
   { ssr: false }
 );
 
-export default function TabContentWedding({ event_id }: { event_id: number }) {
+export default function TabContentWedding({ dataEvent }: { dataEvent: Events }) {
   const tabContents = [
-    { id: "main-info", content: MainTabContent(event_id) },
-    { id: "scheduler", content: SchedulerTabContent(event_id) },
-    { id: "gallery", content: GalleryTabContent(event_id) },
-    { id: "history", content: HistoryTabContent(event_id) },
-    { id: "gift", content: GiftTabContent(event_id) },
-    { id: "rsvp", content: RSVPTabContent(event_id) },
-    { id: "faq", content: FAQTabContent(event_id) },
+    { id: "main-info", content: MainTabContent({ dataEvent }) },
+    { id: "scheduler", content: SchedulerTabContent(dataEvent.id) },
+    { id: "gallery", content: GalleryTabContent(dataEvent.id) },
+    { id: "history", content: HistoryTabContent(dataEvent.id) },
+    { id: "gift", content: GiftTabContent(dataEvent.id) },
+    { id: "rsvp", content: RSVPTabContent(dataEvent.id) },
+    { id: "faq", content: FAQTabContent(dataEvent.id) },
   ];
 
   return <ContentComponent tabContents={tabContents} />;
 }
 
-function MainTabContent(event_id: number) {
+function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
 
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const [stateFormMainInfo, setStateFormMainInfo] = useState<FormState>({ success: false, errors: {} });
 
-  const [greetingMessage, setGreetingMessage] = useState<string>("");
-  const [contactEmail, setContactEmail] = useState<string>("");
-  const [contactPhone, setContactPhone] = useState<string>("");
-  const [musicTheme, setMusicTheme] = useState<string>("");
+  const [greetingMessage, setGreetingMessage] = useState<string>(dataEvent.greeting_msg ?? "");
+  const [contactEmail, setContactEmail] = useState<string>(dataEvent.contact_email ?? "");
+  const [contactPhone, setContactPhone] = useState<string>(dataEvent.contact_phone ?? "");
+  const [musicTheme, setMusicTheme] = useState<string>(dataEvent.music_url ?? "");
   const [imageFileCouple, setImageFileCouple] = useState<File | null>(null);
-  const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(null);
+  const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(dataEvent.couple_img_path);
 
   // Groom Info
   const [groomId, setGroomId] = useState<number | null>(null);
@@ -180,10 +181,10 @@ function MainTabContent(event_id: number) {
 
   const createDtoData = (): DtoMainInfoWedding => {
     const shortNameGroom = groomFullname?.trim().match(/^\S+/)?.[0] ?? "";
-    const shortNameBride= brideFullname?.trim().match(/^\S+/)?.[0] ?? "";
+    const shortNameBride = brideFullname?.trim().match(/^\S+/)?.[0] ?? "";
 
     const newData: DtoMainInfoWedding = {
-      id: event_id,
+      id: dataEvent.id,
       greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
@@ -315,6 +316,48 @@ function MainTabContent(event_id: number) {
     setLoading(false);
   };
 
+  const fatchGroomBride = async () => {
+    setLoading(true);
+    const getData = await GetGroomBrideDataByEventId(dataEvent.id);
+    getData.forEach(x => {
+      const setterType = x.type;
+
+      if (setterType === "Groom") {
+        setGroomId(x.id);
+        setGroomFullname(x.fullname);
+        setGroomBirthDate(x.birth_date);
+        setGroomBirthPlace(x.birth_place);
+        setGroomFathername(x.father_name ?? "");
+        setGroomMothername(x.mother_name ?? "");
+        setGroomPlaceOrigin(x.place_origin ?? "");
+        setGroomOccupation(x.occupation ?? "");
+        setGroomPersonalMsg(x.personal_msg ?? "");
+        setBirthOrderGroom(x.birth_order);
+        setPreviewUrlGroom(x.img_path);
+        setImageFileGroom(null);
+      } else if (setterType === "Bride") {
+        setBrideId(x.id);
+        setBrideFullname(x.fullname);
+        setBrideBirthDate(x.birth_date);
+        setBrideBirthPlace(x.birth_place);
+        setBrideFathername(x.father_name ?? "");
+        setBrideMothername(x.mother_name ?? "");
+        setBridePlaceOrigin(x.place_origin ?? "");
+        setBrideOccupation(x.occupation ?? "");
+        setBridePersonalMsg(x.personal_msg ?? "");
+        setBirthOrderBride(x.birth_order);
+        setPreviewUrlBride(x.img_path);
+        setImageFileBride(null);
+      }
+    });
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeIdxTab == 0) fatchGroomBride();
+  }, [activeIdxTab]);
+
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -371,7 +414,7 @@ function MainTabContent(event_id: number) {
                   </label>
 
                   <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                    <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
+                    <p>Allowed formats: JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB</p>
                     {stateFormMainInfo.errors?.groom_img_prev && <ZodErrors err={stateFormMainInfo.errors?.groom_img_prev} />}
                   </div>
                 </div>
@@ -472,7 +515,7 @@ function MainTabContent(event_id: number) {
                   </label>
 
                   <div className="bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                    <p>Allowed formats: JPG, JPEG, PNG up to 2MB</p>
+                    <p>Allowed formats: JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB</p>
                     {stateFormMainInfo.errors?.bride_img_prev && <ZodErrors err={stateFormMainInfo.errors?.bride_img_prev} />}
                   </div>
                 </div>

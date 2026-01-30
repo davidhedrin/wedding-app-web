@@ -7,8 +7,15 @@ import { auth } from "@/app/api/auth/auth-setup";
 import { DtoGroomBride, DtoMainInfoWedding } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { Prisma, PrismaClient } from "@/generated/prisma";
+import { GroomBrideInfo, Prisma, PrismaClient } from "@/generated/prisma";
 import { User } from "next-auth";
+
+export async function GetGroomBrideDataByEventId(event_id: number) : Promise<GroomBrideInfo[]> {
+  const getData = await db.groomBrideInfo.findMany({
+    where: { event_id: event_id },
+  });
+  return getData;
+}
 
 export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
   try{
@@ -71,57 +78,79 @@ async function upsertGroomBride({
   user: User
 }) {
   if (data === undefined) return;
-  
+
   const typeGroomBride = data.type.toString().toLowerCase();
   const dataId = data.id ?? 0;
-  const findExistData = await tr.groomBrideInfo.findUnique({
-    where: { id: dataId }
-  });
 
-  if(findExistData && findExistData.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, findExistData.img_name).catch(err => {});
-  if(data.file_img !== null) {
-    if(findExistData && findExistData.img_name) CloudflareDeleteFile(Configs.s3_bucket, findExistData.img_name).catch(err => {});
+  if (dataId > 0) {
+    const existing = await tr.groomBrideInfo.findUnique({
+      where: { id: data.id! }
+    });
 
-    var upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${dataId}`);
-    if(upFile != null && upFile.status == true) {
-      data.img_name = upFile.filename;
-      data.img_url = upFile.path;
+    if (!existing) return;
+
+    // Hapus gambar lama jika img dihapus dari form
+    if (existing.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+    // Upload gambar baru
+    if (data.file_img) {
+      if (existing.img_name) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+      const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${data.id}`);
+      if (upFile?.status) {
+        data.img_name = upFile.filename;
+        data.img_url = upFile.path;
+      };
+    };
+
+    await tr.groomBrideInfo.update({
+      where: { id: dataId },
+      data: {
+        fullname: data.fullname,
+        shortname: data.shortname,
+        birth_place: data.birth_place,
+        birth_date: data.birth_date,
+        birth_order: data.birth_order,
+        father_name: data.father_name,
+        mother_name: data.mother_name,
+        place_origin: data.place_origin,
+        occupation: data.occupation,
+        personal_msg: data.personal_msg,
+        img_name: data.img_name,
+        img_path: data.img_url,
+        updatedBy: user?.email
+      }
+    });
+
+    return;
+  } else {
+    const created = await tr.groomBrideInfo.create({
+      data: {
+        event_id,
+        type: data.type,
+        fullname: data.fullname,
+        shortname: data.shortname,
+        birth_place: data.birth_place,
+        birth_date: data.birth_date,
+        birth_order: data.birth_order,
+        father_name: data.father_name,
+        mother_name: data.mother_name,
+        place_origin: data.place_origin,
+        occupation: data.occupation,
+        personal_msg: data.personal_msg,
+        createdBy: user?.email
+      }
+    });
+
+    if (data.file_img) {
+      const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${created.id}`);
+      if (upFile?.status) {
+        await tr.groomBrideInfo.update({
+          where: { id: created.id },
+          data: {
+            img_name: upFile.filename,
+            img_path: upFile.path
+          }
+        });
+      };
     };
   };
-  
-  await tr.groomBrideInfo.upsert({
-    where: { id : dataId },
-    update: {
-      fullname: data.fullname,
-      shortname: data.shortname,
-      birth_place: data.birth_place,
-      birth_date: data.birth_date,
-      birth_order: data.birth_order,
-      father_name: data.father_name,
-      mother_name: data.mother_name,
-      place_origin: data.place_origin,
-      occupation: data.occupation,
-      personal_msg: data.personal_msg,
-      img_name: data.img_name,
-      img_path: data.img_url,
-      updatedBy: user?.email
-    },
-    create: {
-      event_id: event_id,
-      type: data.type,
-      fullname: data.fullname,
-      shortname: data.shortname,
-      birth_place: data.birth_place,
-      birth_date: data.birth_date,
-      birth_order: data.birth_order,
-      father_name: data.father_name,
-      mother_name: data.mother_name,
-      place_origin: data.place_origin,
-      occupation: data.occupation,
-      personal_msg: data.personal_msg,
-      img_name: data.img_name,
-      img_path: data.img_url,
-      createdBy: user?.email
-    }
-  });
 };
