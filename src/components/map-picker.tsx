@@ -16,30 +16,35 @@ const markerIcon = L.icon({
 });
 
 function LocationMarker({
+  value,
   onSelect,
 }: {
+  value?: [number, number] | null;
   onSelect: (lat: number, lng: number) => void;
 }) {
-  const [position, setPosition] = useState<[number, number] | null>(null);
-
-  useMapEvents({
+  const map = useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng;
-      setPosition([lat, lng]);
       onSelect(lat, lng);
     },
   });
 
-  return position ? (
-    <Marker position={position} icon={markerIcon} />
+  if (value) {
+    map.setView(value, map.getZoom(), { animate: true });
+  }
+
+  return value ? (
+    <Marker position={value} icon={markerIcon} />
   ) : null;
 }
 
 export default function MapPicker({
   className,
+  value,
   onChange,
 }: {
   className?: string;
+  value?: [number, number] | null;
   onChange?: (lat: number, lng: number) => void;
 }) {
   return (
@@ -50,7 +55,7 @@ export default function MapPicker({
       )}
     >
       <MapContainer
-        center={[-6.2000, 106.8166]}
+        center={value ?? [-6.2, 106.8166]}
         zoom={15}
         className="h-full w-full z-0"
       >
@@ -59,9 +64,12 @@ export default function MapPicker({
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <LocationMarker onSelect={(lat, lng) => {
-          onChange?.(lat, lng)
-        }} />
+        <LocationMarker
+          value={value}
+          onSelect={(lat, lng) => {
+            onChange?.(lat, lng)
+          }}
+        />
       </MapContainer>
     </div>
   );

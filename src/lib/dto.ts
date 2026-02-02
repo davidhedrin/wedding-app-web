@@ -1,4 +1,4 @@
-import { DiscTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, TradRecepType } from "@/generated/prisma";
 
 export type DtoSignIn = {
   email: string;
@@ -145,4 +145,20 @@ export type DtoGroomBride = {
   img_name: string | null,
   img_url: string | null,
   file_img: File | null;
+};
+
+export type DtoSchedulerWedding = {
+  id: number | null;
+  name: string;
+  date: Date | undefined;
+  start_time: string;
+  end_time: string;
+  loc_name: string;
+  loc_address: string;
+  is_mb_loc: boolean;
+  notes: string[];
+  langLat: number[];
+
+  is_active_tr?: boolean;
+  ceremon_type?: TradRecepType;
 };

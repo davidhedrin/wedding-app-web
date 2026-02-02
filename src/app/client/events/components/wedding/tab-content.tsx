@@ -15,7 +15,7 @@ import Select from "@/components/ui/select";
 import { Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoMainInfoWedding } from "@/lib/dto";
+import { DtoMainInfoWedding, DtoSchedulerWedding } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
 import { GetGroomBrideDataByEventId, StoreUpdateMainInfoWedding } from "@/server/event-detail";
 
@@ -687,37 +687,50 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   )
 };
 
-type SchedulerDto = {
-  name: string;
-  date: Date | undefined;
-  start_time: string;
-  end_time: string;
-  loc_name: string;
-  loc_address: string;
-  is_mb_loc: boolean;
-  notes: string[];
-  langLat: number[];
-};
 function SchedulerTabContent(event_id: number) {
   const { activeIdxTab } = useTabEventDetail();
+  const [stateFormShcedule, setStateFormShcedule] = useState<FormState>({ success: false, errors: {} });
 
   // Marriage Blessing Props
   const [eventDateMb, setDateRangeMb] = useState<Date | undefined>();
+  const [startTimeMb, setStartTimeMb] = useState<string>("");
+  const [endTimeMb, setEndTimeMb] = useState<string>("");
+  const [locNameMb, setLocNameMb] = useState<string>("");
+  const [locAddressMb, setLocAddressMb] = useState<string>("");
+  const [latLangMb, setLatLangMb] = useState<[number, number] | null>(null);
   const [noteListMb, setNoteListMb] = useState<string[]>([""]);
 
   // Traditional Reception Props
+  const [isCheckedTr, setIsCheckedTr] = useState(false);
+  const [isTrUsingLocMb, setTrUsingLocMb] = useState(false);
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
+  const [startTimeTr, setStartTimeTr] = useState<string>("");
+  const [endTimeTr, setEndTimeTr] = useState<string>("");
+  const [locNameTr, setLocNameTr] = useState<string>("");
+  const [locAddressTr, setLocAddressTr] = useState<string>("");
+  const [latLangTr, setLatLangTr] = useState<[number, number] | null>(null);
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
-  const [latLangMb, setLatLangMb] = useState<number[]>([]);
-  const [latLangTr, setLatLangTr] = useState<number[]>([]);
+  const switchMbLoc = (changeVal: boolean) => {
+    setTrUsingLocMb(changeVal);
+    if(changeVal) {
+      setLocNameTr(locNameMb);
+      setLocAddressTr(locAddressMb);
+      setLatLangTr(latLangMb);
+    } else {
+      setLocNameTr("");
+      setLocAddressTr("");
+      setLatLangTr(null);
+    }
+  };
 
-  const [schedulerDtoData, setSchedulerDtoData] = useState<SchedulerDto[]>([]);
+  const [schedulerDtoData, setSchedulerDtoData] = useState<DtoSchedulerWedding[]>([]);
   const addMoreCeremony = () => {
     setSchedulerDtoData(prev => [
       ...prev,
       {
+        id: null,
         name: "",
         date: undefined,
         start_time: "",
@@ -731,8 +744,68 @@ function SchedulerTabContent(event_id: number) {
     ]);
   };
 
+  const FormSchemaSchedule = z.object({
+    mb_event_date: z.string().min(1, { message: 'Event date is required field.' }).trim().refine(
+      (date) => {
+        if (!date) return true
+        return new Date(date) > new Date()
+      },
+      { message: 'Event date cannot be in the past.' }
+    ),
+    mb_start_time: z.string().min(1, { message: 'Event start time is required field.' }).trim(),
+    mb_loc_name: z.string().min(1, { message: 'Event location is required field.' }).trim(),
+    mb_loc_langlat: z.string().min(1, { message: 'Choose location is required field.' }).trim(),
+  });
+
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
-    
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    formData.append("mb_loc_langlat", "");
+    if (latLangMb) formData.append("mb_loc_langlat", latLangMb.length.toString());
+
+    formData.append("mb_event_date", eventDateMb ? eventDateMb.toString() : "");
+
+    let formSchame = FormSchemaSchedule;
+    if (isCheckedTr) {
+      formData.append("tr_loc_langlat", "");
+      if (latLangTr) formData.append("tr_loc_langlat", latLangTr.length.toString());
+      formData.append("tr_event_date", eventDateTr ? eventDateTr.toString() : "");
+
+      const newFormSchame = FormSchemaSchedule.extend({
+        tr_event_date: z.string().min(1, { message: 'Event date is required field.' }).trim().refine(
+          (date) => {
+            if (!date) return true
+            return new Date(date) > new Date()
+          },
+          { message: 'Event date cannot be in the past.' }
+        ),
+        tr_start_time: z.string().min(1, { message: 'Event start time is required field.' }).trim(),
+        tr_loc_name: z.string().min(1, { message: 'Event location is required field.' }).trim(),
+        tr_loc_langlat: z.string().min(1, { message: 'Choose location is required field.' }).trim(),
+      });
+      formSchame = newFormSchame;
+    };
+
+    const data = Object.fromEntries(formData);
+    const valResult = formSchame.safeParse(data);
+    if (!valResult.success) {
+      setStateFormShcedule({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormShcedule({ success: true, errors: {} });
+
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
   };
 
   return (
@@ -748,7 +821,7 @@ function SchedulerTabContent(event_id: number) {
 
       <form onSubmit={handleSubmitForm}>
         <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mb-5">
-          <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+          <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl py-3 px-4">
             <div className="text-muted font-semibold">
               <i className='bx bx-donate-heart text-xl'></i> Marriage Blessing Ceremony
             </div>
@@ -760,18 +833,21 @@ function SchedulerTabContent(event_id: number) {
                   Event Date<span className="text-red-500">*</span>
                 </label>
                 <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
+                {stateFormShcedule.errors?.mb_event_date && <ZodErrors err={stateFormShcedule.errors?.mb_event_date} />}
               </div>
               <div className="col-span-12 md:col-span-4">
-                <Input type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+                <Input value={startTimeMb} onChange={(e) => setStartTimeMb(e.target.value)} type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+                {stateFormShcedule.errors?.mb_start_time && <ZodErrors err={stateFormShcedule.errors?.mb_start_time} />}
               </div>
               <div className="col-span-12 md:col-span-4">
-                <Input type='time' className='py-1.5' id='mb_end_time' label='End Time' />
+                <Input value={endTimeMb} onChange={(e) => setEndTimeMb(e.target.value)} type='time' className='py-1.5' id='mb_end_time' label='End Time' />
               </div>
               <div className="col-span-12">
-                <Input label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
+                <Input value={locNameMb} onChange={(e) => setLocNameMb(e.target.value)} label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
+                {stateFormShcedule.errors?.mb_loc_name && <ZodErrors err={stateFormShcedule.errors?.mb_loc_name} />}
               </div>
               <div className="col-span-12">
-                <Textarea label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+                <Textarea value={locAddressMb} onChange={(e) => setLocAddressMb(e.target.value)} label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -779,8 +855,9 @@ function SchedulerTabContent(event_id: number) {
                   <p className="text-sm text-muted">
                     Click to choose your event location on maps to show direction in your invitaion.
                   </p>
+                  {stateFormShcedule.errors?.mb_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.mb_loc_langlat} />}
                 </label>
-                {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
+                {activeIdxTab === 1 && <MapPicker value={latLangMb} onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -835,135 +912,191 @@ function SchedulerTabContent(event_id: number) {
         </div>
 
         <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mb-3">
-          <div className="bg-gray-100 border-b border-gray-200 rounded-t-xl py-3 px-4">
+          <div className="flex items-center justify-between bg-gray-50 border-b border-gray-200 rounded-t-xl py-3 px-4">
             <div className="text-muted font-semibold">
               <i className='bx bx-party text-xl'></i> Traditional or Reception Ceremony
             </div>
+
+            <div className="flex items-center gap-x-3">
+              <label htmlFor="hs-xs-switch-tr-ceremony" className="relative inline-block w-9 h-5 cursor-pointer">
+                <input
+                  checked={isCheckedTr}
+                  onChange={(e) => {
+                    const val = e.target.checked;
+                    setIsCheckedTr(val);
+                    if(val === false) switchMbLoc(false);
+                  }}
+                  type="checkbox" id="hs-xs-switch-tr-ceremony" className="peer sr-only"
+                />
+                <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+              </label>
+            </div>
           </div>
           <div className="p-3">
-            <div className="grid grid-cols-12 gap-3">
-              <div className="col-span-12">
-                <label className="block text-sm font-medium dark:text-white mb-1">
-                  Ceremony Type
-                </label>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
-                      <span className="text-sm text-black">Traditional Ceremony</span>
-                      <input
-                        checked={radioSelectTypeTr === TradRecepType.Traditional}
-                        onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
-                        type="radio" name="hs-radio-tr-type"
-                        className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
-                      />
+            {
+              isCheckedTr ? (
+                <div className="grid grid-cols-12 gap-3">
+                  <div className="col-span-12">
+                    <label className="block text-sm font-medium dark:text-white mb-1">
+                      Ceremony Type
                     </label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="hs-radio-traditional" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
+                          <span className="text-sm text-black">Traditional Ceremony</span>
+                          <input
+                            checked={radioSelectTypeTr === TradRecepType.Traditional}
+                            onChange={() => setRadioSelectTypeTr(TradRecepType.Traditional)}
+                            type="radio" name="hs-radio-tr-type"
+                            className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-traditional"
+                          />
+                        </label>
+                      </div>
+                      <div>
+                        <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
+                          <span className="text-sm text-black">Reception Ceremony</span>
+                          <input
+                            checked={radioSelectTypeTr === TradRecepType.Reception}
+                            onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
+                            type="radio"
+                            name="hs-radio-tr-type"
+                            className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"
+                          />
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label htmlFor="hs-radio-reception" className="flex p-3 w-full bg-white border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500">
-                      <span className="text-sm text-black">Reception Ceremony</span>
-                      <input
-                        checked={radioSelectTypeTr === TradRecepType.Reception}
-                        onChange={() => setRadioSelectTypeTr(TradRecepType.Reception)}
-                        type="radio"
-                        name="hs-radio-tr-type"
-                        className="scale-150 shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="hs-radio-reception"
-                      />
+
+                  <div className="col-span-12 md:col-span-4">
+                    <label className="block text-sm font-medium mb-1 dark:text-white">
+                      Event Date<span className="text-red-500">*</span>
                     </label>
+                    <DatePicker placeholder="Choose event date" mode='single' value={eventDateTr} onChange={(date) => setDateRangeTr(date as Date)} />
+                    {stateFormShcedule.errors?.tr_event_date && <ZodErrors err={stateFormShcedule.errors?.tr_event_date} />}
                   </div>
-                </div>
-              </div>
-
-              <div className="col-span-12 md:col-span-4">
-                <label className="block text-sm font-medium mb-1 dark:text-white">
-                  Event Date<span className="text-red-500">*</span>
-                </label>
-                <DatePicker placeholder="Choose event date" mode='single' value={eventDateTr} onChange={(date) => setDateRangeTr(date as Date)} />
-              </div>
-              <div className="col-span-12 md:col-span-4">
-                <Input type='time' className='py-1.5' id='tr_start_time' label='Start Time' mandatory />
-              </div>
-              <div className="col-span-12 md:col-span-4">
-                <Input type='time' className='py-1.5' id='tr_end_time' label='End Time' />
-              </div>
-              <div className="col-span-12">
-                <div className="flex items-center gap-x-3 mb-3 mt-2">
-                  <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
-                    <input type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
-                    <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                    <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
-                  </label>
-                  <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
-                </div>
-
-                <Input label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
-              </div>
-              <div className="col-span-12">
-                <Textarea label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
-              </div>
-              <div className="col-span-12">
-                <label className="block text-sm font-medium mb-2 dark:text-white">
-                  Choose Location<span className="text-red-500">*</span>
-                  <p className="text-sm text-muted">
-                    Click to choose your event location on maps to show direction in your invitaion.
-                  </p>
-                </label>
-                {activeIdxTab === 1 && <MapPicker onChange={(lat, lng) => setLatLangTr([lat, lng])} />}
-              </div>
-              <div className="col-span-12">
-                <label className="block text-sm font-medium mb-2 dark:text-white">
-                  Notes
-                  <p className="text-sm text-muted">
-                    Add important short notes regarding the marriage event if any.
-                  </p>
-                </label>
-
-                <div className="grid grid-cols-12 gap-2">
-                  {noteListTr.map((note, i) => (
-                    <div key={i} className="col-span-12 md:col-span-3">
-                      <Input
-                        value={note}
+                  <div className="col-span-12 md:col-span-4">
+                    <Input value={startTimeTr} onChange={(e) => setStartTimeTr(e.target.value)} type='time' className='py-1.5' id='tr_start_time' label='Start Time' mandatory />
+                    {stateFormShcedule.errors?.tr_start_time && <ZodErrors err={stateFormShcedule.errors?.tr_start_time} />}
+                  </div>
+                  <div className="col-span-12 md:col-span-4">
+                    <Input value={endTimeTr} onChange={(e) => setEndTimeTr(e.target.value)} type='time' className='py-1.5' id='tr_end_time' label='End Time' />
+                  </div>
+                  <div className="col-span-12">
+                    <div className="flex items-center gap-x-3 mb-3 mt-2">
+                      <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
+                        <input
+                        checked={isTrUsingLocMb}
                         onChange={(e) => {
-                          const newNotes = [...noteListTr];
-                          newNotes[i] = e.target.value;
-                          setNoteListTr(newNotes);
+                          const val = e.target.checked;
+                          switchMbLoc(val);
                         }}
-                        id={`tr_label_${i}`}
-                        placeholder="Additional note"
-                        className="py-1.5 w-full"
-                        sufixGroup={
-                          <i
-                            onClick={() => {
+                        type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
+                        <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                        <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                      </label>
+                      <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
+                    </div>
+
+                    <Input value={locNameTr} onChange={(e) => {
+                      const val = e.target.value;
+                      if(val !== locNameMb) switchMbLoc(false);
+                      setLocNameTr(val);
+                    }} label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+                    {stateFormShcedule.errors?.tr_loc_name && <ZodErrors err={stateFormShcedule.errors?.tr_loc_name} />}
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea value={locAddressTr} onChange={(e) => {
+                      const val = e.target.value;
+                      if(val !== locAddressMb) switchMbLoc(false);
+                      setLocAddressTr(val);
+                    }} label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
+                  </div>
+                  <div className="col-span-12">
+                    <label className="block text-sm font-medium mb-2 dark:text-white">
+                      Choose Location<span className="text-red-500">*</span>
+                      <p className="text-sm text-muted">
+                        Click to choose your event location on maps to show direction in your invitaion.
+                      </p>
+                    </label>
+                    {stateFormShcedule.errors?.tr_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.tr_loc_langlat} />}
+                    {activeIdxTab === 1 && <MapPicker value={latLangTr} onChange={(lat, lng) => {
+                      const val = [lat, lng];
+                      if(val !== latLangMb) switchMbLoc(false);
+                      setLatLangTr([lat, lng]);
+                    }} />}
+                  </div>
+                  <div className="col-span-12">
+                    <label className="block text-sm font-medium mb-2 dark:text-white">
+                      Notes
+                      <p className="text-sm text-muted">
+                        Add important short notes regarding the marriage event if any.
+                      </p>
+                    </label>
+
+                    <div className="grid grid-cols-12 gap-2">
+                      {noteListTr.map((note, i) => (
+                        <div key={i} className="col-span-12 md:col-span-3">
+                          <Input
+                            value={note}
+                            onChange={(e) => {
                               const newNotes = [...noteListTr];
-                              newNotes.splice(i, 1);
+                              newNotes[i] = e.target.value;
                               setNoteListTr(newNotes);
                             }}
-                            className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                            id={`tr_label_${i}`}
+                            placeholder="Additional note"
+                            className="py-1.5 w-full"
+                            sufixGroup={
+                              <i
+                                onClick={() => {
+                                  const newNotes = [...noteListTr];
+                                  newNotes.splice(i, 1);
+                                  setNoteListTr(newNotes);
+                                }}
+                                className="bx bx-trash text-lg text-muted-foreground hover:text-red-500 cursor-pointer transition"
+                              />
+                            }
                           />
-                        }
-                      />
-                    </div>
-                  ))}
+                        </div>
+                      ))}
 
-                  <div className=" col-span-12 md:col-span-3">
-                    <button
-                      onClick={() => {
-                        setNoteListTr([...noteListTr, ""]);
-                      }}
-                      type="button"
-                      className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
-                      <i className="bx bx-plus text-lg"></i>
-                      {noteListTr.length === 0 ? "Add Note" : "More"}
-                    </button>
+                      <div className=" col-span-12 md:col-span-3">
+                        <button
+                          onClick={() => {
+                            setNoteListTr([...noteListTr, ""]);
+                          }}
+                          type="button"
+                          className="py-1 px-2 text-sm flex items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-400 text-muted-foreground hover:text-primary hover:border-primary transition">
+                          <i className="bx bx-plus text-lg"></i>
+                          {noteListTr.length === 0 ? "Add Note" : "More"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className="min-h-52 flex items-center justify-center px-4">
+                  <div className="max-w-md w-full text-center">
+                    <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
+                      <i className="bx bx-toggle-left text-4xl text-gray-400"></i>
+                    </div>
+                    <div className="text-sm font-medium text-gray-700">
+                      This feature is not active!
+                    </div>
+                    <p className="text-sm/6 text-gray-500">
+                      Turn on the switch above to add details for your Traditional / Reception Ceremony.
+                    </p>
+                  </div>
+                </div>
+              )
+            }
           </div>
         </div>
 
         <>
-        {/* {
+          {/* {
           schedulerDtoData.map((sced, i) => (
             <div key={i} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl mt-5 mb-3">
               <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-4">
