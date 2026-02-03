@@ -4,7 +4,7 @@ import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoGroomBride, DtoMainInfoWedding } from "@/lib/dto";
+import { DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { GroomBrideInfo, Prisma, PrismaClient } from "@/generated/prisma";
@@ -24,7 +24,7 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
     const { user } = session;
     if(!user) throw new Error("Authentication credential not Found!");
 
-    const event_id = formData.id ?? 0;
+    const event_id = formData.event_id ?? 0;
 
     const findEventData = await db.events.findUnique({
       where: { id: event_id }
@@ -154,3 +154,77 @@ async function upsertGroomBride({
     };
   };
 };
+
+export async function StoreUpdateSchedule(event_id: number, formData: DtoScheduler[], schedule_note: string | null) {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const existingIds = await db.scheduleInfo.findMany({
+      where: { event_id },
+      select: {
+        id: true
+      }
+    });
+    const incomingIds = new Set(formData.map(item => item.id).filter(id => id != null));
+    const idsToDelete = existingIds.filter(item => !incomingIds.has(item.id)).map(item => item.id);
+
+    if(formData.length > 0) {
+      await db.$transaction(async (tx) => {
+        for (const x of formData) {
+          const sch_id = x.id ?? 0;
+          const latitude = x.langLat?.[0] ?? 0;
+          const longitude = x.langLat?.[1] ?? 0;
+
+          await tx.scheduleInfo.upsert({
+            where: {
+              id: sch_id,
+            },
+            update: {
+              date: x.date ?? new Date(),
+              start_time: x.start_time,
+              end_time: x.end_time,
+              location: x.loc_name,
+              address: x.loc_address,
+              latitude: latitude.toString(),
+              longitude: longitude.toString(),
+              notes: x.notes,
+              ceremony_type: x.ceremon_type,
+              use_main_loc: x.use_main_loc,
+              updatedBy: user?.email,
+            },
+            create: {
+              event_id,
+              type: x.type,
+              date: x.date ?? new Date(),
+              start_time: x.start_time,
+              end_time: x.end_time,
+              location: x.loc_name,
+              address: x.loc_address,
+              latitude: latitude.toString(),
+              longitude: longitude.toString(),
+              notes: x.notes,
+              ceremony_type: x.ceremon_type,
+              use_main_loc: x.use_main_loc,
+              createdBy: user?.email,
+            },
+          });
+        };
+
+        await tx.events.update({
+          where: { id: event_id },
+          data: { schedule_note }
+        });
+
+        if (idsToDelete.length > 0) await tx.scheduleInfo.deleteMany({
+          where: {
+            id: { in: idsToDelete }
+          }
+        });
+      });
+    }
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}

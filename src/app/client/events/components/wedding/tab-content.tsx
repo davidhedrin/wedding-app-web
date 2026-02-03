@@ -15,9 +15,9 @@ import Select from "@/components/ui/select";
 import { Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoMainInfoWedding, DtoSchedulerWedding } from "@/lib/dto";
+import { DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { GetGroomBrideDataByEventId, StoreUpdateMainInfoWedding } from "@/server/event-detail";
+import { GetGroomBrideDataByEventId, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -184,7 +184,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     const shortNameBride = brideFullname?.trim().match(/^\S+/)?.[0] ?? "";
 
     const newData: DtoMainInfoWedding = {
-      id: dataEvent.id,
+      event_id: dataEvent.id,
       greeting_msg: greetingMessage.trim() != "" ? greetingMessage : null,
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
@@ -688,10 +688,12 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
 };
 
 function SchedulerTabContent(event_id: number) {
+  const { setLoading } = useLoading();
   const { activeIdxTab } = useTabEventDetail();
   const [stateFormShcedule, setStateFormShcedule] = useState<FormState>({ success: false, errors: {} });
 
   // Marriage Blessing Props
+  const [eventMbId, setEventMbId] = useState<number | null>(null);
   const [eventDateMb, setDateRangeMb] = useState<Date | undefined>();
   const [startTimeMb, setStartTimeMb] = useState<string>("");
   const [endTimeMb, setEndTimeMb] = useState<string>("");
@@ -701,6 +703,7 @@ function SchedulerTabContent(event_id: number) {
   const [noteListMb, setNoteListMb] = useState<string[]>([""]);
 
   // Traditional Reception Props
+  const [eventTrId, setEventTrId] = useState<number | null>(null);
   const [isCheckedTr, setIsCheckedTr] = useState(false);
   const [isTrUsingLocMb, setTrUsingLocMb] = useState(false);
   const [eventDateTr, setDateRangeTr] = useState<Date | undefined>();
@@ -712,9 +715,11 @@ function SchedulerTabContent(event_id: number) {
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
+  const [scheduleNote, setScheduleNote] = useState<string>("");
+
   const switchMbLoc = (changeVal: boolean) => {
     setTrUsingLocMb(changeVal);
-    if(changeVal) {
+    if (changeVal) {
       setLocNameTr(locNameMb);
       setLocAddressTr(locAddressMb);
       setLatLangTr(latLangMb);
@@ -725,23 +730,58 @@ function SchedulerTabContent(event_id: number) {
     }
   };
 
-  const [schedulerDtoData, setSchedulerDtoData] = useState<DtoSchedulerWedding[]>([]);
+  const [schedulerDtoData, setSchedulerDtoData] = useState<DtoScheduler[]>([]);
   const addMoreCeremony = () => {
     setSchedulerDtoData(prev => [
       ...prev,
       {
         id: null,
-        name: "",
+        type: "WED_CST",
         date: undefined,
         start_time: "",
         end_time: "",
         loc_name: "",
         loc_address: "",
-        is_mb_loc: false,
+        langLat: null,
+        use_main_loc: false,
         notes: [""],
-        langLat: [],
       }
     ]);
+  };
+
+  const createDtoData = (): DtoScheduler[] => {
+    const data: DtoScheduler[] = [
+      {
+        id: eventMbId,
+        type: "WED_MB",
+        date: eventDateMb,
+        start_time: startTimeMb,
+        end_time: endTimeMb,
+        loc_name: locNameMb,
+        loc_address: locAddressMb,
+        langLat: latLangMb,
+        notes: noteListMb.filter(x => x.trim() !== ""),
+
+        use_main_loc: false,
+      },
+    ];
+
+    if (isCheckedTr) data.push({
+      id: eventTrId,
+      type: "WED_TOR",
+      date: eventDateTr,
+      start_time: startTimeTr,
+      end_time: endTimeTr,
+      loc_name: locNameTr,
+      loc_address: locAddressTr,
+      langLat: latLangTr,
+      notes: noteListTr.filter(x => x.trim() !== ""),
+      
+      use_main_loc: isTrUsingLocMb,
+      ceremon_type: radioSelectTypeTr,
+    });
+
+    return data;
   };
 
   const FormSchemaSchedule = z.object({
@@ -806,6 +846,24 @@ function SchedulerTabContent(event_id: number) {
       icon: 'bx bx-error bx-tada text-blue-500'
     });
     if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await StoreUpdateSchedule(event_id, createDtoData(), scheduleNote.trim() !== "" ? scheduleNote : null);
+      // await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -924,7 +982,7 @@ function SchedulerTabContent(event_id: number) {
                   onChange={(e) => {
                     const val = e.target.checked;
                     setIsCheckedTr(val);
-                    if(val === false) switchMbLoc(false);
+                    if (val === false) switchMbLoc(false);
                   }}
                   type="checkbox" id="hs-xs-switch-tr-ceremony" className="peer sr-only"
                 />
@@ -987,12 +1045,12 @@ function SchedulerTabContent(event_id: number) {
                     <div className="flex items-center gap-x-3 mb-3 mt-2">
                       <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
                         <input
-                        checked={isTrUsingLocMb}
-                        onChange={(e) => {
-                          const val = e.target.checked;
-                          switchMbLoc(val);
-                        }}
-                        type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
+                          checked={isTrUsingLocMb}
+                          onChange={(e) => {
+                            const val = e.target.checked;
+                            switchMbLoc(val);
+                          }}
+                          type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
                         <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
                         <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                       </label>
@@ -1001,7 +1059,7 @@ function SchedulerTabContent(event_id: number) {
 
                     <Input value={locNameTr} onChange={(e) => {
                       const val = e.target.value;
-                      if(val !== locNameMb) switchMbLoc(false);
+                      if (val !== locNameMb) switchMbLoc(false);
                       setLocNameTr(val);
                     }} label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
                     {stateFormShcedule.errors?.tr_loc_name && <ZodErrors err={stateFormShcedule.errors?.tr_loc_name} />}
@@ -1009,7 +1067,7 @@ function SchedulerTabContent(event_id: number) {
                   <div className="col-span-12">
                     <Textarea value={locAddressTr} onChange={(e) => {
                       const val = e.target.value;
-                      if(val !== locAddressMb) switchMbLoc(false);
+                      if (val !== locAddressMb) switchMbLoc(false);
                       setLocAddressTr(val);
                     }} label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
                   </div>
@@ -1023,7 +1081,7 @@ function SchedulerTabContent(event_id: number) {
                     {stateFormShcedule.errors?.tr_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.tr_loc_langlat} />}
                     {activeIdxTab === 1 && <MapPicker value={latLangTr} onChange={(lat, lng) => {
                       const val = [lat, lng];
-                      if(val !== latLangMb) switchMbLoc(false);
+                      if (val !== latLangMb) switchMbLoc(false);
                       setLatLangTr([lat, lng]);
                     }} />}
                   </div>
@@ -1198,7 +1256,7 @@ function SchedulerTabContent(event_id: number) {
         </button> */}
         </>
 
-        <Textarea label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
+        <Textarea value={scheduleNote} onChange={(e) => setScheduleNote(e.target.value)} label="Notes" id="shedule_notes" placeholder="Enter Event Schedule If Any" rows={3} />
 
         <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">
           <p>Fields marked with <span className="text-red-500">*</span> are required.</p>

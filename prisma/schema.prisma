@@ -270,7 +270,7 @@ model ScheduleInfo {
   longitude     String?
   notes         String[]
   ceremony_type TradRecepType?
-  use_mb_loc    Boolean        @default(false)
+  use_main_loc    Boolean        @default(false)
 
   createdBy String?
   updatedBy String?
