@@ -189,11 +189,12 @@ model Events {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  user          User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  template      Templates        @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
-  tr            Tr?
-  gb_info       GroomBrideInfo[]
-  schedule_info ScheduleInfo[]
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  template        Templates        @relation(fields: [tmp_id], references: [id], onDelete: Cascade)
+  tr              Tr?
+  gb_info         GroomBrideInfo[]
+  schedule_info   ScheduleInfo[]
+  event_galleries EventGalleries[]
 }
 
 model Tr {
@@ -246,7 +247,7 @@ model GroomBrideInfo {
   place_origin String?
   occupation   String?
   personal_msg String?
-  img_name      String?
+  img_name     String?
   img_path     String?
 
   createdBy String?
@@ -270,12 +271,24 @@ model ScheduleInfo {
   longitude     String?
   notes         String[]
   ceremony_type TradRecepType?
-  use_main_loc    Boolean        @default(false)
+  use_main_loc  Boolean        @default(false)
 
   createdBy String?
   updatedBy String?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model EventGalleries {
+  id       Int     @id @default(autoincrement())
+  event_id Int
+  img_name String?
+  img_path String?
+
+  createdBy String?
+  createdAt DateTime? @default(now())
 
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
 }

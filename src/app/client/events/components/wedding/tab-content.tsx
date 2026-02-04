@@ -15,7 +15,7 @@ import Select from "@/components/ui/select";
 import { Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
 import { GetGroomBrideDataByEventId, GetScheduleByEventId, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 
@@ -1323,16 +1323,14 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
   )
 };
 
-type UploadedImage = {
-  id: string;
-  url: string;
-  file?: File;
-};
 function GalleryTabContent(event_id: number) {
+  const { setLoading } = useLoading();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [images, setImages] = useState<UploadedImage[]>([]);
+  const [images, setImages] = useState<DtoEventGallery[]>([]);
 
-  const handleFileCaptureChange = (e: { target: { files: FileList | null } }) => {
+  const handleFileCaptureChange = async (e: { target: { files: FileList | null } }) => {
+    setLoading(true);
+
     const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
     const maxSizeInMB = Configs.maxSizePictureInMB;
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
@@ -1340,7 +1338,7 @@ function GalleryTabContent(event_id: number) {
     const files = e.target.files;
     if (!files) return;
 
-    const newImages: UploadedImage[] = [];
+    const newImages: DtoEventGallery[] = [];
     let invalidType = false;
     let invalidSize = false;
 
@@ -1356,8 +1354,9 @@ function GalleryTabContent(event_id: number) {
       };
 
       newImages.push({
-        id: crypto.randomUUID(),
-        url: URL.createObjectURL(file),
+        id: null,
+        img_name: `${file.name}.${file.type}`,
+        img_url: URL.createObjectURL(file),
         file,
       });
     });
@@ -1377,6 +1376,7 @@ function GalleryTabContent(event_id: number) {
     });
 
     setImages((prev) => [...prev, ...newImages]);
+    setLoading(false);
   };
 
   const handleDragOverCapture = (e: React.DragEvent<HTMLDivElement>) => {
@@ -1474,13 +1474,13 @@ function GalleryTabContent(event_id: number) {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {images.map((img) => (
+            {images.map((img, idx) => (
               <div
-                key={img.id}
+                key={idx}
                 className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
               >
                 <Image
-                  src={img.url}
+                  src={img.img_url}
                   alt="Uploaded"
                   fill
                   className="object-cover"
@@ -1490,7 +1490,7 @@ function GalleryTabContent(event_id: number) {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setImages((prev) => prev.filter((i) => i.id !== img.id));
+                    setImages((prev) => prev.filter((_, i) => i !== idx));
                   }}
                   className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
                   aria-label="Hapus foto"
@@ -1499,7 +1499,6 @@ function GalleryTabContent(event_id: number) {
                 </button>
               </div>
             ))}
-
           </div>
         )}
       </div>

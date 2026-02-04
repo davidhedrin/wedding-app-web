@@ -161,3 +161,10 @@ export type DtoScheduler = {
   use_main_loc: boolean;
   ceremon_type?: TradRecepType;
 };
+
+export type DtoEventGallery = {
+  id: number | null;
+  img_name: string,
+  img_url: string,
+  file?: File;
+};

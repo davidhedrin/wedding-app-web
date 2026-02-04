@@ -4,7 +4,7 @@ import { CommonParams, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
@@ -227,6 +227,17 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
         });
       });
     }
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function StoreEventGalleries(event_id: number, formData: DtoEventGallery[]) {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
   } catch (error: any) {
     throw new Error(error.message);
   }
