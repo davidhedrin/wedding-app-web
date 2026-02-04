@@ -42,10 +42,12 @@ export default function MapPicker({
   className,
   value,
   onChange,
+  zoom,
 }: {
   className?: string;
   value?: [number, number] | null;
   onChange?: (lat: number, lng: number) => void;
+  zoom?: number;
 }) {
   return (
     <div
@@ -56,7 +58,7 @@ export default function MapPicker({
     >
       <MapContainer
         center={value ?? [-6.2, 106.8166]}
-        zoom={15}
+        zoom={zoom ?? 15}
         className="h-full w-full z-0"
       >
         <TileLayer

@@ -17,7 +17,7 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { GetGroomBrideDataByEventId, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { GetGroomBrideDataByEventId, GetScheduleByEventId, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -27,7 +27,7 @@ const MapPicker = dynamic(
 export default function TabContentWedding({ dataEvent }: { dataEvent: Events }) {
   const tabContents = [
     { id: "main-info", content: MainTabContent({ dataEvent }) },
-    { id: "scheduler", content: SchedulerTabContent(dataEvent.id) },
+    { id: "scheduler", content: SchedulerTabContent({ dataEvent }) },
     { id: "gallery", content: GalleryTabContent(dataEvent.id) },
     { id: "history", content: HistoryTabContent(dataEvent.id) },
     { id: "gift", content: GiftTabContent(dataEvent.id) },
@@ -300,7 +300,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     setLoading(true);
     try {
       await StoreUpdateMainInfoWedding(createDtoData());
-      // await fatchDatas();
+      await fatchDatas(false);
       toast({
         type: "success",
         title: "Submit successfully",
@@ -316,8 +316,8 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     setLoading(false);
   };
 
-  const fatchGroomBride = async () => {
-    setLoading(true);
+  const fatchDatas = async (isLoading: boolean = true) => {
+    if (isLoading) setLoading(true);
     const getData = await GetGroomBrideDataByEventId(dataEvent.id);
     getData.forEach(x => {
       const setterType = x.type;
@@ -351,11 +351,11 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       }
     });
 
-    setLoading(false);
+    if (isLoading) setLoading(false);
   };
 
   useEffect(() => {
-    if (activeIdxTab == 0) fatchGroomBride();
+    if (activeIdxTab == 0) fatchDatas();
   }, [activeIdxTab]);
 
   return (
@@ -687,7 +687,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   )
 };
 
-function SchedulerTabContent(event_id: number) {
+function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
   const { setLoading } = useLoading();
   const { activeIdxTab } = useTabEventDetail();
   const [stateFormShcedule, setStateFormShcedule] = useState<FormState>({ success: false, errors: {} });
@@ -715,7 +715,7 @@ function SchedulerTabContent(event_id: number) {
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
-  const [scheduleNote, setScheduleNote] = useState<string>("");
+  const [scheduleNote, setScheduleNote] = useState<string>(dataEvent.schedule_note ?? "");
 
   const switchMbLoc = (changeVal: boolean) => {
     setTrUsingLocMb(changeVal);
@@ -776,7 +776,7 @@ function SchedulerTabContent(event_id: number) {
       loc_address: locAddressTr,
       langLat: latLangTr,
       notes: noteListTr.filter(x => x.trim() !== ""),
-      
+
       use_main_loc: isTrUsingLocMb,
       ceremon_type: radioSelectTypeTr,
     });
@@ -849,8 +849,8 @@ function SchedulerTabContent(event_id: number) {
 
     setLoading(true);
     try {
-      await StoreUpdateSchedule(event_id, createDtoData(), scheduleNote.trim() !== "" ? scheduleNote : null);
-      // await fatchDatas();
+      await StoreUpdateSchedule(dataEvent.id, createDtoData(), scheduleNote.trim() !== "" ? scheduleNote : null);
+      await fatchDatas(false);
       toast({
         type: "success",
         title: "Submit successfully",
@@ -865,6 +865,48 @@ function SchedulerTabContent(event_id: number) {
     }
     setLoading(false);
   };
+
+  const fatchDatas = async (isLoading: boolean = true) => {
+    if (isLoading) setLoading(true);
+
+    const getData = await GetScheduleByEventId(dataEvent.id);
+    getData.forEach((x) => {
+      const schType = x.type;
+      let longLat: [number, number] | null = null;
+      if (x.latitude != null && x.longitude != null) longLat = [parseFloat(x.latitude), parseFloat(x.longitude)];
+
+      if (schType === "WED_MB") {
+        setEventMbId(x.id);
+        setDateRangeMb(x.date);
+        setStartTimeMb(x.start_time);
+        setEndTimeMb(x.end_time ?? "");
+        setLocNameMb(x.location ?? "");
+        setLocAddressMb(x.address ?? "");
+        setLatLangMb(longLat);
+        setNoteListMb(x.notes.length > 0 ? x.notes : [""]);
+      };
+
+      if (schType === "WED_TOR") {
+        setEventTrId(x.id);
+        setIsCheckedTr(true);
+        setTrUsingLocMb(x.use_main_loc);
+        setDateRangeTr(x.date);
+        setStartTimeTr(x.start_time);
+        setEndTimeTr(x.end_time ?? "");
+        setLocNameTr(x.location ?? "");
+        setLocAddressTr(x.address ?? "");
+        setLatLangTr(longLat);
+        setNoteListTr(x.notes.length > 0 ? x.notes : [""]);
+        setRadioSelectTypeTr(x.ceremony_type ?? "Traditional");
+      };
+    });
+
+    if (isLoading) setLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeIdxTab == 1) fatchDatas();
+  }, [activeIdxTab]);
 
   return (
     <div>
@@ -901,11 +943,19 @@ function SchedulerTabContent(event_id: number) {
                 <Input value={endTimeMb} onChange={(e) => setEndTimeMb(e.target.value)} type='time' className='py-1.5' id='mb_end_time' label='End Time' />
               </div>
               <div className="col-span-12">
-                <Input value={locNameMb} onChange={(e) => setLocNameMb(e.target.value)} label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
+                <Input value={locNameMb} onChange={(e) => {
+                  const val = e.target.value;
+                  if (val !== locNameTr) switchMbLoc(false);
+                  setLocNameMb(val);
+                }} label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
                 {stateFormShcedule.errors?.mb_loc_name && <ZodErrors err={stateFormShcedule.errors?.mb_loc_name} />}
               </div>
               <div className="col-span-12">
-                <Textarea value={locAddressMb} onChange={(e) => setLocAddressMb(e.target.value)} label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
+                <Textarea value={locAddressMb} onChange={(e) => {
+                  const val = e.target.value;
+                  if (val !== locAddressTr) switchMbLoc(false);
+                  setLocAddressMb(val);
+                }} label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -915,7 +965,11 @@ function SchedulerTabContent(event_id: number) {
                   </p>
                   {stateFormShcedule.errors?.mb_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.mb_loc_langlat} />}
                 </label>
-                {activeIdxTab === 1 && <MapPicker value={latLangMb} onChange={(lat, lng) => setLatLangMb([lat, lng])} />}
+                {activeIdxTab === 1 && <MapPicker value={latLangMb} onChange={(lat, lng) => {
+                  const val = [lat, lng];
+                  if (val !== latLangTr) switchMbLoc(false);
+                  setLatLangMb([lat, lng]);
+                }} zoom={17} />}
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">

@@ -7,13 +7,11 @@ import { auth } from "@/app/api/auth/auth-setup";
 import { DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { GroomBrideInfo, Prisma, PrismaClient } from "@/generated/prisma";
+import { GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 
 export async function GetGroomBrideDataByEventId(event_id: number) : Promise<GroomBrideInfo[]> {
-  const getData = await db.groomBrideInfo.findMany({
-    where: { event_id: event_id },
-  });
+  const getData = await db.groomBrideInfo.findMany({ where: { event_id } });
   return getData;
 }
 
@@ -154,6 +152,11 @@ async function upsertGroomBride({
     };
   };
 };
+
+export async function GetScheduleByEventId(event_id: number): Promise<ScheduleInfo[]> {
+  const getData = await db.scheduleInfo.findMany({ where: { event_id } });
+  return getData;
+}
 
 export async function StoreUpdateSchedule(event_id: number, formData: DtoScheduler[], schedule_note: string | null) {
   try{

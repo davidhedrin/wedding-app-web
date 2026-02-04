@@ -45,10 +45,13 @@ export default function Page() {
     { name: "Added At", key: "createdAt", key_sort: "createdAt", IsVisible: true },
   ]);
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date()),
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    undefined
+    // {
+    //   from: startOfMonth(new Date()),
+    //   to: endOfMonth(new Date()),
+    // }
+  );
   const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
     const selectObj = normalizeSelectObj(tblThColomns);
     const orderObj = sortListToOrderBy(tblSortList);
