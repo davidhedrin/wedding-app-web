@@ -1,6 +1,6 @@
 "use server";
 
-import { CommonParams, PaginateResult } from "@/lib/model-types";
+import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
@@ -9,6 +9,7 @@ import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
+import pLimit from "p-limit";
 
 export async function GetGroomBrideDataByEventId(event_id: number) : Promise<GroomBrideInfo[]> {
   const getData = await db.groomBrideInfo.findMany({ where: { event_id } });
@@ -237,7 +238,58 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
+
+    const limit = pLimit(Configs.p_limit);
+    let uploadPromises: Promise<UploadFileRespons>[] = [];
     
+    formData.forEach(x => {
+      if (x.file !== undefined) {
+        const file: File = x.file;
+        const setLimit = limit(() => CloudflareUploadFile(
+          file,
+          "webp",
+          Configs.s3_bucket,
+          `event-gallery-${event_id}`
+        ));
+        uploadPromises.push(setLimit);
+      }
+    });
+
+    if(uploadPromises.length === 0) return;
+    const results = await Promise.all(uploadPromises);
+
+    const createData = results.map(x => ({
+      event_id,
+      img_name: x.filename,
+      img_path: x.path,
+      createdBy: user?.email
+    }));
+    await db.eventGalleries.createMany({data: createData});
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function GetEventGalleryByEventId(event_id: number) {
+  const getData = await db.eventGalleries.findMany({ where: { event_id } });
+  return getData;
+};
+
+export async function DeleteEventGalleryById(event_id: number, gallery_id: number) {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const findGallery = await db.eventGalleries.findUnique({
+      where: { id: gallery_id }
+    });
+    if(!findGallery) throw new Error("Gallery photo not Found!");
+
+    if (findGallery.img_name) CloudflareDeleteFile(Configs.s3_bucket, findGallery.img_name).catch(err => {});
+    await db.eventGalleries.delete({
+      where: { id: gallery_id, event_id }
+    });
   } catch (error: any) {
     throw new Error(error.message);
   }

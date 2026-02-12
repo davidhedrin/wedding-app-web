@@ -20,7 +20,7 @@ export default function ModalConfirm() {
             <div className="font-semibold">
               {title}
             </div>
-            <p className="text-sm">{message}</p>
+            <p className="text-sm whitespace-pre-line">{message}</p>
           </div>
         </div>
 

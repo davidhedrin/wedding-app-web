@@ -17,7 +17,7 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventGallery, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { GetGroomBrideDataByEventId, GetScheduleByEventId, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteEventGalleryById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -1137,7 +1137,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       const val = [lat, lng];
                       if (val !== latLangMb) switchMbLoc(false);
                       setLatLangTr([lat, lng]);
-                    }} />}
+                    }} zoom={17} />}
                   </div>
                   <div className="col-span-12">
                     <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -1325,33 +1325,32 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
 
 function GalleryTabContent(event_id: number) {
   const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<DtoEventGallery[]>([]);
 
   const handleFileCaptureChange = async (e: { target: { files: FileList | null } }) => {
-    setLoading(true);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
     const maxSizeInMB = Configs.maxSizePictureInMB;
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
-    const files = e.target.files;
-    if (!files) return;
-
     const newImages: DtoEventGallery[] = [];
-    let invalidType = false;
-    let invalidSize = false;
+    let invalidTypeCount = 0;
+    let invalidSizeCount = 0;
 
-    Array.from(files).map((file) => {
+    for (const file of Array.from(files)) {
       if (!allowedTypes.includes(file.type)) {
-        invalidType = true;
-        return;
-      };
+        invalidTypeCount++;
+        continue;
+      }
 
       if (file.size > maxSizeInBytes) {
-        invalidSize = true;
-        return;
-      };
+        invalidSizeCount++;
+        continue;
+      }
 
       newImages.push({
         id: null,
@@ -1359,23 +1358,52 @@ function GalleryTabContent(event_id: number) {
         img_url: URL.createObjectURL(file),
         file,
       });
-    });
+    };
 
-    let message = '';
-    if (invalidType) {
-      message += 'Some files an invalid file type are allowed';
-    }
-    if (invalidSize) {
-      if (message) message += ' and, ';
-      message += `Some files too large, They must be less than ${maxSizeInMB}MB.`;
-    }
-    if (invalidType || invalidSize) toast({
-      type: "warning",
-      title: "Invalid File",
-      message: message
-    });
+    const totalFiles = files.length;
+    const validCount = newImages.length;
+    const totalInvalid = invalidTypeCount + invalidSizeCount;
 
-    setImages((prev) => [...prev, ...newImages]);
+    if (validCount === 0) {
+      toast({
+        type: "warning",
+        title: "Invalid Files",
+        message: "All selected files are invalid.",
+      });
+      return;
+    }
+
+    let message = `${totalFiles} file${totalFiles === 1 ? '' : 's'} selected.\n`;
+    message += `${validCount} file${validCount === 1 ? '' : 's'} ready to upload.`;
+
+    if (totalInvalid > 0) {
+      if (invalidTypeCount > 0) {
+        message += `\n ${invalidTypeCount} invalid file type.`;
+      }
+
+      if (invalidSizeCount > 0) {
+        message += `\n ${invalidSizeCount} file${invalidSizeCount === 1 ? '' : 's'} exceed ${maxSizeInMB}MB.`;
+      }
+    }
+    message += `\nDo you want to continue?`;
+
+    const confirmed = await showConfirm({
+      title: 'Upload Confirmation?',
+      message: message,
+      confirmText: 'Yes, Upload',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    await StoreEventGalleries(event_id, newImages);
+    toast({
+      type: "success",
+      title: "Upload successfully",
+      message: "Your upload has been successfully completed"
+    });
+    await fatchDatas(false);
     setLoading(false);
   };
 
@@ -1396,6 +1424,45 @@ function GalleryTabContent(event_id: number) {
 
     const files = e.dataTransfer.files;
     handleFileCaptureChange({ target: { files } });
+  };
+
+  const fatchDatas = async (isLoading: boolean = true) => {
+    if (isLoading) setLoading(true);
+
+    const getData = await GetEventGalleryByEventId(event_id);
+    if (getData.length > 0) {
+      const createDatas: DtoEventGallery[] = getData.map((x) => ({
+        id: x.id,
+        img_name: x.img_name ?? "",
+        img_url: x.img_path ?? "",
+      }));
+      setImages(createDatas);
+    }
+
+    if (isLoading) setLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeIdxTab == 2) fatchDatas();
+  }, [activeIdxTab]);
+
+  const deleteImage = async (idx: number, gallery_id: number | null) => {
+    if(!gallery_id) return;
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+
+    await DeleteEventGalleryById(event_id, gallery_id);
+
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+    setLoading(false);
   };
 
   return (
@@ -1450,58 +1517,71 @@ function GalleryTabContent(event_id: number) {
         </label>
       </div>
 
-      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3 mt-4">
-        {images.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-rose-100 flex items-center justify-center">
-              <svg
-                className="h-7 w-7 text-rose-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path d="M4 16l4-4a3 3 0 014 0l4 4M2 20h20M6 4h12v6H6z" />
-              </svg>
-            </div>
-
-            <div className="text-sm font-medium text-gray-700">
-              Your gallery moment is empty!
-            </div>
-            <p className="text-sm/6 text-gray-500">
-              Add your beautiful moments to be displayed on the invitation
-            </p>
+      <div className="bg-white border border-gray-200 shadow-2xs rounded-xl p-3 mt-4">
+        <div>
+          <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
+            <i className="bx bx-photo-album text-xl"></i>
+            Gallery Photos
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {images.map((img, idx) => (
-              <div
-                key={idx}
-                className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
-              >
-                <Image
-                  src={img.img_url}
-                  alt="Uploaded"
-                  fill
-                  className="object-cover"
-                />
+          <p className="text-sm text-gray-500">
+            Here your photo gallery list for guests to view and enjoy.
+          </p>
+          <hr className="my-2 text-gray-300" />
+        </div>
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setImages((prev) => prev.filter((_, i) => i !== idx));
-                  }}
-                  className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
-                  aria-label="Hapus foto"
+        <div className="flex flex-col">
+          {images.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-rose-100 flex items-center justify-center">
+                <svg
+                  className="h-7 w-7 text-rose-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
                 >
-                  <i className="bx bx-x text-xl"></i>
-                </button>
+                  <path d="M4 16l4-4a3 3 0 014 0l4 4M2 20h20M6 4h12v6H6z" />
+                </svg>
               </div>
-            ))}
-          </div>
-        )}
+
+              <div className="text-sm font-medium text-gray-700">
+                Your gallery moment is empty!
+              </div>
+              <p className="text-sm/6 text-gray-500">
+                Add your beautiful moments to be displayed on the invitation
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
+                >
+                  <img
+                    src={img.img_url}
+                    alt="Uploaded"
+                    className="object-cover w-full h-full"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteImage(idx, img.id);
+                    }}
+                    className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
+                    aria-label="Hapus foto"
+                  >
+                    <i className="bx bx-x text-xl"></i>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
     </div>
   )
 };
