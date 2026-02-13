@@ -195,6 +195,7 @@ model Events {
   gb_info         GroomBrideInfo[]
   schedule_info   ScheduleInfo[]
   event_galleries EventGalleries[]
+  event_histories EventHistories[]
 }
 
 model Tr {
@@ -290,5 +291,22 @@ model EventGalleries {
   createdBy String?
   createdAt DateTime? @default(now())
 
-  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event           Events           @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event_histories EventHistories[]
+}
+
+model EventHistories {
+  id         Int     @id @default(autoincrement())
+  event_id   Int
+  name       String
+  month      String
+  year       String
+  desc       String?
+  gallery_id Int?
+
+  createdBy String?
+  createdAt DateTime? @default(now())
+
+  event   Events          @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  gallery EventGalleries? @relation(fields: [gallery_id], references: [id], onDelete: SetNull)
 }
