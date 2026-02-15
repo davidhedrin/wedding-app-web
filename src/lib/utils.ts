@@ -321,3 +321,18 @@ export const stopMusic = () => {
     audio.src = "";
   }
 };
+
+type MonthFormat = "short" | "long";
+export function getMonthName(
+  month: string,
+  format: MonthFormat = "short"
+): string {
+  const monthNumber = parseInt(month, 10);
+
+  if (isNaN(monthNumber) || monthNumber < 1 || monthNumber > 12) return "";
+
+  const date = new Date(2024, monthNumber - 1, 1);
+  return date.toLocaleString("en-US", {
+    month: format,
+  });
+};

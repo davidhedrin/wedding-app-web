@@ -8,6 +8,36 @@ import path from "path";
 import sharp from 'sharp';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
+function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo): string {
+  if (typeof format === "string") return format.toLowerCase();
+  if ("id" in format) return format.id;
+  throw new Error("Invalid image format");
+};
+
+function getCompressionParams(sizeKB: number) {
+  if (sizeKB >= 4096) return { quality: 50, effort: 4 };
+  if (sizeKB >= 2048) return { quality: 80, effort: 4 };
+  if (sizeKB >= 1024) return { quality: 100, effort: 3 };
+  if (sizeKB >= 500) return { quality: 140, effort: 3 };
+  // < 500 KB
+  return { quality: 165, effort: 2 };
+};
+
+export async function compressImage(
+  file: File,
+  to_format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo,
+  quality: number = 75,
+  effort: number = 4 // 4 for webp, 5 for avif
+): Promise<Buffer> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  return await sharp(buffer).toFormat(to_format, {
+    quality,
+    effort
+  }).toBuffer();
+};
+
 export async function UploadFile(file: File, loc: string, prefix?: string): Promise<UploadFileRespons> {
   try {
     const bytes = await file.arrayBuffer();
@@ -71,35 +101,6 @@ export async function DeleteFile(loc: string, filename: string): Promise<UploadF
       path: null
     };
   }
-};
-
-export async function compressImage(
-  file: File,
-  to_format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo,
-  quality: number = 75,
-  effort: number = 4 // 4 for webp, 5 for avif
-): Promise<Buffer> {
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  return await sharp(buffer).toFormat(to_format, {
-    quality,
-    effort
-  }).toBuffer();
-};
-
-function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo): string {
-  if (typeof format === "string") return format.toLowerCase();
-  if ("id" in format) return format.id;
-  throw new Error("Invalid image format");
-};
-function getCompressionParams(sizeKB: number) {
-  if (sizeKB >= 4096) return { quality: 8, effort: 5 };
-  if (sizeKB >= 2048) return { quality: 10, effort: 5 };
-  if (sizeKB >= 1024) return { quality: 55, effort: 4 };
-  if (sizeKB >= 500) return { quality: 70, effort: 3 };
-  // < 500 KB
-  return { quality: 95, effort: 0 };
 };
 
 export async function UploadFileCompress(

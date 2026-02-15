@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import Input from "./ui/input";
 
 type TablePaginationProps = {
@@ -33,31 +33,49 @@ export default function TablePagination({
     }
   };
 
+  const defaultPageSizes = [5, 10, 15, 20, 25];
+  const [extraPageSize, setExtraPageSize] = useState<number | null>(null);
+  useEffect(() => {
+    if (perPage !== undefined && !defaultPageSizes.includes(perPage)) {
+      setExtraPageSize(perPage);
+    }
+  }, [perPage]);
+
+  const pageSizes = useMemo(() => {
+    const sizes = [...defaultPageSizes];
+
+    if (extraPageSize && !sizes.includes(extraPageSize)) {
+      sizes.push(extraPageSize);
+    }
+
+    return sizes.sort((a, b) => a - b);
+  }, [extraPageSize]);
+
   return (
     <div className="flex items-center justify-between">
-      <div className="flex-1 text-sm flex">
-        <div className="items-center gap-2 flex">
-          <span className="text-sm text-muted">
-            Show
-          </span>
-          {
-            perPage !== undefined && <div>
+      {
+        perPage !== undefined && <div className="flex-1 text-sm flex">
+          <div className="items-center gap-2 flex">
+            <span className="text-sm text-muted">
+              Show
+            </span>
+            <div>
               <select value={perPage.toString()} onChange={(e) => {
                 const val = e.target.value;
                 setPerPage(parseInt(val));
                 changePaginate(1, parseInt(val));
               }} className="py-1.5 px-1 block w-full border border-gray-300 rounded-lg text-sm hover:border-gray-800 focus:ring-gray-800 disabled:opacity-50 disabled:pointer-events-none">
-                {[5, 10, 15, 20, 25].map((pageSize) => (
+                {pageSizes.map((pageSize) => (
                   <option key={pageSize} value={`${pageSize}`}>{pageSize}</option>
                 ))}
               </select>
             </div>
-          }
-          <span className="hidden text-sm lg:block text-muted">
-            rows of {totalCount} entries
-          </span>
+            <span className="hidden text-sm lg:block text-muted">
+              rows of {totalCount} entries
+            </span>
+          </div>
         </div>
-      </div>
+      }
       <div className="flex items-center gap-4 w-fit">
         <div className="flex items-center text-sm gap-2">
           <div className="text-muted">Page</div>

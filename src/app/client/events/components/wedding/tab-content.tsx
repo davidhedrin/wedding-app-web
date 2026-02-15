@@ -2,7 +2,7 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys } from "@/lib/config";
-import { playMusic, showConfirm, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { getMonthName, modalAction, normalizeSelectObj, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -12,12 +12,13 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventGalleries, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventGallery, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteEventGalleryById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteEventGalleryById, GetDataEventHistories, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -1329,9 +1330,32 @@ function GalleryTabContent(event_id: number) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<DtoEventGallery[]>([]);
 
+  const [inputPage, setInputPage] = useState("1");
+  const [pageTable, setPageTable] = useState(1);
+  const [perPage, setPerPage] = useState(8);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
+    { name: "Image Name", key: "img_name", key_sort: "img_name", IsVisible: true },
+    { name: "Image URL", key: "img_path", key_sort: "img_path", IsVisible: true },
+  ]);
+
   const handleFileCaptureChange = async (e: { target: { files: FileList | null } }) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
+    if ((files.length + images.length) > Configs.p_limit) {
+      toast({
+        type: "warning",
+        title: "Limit Exceeded",
+        message: `You can only upload up to ${Configs.p_limit} files.`,
+      });
+      if (inputRef.current) {
+        if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
+        inputRef.current.value = "";
+      }
+      return;
+    }
 
     const allowedTypes = ["image/jpg", "image/jpeg", "image/png"];
     const maxSizeInMB = Configs.maxSizePictureInMB;
@@ -1403,7 +1427,7 @@ function GalleryTabContent(event_id: number) {
       title: "Upload successfully",
       message: "Your upload has been successfully completed"
     });
-    await fatchDatas(false);
+    await fatchDatas();
     setLoading(false);
   };
 
@@ -1426,28 +1450,44 @@ function GalleryTabContent(event_id: number) {
     handleFileCaptureChange({ target: { files } });
   };
 
-  const fatchDatas = async (isLoading: boolean = true) => {
-    if (isLoading) setLoading(true);
+  const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
+    const selectObj = normalizeSelectObj(tblThColomns);
 
-    const getData = await GetEventGalleryByEventId(event_id);
-    if (getData.length > 0) {
-      const createDatas: DtoEventGallery[] = getData.map((x) => ({
+    const result = await GetEventGalleryByEventId(event_id, {
+      curPage: page,
+      perPage: countPage,
+      select: {
+        id: true,
+        ...selectObj
+      }
+    });
+
+    setTotalPage(result.meta.totalPages);
+    setTotalCount(result.meta.total);
+    setPageTable(result.meta.page);
+    setInputPage(result.meta.page.toString());
+
+    if (result.data.length > 0) {
+      const createDatas: DtoEventGallery[] = result.data.map((x) => ({
         id: x.id,
         img_name: x.img_name ?? "",
         img_url: x.img_path ?? "",
       }));
       setImages(createDatas);
     }
-
-    if (isLoading) setLoading(false);
   };
 
   useEffect(() => {
-    if (activeIdxTab == 2) fatchDatas();
+    const setDatas = async () => {
+      setLoading(true);
+      await fatchDatas();
+      setLoading(false);
+    };
+    if (activeIdxTab == 2) setDatas();
   }, [activeIdxTab]);
 
   const deleteImage = async (idx: number, gallery_id: number | null) => {
-    if(!gallery_id) return;
+    if (!gallery_id) return;
     const confirmed = await showConfirm({
       title: 'Delete Confirmation?',
       message: 'Are your sure want to delete this record? You will not abel to undo this action!',
@@ -1523,9 +1563,15 @@ function GalleryTabContent(event_id: number) {
             <i className="bx bx-photo-album text-xl"></i>
             Gallery Photos
           </div>
-          <p className="text-sm text-gray-500">
-            Here your photo gallery list for guests to view and enjoy.
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              A maximum of 25 files can be uploaded.
+              {/* Here your photo gallery list for guests to view and enjoy. */}
+            </p>
+            <p className="text-sm text-gray-500">
+              Files: {images.length}/25
+            </p>
+          </div>
           <hr className="my-2 text-gray-300" />
         </div>
 
@@ -1552,31 +1598,46 @@ function GalleryTabContent(event_id: number) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
-                >
-                  <img
-                    src={img.img_url}
-                    alt="Uploaded"
-                    className="object-cover w-full h-full"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteImage(idx, img.id);
-                    }}
-                    className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
-                    aria-label="Hapus foto"
+            <div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-2">
+                {images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative aspect-square overflow-hidden rounded-xl border border-gray-200"
                   >
-                    <i className="bx bx-x text-xl"></i>
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={img.img_url}
+                      alt="Uploaded"
+                      className="object-cover w-full h-full"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteImage(idx, img.id);
+                      }}
+                      className="leading-0 absolute top-2 right-2 z-10 rounded-full bg-white/90 backdrop-blur p-1 text-gray-700 shadow hover:bg-red-50 hover:text-red-500 transition"
+                      aria-label="Hapus foto"
+                    >
+                      <i className="bx bx-x text-xl"></i>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <TablePagination
+                perPage={perPage}
+                pageTable={pageTable}
+                totalPage={totalPage}
+                totalCount={totalCount}
+                setPerPage={setPerPage}
+                setPageTable={setPageTable}
+                fatchData={fatchDatas}
+
+                inputPage={inputPage}
+                setInputPage={setInputPage}
+              />
             </div>
           )}
         </div>
@@ -1587,6 +1648,204 @@ function GalleryTabContent(event_id: number) {
 };
 
 function HistoryTabContent(event_id: number) {
+  const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
+  const modalAddEdit = "modal-add-edit-history-wedding";
+  const btnCloseModal = "btn-close-modal-history-wedding";
+
+  // For Gallery List in Form History
+  const [galleryList, setGalleryList] = useState<EventGalleries[]>([]);
+  const [inputPageGallery, setInputPageGallery] = useState("1");
+  const [pageTableGallery, setPageTableGallery] = useState(1);
+  const [perPageGallery, setPerPageGallery] = useState(6);
+  const [totalPageGallery, setTotalPageGallery] = useState(0);
+  const [totalCountGallery, setTotalCountGallery] = useState(0);
+  const [tblThColomnsGallery, setTblThColomnsGallery] = useState<TableThModel[]>([
+    { name: "Image Name", key: "img_name", key_sort: "img_name", IsVisible: true },
+    { name: "Image URL", key: "img_path", key_sort: "img_path", IsVisible: true },
+  ]);
+  // End For Gallery List in Form History
+
+  const [inputPage, setInputPage] = useState("1");
+  const [pageTable, setPageTable] = useState(1);
+  const [perPage, setPerPage] = useState(9);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [datas, setDatas] = useState<(EventHistories & { gallery?: EventGalleries | null })[]>([]);
+  const [inputSearch, setInputSearch] = useState("");
+  const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
+  const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
+    { name: "Title", key: "name", key_sort: "name", IsVisible: true },
+    { name: "Month", key: "month", key_sort: "month", IsVisible: true },
+    { name: "Year", key: "year", key_sort: "year", IsVisible: true },
+    { name: "Description", key: "desc", key_sort: "desc", IsVisible: true },
+    { name: "Gallery", key: "gallery_id", key_sort: "gallery_id", IsVisible: true },
+  ]);
+
+  const [stateFormHistory, setStateFormHistory] = useState<FormState>({ success: false, errors: {} });
+  const [addEditId, setAddEditId] = useState<number | null>(null);
+  const [historyTitle, setHistoryTitle] = useState("");
+  const [historyTime, setHistoryTime] = useState("");
+  const [historyDesc, setHistoryDesc] = useState("");
+  const [selectedImgHistory, setSelectedImgHistory] = useState<number | null>(null);
+
+  const openModalAddEdit = async (id?: number) => {
+    if (id) {
+
+    } else {
+      setAddEditId(null);
+      setHistoryTitle("");
+      setHistoryTime("");
+      setHistoryDesc("");
+      setSelectedImgHistory(null);
+    }
+
+    setStateFormHistory({ success: true, errors: {} });
+    modalAction(`btn-${modalAddEdit}`);
+  };
+
+  const createDtoData = (): DtoEventHistory => {
+    const data = {
+      id: addEditId,
+      name: historyTitle,
+      month_year: historyTime,
+      desc: historyDesc,
+      gallery_id: selectedImgHistory,
+    };
+
+    return data;
+  };
+
+  const FormSchemaHistory = z.object({
+    history_title: z.string().min(1, { message: 'Title is required field.' }).trim(),
+    history_month: z.string().min(1, { message: 'Month is required field.' }).trim(),
+    history_desc: z.string().min(1, { message: 'History description is required field.' }).trim(),
+  });
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaHistory.safeParse(data);
+    if (!valResult.success) {
+      setStateFormHistory({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormHistory({ success: true, errors: {} });
+
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await StoreUpdateHistory(event_id, createDtoData());
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+    }
+    setLoading(false);
+  };
+
+  const fetchDatasGallery = async (page: number = pageTableGallery, countPage: number = perPageGallery) => {
+    const selectObj = normalizeSelectObj(tblThColomnsGallery);
+    const result = await GetEventGalleryByEventId(event_id, {
+      curPage: page,
+      perPage: countPage,
+      select: {
+        id: true,
+        ...selectObj
+      }
+    });
+
+    setTotalPageGallery(result.meta.totalPages);
+    setTotalCountGallery(result.meta.total);
+    setPageTableGallery(result.meta.page);
+    setInputPageGallery(result.meta.page.toString());
+    setGalleryList(result.data);
+  };
+
+  const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
+    const selectObj = normalizeSelectObj(tblThColomns);
+    const orderObj = sortListToOrderBy(tblSortList);
+
+    try {
+      const result = await GetDataEventHistories({
+        curPage: page,
+        perPage: countPage,
+        where: {
+          OR: [
+            { name: { contains: inputSearch.trim(), mode: "insensitive" } },
+          ]
+        },
+        select: {
+          id: true,
+          event_id: true,
+          gallery: true,
+          ...selectObj
+        },
+        orderBy: orderObj
+      });
+      setTotalPage(result.meta.totalPages);
+      setTotalCount(result.meta.total);
+      setPageTable(result.meta.page);
+      setInputPage(result.meta.page.toString());
+
+      setDatas(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender) return;
+    if (tblSortList.length === 0) fatchDatas();
+  }, [tblSortList]);
+  useEffect(() => {
+    if (isFirstRender) return;
+    const timer = setTimeout(() => {
+      fatchDatas(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputSearch]);
+
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  useEffect(() => {
+    const fatchNeedData = async () => {
+      setLoading(true);
+      await fetchDatasGallery();
+
+      await fatchDatas();
+      setIsFirstRender(false);
+      setLoading(false);
+    };
+
+    if (activeIdxTab == 3) fatchNeedData();
+  }, [activeIdxTab]);
+
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -1597,62 +1856,191 @@ function HistoryTabContent(event_id: number) {
           Share your love story and memorable moments leading up to your wedding day.
         </p>
 
-        <button type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+        <button onClick={() => openModalAddEdit()} type="button"
+          className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
           <i className='bx bx-plus text-lg'></i> Add Story
         </button>
+        <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 
-      {/* History List */}
-      {/* <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
-          <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
-            <div className="text-sm text-gray-500">
-              Feb ~ 2022
-            </div>
-            <div className="space-x-1">
-              <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                <i className='bx bxs-edit text-lg'></i>
-              </button>
-              <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                <i className='bx bx-trash text-lg'></i>
-              </button>
-            </div>
-          </div>
+      <TableTopToolbar
+        inputSearch={inputSearch}
+        tblSortList={tblSortList}
+        thColomn={tblThColomns}
+        setTblSortList={setTblSortList}
+        setInputSearch={setInputSearch}
+        fatchData={() => fatchDatas(pageTable)}
+      />
 
-          <div className="relative w-full h-44 md:h-52">
-            <img
-              src="https://picsum.photos/500/600?random=1"
-              alt="Card image"
-              className="w-full h-full object-cover"
-            />
-          </div>
+      <div className="my-3">
+        {
+          datas.length > 0 ? <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {
+              datas.map((x, i) => (
+                <div key={x.id} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+                  <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
+                    <div className="text-sm text-gray-500">
+                      {getMonthName(x.month)} ~ {x.year}
+                    </div>
+                    <div className="space-x-1">
+                      <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                        <i className='bx bxs-edit text-lg text-amber-500'></i>
+                      </button>
+                      <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                        <i className='bx bx-trash text-lg text-red-600'></i>
+                      </button>
+                    </div>
+                  </div>
 
-          <div className="px-3 py-2">
-            <div className="text-base font-bold text-gray-800">
-              Card title
-            </div>
-            <p className="text-sm text-gray-500">
-              With supporting text below as a natural lead-in to additional content.
-            </p>
-          </div>
-        </div>
-      </div> */}
+                  <div className="relative w-full h-44 md:h-52">
+                    {
+                      x.gallery ? <img
+                        src="https://picsum.photos/500/600?random=1"
+                        alt="Card image"
+                        className="w-full h-full object-cover"
+                      /> : <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                        <i className="bx bx-image-alt text-5xl mb-1"></i>
+                        <p className="text-sm font-medium">No image set</p>
+                      </div>
+                    }
+                  </div>
 
-      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
-        <div className="min-h-52 flex items-center justify-center px-4">
-          <div className="max-w-md w-full text-center">
-            <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
-              <i className="bx bx-folder-open text-2xl text-gray-400"></i>
+                  <div className="px-3 py-2">
+                    <div className="text-base font-bold text-gray-800">
+                      {x.name}
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {x.desc}
+                    </p>
+                  </div>
+                </div>
+              ))
+            }
+          </div> : <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
+            <div className="min-h-52 flex items-center justify-center px-4">
+              <div className="max-w-md w-full text-center">
+                <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
+                  <i className="bx bx-folder-open text-2xl text-gray-400"></i>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  Your journey moment is empty!
+                </div>
+                <p className="text-sm/6 text-gray-500">
+                  Add your beautiful moments to be displayed on the invitation
+                </p>
+              </div>
             </div>
-            <div className="text-sm font-medium text-gray-700">
-              Your journey moment is empty!
-            </div>
-            <p className="text-sm/6 text-gray-500">
-              Add your beautiful moments to be displayed on the invitation
-            </p>
           </div>
-        </div>
+        }
       </div>
+
+      <TablePagination
+        perPage={perPage}
+        pageTable={pageTable}
+        totalPage={totalPage}
+        totalCount={totalCount}
+        setPerPage={setPerPage}
+        setPageTable={setPageTable}
+        fatchData={fatchDatas}
+
+        inputPage={inputPage}
+        setInputPage={setInputPage}
+      />
+
+      <UiPortal>
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    <i className='bx bx-book-heart text-lg'></i> {addEditId ? "Edit" : "Add"} History
+                  </div>
+                  <p className='text-xs text-muted'>Here form to register or edit History data</p>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalAddEdit}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12 md:col-span-6">
+                    <Input value={historyTitle} onChange={(e) => setHistoryTitle(e.target.value)} type='text' className='py-1.5' id='history_title' label='Title' placeholder='Enter history title' mandatory />
+                    {stateFormHistory.errors?.history_title && <ZodErrors err={stateFormHistory.errors?.history_title} />}
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input value={historyTime} onChange={(e) => setHistoryTime(e.target.value)} type='month' className='py-1.5' id='history_month' label='Month' mandatory />
+                    {stateFormHistory.errors?.history_month && <ZodErrors err={stateFormHistory.errors?.history_month} />}
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea value={historyDesc} onChange={(e) => setHistoryDesc(e.target.value)} label="Description" id="history_desc" placeholder="Enter history description" rows={3} mandatory />
+                    {stateFormHistory.errors?.history_desc && <ZodErrors err={stateFormHistory.errors?.history_desc} />}
+                  </div>
+                  <div className="col-span-12">
+                    <label className="block text-sm font-medium dark:text-white mb-1">
+                      Image
+                      <p className="text-sm text-muted">
+                        The available Images are taken from the gallery tab.
+                      </p>
+                    </label>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
+                      {galleryList.map((x, i) => (
+                        // <img key={i} src={x.img_path ?? ""} alt={`image-${i}`} className="w-full h-24 object-cover rounded-md border border-gray-200" />
+                        <div key={i} className="relative rounded-md overflow-hidden border border-gray-200">
+                          <img
+                            src="https://picsum.photos/400/300"
+                            alt={`image-${i}`}
+                            className="w-full h-24 object-cover cursor-pointer"
+                            onClick={() => setSelectedImgHistory(prev => prev === x.id ? null : x.id)}
+                          />
+                          <div className="absolute top-2 right-2">
+                            <Input
+                              checked={selectedImgHistory === x.id}
+                              onChange={() => setSelectedImgHistory(prev => prev === x.id ? null : x.id)}
+                              type="checkbox"
+                              className="scale-150 cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <TablePagination
+                      pageTable={pageTableGallery}
+                      totalPage={totalPageGallery}
+                      totalCount={totalCountGallery}
+                      setPerPage={setPerPageGallery}
+                      setPageTable={setPageTableGallery}
+                      fatchData={fetchDatasGallery}
+
+                      inputPage={inputPageGallery}
+                      setInputPage={setInputPageGallery}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </UiPortal>
     </div>
   )
 };

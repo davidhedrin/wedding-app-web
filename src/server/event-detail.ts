@@ -4,10 +4,10 @@ import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-typ
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventGallery, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
+import { EventGalleries, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 
@@ -270,9 +270,34 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
   }
 };
 
-export async function GetEventGalleryByEventId(event_id: number) {
-  const getData = await db.eventGalleries.findMany({ where: { event_id } });
-  return getData;
+type GetDataEventGalleriesParams = {
+  where?: Prisma.EventGalleriesWhereInput;
+  orderBy?: Prisma.EventGalleriesOrderByWithRelationInput | Prisma.EventGalleriesOrderByWithRelationInput[];
+  select?: Prisma.EventGalleriesSelect<DefaultArgs> | undefined;
+} & CommonParams;
+export async function GetEventGalleryByEventId(event_id: number, params: GetDataEventGalleriesParams): Promise<PaginateResult<EventGalleries>> {
+  const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  const skip = (curPage - 1) * perPage;
+  const [data, total] = await Promise.all([
+    db.eventGalleries.findMany({
+      skip,
+      take: perPage,
+      where: { ...where, event_id },
+      orderBy,
+      select
+    }),
+    db.eventGalleries.count({ where: { ...where, event_id } })
+  ]);
+
+  return {
+    data,
+    meta: {
+      page: curPage,
+      limit: perPage,
+      total,
+      totalPages: Math.ceil(total/perPage)
+    }
+  };
 };
 
 export async function DeleteEventGalleryById(event_id: number, gallery_id: number) {
@@ -293,4 +318,72 @@ export async function DeleteEventGalleryById(event_id: number, gallery_id: numbe
   } catch (error: any) {
     throw new Error(error.message);
   }
-}
+};
+
+type GetDataEventHistoriesParams = {
+  where?: Prisma.EventHistoriesWhereInput;
+  orderBy?: Prisma.EventHistoriesOrderByWithRelationInput | Prisma.EventHistoriesOrderByWithRelationInput[];
+  select?: Prisma.EventHistoriesSelect<DefaultArgs> | undefined;
+} & CommonParams;
+export async function GetDataEventHistories(params: GetDataEventHistoriesParams): Promise<PaginateResult<EventHistories & {
+  gallery?: EventGalleries | null
+}>> {
+  const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  const skip = (curPage - 1) * perPage;
+  const [data, total] = await Promise.all([
+    db.eventHistories.findMany({
+      skip,
+      take: perPage,
+      where,
+      orderBy,
+      select: {
+        ...select,
+        gallery: select?.gallery
+      }
+    }),
+    db.eventHistories.count({ where })
+  ]);
+
+  return {
+    data,
+    meta: {
+      page: curPage,
+      limit: perPage,
+      total,
+      totalPages: Math.ceil(total/perPage)
+    }
+  };
+};
+
+export async function StoreUpdateHistory(event_id: number, formData: DtoEventHistory) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const history_id = formData.id ?? 0;
+    const monthYear = formData.month_year.split("-");
+    await db.eventHistories.upsert({
+      where: { id: history_id },
+      update: {
+        name: formData.name,
+        month: monthYear[1],
+        year: monthYear[0],
+        desc: formData.desc,
+        gallery_id: formData.gallery_id,
+        updatedBy: user?.email
+      },
+      create: {
+        event_id,
+        name: formData.name,
+        month: monthYear[1],
+        year: monthYear[0],
+        desc: formData.desc,
+        gallery_id: formData.gallery_id,
+        createdBy: user?.email
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

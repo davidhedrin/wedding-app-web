@@ -168,3 +168,11 @@ export type DtoEventGallery = {
   img_url: string,
   file?: File;
 };
+
+export type DtoEventHistory = {
+  id: number | null;
+  name: string;
+  month_year: string;
+  desc: string;
+  gallery_id: number | null;
+};

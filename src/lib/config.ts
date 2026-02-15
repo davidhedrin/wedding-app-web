@@ -21,7 +21,7 @@ const Configs = {
   toastDuration: 4000, // In second
 
   s3_bucket: "wedlyvite",
-  p_limit: 20
+  p_limit: 25
 };
 export default Configs;
 
