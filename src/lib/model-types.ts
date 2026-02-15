@@ -70,3 +70,10 @@ export type MusicThemeProps = {
   name: string;
   url: string;
 };
+
+export type PaymentMethodProps = {
+  key: string;
+  name: string;
+  icon: string;
+  status: boolean;
+};

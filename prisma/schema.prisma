@@ -56,6 +56,11 @@ enum GroomBrideEnum {
   Bride
 }
 
+enum EventGiftTypeEnum {
+  Transfer
+  Wishlist
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique
@@ -196,6 +201,7 @@ model Events {
   schedule_info   ScheduleInfo[]
   event_galleries EventGalleries[]
   event_histories EventHistories[]
+  event_gifts     EventGifts[]
 }
 
 model Tr {
@@ -311,4 +317,18 @@ model EventHistories {
 
   event   Events          @relation(fields: [event_id], references: [id], onDelete: Cascade)
   gallery EventGalleries? @relation(fields: [gallery_id], references: [id], onDelete: SetNull)
+}
+
+model EventGifts {
+  id          Int               @id @default(autoincrement())
+  event_id    Int
+  type        EventGiftTypeEnum
+  name        String
+  account     String?
+  no_rek      String?
+  qty         Int?
+  product_url String?
+  reserve_qty Int?
+
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
 }

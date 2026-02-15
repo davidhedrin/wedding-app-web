@@ -1,0 +1,88 @@
+[
+  {
+    "key": "qris",
+    "name": "QRIS",
+    "icon": "assets/payment-method/qris.png",
+    "status": false
+  },
+
+  {
+    "key": "bca",
+    "name": "BCA",
+    "icon": "assets/payment-method/bca.png",
+    "status": true
+  },
+  {
+    "key": "bni",
+    "name": "BNI",
+    "icon": "assets/payment-method/bni.png",
+    "status": true
+  },
+  {
+    "key": "bri",
+    "name": "BRI",
+    "icon": "assets/payment-method/bri.png",
+    "status": true
+  },
+  {
+    "key": "mandiri",
+    "name": "Mandiri",
+    "icon": "assets/payment-method/mandiri.png",
+    "status": true
+  },
+  {
+    "key": "permata",
+    "name": "PermataBank",
+    "icon": "assets/payment-method/permatabank.png",
+    "status": true
+  },
+  {
+    "key": "cimb",
+    "name": "CIMB Niaga",
+    "icon": "assets/payment-method/cimbniaga.png",
+    "status": true
+  },
+  {
+    "key": "dana",
+    "name": "Dana",
+    "icon": "assets/payment-method/dana.png",
+    "status": true
+  },
+  {
+    "key": "gopay",
+    "name": "GoPay",
+    "icon": "assets/payment-method/gopay.png",
+    "status": true
+  },
+  {
+    "key": "shopee_pay",
+    "name": "ShopeePay",
+    "icon": "assets/payment-method/shopeepay.png",
+    "status": true
+  },
+  {
+    "key": "ovo",
+    "name": "OVO",
+    "icon": "assets/payment-method/ovo.png",
+    "status": true
+  },
+  {
+    "key": "linkaja",
+    "name": "LinkAja",
+    "icon": "assets/payment-method/linkaja.png",
+    "status": true
+  },
+  
+  {
+    "key": "indomaret",
+    "name": "Indomaret",
+    "icon": "assets/payment-method/indomaret.png",
+    "status": false
+  },
+  {
+    "key": "alfamart",
+    "name": "Alfamart",
+    "icon": "assets/payment-method/alfamart.png",
+    "status": false
+  }
+]

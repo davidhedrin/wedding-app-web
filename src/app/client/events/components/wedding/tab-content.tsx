@@ -1,7 +1,7 @@
 import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
-import Configs, { MusicThemeKeys } from "@/lib/config";
+import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
 import { getMonthName, modalAction, normalizeSelectObj, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
@@ -12,7 +12,7 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { EventGalleries, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventGalleries, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventGallery, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
@@ -1747,6 +1747,7 @@ function HistoryTabContent(event_id: number) {
     };
     setStateFormHistory({ success: true, errors: {} });
 
+    modalAction(btnCloseModal);
     const confirmed = await showConfirm({
       title: 'Submit Confirmation?',
       message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
@@ -1754,7 +1755,10 @@ function HistoryTabContent(event_id: number) {
       cancelText: 'No, Go Back',
       icon: 'bx bx-error bx-tada text-blue-500'
     });
-    if (!confirmed) return;
+    if (!confirmed) {
+      modalAction(`btn-${modalAddEdit}`);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -1771,6 +1775,7 @@ function HistoryTabContent(event_id: number) {
         title: "Request Failed",
         message: error.message
       });
+      modalAction(`btn-${modalAddEdit}`);
     }
     setLoading(false);
   };
@@ -2084,6 +2089,32 @@ function HistoryTabContent(event_id: number) {
 };
 
 function GiftTabContent(event_id: number) {
+  const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
+  const modalAddEdit = "modal-add-edit-gift-wedding";
+  const btnCloseModal = "btn-close-modal-gift-wedding";
+  const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
+
+  const [stateFormGift, setStateFormGift] = useState<FormState>({ success: false, errors: {} });
+  const [addEditId, setAddEditId] = useState<number | null>(null);
+  const [giftType, setGiftType] = useState<EventGiftTypeEnum>(EventGiftTypeEnum.Transfer);
+
+  const openModalAddEdit = async (type: EventGiftTypeEnum, id?: number) => {
+    if (id) {
+      // setLoading(true);
+
+      // setLoading(false);
+    } else {
+    }
+
+    setStateFormGift({ success: true, errors: {} });
+    setGiftType(type);
+    modalAction(`btn-${modalAddEdit}`);
+  };
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+  };
+
   return (
     <div>
       <div className="mb-7 mt-3 text-center">
@@ -2093,10 +2124,11 @@ function GiftTabContent(event_id: number) {
         <p className="text-sm text-gray-500">
           Add and manage gift options or bank account details that will be displayed on your wedding invitation.
         </p>
+        <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-credit-card text-xl text-blue-600"></i>
@@ -2108,6 +2140,7 @@ function GiftTabContent(event_id: number) {
           </div>
 
           <button
+            onClick={() => openModalAddEdit(EventGiftTypeEnum.Transfer)}
             type="button"
             className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
           >
@@ -2116,16 +2149,43 @@ function GiftTabContent(event_id: number) {
           </button>
         </div>
 
-        <div className="mt-6 rounded-lg border border-dashed border-gray-200 p-6 text-center">
+        {/* <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
           <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
           <p className="text-sm text-gray-500">
             No bank accounts added yet.
           </p>
+        </div> */}
+
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4">
+          <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+            <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
+              <div className="text-sm text-gray-500">
+                BCA
+              </div>
+              <div className="space-x-1">
+                <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                  <i className='bx bxs-edit text-lg text-amber-500'></i>
+                </button>
+                <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                  <i className='bx bx-trash text-lg text-red-600'></i>
+                </button>
+              </div>
+            </div>
+
+            <div className="px-3 py-2">
+              <div className="text-base font-bold text-gray-800">
+                841-012-3456
+              </div>
+              <p className="text-sm text-gray-500">
+                a/n: John Doe
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3 mt-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-gift text-xl text-pink-600"></i>
@@ -2137,6 +2197,7 @@ function GiftTabContent(event_id: number) {
           </div>
 
           <button
+            onClick={() => openModalAddEdit(EventGiftTypeEnum.Wishlist)}
             type="button"
             className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 focus:outline-none focus:bg-pink-200 disabled:opacity-50 disabled:pointer-events-none"
           >
@@ -2145,13 +2206,60 @@ function GiftTabContent(event_id: number) {
           </button>
         </div>
 
-        <div className="mt-6 rounded-lg border border-dashed border-gray-200 p-6 text-center">
+        <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
           <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
           <p className="text-sm text-gray-500">
             Your wishlist is still empty.
           </p>
         </div>
       </div>
+
+      <UiPortal>
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    <i className='bx bx-gift text-lg'></i> {addEditId ? "Edit" : "Add"} {giftType === EventGiftTypeEnum.Transfer ? "Transfer" : giftType === EventGiftTypeEnum.Wishlist ? "Wishlist" : ""} Gift
+                  </div>
+                  <p className='text-xs text-muted'>Here form to register or edit Gift data</p>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalAddEdit}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12 md:col-span-6">
+                    <Input type='text' className='py-1.5' id='history_title' label='Title' placeholder='Enter history title' mandatory />
+                    {/* {stateFormHistory.errors?.history_title && <ZodErrors err={stateFormHistory.errors?.history_title} />} */}
+                  </div>
+
+
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </UiPortal>
     </div>
   )
 };

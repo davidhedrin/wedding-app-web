@@ -1,6 +1,7 @@
-import { CategoryKeyProps, MusicGroupProps } from "./model-types";
+import { CategoryKeyProps, MusicGroupProps, PaymentMethodProps } from "./model-types";
 import categoryKeys from "@/json/template-key.json";
 import musicThemeKeys from "@/json/music-theme.json";
+import paymentMethod from "@/json/payment-method.json";
 
 const Configs = {
   app_name: "Wedlyvite",
@@ -27,3 +28,4 @@ export default Configs;
 
 export const CategoryKeys: CategoryKeyProps[] = categoryKeys;
 export const MusicThemeKeys: MusicGroupProps[] = musicThemeKeys;
+export const PaymentMethodKeys: PaymentMethodProps[] = paymentMethod;
