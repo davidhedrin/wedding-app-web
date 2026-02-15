@@ -355,6 +355,13 @@ export async function GetDataEventHistories(params: GetDataEventHistoriesParams)
   };
 };
 
+export async function GetDataEventHistoriesById(id: number): Promise<EventHistories | null> {
+  const getData = await db.eventHistories.findUnique({
+    where: { id }
+  });
+  return getData;
+};
+
 export async function StoreUpdateHistory(event_id: number, formData: DtoEventHistory) {
   try {
     const session = await auth();
@@ -382,6 +389,20 @@ export async function StoreUpdateHistory(event_id: number, formData: DtoEventHis
         gallery_id: formData.gallery_id,
         createdBy: user?.email
       }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function DeleteDataEventHistories(id: number) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventHistories.delete({
+      where: { id }
     });
   } catch (error: any) {
     throw new Error(error.message);

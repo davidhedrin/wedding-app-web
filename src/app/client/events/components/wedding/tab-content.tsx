@@ -17,7 +17,7 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventGallery, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteEventGalleryById, GetDataEventHistories, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
@@ -1691,7 +1691,16 @@ function HistoryTabContent(event_id: number) {
 
   const openModalAddEdit = async (id?: number) => {
     if (id) {
-
+      setLoading(true);
+      const data = await GetDataEventHistoriesById(id);
+      if (data) {
+        setAddEditId(data.id);
+        setHistoryTitle(data.name ?? "");
+        setHistoryTime(`${data.year}-${data.month}`);
+        setHistoryDesc(data.desc ?? "");
+        setSelectedImgHistory(data.gallery_id);
+      }
+      setLoading(false);
     } else {
       setAddEditId(null);
       setHistoryTitle("");
@@ -1761,6 +1770,35 @@ function HistoryTabContent(event_id: number) {
         type: "warning",
         title: "Request Failed",
         message: error.message
+      });
+    }
+    setLoading(false);
+  };
+
+  const deleteRow = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataEventHistories(id);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
       });
     }
     setLoading(false);
@@ -1883,10 +1921,10 @@ function HistoryTabContent(event_id: number) {
                       {getMonthName(x.month)} ~ {x.year}
                     </div>
                     <div className="space-x-1">
-                      <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                      <button onClick={() => openModalAddEdit(x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                         <i className='bx bxs-edit text-lg text-amber-500'></i>
                       </button>
-                      <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                      <button onClick={() => deleteRow(x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                         <i className='bx bx-trash text-lg text-red-600'></i>
                       </button>
                     </div>
