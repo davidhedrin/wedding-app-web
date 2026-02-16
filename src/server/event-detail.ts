@@ -7,7 +7,7 @@ import { auth } from "@/app/api/auth/auth-setup";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { EventFAQ, EventGalleries, EventGifts, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 
@@ -529,6 +529,13 @@ export async function GetDataEventFAQ(event_id: number, params: GetDataEventFAQP
   };
 };
 
+export async function GetDataEventFAQById(id: number): Promise<EventFAQ | null> {
+  const getData = await db.eventFAQ.findUnique({
+    where: { id }
+  });
+  return getData;
+};
+
 export async function StoreUpdateEventFAQ(event_id: number, formData: DtoEventFAQ) {
   try {
     const session = await auth();
@@ -553,4 +560,51 @@ export async function StoreUpdateEventFAQ(event_id: number, formData: DtoEventFA
   } catch (error: any) {
     throw new Error(error.message);
   }
+};
+
+export async function DeleteDataEventFAQ(id: number) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventFAQ.delete({
+      where: { id }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+
+type GetDataEventRsvpParams = {
+  where?: Prisma.EventRsvpWhereInput;
+  orderBy?: Prisma.EventRsvpOrderByWithRelationInput | Prisma.EventRsvpOrderByWithRelationInput[];
+  select?: Prisma.EventRsvpSelect<DefaultArgs> | undefined;
+} & CommonParams;
+export async function GetDataEventRsvp(event_id: number, params: GetDataEventRsvpParams): Promise<PaginateResult<EventRsvp & {
+  gallery?: EventGalleries | null
+}>> {
+  const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  const skip = (curPage - 1) * perPage;
+  const [data, total] = await Promise.all([
+    db.eventRsvp.findMany({
+      skip,
+      take: perPage,
+      where: { ...where, event_id },
+      orderBy,
+      select
+    }),
+    db.eventRsvp.count({ where: { ...where, event_id } })
+  ]);
+
+  return {
+    data,
+    meta: {
+      page: curPage,
+      limit: perPage,
+      total,
+      totalPages: Math.ceil(total/perPage)
+    }
+  };
 };

@@ -12,12 +12,12 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
@@ -2701,20 +2701,85 @@ function GiftTabContent(event_id: number) {
 };
 
 function RSVPTabContent(event_id: number) {
+  const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
+  const modalAddEdit = "modal-add-edit-rsvp-wedding";
+  const btnCloseModal = "btn-close-modal-rsvp-wedding";
+
   const [inputPage, setInputPage] = useState("1");
   const [pageTable, setPageTable] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [inputSearch, setInputSearch] = useState("");
+  const [datas, setDatas] = useState<EventRsvp[]>([]);
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
-    { name: "Slug", key: "code", key_sort: "code", IsVisible: true },
-    { name: "Name", key: "disc_amount", key_sort: "disc_amount", IsVisible: true },
-    { name: "No Phone", key: "total_qty", key_sort: "total_qty", IsVisible: true },
-    { name: "Attandance", key: "valid_from", key_sort: "valid_from", IsVisible: true },
-    { name: "URI", key: "valid_to", key_sort: "valid_to", IsVisible: true },
+    { name: "Slug", key: "barcode", key_sort: "barcode", IsVisible: true },
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
+    { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
+    { name: "Attandance", key: "rsvp", key_sort: "rsvp", IsVisible: true },
+    { name: "URI", key: "url", key_sort: "url", IsVisible: true },
   ]);
+
+  const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
+    const selectObj = normalizeSelectObj(tblThColomns);
+    const orderObj = sortListToOrderBy(tblSortList);
+
+    try {
+      const result = await GetDataEventRsvp(event_id, {
+        curPage: page,
+        perPage: countPage,
+        where: {
+          OR: [
+            { name: { contains: inputSearch.trim(), mode: "insensitive" } },
+          ]
+        },
+        select: {
+          id: true,
+          event_id: true,
+          ...selectObj
+        },
+        orderBy: orderObj
+      });
+      setTotalPage(result.meta.totalPages);
+      setTotalCount(result.meta.total);
+      setPageTable(result.meta.page);
+      setInputPage(result.meta.page.toString());
+
+      setDatas(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender) return;
+    if (tblSortList.length === 0) fatchDatas();
+  }, [tblSortList]);
+  useEffect(() => {
+    if (isFirstRender) return;
+    const timer = setTimeout(() => {
+      fatchDatas(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputSearch]);
+
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  useEffect(() => {
+    const fatchNeedData = async () => {
+      setLoading(true);
+      await fatchDatas();
+      setIsFirstRender(false);
+      setLoading(false);
+    };
+
+    if (activeIdxTab == 5) fatchNeedData();
+  }, [activeIdxTab]);
 
   return (
     <div>
@@ -3041,24 +3106,6 @@ function FAQTabContent(event_id: number) {
                 </div>
               ))
             }
-            {/* <div className="hs-accordion active bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-one">
-              <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="true" aria-controls="accordion-collapse-one">
-                <div className="text-sm">Accordion #1</div>
-                <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m6 9 6 6 6-6"></path>
-                </svg>
-                <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m18 15-6-6-6 6"></path>
-                </svg>
-              </button>
-              <div id="accordion-collapse-one" className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-one">
-                <div className="pb-4 px-5">
-                  <p className="text-gray-800">
-                    <em>This is the first item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
-                  </p>
-                </div>
-              </div>
-            </div> */}
           </div> : <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
             <div className="min-h-52 flex items-center justify-center px-4">
               <div className="max-w-md w-full text-center">

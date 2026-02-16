@@ -203,6 +203,7 @@ model Events {
   event_histories EventHistories[]
   event_gifts     EventGifts[]
   event_faq       EventFAQ[]
+  event_rsvp      EventRsvp[]
 }
 
 model Tr {
@@ -345,6 +346,23 @@ model EventFAQ {
   event_id Int
   question String
   answer   String
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model EventRsvp {
+  id       Int     @id @default(autoincrement())
+  event_id Int
+  name     String
+  phone    String?
+  rsvp     Boolean @default(false)
+  barcode  String? @unique
+  url      String?
 
   createdBy String?
   updatedBy String?
