@@ -1,4 +1,4 @@
-import { DiscTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
+import { DiscTypeEnum, EventGiftTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
 
 export type DtoSignIn = {
   email: string;
@@ -175,4 +175,15 @@ export type DtoEventHistory = {
   month_year: string;
   desc: string;
   gallery_id: number | null;
+};
+
+export type DtoEventGift = {
+  id: number | null;
+  type: EventGiftTypeEnum;
+  name: string;
+  account: string | null;
+  no_rek: string | null;
+  qty: number | null;
+  product_url: string | null;
+  product_price: number | null;
 };

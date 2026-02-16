@@ -8,6 +8,7 @@ import {
 } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type DatePickerProps = {
   label?: string;
@@ -17,6 +18,7 @@ type DatePickerProps = {
   onChange?: (date: Date | Date[] | DateRange | undefined) => void;
   position?: 'start' | 'end';
   placeholder?: string;
+  className?: string;
 };
 
 export default function DatePicker({
@@ -27,6 +29,7 @@ export default function DatePicker({
   onChange,
   position = 'start',
   placeholder = 'Choose Date',
+  className,
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -99,7 +102,10 @@ export default function DatePicker({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full truncate justify-between hs-dropdown-toggle inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-800 focus:ring-gray-800 focus:outline-none"
+        className={cn(
+          "w-full truncate justify-between hs-dropdown-toggle inline-flex items-center gap-2 py-2 px-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:border-gray-800 focus:ring-gray-800 focus:outline-none",
+          className
+        )}
       >
         <span className="truncate overflow-hidden whitespace-nowrap text-black text-sm">{getFormattedDate()}</span>
         <svg

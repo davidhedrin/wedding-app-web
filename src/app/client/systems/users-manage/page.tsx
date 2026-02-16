@@ -465,7 +465,7 @@ export default function Page() {
 
                 <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                   <div>
-                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} className='py-1.5' id='is_active' label='Status' placeholder='Select user status' mandatory
+                    <Select value={isActive} onChange={(e) => setIsActive(e.target.value)} id='is_active' label='Status' placeholder='Select user status' mandatory
                       options={[
                         { label: "Active", value: "true" },
                         { label: "Inactive", value: "false" },
@@ -474,21 +474,21 @@ export default function Page() {
                     {stateFormAddEdit.errors?.is_active && <ZodErrors err={stateFormAddEdit.errors?.is_active} />}
                   </div>
                   <div>
-                    <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' className='py-1.5' id='email' label='Email' placeholder='example@mail.com' mandatory />
+                    <Input disabled={addEditId !== null} value={txtEmail} onChange={(e) => setTxtEmail(e.target.value)} type='text' id='email' label='Email' placeholder='example@mail.com' mandatory />
                     {stateFormAddEdit.errors?.email && <ZodErrors err={stateFormAddEdit.errors?.email} />}
                   </div>
                   <div>
-                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' className='py-1.5' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' mandatory />
+                    <Input value={txtName} onChange={(e) => setTxtName(e.target.value)} type='text' id='fullname' label='Fullname' placeholder='Ex. John Thor Doe' mandatory />
                     {stateFormAddEdit.errors?.fullname && <ZodErrors err={stateFormAddEdit.errors?.fullname} />}
                   </div>
                   <div>
-                    <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} className='py-1.5' id='role' label='Role' placeholder='Select user role' mandatory
+                    <Select value={txtRole} onChange={(e) => setTxtRole(e.target.value)} id='role' label='Role' placeholder='Select user role' mandatory
                       options={Object.values(RolesEnum).map(x => ({ label: x, value: x }))}
                     />
                     {stateFormAddEdit.errors?.role && <ZodErrors err={stateFormAddEdit.errors?.role} />}
                   </div>
-                  <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' className='py-1.5' id='no_phone' label='No Phone' placeholder='Enter phone number' />
-                  <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} className='py-1.5' id='gender' label='Gender' placeholder='Select user gender'
+                  <Input value={txtPhone} onChange={(e) => setTxtPhone(e.target.value)} type='text' id='no_phone' label='No Phone' placeholder='Enter phone number' />
+                  <Select value={txtGender} onChange={(e) => setTxtGender(e.target.value)} id='gender' label='Gender' placeholder='Select user gender'
                     options={[
                       { label: "Male", value: "Male" },
                       { label: "Female", value: "Female" },
@@ -496,7 +496,7 @@ export default function Page() {
                     ]}
                   />
                   <DatePicker mode='single' value={birthDate || undefined} onChange={(date) => setBirthDate(date as Date)} label='Birth Date' />
-                  <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' className='py-1.5' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
+                  <Input value={txtBirthPlace} onChange={(e) => setTxtBirthPlace(e.target.value)} type='text' id='birth_place' label='Birth Place' placeholder='Enter birth place' />
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">

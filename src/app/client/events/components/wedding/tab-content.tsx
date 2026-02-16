@@ -2,7 +2,7 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { getMonthName, modalAction, normalizeSelectObj, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -12,12 +12,12 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { EventGalleries, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventGallery, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoEventGift, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
@@ -424,7 +424,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
               <div className="p-3">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomBirthPlace} onChange={(e) => setGroomBirthPlace(e.target.value)} type='text' className='py-1.5' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    <Input value={groomBirthPlace} onChange={(e) => setGroomBirthPlace(e.target.value)} type='text' id='groom_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
                     {stateFormMainInfo.errors?.groom_birth_place && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
@@ -432,7 +432,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                     {stateFormMainInfo.errors?.groom_birth_date && <ZodErrors err={stateFormMainInfo.errors?.groom_birth_date} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomFullname} onChange={(e) => setGroomFullname(e.target.value)} type='text' className='py-1.5' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    <Input value={groomFullname} onChange={(e) => setGroomFullname(e.target.value)} type='text' id='groom_full_name' label='Full Name' placeholder='Enter full name' mandatory />
                     {stateFormMainInfo.errors?.groom_full_name && <ZodErrors err={stateFormMainInfo.errors?.groom_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
@@ -456,19 +456,19 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                         }
                       }}
                       sufixGroup={<span>{typeof birthOrderGroom === "number" ? `${toOrdinal(birthOrderGroom)} Child` : "- Child"}</span>}
-                      type='number' min={1} className='py-1.5' id='groom_birth_order' label='Birth Order' placeholder='Order' mandatory />
+                      type='number' min={1} id='groom_birth_order' label='Birth Order' placeholder='Order' mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomFathername} onChange={(e) => setGroomFathername(e.target.value)} type='text' className='py-1.5' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
+                    <Input value={groomFathername} onChange={(e) => setGroomFathername(e.target.value)} type='text' id='groom_father_name' label='Father Name' placeholder='Enter father name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomMothername} onChange={(e) => setGroomMothername(e.target.value)} type='text' className='py-1.5' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                    <Input value={groomMothername} onChange={(e) => setGroomMothername(e.target.value)} type='text' id='groom_mother_name' label='Mother Name' placeholder='Enter mother name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomPlaceOrigin} onChange={(e) => setGroomPlaceOrigin(e.target.value)} type='text' className='py-1.5' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                    <Input value={groomPlaceOrigin} onChange={(e) => setGroomPlaceOrigin(e.target.value)} type='text' id='groom_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={groomOccupation} onChange={(e) => setGroomOccupation(e.target.value)} type='text' className='py-1.5' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                    <Input value={groomOccupation} onChange={(e) => setGroomOccupation(e.target.value)} type='text' id='groom_occupation' label='Occupation' placeholder='Enter occupation or Background' />
                   </div>
                   <div className="col-span-12">
                     <Textarea value={groomPersonalMsg} onChange={(e) => setGroomPersonalMsg(e.target.value)} label="Personality Tagline" id="groom_tagline" placeholder="Enter personality tagline if any" rows={2} />
@@ -525,7 +525,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
               <div className="p-3">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={brideBirthPlace} onChange={(e) => setBrideBirthPlace(e.target.value)} type='text' className='py-1.5' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
+                    <Input value={brideBirthPlace} onChange={(e) => setBrideBirthPlace(e.target.value)} type='text' id='bride_birth_place' label='Birth Place' placeholder='Enter birth place' mandatory />
                     {stateFormMainInfo.errors?.bride_birth_place && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_place} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
@@ -533,7 +533,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                     {stateFormMainInfo.errors?.bride_birth_date && <ZodErrors err={stateFormMainInfo.errors?.bride_birth_date} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={brideFullname} onChange={(e) => setBrideFullname(e.target.value)} type='text' className='py-1.5' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
+                    <Input value={brideFullname} onChange={(e) => setBrideFullname(e.target.value)} type='text' id='bride_full_name' label='Full Name' placeholder='Enter full name' mandatory />
                     {stateFormMainInfo.errors?.bride_full_name && <ZodErrors err={stateFormMainInfo.errors?.bride_full_name} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
@@ -557,19 +557,19 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                         }
                       }}
                       sufixGroup={<span>{typeof birthOrderBride === "number" ? `${toOrdinal(birthOrderBride)} Child` : "- Child"}</span>}
-                      type='number' min={1} className='py-1.5' id='bride_birth_order' label='Birth Order' placeholder='Order' mandatory />
+                      type='number' min={1} id='bride_birth_order' label='Birth Order' placeholder='Order' mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={brideFathername} onChange={(e) => setBrideFathername(e.target.value)} type='text' className='py-1.5' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
+                    <Input value={brideFathername} onChange={(e) => setBrideFathername(e.target.value)} type='text' id='bride_father_name' label='Father Name' placeholder='Enter father name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={brideMothername} onChange={(e) => setBrideMothername(e.target.value)} type='text' className='py-1.5' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
+                    <Input value={brideMothername} onChange={(e) => setBrideMothername(e.target.value)} type='text' id='bride_mother_name' label='Mother Name' placeholder='Enter mother name' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={bridePlaceOrigin} onChange={(e) => setBridePlaceOrigin(e.target.value)} type='text' className='py-1.5' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
+                    <Input value={bridePlaceOrigin} onChange={(e) => setBridePlaceOrigin(e.target.value)} type='text' id='bride_place_origin' label='Place of Origin' placeholder='Enter place of origin' />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={brideOccupation} onChange={(e) => setBrideOccupation(e.target.value)} type='text' className='py-1.5' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
+                    <Input value={brideOccupation} onChange={(e) => setBrideOccupation(e.target.value)} type='text' id='bride_occupation' label='Occupation' placeholder='Enter occupation or Background' />
                   </div>
                   <div className="col-span-12">
                     <Textarea value={bridePersonalMsg} onChange={(e) => setBridePersonalMsg(e.target.value)} label="Personality Tagline" id="bride_tagline" placeholder="Enter personality tagline if any" rows={2} />
@@ -652,10 +652,10 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
             {stateFormMainInfo.errors?.couple_img_prev && <ZodErrors err={stateFormMainInfo.errors?.couple_img_prev} />}
           </div>
           <div className="col-span-12 md:col-span-4">
-            <Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type='text' className='py-1.5' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
+            <Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type='text' id='contact_email' label='Contact Email' placeholder="Enter contact email address" />
           </div>
           <div className="col-span-12 md:col-span-4">
-            <Input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} type='text' className='py-1.5' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
+            <Input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} type='text' id='contact_phone' label='Contact Phone/WhatsApp' placeholder="Enter contact phone/whatsapp number" />
           </div>
           <div className="col-span-12 md:col-span-4">
             <Select value={musicTheme}
@@ -937,18 +937,18 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                 {stateFormShcedule.errors?.mb_event_date && <ZodErrors err={stateFormShcedule.errors?.mb_event_date} />}
               </div>
               <div className="col-span-12 md:col-span-4">
-                <Input value={startTimeMb} onChange={(e) => setStartTimeMb(e.target.value)} type='time' className='py-1.5' id='mb_start_time' label='Start Time' mandatory />
+                <Input value={startTimeMb} onChange={(e) => setStartTimeMb(e.target.value)} type='time' id='mb_start_time' label='Start Time' mandatory />
                 {stateFormShcedule.errors?.mb_start_time && <ZodErrors err={stateFormShcedule.errors?.mb_start_time} />}
               </div>
               <div className="col-span-12 md:col-span-4">
-                <Input value={endTimeMb} onChange={(e) => setEndTimeMb(e.target.value)} type='time' className='py-1.5' id='mb_end_time' label='End Time' />
+                <Input value={endTimeMb} onChange={(e) => setEndTimeMb(e.target.value)} type='time' id='mb_end_time' label='End Time' />
               </div>
               <div className="col-span-12">
                 <Input value={locNameMb} onChange={(e) => {
                   const val = e.target.value;
                   if (val !== locNameTr) switchMbLoc(false);
                   setLocNameMb(val);
-                }} label="Location Name" className='py-1.5' id="mb_loc_name" placeholder="Enter Location Name" mandatory />
+                }} label="Location Name" id="mb_loc_name" placeholder="Enter Location Name" mandatory />
                 {stateFormShcedule.errors?.mb_loc_name && <ZodErrors err={stateFormShcedule.errors?.mb_loc_name} />}
               </div>
               <div className="col-span-12">
@@ -1090,11 +1090,11 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                     {stateFormShcedule.errors?.tr_event_date && <ZodErrors err={stateFormShcedule.errors?.tr_event_date} />}
                   </div>
                   <div className="col-span-12 md:col-span-4">
-                    <Input value={startTimeTr} onChange={(e) => setStartTimeTr(e.target.value)} type='time' className='py-1.5' id='tr_start_time' label='Start Time' mandatory />
+                    <Input value={startTimeTr} onChange={(e) => setStartTimeTr(e.target.value)} type='time' id='tr_start_time' label='Start Time' mandatory />
                     {stateFormShcedule.errors?.tr_start_time && <ZodErrors err={stateFormShcedule.errors?.tr_start_time} />}
                   </div>
                   <div className="col-span-12 md:col-span-4">
-                    <Input value={endTimeTr} onChange={(e) => setEndTimeTr(e.target.value)} type='time' className='py-1.5' id='tr_end_time' label='End Time' />
+                    <Input value={endTimeTr} onChange={(e) => setEndTimeTr(e.target.value)} type='time' id='tr_end_time' label='End Time' />
                   </div>
                   <div className="col-span-12">
                     <div className="flex items-center gap-x-3 mb-3 mt-2">
@@ -1116,7 +1116,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       const val = e.target.value;
                       if (val !== locNameMb) switchMbLoc(false);
                       setLocNameTr(val);
-                    }} label="Location Name" className='py-1.5' id="tr_loc_name" placeholder="Enter Location Name" mandatory />
+                    }} label="Location Name" id="tr_loc_name" placeholder="Enter Location Name" mandatory />
                     {stateFormShcedule.errors?.tr_loc_name && <ZodErrors err={stateFormShcedule.errors?.tr_loc_name} />}
                   </div>
                   <div className="col-span-12">
@@ -1225,7 +1225,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
               <div className="p-3">
                 <div className="grid grid-cols-12 gap-3">
                   <div className="col-span-12 md:col-span-6">
-                    <Input label="Ceremony Name" className='py-1.5' id={`cst_event_name_${i}`} placeholder="Enter Ceremony Name" mandatory />
+                    <Input label="Ceremony Name" id={`cst_event_name_${i}`} placeholder="Enter Ceremony Name" mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
                     <label className="block text-sm font-medium mb-1 dark:text-white">
@@ -1234,10 +1234,10 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                     <DatePicker placeholder="Choose event date" mode='single' value={eventDateMb} onChange={(date) => setDateRangeMb(date as Date)} />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='time' className='py-1.5' id={`cst_start_time_${i}`} label='Start Time' mandatory />
+                    <Input type='time' id={`cst_start_time_${i}`} label='Start Time' mandatory />
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input type='time' className='py-1.5' id={`cst_end_time_${i}`} label='End Time' />
+                    <Input type='time' id={`cst_end_time_${i}`} label='End Time' />
                   </div>
 
                   <div className="col-span-12">
@@ -1250,7 +1250,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       <label htmlFor={`hs-xs-switch-loc-cst-${i}`} className="text-sm text-gray-500">Use Marriage Blessing Location</label>
                     </div>
 
-                    <Input label="Location Name" className='py-1.5' id={`cst_loc_name_${i}`} placeholder="Enter Location Name" mandatory />
+                    <Input label="Location Name" id={`cst_loc_name_${i}`} placeholder="Enter Location Name" mandatory />
                   </div>
                   <div className="col-span-12">
                     <Textarea label="Location Address" id={`cst_loc_address_${i}`} placeholder="Enter Location Address" rows={3} />
@@ -2012,11 +2012,11 @@ function HistoryTabContent(event_id: number) {
               <div className="py-3 px-4 overflow-y-auto">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={historyTitle} onChange={(e) => setHistoryTitle(e.target.value)} type='text' className='py-1.5' id='history_title' label='Title' placeholder='Enter history title' mandatory />
+                    <Input value={historyTitle} onChange={(e) => setHistoryTitle(e.target.value)} type='text' id='history_title' label='Title' placeholder='Enter history title' mandatory />
                     {stateFormHistory.errors?.history_title && <ZodErrors err={stateFormHistory.errors?.history_title} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">
-                    <Input value={historyTime} onChange={(e) => setHistoryTime(e.target.value)} type='month' className='py-1.5' id='history_month' label='Month' mandatory />
+                    <Input value={historyTime} onChange={(e) => setHistoryTime(e.target.value)} type='month' id='history_month' label='Month' mandatory />
                     {stateFormHistory.errors?.history_month && <ZodErrors err={stateFormHistory.errors?.history_month} />}
                   </div>
                   <div className="col-span-12">
@@ -2099,20 +2099,313 @@ function GiftTabContent(event_id: number) {
   const [addEditId, setAddEditId] = useState<number | null>(null);
   const [giftType, setGiftType] = useState<EventGiftTypeEnum>(EventGiftTypeEnum.Transfer);
 
-  const openModalAddEdit = async (type: EventGiftTypeEnum, id?: number) => {
-    if (id) {
-      // setLoading(true);
+  // For Transfer Gift
+  const [tfMethood, setTfMethod] = useState<string>("");
+  const [tfAccountName, setTfAccountName] = useState("");
+  const [tfAccountNumber, setTfAccountNumber] = useState("");
+  // End For Transfer Gift
 
-      // setLoading(false);
-    } else {
+  // For Wishlist Gift
+  const [productName, setProductName] = useState("");
+  const [reservationQty, setReservationQty] = useState<number | "">(1);
+  const [reservationUrl, setReservationUrl] = useState("");
+  const [productPrice, setProductPrice] = useState("");
+  // End For Wishlist Gift
+
+  const createDtoData = (): DtoEventGift => {
+    const data = {
+      id: addEditId,
+      type: giftType,
+      name: giftType === EventGiftTypeEnum.Transfer ? tfMethood : giftType === EventGiftTypeEnum.Wishlist ? productName : "",
+
+      account: giftType === EventGiftTypeEnum.Transfer ? tfAccountName : null,
+      no_rek: giftType === EventGiftTypeEnum.Transfer ? tfAccountNumber : null,
+
+      qty: giftType === EventGiftTypeEnum.Wishlist ? (reservationQty === "" ? 1 : reservationQty) : null,
+      product_url: giftType === EventGiftTypeEnum.Wishlist ? reservationUrl : null,
+      product_price: giftType === EventGiftTypeEnum.Wishlist ? parseFromIDR(productPrice) : null,
+    };
+
+    return data;
+  };
+
+  const openModalAddEdit = async (type: EventGiftTypeEnum, id?: number) => {
+    setGiftType(type);
+
+    setTfMethod("");
+    setTfAccountName("");
+    setTfAccountNumber("");
+
+    setProductName("");
+    setReservationQty(1);
+    setReservationUrl("");
+
+    if (id) {
+      setLoading(true);
+      const data = await GetDataEventGiftsById(id);
+      if (data) {
+        setAddEditId(data.id);
+        setGiftType(data.type);
+
+        if (data.type === EventGiftTypeEnum.Transfer) {
+          setTfMethod(data.name);
+          setTfAccountName(data.account ?? "");
+          setTfAccountNumber(data.no_rek ?? "");
+        } else if (data.type === EventGiftTypeEnum.Wishlist) {
+          setProductName(data.name);
+          setReservationQty(data.qty ?? 1);
+          setReservationUrl(data.product_url ?? "");
+        }
+      }
+      setLoading(false);
     }
 
     setStateFormGift({ success: true, errors: {} });
-    setGiftType(type);
     modalAction(`btn-${modalAddEdit}`);
   };
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const FormSchemaTfGift = z.object({
+      receipt_method: z.string().min(1, { message: 'Method is required field.' }).trim(),
+      account_name: z.string().min(1, { message: 'A/N is required field.' }).trim(),
+      account_number: z.string().min(1, { message: 'Account number is required field.' }).trim(),
+    });
+
+    const FormSchemaWhGift = z.object({
+      product_name: z.string().min(1, { message: 'Name is required field.' }).trim(),
+      reservation_qty: z.string().min(1, { message: 'QTY is required field.' }).trim(),
+      product_price: z.string().min(1, { message: 'Price required field.' }).trim(),
+    });
+
+    const FormSchemaGift = giftType === EventGiftTypeEnum.Transfer ? FormSchemaTfGift : giftType === EventGiftTypeEnum.Wishlist ? FormSchemaWhGift : z.object({});
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaGift.safeParse(data);
+    if (!valResult.success) {
+      setStateFormGift({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormGift({ success: true, errors: {} });
+
+    modalAction(btnCloseModal);
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) {
+      modalAction(`btn-${modalAddEdit}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const createDto = createDtoData();
+      await StoreUpdateGift(event_id, createDto);
+
+      if (createDto.type === EventGiftTypeEnum.Transfer) await fatchDatasTf();
+      else if (createDto.type === EventGiftTypeEnum.Wishlist) await fatchDatasWs();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      modalAction(`btn-${modalAddEdit}`);
+    }
+    setLoading(false);
+  };
+
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
+  // For Transfer Gift
+  const [inputPageTf, setInputPageTf] = useState("1");
+  const [pageTableTf, setPageTableTf] = useState(1);
+  const [perPageTf, setPerPageTf] = useState(8);
+  const [totalPageTf, setTotalPageTf] = useState(0);
+  const [totalCountTf, setTotalCountTf] = useState(0);
+  const [datasTf, setDatasTf] = useState<EventGifts[]>([]);
+  const [inputSearchTf, setInputSearchTf] = useState("");
+  const [tblSortListTf, setTblSortListTf] = useState<TableShortList[]>([]);
+  const [tblThColomnsTf, setTblThColomnsTf] = useState<TableThModel[]>([
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
+    { name: "Account", key: "account", key_sort: "account", IsVisible: true },
+    { name: "No Rek", key: "no_rek", key_sort: "no_rek", IsVisible: true },
+  ]);
+
+  const fatchDatasTf = async (page: number = pageTableTf, countPage: number = perPageTf) => {
+    const selectObj = normalizeSelectObj(tblThColomnsTf);
+    const orderObj = sortListToOrderBy(tblSortListTf);
+
+    try {
+      const result = await GetDataEventGifts(event_id, {
+        curPage: page,
+        perPage: countPage,
+        where: {
+          type: EventGiftTypeEnum.Transfer,
+          OR: [
+            { name: { contains: inputSearchTf.trim(), mode: "insensitive" } },
+            { account: { contains: inputSearchTf.trim(), mode: "insensitive" } },
+            { no_rek: { contains: inputSearchTf.trim(), mode: "insensitive" } },
+          ]
+        },
+        select: {
+          id: true,
+          type: true,
+          ...selectObj
+        },
+        orderBy: orderObj
+      });
+      setTotalPageTf(result.meta.totalPages);
+      setTotalCountTf(result.meta.total);
+      setPageTableTf(result.meta.page);
+      setInputPageTf(result.meta.page.toString());
+
+      setDatasTf(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender) return;
+    if (tblSortListTf.length === 0) fatchDatasTf();
+  }, [tblSortListTf]);
+  useEffect(() => {
+    if (isFirstRender) return;
+    const timer = setTimeout(() => {
+      fatchDatasTf(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputSearchTf]);
+  // End For Transfer Gift
+
+  // For Wishlist Gift
+  const [inputPageWs, setInputPageWs] = useState("1");
+  const [pageTableWs, setPageTableWs] = useState(1);
+  const [perPageWs, setPerPageWs] = useState(8);
+  const [totalPageWs, setTotalPageWs] = useState(0);
+  const [totalCountWs, setTotalCountWs] = useState(0);
+  const [datasWs, setDatasWs] = useState<EventGifts[]>([]);
+  const [inputSearchWs, setInputSearchWs] = useState("");
+  const [tblSortListWs, setTblSortListWs] = useState<TableShortList[]>([]);
+  const [tblThColomnsWs, setTblThColomnsWs] = useState<TableThModel[]>([
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
+    { name: "QTY", key: "qty", key_sort: "qty", IsVisible: true },
+    { name: "URL", key: "product_url", key_sort: "product_url", IsVisible: true },
+    { name: "Price", key: "product_price", key_sort: "product_price", IsVisible: true },
+  ]);
+
+  const fatchDatasWs = async (page: number = pageTableWs, countPage: number = perPageWs) => {
+    const selectObj = normalizeSelectObj(tblThColomnsWs);
+    const orderObj = sortListToOrderBy(tblSortListWs);
+
+    try {
+      const result = await GetDataEventGifts(event_id, {
+        curPage: page,
+        perPage: countPage,
+        where: {
+          type: EventGiftTypeEnum.Wishlist,
+          OR: [
+            { name: { contains: inputSearchWs.trim(), mode: "insensitive" } },
+            { product_url: { contains: inputSearchWs.trim(), mode: "insensitive" } },
+          ]
+        },
+        select: {
+          id: true,
+          type: true,
+          reserve_qty: true,
+          ...selectObj
+        },
+        orderBy: orderObj
+      });
+      setTotalPageWs(result.meta.totalPages);
+      setTotalCountWs(result.meta.total);
+      setPageTableWs(result.meta.page);
+      setInputPageWs(result.meta.page.toString());
+
+      setDatasWs(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender) return;
+    if (tblSortListWs.length === 0) fatchDatasWs();
+  }, [tblSortListWs]);
+  useEffect(() => {
+    if (isFirstRender) return;
+    const timer = setTimeout(() => {
+      fatchDatasWs(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputSearchWs]);
+  // End For Transfer Gift
+
+  useEffect(() => {
+    const fatchNeedData = async () => {
+      setLoading(true);
+      await fatchDatasTf();
+      await fatchDatasWs();
+      setIsFirstRender(false);
+      setLoading(false);
+    };
+
+    if (activeIdxTab == 4) fatchNeedData();
+  }, [activeIdxTab]);
+
+  const deleteRowGift = async (type: EventGiftTypeEnum, id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataEventGifts(id);
+
+      if (type === EventGiftTypeEnum.Transfer) await fatchDatasTf();
+      else if (type === EventGiftTypeEnum.Wishlist) await fatchDatasWs();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -2128,7 +2421,7 @@ function GiftTabContent(event_id: number) {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-credit-card text-xl text-blue-600"></i>
@@ -2149,43 +2442,71 @@ function GiftTabContent(event_id: number) {
           </button>
         </div>
 
-        {/* <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
-          <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
-          <p className="text-sm text-gray-500">
-            No bank accounts added yet.
-          </p>
-        </div> */}
+        <TableTopToolbar
+          inputSearch={inputSearchTf}
+          tblSortList={tblSortListTf}
+          thColomn={tblThColomnsTf}
+          setTblSortList={setTblSortListTf}
+          setInputSearch={setInputSearchTf}
+          fatchData={() => fatchDatasTf(pageTableTf)}
+        />
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4">
-          <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
-            <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
-              <div className="text-sm text-gray-500">
-                BCA
-              </div>
-              <div className="space-x-1">
-                <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                  <i className='bx bxs-edit text-lg text-amber-500'></i>
-                </button>
-                <button type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                  <i className='bx bx-trash text-lg text-red-600'></i>
-                </button>
-              </div>
-            </div>
+        <div className="my-3">
+          {
+            datasTf.length > 0 ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4">
+              {
+                datasTf.map((x, i) => (
+                  <div key={x.id} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+                    <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
+                      <div className="text-sm text-gray-500">
+                        <img className="h-5" src={PaymentMethodKeys.find(m => m.key === x.name)?.icon} />
+                      </div>
+                      <div className="space-x-1">
+                        <button onClick={() => openModalAddEdit(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                          <i className='bx bxs-edit text-lg text-amber-500'></i>
+                        </button>
+                        <button onClick={() => deleteRowGift(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                          <i className='bx bx-trash text-lg text-red-600'></i>
+                        </button>
+                      </div>
+                    </div>
 
-            <div className="px-3 py-2">
-              <div className="text-base font-bold text-gray-800">
-                841-012-3456
-              </div>
+                    <div className="px-3 py-2">
+                      <div className="text-sm font-bold text-gray-800">
+                        {x.no_rek}
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        {x.account}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              }
+            </div> : <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
+              <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
               <p className="text-sm text-gray-500">
-                a/n: John Doe
+                No bank accounts added yet.
               </p>
             </div>
-          </div>
+          }
         </div>
+
+        <TablePagination
+          perPage={perPageTf}
+          pageTable={pageTableTf}
+          totalPage={totalPageTf}
+          totalCount={totalCountTf}
+          setPerPage={setPerPageTf}
+          setPageTable={setPageTableTf}
+          fatchData={fatchDatasTf}
+
+          inputPage={inputPageTf}
+          setInputPage={setInputPageTf}
+        />
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3 mt-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-3">
           <div>
             <div className="flex items-center gap-2 text-base font-semibold text-gray-800">
               <i className="bx bx-gift text-xl text-pink-600"></i>
@@ -2206,12 +2527,73 @@ function GiftTabContent(event_id: number) {
           </button>
         </div>
 
-        <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
-          <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
-          <p className="text-sm text-gray-500">
-            Your wishlist is still empty.
-          </p>
+
+        <TableTopToolbar
+          inputSearch={inputSearchWs}
+          tblSortList={tblSortListWs}
+          thColomn={tblThColomnsWs}
+          setTblSortList={setTblSortListWs}
+          setInputSearch={setInputSearchWs}
+          fatchData={() => fatchDatasWs(pageTableWs)}
+        />
+
+        <div className="my-3">
+          {
+            datasWs.length > 0 ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4">
+              {
+                datasWs.map((x, i) => (
+                  <div key={x.id} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
+                    <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
+                      <div className="text-sm text-gray-500">
+                        {x.qty} Unit{x.qty && x.qty > 1 ? "s" : ""}
+                      </div>
+                      <div className="space-x-1">
+                        <button onClick={() => openModalAddEdit(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                          <i className='bx bxs-edit text-lg text-amber-500'></i>
+                        </button>
+                        <button onClick={() => deleteRowGift(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                          <i className='bx bx-trash text-lg text-red-600'></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="px-3 py-2">
+                      <div className="text-sm font-bold text-gray-800">
+                        {x.name}
+                      </div>
+                      <p className="text-sm text-gray-500 font-semibold">
+                        Rp {(x.product_price ?? 0).toLocaleString('id-ID')}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Reservation URL: {
+                          x.product_url ? <a href={x.product_url} target="_blank" className="underline text-blue-800">View Here</a> : "-"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                ))
+              }
+            </div> : <div className="rounded-lg border-2 border-dashed border-gray-200 p-6 text-center">
+              <i className="bx bx-folder-open text-3xl text-gray-300 mb-2"></i>
+              <p className="text-sm text-gray-500">
+                Your wishlist is still empty.
+              </p>
+            </div>
+          }
         </div>
+
+        <TablePagination
+          perPage={perPageWs}
+          pageTable={pageTableWs}
+          totalPage={totalPageWs}
+          totalCount={totalCountWs}
+          setPerPage={setPerPageWs}
+          setPageTable={setPageTableWs}
+          fatchData={fatchDatasWs}
+
+          inputPage={inputPageWs}
+          setInputPage={setInputPageWs}
+        />
       </div>
 
       <UiPortal>
@@ -2234,14 +2616,68 @@ function GiftTabContent(event_id: number) {
                 </button>
               </div>
               <div className="py-3 px-4 overflow-y-auto">
-                <div className="grid grid-cols-12 gap-2">
-                  <div className="col-span-12 md:col-span-6">
-                    <Input type='text' className='py-1.5' id='history_title' label='Title' placeholder='Enter history title' mandatory />
-                    {/* {stateFormHistory.errors?.history_title && <ZodErrors err={stateFormHistory.errors?.history_title} />} */}
+                {
+                  giftType === EventGiftTypeEnum.Transfer && <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-12 md:col-span-6">
+                      <Select
+                        value={tfMethood}
+                        onChange={(e) => setTfMethod(e.target.value)}
+                        id='receipt_method' label='Method' placeholder='Select gift method' mandatory
+                        options={
+                          allPaymentMethod.map(x => ({ value: x.key, label: x.name }))
+                        }
+                      />
+                      {stateFormGift.errors?.receipt_method && <ZodErrors err={stateFormGift.errors?.receipt_method} />}
+                    </div>
+                    <div className="col-span-12 md:col-span-6">
+                      <Input value={tfAccountName} onChange={(e) => setTfAccountName(e.target.value)} type='text' id='account_name' label='Account Name' placeholder='Enter account name' mandatory />
+                      {stateFormGift.errors?.account_name && <ZodErrors err={stateFormGift.errors?.account_name} />}
+                    </div>
+                    <div className="col-span-12">
+                      <Input value={tfAccountNumber} onChange={(e) => setTfAccountNumber(e.target.value)} type='text' id='account_number' label='Account / Wallet Number' placeholder='Enter account number' mandatory />
+                      {stateFormGift.errors?.account_number && <ZodErrors err={stateFormGift.errors?.account_number} />}
+                    </div>
                   </div>
+                }
+                {
+                  giftType === EventGiftTypeEnum.Wishlist && <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-12">
+                      <Input value={productName} onChange={(e) => setProductName(e.target.value)} type='text' id='product_name' label='Product Name' placeholder='Enter product name' mandatory />
+                      {stateFormGift.errors?.product_name && <ZodErrors err={stateFormGift.errors?.product_name} />}
+                    </div>
+                    <div className="col-span-12 md:col-span-6">
+                      <Input value={productPrice} onChange={(e) => setProductPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='input-no-spinner' id='product_price' label='Price' placeholder='Enter product price' mandatory />
+                      {stateFormGift.errors?.product_price && <ZodErrors err={stateFormGift.errors?.product_price} />}
+                    </div>
+                    <div className="col-span-12 md:col-span-6">
+                      <Input
+                        value={reservationQty}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === "") {
+                            setReservationQty("");
+                            return;
+                          }
 
+                          const num = Number(value);
+                          if (num < 1) return;
 
-                </div>
+                          setReservationQty(num);
+                        }}
+                        onBlur={() => {
+                          if (reservationQty === "") {
+                            setReservationQty(1);
+                          }
+                        }}
+                        sufixGroup={<span>{typeof reservationQty === "number" ? `Unit${reservationQty > 1 ? "s" : ""}` : "Unit"}</span>}
+                        type='number' min={1} id='reservation_qty' label='Reservation QTY' mandatory />
+                      {stateFormGift.errors?.reservation_qty && <ZodErrors err={stateFormGift.errors?.reservation_qty} />}
+                    </div>
+                    <div className="col-span-12">
+                      <Input value={reservationUrl} onChange={(e) => setReservationUrl(e.target.value)} type='text' id='reservation_url' label='Reservation URL' placeholder='Enter reservation reference URL' mandatory />
+                    </div>
+                  </div>
+                }
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
                 <div className="text-xs text-gray-500 sm:order-1 order-1 italic">

@@ -107,7 +107,7 @@ export default function TableTopToolbar({
         <div className="flex flex-col lg:flex-row lg:items-center gap-2">
           {
             setDateRange && <div>
-              <DatePicker mode='range' value={dateRange} onChange={(date) => setDateRange(date as DateRange)} placeholder={datePlaceholder} />
+              <DatePicker className='py-1.5' mode='range' value={dateRange} onChange={(date) => setDateRange(date as DateRange)} placeholder={datePlaceholder} />
             </div>
           }
 

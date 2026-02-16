@@ -401,7 +401,7 @@ export default function Page() {
               <div className="py-3 px-4 overflow-y-auto">
                 <div className="grid grid-cols-12 gap-2">
                   <div className="col-span-12">
-                    <Input readOnly={addEditId != null} value={voucherCode} onChange={(e) => setVoucherCode(e.target.value)} type='text' className='py-1.5' id='voucher_code' label='Voucher Code' placeholder='Enter voucher code' mandatory />
+                    <Input readOnly={addEditId != null} value={voucherCode} onChange={(e) => setVoucherCode(e.target.value)} type='text' id='voucher_code' label='Voucher Code' placeholder='Enter voucher code' mandatory />
                     {stateFormAddEdit.errors?.voucher_code && <ZodErrors err={stateFormAddEdit.errors?.voucher_code} />}
                   </div>
                   <div className="col-span-12 md:col-span-6">

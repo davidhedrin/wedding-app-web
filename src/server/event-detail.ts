@@ -4,10 +4,10 @@ import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-typ
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventGallery, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventGallery, DtoEventGift, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { EventGalleries, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
+import { EventGalleries, EventGifts, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 
@@ -402,6 +402,95 @@ export async function DeleteDataEventHistories(id: number) {
     const { user } = session;
     
     await db.eventHistories.delete({
+      where: { id }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+
+type GetDataEventGiftsParams = {
+  where?: Prisma.EventGiftsWhereInput;
+  orderBy?: Prisma.EventGiftsOrderByWithRelationInput | Prisma.EventGiftsOrderByWithRelationInput[];
+  select?: Prisma.EventGiftsSelect<DefaultArgs> | undefined;
+} & CommonParams;
+export async function GetDataEventGifts(event_id: number, params: GetDataEventGiftsParams): Promise<PaginateResult<EventGifts & {
+  gallery?: EventGalleries | null
+}>> {
+  const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  const skip = (curPage - 1) * perPage;
+  const [data, total] = await Promise.all([
+    db.eventGifts.findMany({
+      skip,
+      take: perPage,
+      where: { ...where, event_id },
+      orderBy,
+      select
+    }),
+    db.eventGifts.count({ where: { ...where, event_id } })
+  ]);
+
+  return {
+    data,
+    meta: {
+      page: curPage,
+      limit: perPage,
+      total,
+      totalPages: Math.ceil(total/perPage)
+    }
+  };
+};
+
+export async function GetDataEventGiftsById(id: number): Promise<EventGifts | null> {
+  const getData = await db.eventGifts.findUnique({
+    where: { id }
+  });
+  return getData;
+};
+
+export async function StoreUpdateGift(event_id: number, formData: DtoEventGift) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const gift_id = formData.id ?? 0;
+    await db.eventGifts.upsert({
+      where: { id: gift_id },
+      update: {
+        name: formData.name,
+        account: formData.account,
+        no_rek: formData.no_rek,
+        qty: formData.qty,
+        product_url: formData.product_url,
+        product_price: formData.product_price,
+        updatedBy: user?.email
+      },
+      create: {
+        event_id,
+        type: formData.type,
+        name: formData.name,
+        account: formData.account,
+        no_rek: formData.no_rek,
+        qty: formData.qty,
+        product_url: formData.product_url,
+        product_price: formData.product_price,
+        createdBy: user?.email
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function DeleteDataEventGifts(id: number) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventGifts.delete({
       where: { id }
     });
   } catch (error: any) {
