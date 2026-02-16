@@ -4,10 +4,10 @@ import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-typ
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventGallery, DtoEventGift, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { EventGalleries, EventGifts, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventHistories, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 
@@ -409,7 +409,6 @@ export async function DeleteDataEventHistories(id: number) {
   }
 };
 
-
 type GetDataEventGiftsParams = {
   where?: Prisma.EventGiftsWhereInput;
   orderBy?: Prisma.EventGiftsOrderByWithRelationInput | Prisma.EventGiftsOrderByWithRelationInput[];
@@ -492,6 +491,64 @@ export async function DeleteDataEventGifts(id: number) {
     
     await db.eventGifts.delete({
       where: { id }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+type GetDataEventFAQParams = {
+  where?: Prisma.EventFAQWhereInput;
+  orderBy?: Prisma.EventFAQOrderByWithRelationInput | Prisma.EventFAQOrderByWithRelationInput[];
+  select?: Prisma.EventFAQSelect<DefaultArgs> | undefined;
+} & CommonParams;
+export async function GetDataEventFAQ(event_id: number, params: GetDataEventFAQParams): Promise<PaginateResult<EventFAQ & {
+  gallery?: EventGalleries | null
+}>> {
+  const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
+  const skip = (curPage - 1) * perPage;
+  const [data, total] = await Promise.all([
+    db.eventFAQ.findMany({
+      skip,
+      take: perPage,
+      where: { ...where, event_id },
+      orderBy,
+      select
+    }),
+    db.eventFAQ.count({ where: { ...where, event_id } })
+  ]);
+
+  return {
+    data,
+    meta: {
+      page: curPage,
+      limit: perPage,
+      total,
+      totalPages: Math.ceil(total/perPage)
+    }
+  };
+};
+
+export async function StoreUpdateEventFAQ(event_id: number, formData: DtoEventFAQ) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const gift_id = formData.id ?? 0;
+    await db.eventFAQ.upsert({
+      where: { id: gift_id },
+      update: {
+        question: formData.question,
+        answer: formData.answer,
+        updatedBy: user?.email
+      },
+      create: {
+        event_id,
+        question: formData.question,
+        answer: formData.answer,
+        createdBy: user?.email
+      }
     });
   } catch (error: any) {
     throw new Error(error.message);

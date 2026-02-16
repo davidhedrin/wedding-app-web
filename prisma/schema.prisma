@@ -202,6 +202,7 @@ model Events {
   event_galleries EventGalleries[]
   event_histories EventHistories[]
   event_gifts     EventGifts[]
+  event_faq       EventFAQ[]
 }
 
 model Tr {
@@ -330,6 +331,20 @@ model EventGifts {
   product_url   String?
   product_price Int?
   reserve_qty   Int               @default(0)
+
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model EventFAQ {
+  id       Int    @id @default(autoincrement())
+  event_id Int
+  question String
+  answer   String
 
   createdBy String?
   updatedBy String?

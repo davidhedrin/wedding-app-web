@@ -187,3 +187,9 @@ export type DtoEventGift = {
   product_url: string | null;
   product_price: number | null;
 };
+
+export type DtoEventFAQ = {
+  id: number | null;
+  question: string,
+  answer: string,
+};

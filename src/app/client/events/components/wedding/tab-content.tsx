@@ -12,12 +12,12 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventGallery, DtoEventGift, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
@@ -2828,6 +2828,169 @@ function RSVPTabContent(event_id: number) {
 };
 
 function FAQTabContent(event_id: number) {
+  const { setLoading } = useLoading();
+  const { activeIdxTab } = useTabEventDetail();
+  const modalAddEdit = "modal-add-edit-faq-wedding";
+  const btnCloseModal = "btn-close-modal-faq-wedding";
+
+  const [stateFormFaq, setStateFormFaq] = useState<FormState>({ success: false, errors: {} });
+  const [addEditId, setAddEditId] = useState<number | null>(null);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  const [faqActiveIdx, setFaqActiveIdx] = useState<number | null>(null);
+
+  const [inputPage, setInputPage] = useState("1");
+  const [pageTable, setPageTable] = useState(1);
+  const [perPage, setPerPage] = useState(9);
+  const [totalPage, setTotalPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [datas, setDatas] = useState<EventFAQ[]>([]);
+  const [inputSearch, setInputSearch] = useState("");
+  const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
+  const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
+    { name: "Question", key: "question", key_sort: "question", IsVisible: true },
+    { name: "Answer", key: "answer", key_sort: "answer", IsVisible: true },
+  ]);
+
+  const openModalAddEdit = async (id?: number) => {
+    if (id) {
+      setLoading(true);
+      const data = await GetDataEventHistoriesById(id);
+      if (data) {
+      }
+      setLoading(false);
+    } else {
+    }
+
+    setStateFormFaq({ success: true, errors: {} });
+    modalAction(`btn-${modalAddEdit}`);
+  };
+
+  const createDtoData = (): DtoEventFAQ => {
+    const data = {
+      id: addEditId,
+      question: question,
+      answer: answer,
+    };
+
+    return data;
+  };
+
+  const FormSchemaFaq = z.object({
+    faq_question: z.string().min(1, { message: 'Question is required field.' }).trim(),
+    faq_answer: z.string().min(1, { message: 'Answer is required field.' }).trim(),
+  });
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaFaq.safeParse(data);
+    if (!valResult.success) {
+      setStateFormFaq({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormFaq({ success: true, errors: {} });
+
+    modalAction(btnCloseModal);
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) {
+      modalAction(`btn-${modalAddEdit}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await StoreUpdateEventFAQ(event_id, createDtoData());
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      modalAction(`btn-${modalAddEdit}`);
+    }
+    setLoading(false);
+  };
+
+  const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
+    const selectObj = normalizeSelectObj(tblThColomns);
+    const orderObj = sortListToOrderBy(tblSortList);
+
+    try {
+      const result = await GetDataEventFAQ(event_id, {
+        curPage: page,
+        perPage: countPage,
+        where: {
+          OR: [
+            { question: { contains: inputSearch.trim(), mode: "insensitive" } },
+            { answer: { contains: inputSearch.trim(), mode: "insensitive" } },
+          ]
+        },
+        select: {
+          id: true,
+          ...selectObj
+        },
+        orderBy: orderObj
+      });
+      setTotalPage(result.meta.totalPages);
+      setTotalCount(result.meta.total);
+      setPageTable(result.meta.page);
+      setInputPage(result.meta.page.toString());
+
+      setDatas(result.data);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFirstRender) return;
+    if (tblSortList.length === 0) fatchDatas();
+  }, [tblSortList]);
+  useEffect(() => {
+    if (isFirstRender) return;
+    const timer = setTimeout(() => {
+      setFaqActiveIdx(null);
+      fatchDatas(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputSearch]);
+
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  useEffect(() => {
+    const fatchNeedData = async () => {
+      setLoading(true);
+      await fatchDatas();
+      setIsFirstRender(false);
+      setLoading(false);
+    };
+
+    if (activeIdxTab == 6) fatchNeedData();
+  }, [activeIdxTab]);
+
   return (
     <div>
       <div className="mb-6 mt-3 text-center">
@@ -2838,86 +3001,143 @@ function FAQTabContent(event_id: number) {
           Create and manage FAQ for your wedding, so your guests can find important information easily.
         </p>
 
-        <button type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+        <button onClick={() => openModalAddEdit()} type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
           <i className='bx bx-plus text-lg'></i> Add FAQ
         </button>
+        <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 
+      <TableTopToolbar
+        inputSearch={inputSearch}
+        tblSortList={tblSortList}
+        thColomn={tblThColomns}
+        setTblSortList={setTblSortList}
+        setInputSearch={setInputSearch}
+        fatchData={() => fatchDatas(pageTable)}
+      />
 
-      <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
-        <div className="min-h-52 flex items-center justify-center px-4">
-          <div className="max-w-md w-full text-center">
-            <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
-              <i className="bx bx-folder-open text-2xl text-gray-400"></i>
+      <div className="my-3">
+        {
+          datas.length > 0 ? <div className="hs-accordion-group">
+            {
+              datas.map((x, i) => (
+                <div onClick={() => setFaqActiveIdx(prev => prev === i ? null : i)} key={x.id} className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg">
+                  <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none">
+                    <div className="text-sm">Question: {x.question}?</div>
+                    <svg className={`size-5 ${faqActiveIdx === i ? "hidden" : "block"}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                    <svg className={`size-5 ${faqActiveIdx === i ? "block" : "hidden"}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m18 15-6-6-6 6"></path>
+                    </svg>
+                  </button>
+                  <div id="accordion-hs-two" className={`hs-accordion-content w-full overflow-hidden transition-[height] duration-300 ${faqActiveIdx === i ? "block" : "hidden"}`}>
+                    <div className="pb-4 px-5">
+                      <p className="text-gray-800 text-sm">
+                        Answer: {x.answer}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+            {/* <div className="hs-accordion active bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-one">
+              <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="true" aria-controls="accordion-collapse-one">
+                <div className="text-sm">Accordion #1</div>
+                <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
+                <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m18 15-6-6-6 6"></path>
+                </svg>
+              </button>
+              <div id="accordion-collapse-one" className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-one">
+                <div className="pb-4 px-5">
+                  <p className="text-gray-800">
+                    <em>This is the first item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
+                  </p>
+                </div>
+              </div>
+            </div> */}
+          </div> : <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
+            <div className="min-h-52 flex items-center justify-center px-4">
+              <div className="max-w-md w-full text-center">
+                <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">
+                  <i className="bx bx-folder-open text-2xl text-gray-400"></i>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  Your FAQ list is empty!
+                </div>
+                <p className="text-sm/6 text-gray-500">
+                  Add questions and answers here so your guests can easily find important information.
+                </p>
+              </div>
             </div>
-            <div className="text-sm font-medium text-gray-700">
-              Your FAQ list is empty!
-            </div>
-            <p className="text-sm/6 text-gray-500">
-              Add questions and answers here so your guests can easily find important information.
-            </p>
           </div>
-        </div>
+        }
       </div>
 
-      {/* <div className="hs-accordion-group">
-        <div className="hs-accordion active bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-one">
-          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="true" aria-controls="accordion-collapse-one">
-            <div className="text-sm">Accordion #1</div>
-            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 15-6-6-6 6"></path>
-            </svg>
-          </button>
-          <div id="accordion-collapse-one" className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-one">
-            <div className="pb-4 px-5">
-              <p className="text-gray-800">
-                <em>This is the first item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
-              </p>
-            </div>
-          </div>
-        </div>
+      <TablePagination
+        perPage={perPage}
+        pageTable={pageTable}
+        totalPage={totalPage}
+        totalCount={totalCount}
+        setPerPage={setPerPage}
+        setPageTable={setPageTable}
+        fatchData={fatchDatas}
 
-        <div className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-two">
-          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="false" aria-controls="accordion-hs-two">
-            <div className="text-sm">Accordion #2</div>
-            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 15-6-6-6 6"></path>
-            </svg>
-          </button>
-          <div id="accordion-hs-two" className="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-two">
-            <div className="pb-4 px-5">
-              <p className="text-gray-800">
-                <em>This is the second item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
-              </p>
-            </div>
-          </div>
-        </div>
+        inputPage={inputPage}
+        setInputPage={setInputPage}
+      />
 
-        <div className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg" id="accordion-hs-three">
-          <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none" aria-expanded="false" aria-controls="accordion-hs-three">
-            <div className="text-sm">Accordion #3</div>
-            <svg className="hs-accordion-active:hidden block size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-            <svg className="hs-accordion-active:block hidden size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 15-6-6-6 6"></path>
-            </svg>
-          </button>
-          <div id="accordion-hs-three" className="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="accordion-hs-three">
-            <div className="pb-4 px-5">
-              <p className="text-gray-800">
-                <em>This is the third item's accordion body.</em> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions.
-              </p>
-            </div>
+      <UiPortal>
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    <i className='bx bx-help-circle text-lg'></i> {addEditId ? "Edit" : "Add"} FAQ
+                  </div>
+                  <p className='text-xs text-muted'>Here form to register or edit FAQ data</p>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalAddEdit}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12">
+                    <Input value={question} onChange={(e) => setQuestion(e.target.value)} type='text' id='faq_question' label='Question' placeholder='Enter question of FQA' mandatory />
+                    {stateFormFaq.errors?.faq_question && <ZodErrors err={stateFormFaq.errors?.faq_question} />}
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea value={answer} onChange={(e) => setAnswer(e.target.value)} label="Answer" id="faq_answer" placeholder="Enter answer of FQA" rows={3} mandatory />
+                    {stateFormFaq.errors?.faq_answer && <ZodErrors err={stateFormFaq.errors?.faq_answer} />}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </div> */}
+      </UiPortal>
     </div>
   )
 };
