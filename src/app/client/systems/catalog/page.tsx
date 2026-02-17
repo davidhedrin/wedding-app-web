@@ -440,7 +440,7 @@ export default function Page() {
                               }
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
-                                <Link href={`${Configs.base_url}/${data.url}`} target='_blank'><i className='bx bx-show-alt text-lg text-blue-500 cursor-pointer'></i></Link>
+                                <Link href={`/${data.url}`} target='_blank'><i className='bx bx-show-alt text-lg text-blue-500 cursor-pointer'></i></Link>
                                 <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
                                 <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                               </td>

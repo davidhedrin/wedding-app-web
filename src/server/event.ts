@@ -107,7 +107,7 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
         tmp_status: formData.tmp_status,
 
         tmp_id: formData.tmp_id,
-        tmp_code: stringWithTimestamp.v2(15, true, formData.tmp_ctg_key.toUpperCase()),
+        tmp_code: stringWithTimestamp.v2(8, true, formData.tmp_ctg_key.toUpperCase()),
         tmp_ctg: formData.tmp_ctg,
         tmp_ctg_key: formData.tmp_ctg_key,
         createdBy: user?.email
@@ -127,7 +127,7 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
   }
 };
 
-export async function GetDataEventByCode(code: string): Promise<Events & { 
+export async function GetDataEventByCode(code: string): Promise<Events & {
   template: Templates & { captures: { file_path: string }[] | null } | null,
   tr: Tr | null 
 } | null> {

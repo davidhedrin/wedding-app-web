@@ -2,7 +2,7 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { copyToClipboard, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -15,9 +15,9 @@ import Select from "@/components/ui/select";
 import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventGifts, DeleteDataEventHistories, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 
 const MapPicker = dynamic(
@@ -25,14 +25,14 @@ const MapPicker = dynamic(
   { ssr: false }
 );
 
-export default function TabContentWedding({ dataEvent }: { dataEvent: Events }) {
+export default function TabContentWedding({ dataEvent, url }: { dataEvent: Events, url: string }) {
   const tabContents = [
     { id: "main-info", content: MainTabContent({ dataEvent }) },
     { id: "scheduler", content: SchedulerTabContent({ dataEvent }) },
     { id: "gallery", content: GalleryTabContent(dataEvent.id) },
     { id: "history", content: HistoryTabContent(dataEvent.id) },
     { id: "gift", content: GiftTabContent(dataEvent.id) },
-    { id: "rsvp", content: RSVPTabContent(dataEvent.id) },
+    { id: "rsvp", content: RSVPTabContent({ event_id: dataEvent.id, url }) },
     { id: "faq", content: FAQTabContent(dataEvent.id) },
   ];
 
@@ -2700,7 +2700,7 @@ function GiftTabContent(event_id: number) {
   )
 };
 
-function RSVPTabContent(event_id: number) {
+function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const { setLoading } = useLoading();
   const { activeIdxTab } = useTabEventDetail();
   const modalAddEdit = "modal-add-edit-rsvp-wedding";
@@ -2715,12 +2715,99 @@ function RSVPTabContent(event_id: number) {
   const [datas, setDatas] = useState<EventRsvp[]>([]);
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
-    { name: "Slug", key: "barcode", key_sort: "barcode", IsVisible: true },
+    { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
     { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
     { name: "Attandance", key: "rsvp", key_sort: "rsvp", IsVisible: true },
-    { name: "URI", key: "url", key_sort: "url", IsVisible: true },
   ]);
+
+  const [stateFormRsvp, setStateFormRsvp] = useState<FormState>({ success: false, errors: {} });
+  const [addEditId, setAddEditId] = useState<number | null>(null);
+  const [rsvpName, setRsvpName] = useState("");
+  const [rsvpPhone, setRsvpPhone] = useState("");
+
+  const openModalAddEdit = async (id?: number) => {
+    if (id) {
+      setLoading(true);
+      const data = await GetDataEventRsvpById(id);
+      if (data) {
+        setAddEditId(data.id);
+        setRsvpName(data.name);
+        setRsvpPhone(data.phone ?? "");
+      }
+      setLoading(false);
+    } else {
+      setAddEditId(null);
+      setRsvpName("");
+      setRsvpPhone("");
+    }
+
+    setStateFormRsvp({ success: true, errors: {} });
+    modalAction(`btn-${modalAddEdit}`);
+  };
+
+  const createDtoData = (): DtoEventRsvp => {
+    const data = {
+      id: addEditId,
+      name: rsvpName,
+      phone: rsvpPhone,
+    };
+
+    return data;
+  };
+
+  const FormSchemaRsvp = z.object({
+    rsvp_name: z.string().min(1, { message: 'Name is required field.' }).trim(),
+  });
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaRsvp.safeParse(data);
+    if (!valResult.success) {
+      setStateFormRsvp({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormRsvp({ success: true, errors: {} });
+
+    modalAction(btnCloseModal);
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) {
+      modalAction(`btn-${modalAddEdit}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await StoreUpdateEventRSVP(event_id, createDtoData());
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      modalAction(`btn-${modalAddEdit}`);
+    }
+    setLoading(false);
+  };
 
   const fatchDatas = async (page: number = pageTable, countPage: number = perPage) => {
     const selectObj = normalizeSelectObj(tblThColomns);
@@ -2755,6 +2842,35 @@ function RSVPTabContent(event_id: number) {
         message: "We can't proccess your request, Please try again."
       });
     }
+  };
+
+  const deleteRow = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataEventRsvp(id);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -2801,9 +2917,9 @@ function RSVPTabContent(event_id: number) {
             setTblThColomns={setTblThColomns}
             setTblSortList={setTblSortList}
             setInputSearch={setInputSearch}
-          // fatchData={() => fatchDatas(pageTable)}
+            fatchData={() => fatchDatas(pageTable)}
 
-          // openModal={openModalAddEdit}
+            openModal={openModalAddEdit}
           />
 
           <div className="flex flex-col pt-5 pb-4 px-1.5">
@@ -2819,54 +2935,55 @@ function RSVPTabContent(event_id: number) {
                             if (x.IsVisible) return <th key={x.key} scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">{x.name}</th>
                           })
                         }
+                        <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">URL</th>
                         <th scope="col" className="px-3 py-2.5 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-3 py-2.5 text-center text-muted text-sm" colSpan={tblThColomns.length + 3}><i>No data found!</i></td>
-                      </tr>
+                      {
+                        datas.map((data, i) => (
+                          <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
 
-                      {/* {
-                          datas.map((data, i) => (
-                            <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
-                              <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
-
-                              {'code' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.code}</td>}
-                              {'disc_amount' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                                {
-                                  data.disc_type === DiscTypeEnum.AMOUNT ? `Rp ${data.disc_amount.toLocaleString('id-ID')}` : data.disc_type === DiscTypeEnum.PERCENT ? `${data.disc_amount}%` : "-"
-                                }
-                              </td>}
-                              {'total_qty' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.total_qty} Voucher</td>}
-                              {'valid_from' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{formatDate(data.valid_from, "medium", "short")}</td>}
-                              {'valid_to' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{formatDate(data.valid_to, "medium", "short")}</td>}
-                              {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
-                              {
-                                'is_active' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.is_active === true ? "text-green-600" : "text-red-600"}`}>
-                                  {data.is_active === true ? "Active" : "Inactive"}
-                                </td>
-                              }
-
-                              <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
-                                <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
-                                <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
+                            {'barcode' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.barcode}</td>}
+                            {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
+                            {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
+                            {
+                              'rsvp' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.rsvp != null && (data.rsvp === true ? "text-green-600" : "text-red-600")} font-semibold`}>
+                                {data.rsvp != null ? data.rsvp === true ? "Present" : "Absent" : "-"}
                               </td>
-                            </tr>
-                          ))
-                        }
-                        {
-                          isFirstRender === false && datas.length === 0 && <tr>
-                            <td className="px-3 py-2.5 text-center text-muted text-sm" colSpan={tblThColomns.length + 3}><i>No data found!</i></td>
-                          </tr>
-                        }
-                        {
-                          isFirstRender === true && <tr>
-                            <td className="text-center p-0" colSpan={tblThColomns.length + 3}>
-                              <div className="animate-pulse h-62.5 w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
+                            }
+                            <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                              <span onClick={() => {
+                                const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
+                                copyToClipboard(craateUrl);
+                                toast({
+                                  type: "success",
+                                  title: "Copy to Clipboard",
+                                  message: "Well done, Text copied to clipboard.",
+                                });
+                              }} className="underline text-blue-600 cursor-pointer">Copy URL <i className='bx bx-copy-alt text-base'></i></span>
+                            </td>
+
+                            <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
+                              <i onClick={() => openModalAddEdit(data.id)} className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
+                              <i onClick={() => deleteRow(data.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                             </td>
                           </tr>
-                        } */}
+                        ))
+                      }
+                      {
+                        isFirstRender === false && datas.length === 0 && <tr>
+                          <td className="px-3 py-2.5 text-center text-muted text-sm" colSpan={tblThColomns.length + 3}><i>No data found!</i></td>
+                        </tr>
+                      }
+                      {
+                        isFirstRender === true && <tr>
+                          <td className="text-center p-0" colSpan={tblThColomns.length + 3}>
+                            <div className="animate-pulse h-62.5 w-full bg-gray-200 rounded-none dark:bg-neutral-700"></div>
+                          </td>
+                        </tr>
+                      }
                     </tbody>
                   </table>
                 </div>
@@ -2881,13 +2998,64 @@ function RSVPTabContent(event_id: number) {
             totalCount={totalCount}
             setPerPage={setPerPage}
             setPageTable={setPageTable}
-            // fatchData={fatchDatas}
+            fatchData={fatchDatas}
 
             inputPage={inputPage}
             setInputPage={setInputPage}
           />
         </div>
       </div>
+
+      <button id={`btn-${modalAddEdit}`} type="button" className="hidden" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`}>
+        -
+      </button>
+      <UiPortal>
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-sm hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    <i className='bx bx-envelope text-lg'></i> {addEditId ? "Edit" : "Add"} RSVP
+                  </div>
+                  <p className='text-xs text-muted'>Here form to register or edit RSVP data</p>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalAddEdit}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="grid grid-cols-12 gap-2">
+                  <div className="col-span-12">
+                    <Input value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} type='text' id='rsvp_name' label='Name' placeholder='Enter rsvp name' mandatory />
+                    {stateFormRsvp.errors?.rsvp_name && <ZodErrors err={stateFormRsvp.errors?.rsvp_name} />}
+                  </div>
+                  <div className="col-span-12">
+                    <Input value={rsvpPhone} onChange={(e) => setRsvpPhone(e.target.value)} type='text' id='rsvp_phone' label='No Phone' placeholder='Enter rsvp phone number' />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </UiPortal>
     </div>
   )
 };
@@ -2921,11 +3089,17 @@ function FAQTabContent(event_id: number) {
   const openModalAddEdit = async (id?: number) => {
     if (id) {
       setLoading(true);
-      const data = await GetDataEventHistoriesById(id);
+      const data = await GetDataEventFAQById(id);
       if (data) {
+        setAddEditId(data.id);
+        setQuestion(data.question);
+        setAnswer(data.answer);
       }
       setLoading(false);
     } else {
+      setAddEditId(null);
+      setQuestion("");
+      setAnswer("");
     }
 
     setStateFormFaq({ success: true, errors: {} });
@@ -3030,6 +3204,35 @@ function FAQTabContent(event_id: number) {
       });
     }
   };
+  
+  const deleteRow = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Delete Confirmation?',
+      message: 'Are your sure want to delete this record? You will not abel to undo this action!',
+      confirmText: 'Yes, Delete',
+      cancelText: 'No, Keep It',
+      icon: 'bx bx-trash bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await DeleteDataEventFAQ(id);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (isFirstRender) return;
@@ -3083,30 +3286,47 @@ function FAQTabContent(event_id: number) {
 
       <div className="my-3">
         {
-          datas.length > 0 ? <div className="hs-accordion-group">
-            {
-              datas.map((x, i) => (
-                <div onClick={() => setFaqActiveIdx(prev => prev === i ? null : i)} key={x.id} className="hs-accordion bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg">
-                  <button className="hs-accordion-toggle hs-accordion-active:text-blue-600 inline-flex items-center justify-between gap-x-3 w-full font-semibold text-start text-gray-800 py-4 px-5 hover:text-gray-500 disabled:opacity-50 disabled:pointer-events-none">
-                    <div className="text-sm">Question: {x.question}?</div>
-                    <svg className={`size-5 ${faqActiveIdx === i ? "hidden" : "block"}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          datas.length > 0 ? datas.map((x, i) => (
+            <div key={x.id} className="bg-white border border-gray-200 -mt-px first:rounded-t-lg last:rounded-b-lg">
+              <div className="flex items-center justify-between w-full py-4 px-5">
+                <button onClick={() => setFaqActiveIdx((prev) => (prev === i ? null : i))}
+                  className="flex items-center justify-between w-full text-left font-semibold text-gray-800 hover:text-gray-500"
+                >
+                  <div className="text-sm">Question: {x.question}?</div>
+                  <div className="ml-3">
+                    <svg className={`size-5 ${faqActiveIdx === i ? "hidden" : "block"}`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="m6 9 6 6 6-6"></path>
                     </svg>
-                    <svg className={`size-5 ${faqActiveIdx === i ? "block" : "hidden"}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className={`size-5 ${faqActiveIdx === i ? "block" : "hidden"}`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="m18 15-6-6-6 6"></path>
                     </svg>
-                  </button>
-                  <div id="accordion-hs-two" className={`hs-accordion-content w-full overflow-hidden transition-[height] duration-300 ${faqActiveIdx === i ? "block" : "hidden"}`}>
-                    <div className="pb-4 px-5">
-                      <p className="text-gray-800 text-sm">
-                        Answer: {x.answer}
-                      </p>
-                    </div>
                   </div>
+                </button>
+                <div className="flex gap-2 ml-4">
+                  <i onClick={() => openModalAddEdit(x.id)} className='bx bxs-edit text-lg text-amber-500 cursor-pointer'></i>
+                  <i onClick={() => deleteRow(x.id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                 </div>
-              ))
-            }
-          </div> : <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
+              </div>
+
+              <div className={`w-full overflow-hidden transition-[height] duration-300 ${faqActiveIdx === i ? "block" : "hidden"}`}>
+                <div className="pb-4 px-5">
+                  <p className="text-gray-800 text-sm">
+                    Answer: {x.answer}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )) : <div className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl p-3">
             <div className="min-h-52 flex items-center justify-center px-4">
               <div className="max-w-md w-full text-center">
                 <div className="mx-auto mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-gray-100">

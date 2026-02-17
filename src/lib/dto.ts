@@ -198,7 +198,4 @@ export type DtoEventRsvp = {
   id: number | null;
   name: string;
   phone: string | null;
-  rsvp: boolean | null;
-  barcode: string | null;
-  url: string | null;
 };

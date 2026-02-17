@@ -4,12 +4,13 @@ import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-typ
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
+import { stringWithTimestamp } from "@/lib/utils";
 
 export async function GetGroomBrideDataByEventId(event_id: number) : Promise<GroomBrideInfo[]> {
   const getData = await db.groomBrideInfo.findMany({ where: { event_id } });
@@ -368,10 +369,10 @@ export async function StoreUpdateHistory(event_id: number, formData: DtoEventHis
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
 
-    const history_id = formData.id ?? 0;
+    const data_id = formData.id ?? 0;
     const monthYear = formData.month_year.split("-");
     await db.eventHistories.upsert({
-      where: { id: history_id },
+      where: { id: data_id },
       update: {
         name: formData.name,
         month: monthYear[1],
@@ -454,9 +455,9 @@ export async function StoreUpdateGift(event_id: number, formData: DtoEventGift) 
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
 
-    const gift_id = formData.id ?? 0;
+    const data_id = formData.id ?? 0;
     await db.eventGifts.upsert({
-      where: { id: gift_id },
+      where: { id: data_id },
       update: {
         name: formData.name,
         account: formData.account,
@@ -542,9 +543,9 @@ export async function StoreUpdateEventFAQ(event_id: number, formData: DtoEventFA
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
 
-    const gift_id = formData.id ?? 0;
+    const data_id = formData.id ?? 0;
     await db.eventFAQ.upsert({
-      where: { id: gift_id },
+      where: { id: data_id },
       update: {
         question: formData.question,
         answer: formData.answer,
@@ -607,4 +608,52 @@ export async function GetDataEventRsvp(event_id: number, params: GetDataEventRsv
       totalPages: Math.ceil(total/perPage)
     }
   };
+};
+
+export async function StoreUpdateEventRSVP(event_id: number, formData: DtoEventRsvp) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const data_id = formData.id ?? 0;
+    await db.eventRsvp.upsert({
+      where: { id: data_id },
+      update: {
+        name: formData.name,
+        phone: formData.phone,
+        updatedBy: user?.email
+      },
+      create: {
+        event_id,
+        barcode: `${event_id}${stringWithTimestamp.v2(9)}`,
+        name: formData.name,
+        phone: formData.phone,
+        createdBy: user?.email
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export async function GetDataEventRsvpById(id: number): Promise<EventRsvp | null> {
+  const getData = await db.eventRsvp.findUnique({
+    where: { id }
+  });
+  return getData;
+};
+
+export async function DeleteDataEventRsvp(id: number) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventRsvp.delete({
+      where: { id }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 };

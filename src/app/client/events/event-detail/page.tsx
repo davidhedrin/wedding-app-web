@@ -17,6 +17,7 @@ import { CheckVoucherCode } from "@/server/systems/voucher";
 import Configs from "@/lib/config";
 import TabListWraper from "../components/wraper-list";
 import TabContentWraper from "../components/wraper-content";
+import Link from "next/link";
 
 declare global {
   interface Window {
@@ -515,9 +516,9 @@ export default function Page() {
                       </div>
 
                       {/* Preview Button */}
-                      <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                      <Link href={`/${dataEvent.template.url}`} target='_blank' className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
                         Preview
-                      </button>
+                      </Link>
                     </div>
 
                     <hr className="my-3 text-gray-300" />
@@ -531,7 +532,7 @@ export default function Page() {
                           </div>
 
                           <div className="w-full sm:border-s border-gray-200 sm:ps-4 pt-3 sm:pt-0">
-                            <TabContentWraper dataEvent={dataEvent} />
+                            <TabContentWraper dataEvent={dataEvent} url={dataEvent.template.url} />
                           </div>
 
                           {/* <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">

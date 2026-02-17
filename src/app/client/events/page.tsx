@@ -232,11 +232,22 @@ export default function Page() {
                                       type: "success",
                                       title: "Copy to Clipboard",
                                       message: "Well done, Text copied to clipboard.",
-                                      duration: 3000
                                     });
                                   }} className='bx bx-copy-alt text-base text-blue-600 cursor-pointer'></i>
                                 </span>
                               </td>}
+                              {/* {'tmp_code' in data &&
+                                <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                                  <span onClick={() => {
+                                    if (data.tmp_code == null) return;
+                                    copyToClipboard(data.tmp_code);
+                                    toast({
+                                      type: "success",
+                                      title: "Copy to Clipboard",
+                                      message: "Well done, Text copied to clipboard.",
+                                    });
+                                  }} className="underline text-blue-600 cursor-pointer">Copy <i className='bx bx-copy-alt text-base'></i></span>
+                                </td>} */}
                               {'template' in data && data.template?.name && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800"><div className="truncate max-w-45">{data.template.name}</div></td>}
                               {'tmp_ctg' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.tmp_ctg}</td>}
                               {'template' in data && data.template?.price && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">Rp {data.template.price.toLocaleString("id-ID")}</td>}

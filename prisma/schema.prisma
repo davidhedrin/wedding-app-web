@@ -360,9 +360,8 @@ model EventRsvp {
   event_id Int
   name     String
   phone    String?
-  rsvp     Boolean @default(false)
+  rsvp     Boolean?
   barcode  String? @unique
-  url      String?
 
   createdBy String?
   updatedBy String?
