@@ -6,7 +6,6 @@ import { db } from '../../prisma/db-init';
 import { randomUUID } from 'crypto';
 import EmailVerifyTemplate from '@/components/email/email-verify';
 import ResetPasswordTemplate from '@/components/email/reset-password';
-import { Prisma } from '@/generated/prisma';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = Configs.base_url;
@@ -82,7 +81,7 @@ export async function EmailForgotPassword(email: string) {
       });
       
       const { data, error } = await resend.emails.send({
-        from: `${appName} <no-replay@resend.dev>`,
+        from: `${appName} <${Configs.resend_from}>`,
         to: [email.toString()],
         subject: 'Password Reset',
         react: ResetPasswordTemplate({

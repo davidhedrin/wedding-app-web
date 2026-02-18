@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
@@ -2139,6 +2138,7 @@ function GiftTabContent(event_id: number) {
     setProductName("");
     setReservationQty(1);
     setReservationUrl("");
+    setProductPrice("");
 
     if (id) {
       setLoading(true);
@@ -2155,6 +2155,7 @@ function GiftTabContent(event_id: number) {
           setProductName(data.name);
           setReservationQty(data.qty ?? 1);
           setReservationUrl(data.product_url ?? "");
+          setProductPrice(data.product_price ? data.product_price.toLocaleString('id-ID') : "");
         }
       }
       setLoading(false);
@@ -3204,7 +3205,7 @@ function FAQTabContent(event_id: number) {
       });
     }
   };
-  
+
   const deleteRow = async (id: number) => {
     const confirmed = await showConfirm({
       title: 'Delete Confirmation?',
