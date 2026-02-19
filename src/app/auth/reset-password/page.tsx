@@ -8,7 +8,6 @@ import { FormState } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
 import { toast } from "@/lib/utils";
 import { checkTokenResetPass, resetPassword } from "@/server/auth";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import z from "zod";
@@ -127,9 +126,9 @@ export default function Page() {
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-muted px-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-4">
         <div className="flex items-center gap-2 self-center font-medium mb-1">
-          <Link href="/" onClick={() => smartLink("/")}>
-            <img src="/assets/img/logo/wedlyvite-basic.png" className="h-[70px] w-auto" />
-          </Link>
+          <a href="/" onClick={() => smartLink("/")}>
+            <img src="/assets/img/logo/wedlyvite-basic.png" className="h-17.5 w-auto" />
+          </a>
         </div>
 
         <form action={(formData) => handleSubmitForm(formData)} className="grid gap-4 p-4 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
@@ -146,7 +145,7 @@ export default function Page() {
               {stateForm.errors?.password && <ZodErrors err={stateForm.errors?.password} />}
             </div>
             <div
-              className="absolute right-2 top-[34px] text-muted-foreground hover:text-foreground cursor-pointer"
+              className="absolute right-2 top-8.5 text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={() => setTogglePass((prev) => !prev)}
               tabIndex={-1}
             >
@@ -159,7 +158,7 @@ export default function Page() {
               {stateForm.errors?.co_password && <ZodErrors err={stateForm.errors?.co_password} />}
             </div>
             <div
-              className="absolute right-2 top-[34px] text-muted-foreground hover:text-foreground cursor-pointer"
+              className="absolute right-2 top-8.5 text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={() => setToggleCoPass((prev) => !prev)}
               tabIndex={-1}
             >
@@ -172,9 +171,9 @@ export default function Page() {
           </button>
 
           <p className="flex gap-1 justify-center text-sm text-gray-600">
-            <i className='bx bx-left-arrow-alt text-lg'></i> <Link href={"/auth"} onClick={() => smartLink("/auth")} className="underline underline-offset-4 cursor-pointer">
+            <i className='bx bx-left-arrow-alt text-lg'></i> <a href={"/auth"} onClick={() => smartLink("/auth")} className="underline underline-offset-4 cursor-pointer">
               Back to Login
-            </Link>
+            </a>
           </p>
         </form>
 

@@ -3,7 +3,6 @@
 import { useLoading } from "@/components/loading/loading-context";
 import TypingEffect from "@/components/ui/typing-text";
 import Configs from "@/lib/config";
-import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Page() {
@@ -73,7 +72,7 @@ export default function Page() {
         </div>
 
         <div className="flex justify-end mb-2">
-          <Link href="/" className="text-blue-500 inline-flex items-center gap-x-1 text-sm md:text-base font-medium">More Services <i className='bx bx-right-arrow-alt text-lg'></i></Link>
+          <a href="/" className="text-blue-500 inline-flex items-center gap-x-1 text-sm md:text-base font-medium">More Services <i className='bx bx-right-arrow-alt text-lg'></i></a>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">

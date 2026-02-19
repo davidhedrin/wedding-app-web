@@ -3,7 +3,6 @@ import { signOutAction, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { GetDataEvents } from "@/server/event";
 import { Events, RolesEnum, Templates } from "@/generated/prisma";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function MainSidebar() {
@@ -94,9 +93,9 @@ export default function MainSidebar() {
 
               <ul className="flex flex-col">
                 <li>
-                  <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                  <a href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                     <i className='bx bx-tachometer text-lg'></i> Dashboard
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -110,7 +109,7 @@ export default function MainSidebar() {
                 {
                   datas && datas.length > 0 ? datas.map((x, i) => (
                     <li key={i}>
-                      <Link
+                      <a
                         href={`/client/events/event-detail?code=${x.tmp_code}`}
                         onClick={() => smartLink("/client/events/event-detail")}
                         className="border border-gray-400 border-dashed w-full flex items-center leading-none gap-x-2 py-1.5 px-0.5 lg:px-2.5 mb-1 mt-1 text-sm hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800"
@@ -118,7 +117,7 @@ export default function MainSidebar() {
                         <span className="truncate block max-w-45 leading-normal" title={`${x.template?.ctg_name} - ${x.template?.name}`}>
                           {x.template?.ctg_name} - {x.template?.name}
                         </span>
-                      </Link>
+                      </a>
                     </li>
                   )) : <li className="py-2 px-1 lg:px-2">
                     <div className="border-2 border-dashed border-gray-400 rounded-lg bg-gray-50 text-center p-3">
@@ -126,17 +125,17 @@ export default function MainSidebar() {
                       <p className="text-sm italic text-gray-600 mb-2">
                         Let's create your first online event invitation or <u className="font-semibold">try 3 days</u>!
                       </p>
-                      <Link href="/catalog" onClick={() => smartLink("/catalog")} type="button" className="w-full py-2 px-4 inline-flex justify-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
+                      <a href="/catalog" onClick={() => smartLink("/catalog")} type="button" className="w-full py-2 px-4 inline-flex justify-center gap-x-1 btn-color-app font-medium text-sm text-nowrap text-white rounded-lg focus:outline-hidden hover:scale-103 active:scale-100">
                         Find Template
-                      </Link>
+                      </a>
                     </div>
                   </li>
                 }
 
                 <li>
-                  <Link href="/client/events" onClick={() => smartLink("/client/events")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                  <a href="/client/events" onClick={() => smartLink("/client/events")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                     <i className='bx bx-calendar-event text-lg'></i> See All Event...
-                  </Link>
+                  </a>
                 </li>
                 {/* <li className="hs-accordion" id="account-accordion">
                 <a className="hs-accordion-toggle w-full flex items-center leading-none gap-x-2 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800" aria-expanded="true" aria-controls="account-accordion-sub-1-collapse-1">
@@ -176,19 +175,19 @@ export default function MainSidebar() {
 
                 <ul className="flex flex-col">
                   <li>
-                    <Link href="/client/systems/voucher" onClick={() => smartLink("/client/systems/voucher")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                    <a href="/client/systems/voucher" onClick={() => smartLink("/client/systems/voucher")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                       <i className='bx bxs-coupon text-lg'></i> Vouchers
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                    <a href="/client/systems/catalog" onClick={() => smartLink("/client/systems/catalog")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                       <i className='bx bx-customize text-lg'></i> Catalog
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link href="/client/systems/users-manage" onClick={() => smartLink("/client/systems/users-manage")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
+                    <a href="/client/systems/users-manage" onClick={() => smartLink("/client/systems/users-manage")} className="w-full flex items-center leading-none gap-x-2 py-2 px-0.5 lg:px-2.5 text-sm rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 focus:text-gray-800">
                       <i className='bx bx-user-pin text-lg'></i> Users Mangement
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>

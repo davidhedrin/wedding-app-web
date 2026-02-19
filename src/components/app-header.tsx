@@ -3,7 +3,6 @@
 import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
-import Link from "next/link";
 
 export default function AppHeader() {
   const smartLink = useSmartLink();
@@ -13,9 +12,9 @@ export default function AppHeader() {
     <header className="fixed top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-6xl before:mx-2 lg:before:mx-auto before:rounded-xl before:bg-neutral-300/45 before:backdrop-blur-md">
       <nav className="relative max-w-6xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 px-3 md:py-0.5 mx-2 lg:mx-auto">
         <div className="flex items-center">
-          <Link href="/" onClick={() => smartLink("/")}>
+          <a href="/" onClick={() => smartLink("/")}>
             <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-36" />
-          </Link>
+          </a>
         </div>
 
         <div className="md:order-3 flex items-center gap-x-3">
@@ -35,12 +34,12 @@ export default function AppHeader() {
                   </p>
                 </div>
                 <div className="p-1 border-t border-gray-200 ">
-                  <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
+                  <a href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                     <i className='bx bx-tachometer text-lg'></i>Dashboard
-                  </Link>
-                  <Link href="/client/events" onClick={() => smartLink("/client/events")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
+                  </a>
+                  <a href="/client/events" onClick={() => smartLink("/client/events")} className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                     <i className='bx bx-calendar-event text-lg'></i>My Events
-                  </Link>
+                  </a>
                   <div onClick={() => signOutAction()} className="flex cursor-pointer items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-100">
                     <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="m16 17 5-5-5-5" />
@@ -50,9 +49,9 @@ export default function AppHeader() {
                   </div>
                 </div>
               </div>
-            </div> : <Link href="/auth" onClick={() => smartLink("/auth")} className="ps-3 group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+            </div> : <a href="/auth" onClick={() => smartLink("/auth")} className="ps-3 group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
               Start Here! <i className='bx bx-log-in text-lg'></i>
-            </Link>
+            </a>
           }
 
           <div className="md:hidden">
@@ -91,9 +90,9 @@ export default function AppHeader() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="group inline-flex items-center gap-x-1 py-1.5 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+                    <a href="/client/dashboard" onClick={() => smartLink("/client/dashboard")} className="group inline-flex items-center gap-x-1 py-1.5 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
                       Dashboard <i className='bx bx-tachometer text-lg'></i>
-                    </Link>
+                    </a>
                     <button onClick={() => signOutAction()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-800 text-gray-800 hover:border-gray-500 hover:text-gray-500 focus:outline-hidden focus:border-gray-500 focus:text-gray-500 disabled:opacity-50 disabled:pointer-events-none">
                       Sign Out <i className='bx bx-log-out text-lg bx-rotate-180' ></i>
                     </button>
@@ -103,11 +102,11 @@ export default function AppHeader() {
             }
             <hr className="text-muted" />
 
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" onClick={() => smartLink("/")} aria-current="page">Home</Link>
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/catalog" onClick={() => smartLink("/catalog")}>Catalog</Link>
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/about-us" onClick={() => smartLink("/about-us")}>About Us</Link>
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/contact" onClick={() => smartLink("/contact")}>Contact</Link>
-            <Link className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</Link>
+            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/" onClick={() => smartLink("/")} aria-current="page">Home</a>
+            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/catalog" onClick={() => smartLink("/catalog")}>Catalog</a>
+            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/about-us" onClick={() => smartLink("/about-us")}>About Us</a>
+            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/contact" onClick={() => smartLink("/contact")}>Contact</a>
+            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</a>
             {/* <div className="hs-dropdown [--strategy:static] md:[--strategy:absolute] [--adaptive:none] md:[--trigger:hover] [--auto-close:inside] md:inline-block">
               <button id="hs-pro-anpd" type="button" className="gap-0.5 hs-dropdown-toggle px-3 md:py-3 w-full md:w-auto flex items-center text-sm font-medium hover:text-neutral-600 focus:outline-hidden" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
                 Product

@@ -6,7 +6,6 @@ import { calculateRateProduct, showConfirm, toast } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
 import { StoreUpdateDataEvents } from "@/server/event";
 import { TemplateCaptures, Templates } from "@/generated/prisma";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoading } from "./loading/loading-context";
 
@@ -69,13 +68,13 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition transform">
       {/* Gambar dengan aspect ratio */}
       <div className="relative w-full aspect-4/3">
-        <Link href={`/template-detail?name=${template.slug}`} onClick={() => smartLink(`/template-detail?name=${template.slug}`)}>
+        <a href={`/template-detail?name=${template.slug}`} onClick={() => smartLink(`/template-detail?name=${template.slug}`)}>
           <img
             src={template.captures ? template.captures[0].file_path : ""}
             alt="Produk"
             className="object-cover w-full h-full"
           />
-        </Link>
+        </a>
 
         {/* Badge */}
         <div className="absolute flex items-center top-3 left-3 gap-x-1.5">
@@ -109,9 +108,9 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
           <span>{template.sold || 0} Choosen</span>
         </div>
         <h3 className="text-base md:text-lg font-semibold text-gray-800 mt-1 line-clamp-2">
-          <Link href={`/template-detail?name=${template.slug}`} onClick={() => smartLink(`/template-detail?name=${template.slug}`)} className='underline'>
+          <a href={`/template-detail?name=${template.slug}`} onClick={() => smartLink(`/template-detail?name=${template.slug}`)} className='underline'>
             {template.name}
-          </Link>
+          </a>
         </h3>
         <p className="text-gray-500 mt-1 text-sm line-clamp-2">
           {template.short_desc}
@@ -140,13 +139,13 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
             <button onClick={addTemplate} className="bg-indigo-600 text-white px-3 py-1.5 text-xs md:text-sm rounded-lg font-medium hover:bg-indigo-700 transition">
               Use
             </button>
-            <Link
+            <a
               href={`/${template.url}`}
               className="text-center border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold text-xs md:text-sm px-3 py-1.5 rounded-lg transition"
               target="_blank"
             >
               Preview
-            </Link>
+            </a>
           </div>
         </div>
       </div>

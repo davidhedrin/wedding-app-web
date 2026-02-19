@@ -3,7 +3,6 @@
 import { useSmartLink } from "@/lib/smart-link";
 import { signOutAction } from "@/lib/utils";
 import { userLoginData } from "@/lib/zustand";
-import Link from "next/link";
 
 export default function MainHeader() {
   const smartLink = useSmartLink();
@@ -15,9 +14,9 @@ export default function MainHeader() {
         <div className="w-full flex items-center gap-x-1.5">
           <ul className="flex items-center gap-1.5">
             <li className="inline-flex items-center relative gap-6 pe-1.5 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
-              <Link href="/" onClick={() => smartLink("/")}>
+              <a href="/" onClick={() => smartLink("/")}>
                 <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-28" />
-              </Link>
+              </a>
 
               <button type="button" className="cursor-pointer pt-0.5 inline-flex items-center text-xs rounded-md border border-transparent text-gray-500 hover:text-gray-800 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:text-gray-800" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-pro-sidebar" data-hs-overlay="#hs-pro-sidebar">
                 <i className='bx bx-book-content text-xl'></i>

@@ -10,7 +10,6 @@ import { copyToClipboard, eventStatusLabels, formatDate, normalizeSelectObj, sho
 import { CancelOrderEvent, GetDataEvents } from "@/server/event";
 import { Events, TemplateCaptures, Templates } from "@/generated/prisma";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import Badge from "@/components/ui/badge";
 import { DateRange } from "react-day-picker";
@@ -257,9 +256,9 @@ export default function Page() {
                               {'createdAt' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.createdAt ? formatDate(data.createdAt, "medium") : "-"}</td>}
 
                               <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
-                                <Link href={`/client/events/event-detail?code=${data.tmp_code}`} onClick={() => smartLink("/client/events/event-detail")}>
+                                <a href={`/client/events/event-detail?code=${data.tmp_code}`} onClick={() => smartLink("/client/events/event-detail")}>
                                   <i className='bx bx-edit text-lg text-amber-500 cursor-pointer'></i>
-                                </Link>
+                                </a>
                                 {
                                   (data.tmp_status && (data.tmp_status === "NOT_PAID" || data.tmp_status === "PENDING")) && <i onClick={() => deleteRow(data.id, data.user_id)} className='bx bx-trash text-lg text-red-600 cursor-pointer'></i>
                                 }

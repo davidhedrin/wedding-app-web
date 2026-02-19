@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import "boxicons/css/boxicons.min.css";
 
-import PrelineScriptWrapper from '@/components/PrelineScriptWrapper';
 import LayoutWraper from "./layout-wraper";
 import Configs from "@/lib/config";
 import { LoadingProvider } from "@/components/loading/loading-context";
@@ -11,6 +10,7 @@ import Loading from "@/components/loading/loading";
 import { SessionProvider } from "next-auth/react";
 import { ToastProvider } from "@/components/toast-provider";
 import ModalConfirm from "@/components/modal-confirm";
+import PrelineProvider from "@/components/preline-provider";
 
 // const fontStyleApp = Work_Sans({
 //   variable: "--font-work-sans",
@@ -52,8 +52,8 @@ export default function RootLayout({
         <SessionProvider>
           <LoadingProvider>
             <Loading />
-            <LayoutWraper children={children} />
-            <PrelineScriptWrapper />
+            <LayoutWraper>{children}</LayoutWraper>
+            <PrelineProvider />
           </LoadingProvider>
         </SessionProvider>
       </body>
