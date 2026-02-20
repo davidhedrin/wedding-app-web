@@ -1,5 +1,6 @@
 Buatkan sebuah file .tsx untuk proyek Next.js dengan Tailwind CSS. Desainnya adalah undangan pernikahan digital yang: 
-- Sangat lengkap, detail, dan kompleks, dengan desain modern dan elegan. Responsive di semua ukuran layar (mobile, tablet, desktop. Terutama mobile yg paling penting!). 
+- Sangat lengkap, detail, dan kompleks, dengan desain modern dan elegan. Responsive di semua ukuran layar (mobile, tablet, desktop. Terutama mobile yg paling penting!).
+- Saat pertama kali membuka undangan, terdapat halaman fix paling depan yang menutupi full seluruh halaman dimana hanya terdapat konten nama kedua mempelai, tanggal/waktu acara, nama yang diundang, lalu ada tombol buka undangan (Ketika diklik halaman fix tertutup) pada saat tampilan ini halaman belakang tidak berpengaruh ketika di scroll.
 - Memiliki navigation header (sticky atau fixed) yang mengarah ke setiap section dengan smooth scroll.
 - Bagian atas (hero section) menampilkan countdown tanggal pernikahan (buatkan design countdown kondisi menunggu hari h, sedang hari h, dan setelah hari h) dan background carousel gambar agar terlihat hidup dan mewah, juga terdapat tombol untuk buka undangan. Susunan konten dibagian atas buat semenarik mungkin!! boleh row atas ke bawah, atau terserah bagaimana bagusnya.
 - Untuk tema latar belakang seluruh halaman gunakan gambar(sticky atau fixed) yang dilapisi warna yang elegan untuk latar belakang seluruh halaman (kalau bisa jangan tema warna putih, dan boleh warna apa saja dengan) serta gunakan tipografi yang sesuai untuk acara pernikahan.
@@ -18,4 +19,265 @@ FAQ – daftar pertanyaan umum dengan format interaktif (accordion/dropdown).
 Footer - buatkan footer nya juga yg cantik dan menarik, yang pasti harus ada kumpulan menu navigasi nya gitu.
 
 Catatan:
-Untuk setiap section, buatkan design posisi yang menarik dan bagus
+Untuk setiap section, buatkan design posisi yang menarik dan bagus. Dan berikan nama template nya yg bagus dan elegan maksimak 3 kata dalam bahasa inggris.
+
+
+----------------------------------------------------------------------------------------
+
+
+Buatkan sebuah file .tsx untuk proyek Next.js (App Router) dengan Tailwind CSS.
+
+INI HARUS MENJADI FILE YANG SANGAT PANJANG DAN KOMPLEKS (MINIMAL 800–1200 BARIS KODE). Jangan buat versi ringkas. Jangan simplifikasi. Buat seperti template premium production-level.
+
+Spesifikasi:
+1. Struktur Teknis Wajib:
+- Gunakan TypeScript interface/type lengkap untuk semua data
+- Gunakan banyak reusable component dalam satu file (HeroSection, Countdown, GalleryCarousel, RSVPForm, FAQAccordion, dll)
+- Gunakan custom hook untuk countdown (useCountdown)
+- Gunakan state management dengan useState dan useEffect di beberapa bagian
+- Gunakan conditional rendering kompleks (untuk kondisi sebelum hari H, hari H, dan setelah hari H)
+- Gunakan animasi Tailwind + custom keyframes
+- Gunakan transition, transform, hover effects, dan micro-interactions di hampir semua elemen
+- Gunakan array data dummy yang panjang (galeri minimal 12 foto)
+- Buat logic carousel manual (tanpa library eksternal)
+- Gunakan dynamic class merging
+- Gunakan scroll behavior custom
+- Buat overlay opening screen yang mengunci scroll body hingga tombol diklik
+2. Desain & UX:
+- Desain modern, elegan, luxurious
+- Fokus utama mobile-first
+- Sangat responsif di semua ukuran layar
+- Gunakan layered background (fixed background + gradient overlay)
+- Gunakan kombinasi beberapa font elegan (misal serif + script style)
+- Jangan gunakan tema putih dominan
+- Gunakan warna yang elegan untuk latar belakang seluruh halaman (kalau bisa jangan tema warna putih, dan boleh warna apa saja dengan)
+3. Halaman Opening Screen:
+- Full screen fixed overlay
+- Tidak bisa scroll background sebelum tombol diklik
+- Animasi fade out saat dibuka
+- Tampilkan: Nama kedua mempelai, Tanggal, Nama tamu, Tombol buka undangan.
+4. Hero Section:
+- Background image carousel auto slide
+- Countdown dengan 3 mode desain: Sebelum hari H, Saat hari H, Setelah hari H
+- Layout kreatif dan interaktif
+- Terdapat tombol untuk Lihat undangan yang lengsung berpindah kebawah
+5. Section Urutan:
+- Mempelai
+- Acara (dengan Google Maps iframe)
+- Galeri (interactive carousel)
+- Cerita (timeline zigzag layout)
+- RSVP (form dengan validasi sederhana)
+- Hadiah
+- FAQ (accordion interaktif)
+- Footer dengan navigasi lengkap
+6. Gunakan gambar ini untuk SEMUA gambar: http://localhost:3005/assets/img/2149043983.jpg
+7. Tambahkan banyak detail kecil:
+- Hover glow
+- Animated borders
+- Gradient text
+- Shadow layering
+- Decorative divider
+- Smooth scroll navigation
+- Sticky header dengan efek blur saat scroll
+8. Berikan nama template elegan maksimal 3 kata bahasa Inggris di bagian atas file sebagai comment.
+
+Catatan: JANGAN RINGKAS. JANGAN BUAT VERSI SEDERHANA. Buat seolah ini template premium marketplace.
+
+
+
+----------------------------------------------------------------------------------------
+
+
+
+Buatkan sebuah file .tsx untuk proyek Next.js 14 (App Router) menggunakan TypeScript dan Tailwind CSS.
+
+WAJIB:
+Minimal 1200–2000 baris kode.
+Jangan buat versi ringkas.
+Jangan buat contoh sederhana.
+Jangan mengurangi kompleksitas.
+Buat seperti template premium marketplace (ThemeForest-level quality).
+Semua logic, state, dan animasi harus benar-benar ditulis lengkap.
+Tambahkan comment di paling atas file berisi nama template (maksimal 3 kata bahasa Inggris, terdengar mewah dan elegan).
+
+====================================================
+ARSITEKTUR WAJIB
+Dalam SATU file .tsx tersebut harus memiliki:
+
+TypeScript Modeling
+Buat interface/type lengkap untuk:
+Bride
+Groom
+EventDetail
+TimelineStory
+GalleryItem
+FAQItem
+RSVPFormData
+GiftOption
+NavigationItem
+CountdownState
+Semua harus strongly typed dan benar-benar digunakan.
+
+Custom Hooks
+Wajib buat:
+useCountdown(targetDate)
+useCarousel(images, autoPlayInterval)
+useScrollSpy(sectionIds)
+useLockBodyScroll(isLocked)
+useParallaxEffect()
+Semua hook harus memiliki logic lengkap, bukan pseudo-code.
+Reusable Components (di file yang sama)
+
+Buat komponen terpisah:
+OpeningOverlay
+StickyNavbar
+HeroSection
+CountdownDisplay
+CarouselBackground
+BrideGroomSection
+EventSection
+MapEmbed
+GallerySection
+StoryTimeline
+RSVPSection
+GiftSection
+FAQSection
+FooterSection
+DecorativeDivider
+AnimatedButton
+SectionContainer
+
+Setiap komponen wajib:
+Props typed
+Responsive
+Memiliki animasi
+Memiliki interaksi
+
+====================================================
+DESAIN & VISUAL
+Background:
+Fixed background image
+Overlay gradient elegan (navy, burgundy, emerald, gold accent)
+Glassmorphism di beberapa bagian
+Navbar blur saat scroll
+
+Typography:
+Serif elegan
+Script/cursive untuk nama mempelai
+Sans modern untuk body
+Gradient text
+Text shadow halus
+Animated underline hover
+Mobile-first adalah prioritas utama.
+
+====================================================
+FITUR DETAIL WAJIB
+Opening Overlay:
+Fixed full screen
+Lock scroll body
+Animasi fade out + scale
+Tidak bisa scroll sebelum dibuka
+Tampilkan nama mempelai, nama tamu (dummy), tanggal, tombol buka undangan dengan efek glow
+
+Hero Section:
+Background carousel auto slide
+Animated gradient overlay
+
+Countdown dengan 3 mode desain:
+Before Event
+On Event Day
+After Event
+Parallax effect ringan
+Micro-interaction pada angka countdown
+Terdapat tombol untuk Lihat undangan yang lengsung berpindah kebawah
+
+Bride & Groom Section:
+Layout zigzag desktop
+Card glass effect
+Hover reveal
+
+Event Section:
+Detail akad & resepsi
+Timeline mini
+Dress code
+Informasi tambahan
+Google Maps iframe
+Button buka Google Maps
+
+Gallery Section:
+Custom carousel manual (tanpa library)
+Thumbnails
+Modal preview
+Animated transitions
+Minimal 12 dummy images
+
+Story Timeline:
+Alternating left-right layout desktop
+Vertical center line
+Animated reveal on scroll
+
+RSVP Section:
+Form validation
+Loading state
+Success state
+Error state
+Animated input focus
+Custom radio button
+
+Gift Section:
+Accordion rekening
+Copy to clipboard
+Toast notification custom tanpa library
+
+FAQ Section:
+Animated accordion
+Smooth height transition
+Chevron rotate animation
+
+Footer:
+Multi column navigation
+Social icon dummy
+Back to top button
+Decorative gradient line
+
+====================================================
+ANIMASI WAJIB
+Gunakan:
+Tailwind transition
+Custom keyframes
+Fade in on scroll
+Hover glow
+Transform scale
+Floating animation ringan
+Animated gradient background
+Smooth scroll
+Sticky header dengan blur saat scroll
+
+====================================================
+DATA DUMMY
+Gallery minimal 12 item
+FAQ minimal 6 item
+Timeline minimal 5 cerita
+Gift options minimal 3
+Navigation items lengkap
+
+====================================================
+SEMUA GAMBAR GUNAKAN INI:
+http://localhost:3005/assets/img/2149043983.jpg
+
+====================================================
+LARANGAN
+Jangan gunakan library eksternal
+Jangan buat versi sederhana
+Jangan buat placeholder kosong
+Jangan mempersingkat kode
+Jangan membuat desain flat minimalis biasa
+
+====================================================
+TUJUAN AKHIR
+File harus terlihat seperti template premium marketplace:
+Kompleks
+Elegan
+Interaktif
+Production-level
+Sangat panjang dan detail

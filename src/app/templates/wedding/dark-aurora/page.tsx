@@ -118,7 +118,7 @@ export default function WeddingInvitationPage() {
   }, []);
 
   return (
-    <main className={`${playfair.variable} ${lora.variable} ${greatVibes.variable} scroll-smooth min-h-screen bg-gradient-to-br ${THEME.bgGradient}`}>
+    <main className={`${playfair.variable} ${lora.variable} ${greatVibes.variable} scroll-smooth min-h-screen bg-linear-to-br ${THEME.bgGradient}`}>
       {/* ===== Sticky Header ===== */}
       <header className="fixed top-0 inset-x-0 z-50">
         <div className="mx-auto max-w-6xl px-4">
@@ -131,13 +131,13 @@ export default function WeddingInvitationPage() {
               className="group flex items-center gap-2 rounded-xl px-3 py-1.5 transition"
               aria-label="Kembali ke atas"
             >
-              <span className="font-[var(--font-greatvibes)] text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
+              <span className="font-(--font-greatvibes) text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
                 F
               </span>
-              <span className="font-[var(--font-greatvibes)] text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
+              <span className="font-(--font-greatvibes) text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
                 &
               </span>
-              <span className="font-[var(--font-greatvibes)] text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
+              <span className="font-(--font-greatvibes) text-2xl leading-none text-amber-300 group-hover:scale-105 transition">
                 A
               </span>
               <span className="sr-only">Beranda</span>
@@ -166,19 +166,19 @@ export default function WeddingInvitationPage() {
       </header>
 
       {/* ===== Hero ===== */}
-      <section id="hero" className="relative h-screen min-h-[560px] w-full overflow-hidden">
+      <section id="hero" className="relative h-screen min-h-140 w-full overflow-hidden">
         {/* Background Carousel */}
         <div className="absolute inset-0">
           {HERO_IMAGES.map((src, i) => (
             <div
               key={i}
-              className="absolute inset-0 transition-opacity duration-[1500ms]"
+              className="absolute inset-0 transition-opacity duration-1500"
               style={{ opacity: heroIdx === i ? 1 : 0 }}
               aria-hidden={heroIdx !== i}
             >
               {/* pakai Image untuk optimasi; bisa juga pakai div bg-cover */}
               <img src={src} alt={`Hero ${i + 1}`} className="object-cover h-screen w-full" />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-slate-950/70 to-slate-950/95" />
+              <div className="absolute inset-0 bg-linear-to-b from-black/60 via-slate-950/70 to-slate-950/95" />
             </div>
           ))}
         </div>
@@ -186,13 +186,13 @@ export default function WeddingInvitationPage() {
         {/* Content */}
         <div className="relative z-10 h-full">
           <div className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center">
-            <p className="font-[var(--font-greatvibes)] text-4xl sm:text-5xl md:text-6xl text-amber-300 drop-shadow">
+            <p className="font-(--font-greatvibes) text-4xl sm:text-5xl md:text-6xl text-amber-300 drop-shadow">
               Undangan Pernikahan
             </p>
             <h1 className={`mt-3 text-3xl sm:text-5xl md:text-6xl font-semibold ${THEME.heading} tracking-tight`}>
-              {COUPLE.groom.name} <span className="font-[var(--font-greatvibes)] text-amber-300">&</span> {COUPLE.bride.name}
+              {COUPLE.groom.name} <span className="font-(--font-greatvibes) text-amber-300">&</span> {COUPLE.bride.name}
             </h1>
-            <p className={`mt-4 max-w-2xl ${THEME.body} font-[var(--font-lora)]`}>
+            <p className={`mt-4 max-w-2xl ${THEME.body} font-(--font-lora)`}>
               Dengan penuh rasa syukur, kami mengundang Anda untuk hadir dan memberikan doa restu pada hari bahagia kami.
             </p>
 
@@ -217,7 +217,7 @@ export default function WeddingInvitationPage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={() => scrollToId("mempelai")}
-                className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium bg-amber-300 text-slate-900 shadow-lg shadow-amber-900/20 hover:shadow-amber-800/30 hover:translate-y-[-1px] active:translate-y-0 transition"
+                className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium bg-amber-300 text-slate-900 shadow-lg shadow-amber-900/20 hover:shadow-amber-800/30 hover:-translate-y-px active:translate-y-0 transition"
               >
                 Buka Undangan
                 <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
@@ -233,12 +233,12 @@ export default function WeddingInvitationPage() {
         </div>
 
         {/* Decorative bottom wave */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-24 bg-gradient-to-b from-transparent to-slate-950" />
+        <div className="pointer-events-none absolute inset-x-0 -bottom-px h-24 bg-linear-to-b from-transparent to-slate-950" />
       </section>
 
       {/* ===== Mempelai ===== */}
       <Section id="mempelai" title="Mempelai">
-        <blockquote className="mb-8 mx-auto max-w-3xl text-center font-[var(--font-lora)] text-slate-200/90 italic">
+        <blockquote className="mb-8 mx-auto max-w-3xl text-center font-(--font-lora) text-slate-200/90 italic">
           “Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu...” (QS. Ar-Rum: 21)
         </blockquote>
         <div className="grid gap-6 md:grid-cols-2">
@@ -247,7 +247,7 @@ export default function WeddingInvitationPage() {
               key={p.name}
               className={`group overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring} p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4`}
             >
-              <div className="relative aspect-[3/4] sm:aspect-[4/3] overflow-hidden rounded-2xl">
+              <div className="relative aspect-3/4 sm:aspect-4/3 overflow-hidden rounded-2xl">
                 <img
                   src={PLACEHOLDER_IMG}
                   alt={p.name}
@@ -258,10 +258,10 @@ export default function WeddingInvitationPage() {
                 <h3 className={`text-xl sm:text-2xl font-semibold ${THEME.heading}`}>
                   {p.name}
                 </h3>
-                <p className={`mt-1 text-sm ${THEME.body} font-[var(--font-lora)]`}>
+                <p className={`mt-1 text-sm ${THEME.body} font-(--font-lora)`}>
                   {p.desc}
                 </p>
-                <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
+                <div className="mt-3 h-px w-full bg-linear-to-r from-transparent via-amber-300/40 to-transparent" />
               </div>
             </div>
           ))}
@@ -295,7 +295,7 @@ export default function WeddingInvitationPage() {
             <iframe
               title="Lokasi Acara"
               src={COUPLE.gmapsSrc}
-              className="h-[320px] w-full md:h-full"
+              className="h-80 w-full md:h-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
@@ -307,7 +307,7 @@ export default function WeddingInvitationPage() {
       <Section id="galeri" title="Galeri">
         <div className={`relative overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring}`}>
           {/* Slides */}
-          <div className="relative h-[54svh] min-h-[320px] w-full">
+          <div className="relative h-[54svh] min-h-80 w-full">
             {GALLERY_IMAGES.map((src, i) => (
               <div
                 key={i}
@@ -319,7 +319,7 @@ export default function WeddingInvitationPage() {
                   alt={`Galeri ${i + 1}`}
                   className="h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-slate-950/50 to-transparent" />
               </div>
             ))}
           </div>
@@ -365,7 +365,7 @@ export default function WeddingInvitationPage() {
             { t: "2025", title: "Menuju Ijab Kabul", desc: "Menanti hari penuh doa dan kebahagiaan." },
           ].map((item, idx) => (
             <li key={idx} className="relative">
-              <span className="absolute -left-[26px] top-1 grid h-5 w-5 place-items-center rounded-full bg-amber-300/90 text-slate-900 text-xs font-bold shadow ring-2 ring-slate-900">
+              <span className="absolute -left-6.5 top-1 grid h-5 w-5 place-items-center rounded-full bg-amber-300/90 text-slate-900 text-xs font-bold shadow ring-2 ring-slate-900">
                 {idx + 1}
               </span>
               <div className={`rounded-2xl ${THEME.card} ${THEME.ring} p-4 sm:p-5`}>
@@ -501,11 +501,11 @@ export default function WeddingInvitationPage() {
           </div>
 
           <div className={`overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring} p-0`}>
-            <div className="relative h-full min-h-[280px]">
+            <div className="relative h-full min-h-70">
               <img src={PLACEHOLDER_IMG} alt="Hadiah" className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="font-[var(--font-greatvibes)] text-3xl text-amber-300">Terima kasih</p>
+                <p className="font-(--font-greatvibes) text-3xl text-amber-300">Terima kasih</p>
                 <p className="text-slate-200/90">Atas doa, dukungan, dan kasih sayang yang Anda berikan.</p>
               </div>
             </div>
@@ -533,7 +533,7 @@ export default function WeddingInvitationPage() {
               </button>
               <div
                 className={`overflow-hidden transition-all duration-300 ease-out ${openFaq === idx
-                    ? "max-h-[1000px] opacity-100"
+                    ? "max-h-250 opacity-100"
                     : "max-h-0 opacity-0"
                   }`}
               >
@@ -551,7 +551,7 @@ export default function WeddingInvitationPage() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-[var(--font-greatvibes)] text-3xl text-amber-300">F & A</span>
+                <span className="font-(--font-greatvibes) text-3xl text-amber-300">F & A</span>
               </div>
               <p className="mt-3 text-sm text-slate-300/90">
                 Terima kasih telah menjadi bagian dari hari bahagia kami. Sampai jumpa di acara!
@@ -613,9 +613,9 @@ function Section({ id, title, children }: React.PropsWithChildren<{ id: string; 
     <section id={id} className="scroll-mt-28">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:py-16">
         <header className="mb-8 text-center">
-          <p className="font-[var(--font-greatvibes)] text-3xl text-amber-300">{title}</p>
+          <p className="font-(--font-greatvibes) text-3xl text-amber-300">{title}</p>
           <h2 className="mt-1 text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-100 tracking-tight">{title}</h2>
-          <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-amber-300/70 to-transparent" />
+          <div className="mx-auto mt-4 h-px w-24 bg-linear-to-r from-transparent via-amber-300/70 to-transparent" />
         </header>
         {children}
       </div>

@@ -1,0 +1,70 @@
+{!isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f0c1a] text-center px-6">
+          <div className="max-w-lg animate-fadeIn">
+            <h2 className="text-sm uppercase tracking-[0.3em] text-rose-400 mb-4">
+              Wedding Invitation
+            </h2>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              Ariana & Daniel
+            </h1>
+            <p className="text-lg mb-2">20 Desember 2026</p>
+            <p className="italic text-gray-300 mb-6">
+              Kepada Yth. Bapak/Ibu/Saudara/i
+              <br />
+              <span className="font-semibold text-white">
+                Nama Tamu Undangan
+              </span>
+            </p>
+            <button
+              onClick={() => setIsOpen(true)}
+              className="px-8 py-3 rounded-full bg-rose-500 hover:bg-rose-600 transition-all duration-500 shadow-xl hover:scale-105"
+            >
+              Buka Undangan
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
+
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={IMAGE_URL}
+                alt="cover"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4">Wedding Invitation</p>
+              <h1 className={`${playfair.className} text-4xl md:text-6xl font-bold`}>
+                Andi & Salsabila
+              </h1>
+              <p className="mt-4 text-lg">20 Desember 2026</p>
+              <p className="mt-2 italic">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1">Nama Tamu</p>
+
+              <button
+                onClick={() => setIsOpen(true)}
+                className="mt-8 px-8 py-3 bg-rose-600 hover:bg-rose-700 rounded-full transition-all duration-300 shadow-xl"
+              >
+                Buka Undangan
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
