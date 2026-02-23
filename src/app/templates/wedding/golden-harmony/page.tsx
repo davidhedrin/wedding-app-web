@@ -6,6 +6,7 @@ import useCountdown from "@/lib/countdown";
 
 import bgImage from './bg.jpg';
 import { formatDate } from "@/lib/utils";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -25,7 +26,20 @@ WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 const MAP_EMBED = `https://www.google.com/maps?q=-6.200000,106.816666&z=15&output=embed`; // contoh: Jakarta
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+}
+
 export default function WeddingInvite() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // hero carousel
   const [heroIdx, setHeroIdx] = useState(0);
   useEffect(() => {
@@ -85,6 +99,51 @@ export default function WeddingInvite() {
           backgroundPosition: "center",
         }}
       >
+
+        <AnimatePresence>
+          {!opened && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src={bgImage.src}
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+              </div>
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
+              >
+                <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+                <h1 className="font-playfair text-4xl sm:text-3xl md:text-5xl leading-tight mb-4">
+                  Airilyn<br />
+                  &<br />
+                  Bernando
+                </h1>
+                <p className="mt-4 text-lg text-amber-300">20 Desember 2026</p>
+                <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+                <button
+                  onClick={() => setOpened(true)}
+                  className="px-5 py-3 rounded-full bg-amber-300 text-slate-900 font-medium shadow-md hover:scale-[1.02] transition"
+                >
+                  Buka Undangan
+                  <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Sticky navbar */}
         <header className="fixed top-0 left-0 right-0 z-40">
           <nav className="backdrop-blur-sm bg-slate-900/40 border-b border-slate-800">
@@ -231,11 +290,11 @@ export default function WeddingInvite() {
                     onClick={() => scrollTo("mempelai")}
                     className="px-5 py-3 rounded-full bg-amber-300 text-slate-900 font-medium shadow-md hover:scale-[1.02] transition"
                   >
-                    Buka Undangan
+                    Lihat Undangan
                   </button>
                   <button
                     onClick={() => scrollTo("rsvp")}
-                    className="px-5 py-3 rounded-full border border-slate-600 text-slate-200 hover:bg-slate-800 transition"
+                    className="px-5 py-3 rounded-full border-slate-800 border-2 text-slate-200 hover:bg-slate-800 transition"
                   >
                     Konfirmasi Kehadiran
                   </button>
@@ -248,7 +307,7 @@ export default function WeddingInvite() {
 
               {/* right: visual hero with carousel overlay */}
               <div className="relative order-first md:order-last w-full">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700 aspect-[4/5] sm:aspect-[3/4] md:aspect-[4/5] lg:aspect-[5/6]">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700 aspect-4/5 sm:aspect-3/4 md:aspect-4/5 lg:aspect-5/6">
                   {HERO_IMAGES.map((src, i) => (
                     <img
                       key={i}
@@ -262,7 +321,7 @@ export default function WeddingInvite() {
                   ))}
 
                   {/* overlay gradient biar mewah */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-slate-900/30 to-transparent" />
 
                   {/* subtle overlay content */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -284,7 +343,7 @@ export default function WeddingInvite() {
                       onClick={() => setHeroIdx(i)}
                       className={`
                         w-3 h-3 rounded-full transition-all
-                        ${i === heroIdx ? "bg-amber-300 scale-110" : "bg-slate-600 hover:bg-slate-500"}
+                        ${i === heroIdx ? "bg-amber-300 scale-110" : "bg-slate-800 hover:bg-slate-500"}
                       `}
                       aria-label={`Slide ${i + 1}`}
                     />
@@ -360,7 +419,7 @@ export default function WeddingInvite() {
                   <iframe
                     title="Lokasi Acara"
                     src={MAP_EMBED}
-                    className="w-full h-full min-h-[320px]"
+                    className="w-full h-full min-h-80"
                     loading="lazy"
                   />
                 </div>
@@ -384,7 +443,7 @@ export default function WeddingInvite() {
                     }}
                   >
                     {Array.from({ length: galleryCount }).map((_, i) => (
-                      <div key={i} className="w-full flex-shrink-0 px-2">
+                      <div key={i} className="w-full shrink-0 px-2">
                         <div className="h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-700">
                           <img
                             src="http://localhost:3005/assets/img/2149043983.jpg"
@@ -401,13 +460,13 @@ export default function WeddingInvite() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setGalleryIdx((s) => (s - 1 + galleryCount) % galleryCount)}
-                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-600 transition"
+                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
                     >
                       Prev
                     </button>
                     <button
                       onClick={() => setGalleryIdx((s) => (s + 1) % galleryCount)}
-                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-600 transition"
+                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
                     >
                       Next
                     </button>
@@ -440,7 +499,7 @@ export default function WeddingInvite() {
                     { date: "2025", title: "Lamaran", desc: "Melewati proses lamaran keluarga." },
                   ].map((it, idx) => (
                     <li key={idx} className="mb-8 ml-6">
-                      <span className="absolute -left-6 w-4 h-4 rounded-full bg-amber-300 border border-slate-800" />
+                      <span className="absolute -left-6 w-4 h-4 rounded-full bg-amber-300 border-2 border-slate-800" />
                       <div className="text-sm text-amber-200">{it.date}</div>
                       <div className="font-semibold text-lg mt-1">{it.title}</div>
                       <div className="text-slate-300 mt-2">{it.desc}</div>
@@ -452,8 +511,8 @@ export default function WeddingInvite() {
 
             {/* RSVP */}
             <section id="rsvp">
-              <h2 className="font-playfair text-3xl mb-6">RSVP</h2>
-              <div className="grid md:grid-cols-2 gap-6 items-start">
+              <div className="mx-auto max-w-2xl">
+                <h2 className="font-playfair text-3xl mb-6">RSVP</h2>
                 <form onSubmit={handleRsvpSubmit} className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 shadow">
                   <div className="grid gap-3">
                     <label className="text-sm text-slate-300">
@@ -514,44 +573,170 @@ export default function WeddingInvite() {
                     {rsvpSent && <div className="text-sm text-emerald-300">Terima kasih! Konfirmasi Anda telah diterima.</div>}
                   </div>
                 </form>
-
-                <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700">
-                  <div className="font-semibold mb-2">Informasi Tambahan</div>
-                  <div className="text-slate-300 text-sm">
-                    Jika Anda ingin mengirim kado atau transfer, silakan gunakan informasi di bagian Hadiah.
-                    Untuk pertanyaan lebih lanjut, hubungi keluarga.
-                  </div>
-
-                  <div className="mt-4">
-                    <button onClick={() => scrollTo("hadiah")} className="px-4 py-2 rounded-md bg-amber-300 text-slate-900">Lihat Info Hadiah</button>
-                  </div>
-                </div>
               </div>
             </section>
 
             {/* Hadiah */}
-            <section id="hadiah">
-              <h2 className="font-playfair text-3xl mb-6">Hadiah</h2>
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="p-6 rounded-2xl bg-slate-800/30 border border-slate-700 text-center">
-                  <div className="text-slate-400 text-sm">Rekening Bank</div>
-                  <div className="font-semibold text-lg mt-2">Bank Indonesia • 123-456-7890</div>
-                  <div className="text-slate-300 text-sm mt-2">Atas Nama: Nama Mempelai</div>
-                  <div className="mt-4">
-                    <a href="https://example.com" className="inline-block px-4 py-2 rounded-md bg-amber-300 text-slate-900">Salin Nomor</a>
+            <section id="hadiah" className="scroll-mt-24">
+              <h2 className="font-playfair text-3xl mb-6 text-white">
+                Hadiah
+              </h2>
+
+              <p className="mb-8 max-w-xl text-slate-300">
+                Doa dan kehadiran Anda adalah hadiah terindah bagi kami.
+                Namun bila berkenan berbagi kebahagiaan, berikut beberapa opsi
+                yang dapat dipilih.
+              </p>
+
+              <div className="space-y-8">
+                {/* ====================================== */}
+                {/* TRANSFER / E-WALLET                    */}
+                {/* ====================================== */}
+                <div className="rounded-2xl bg-slate-800/30 border border-slate-700 p-6">
+                  <h4 className="text-lg font-semibold text-slate-100">
+                    Kado Digital
+                  </h4>
+
+                  <div className="mt-5 grid md:grid-cols-3 gap-5">
+                    {/* Bank */}
+                    <div className="rounded-xl bg-black/30 border border-slate-700 p-4">
+                      <p className="text-sm text-slate-300">
+                        Bank Indonesia · A/N Nama Mempelai
+                      </p>
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <code className="rounded bg-black/40 px-3 py-1 text-sm text-slate-100">
+                          123-456-7890
+                        </code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText("123-456-7890")}
+                          className="text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                        >
+                          Salin
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* E-Wallet */}
+                    <div className="rounded-xl bg-black/30 border border-slate-700 p-4">
+                      <p className="text-sm text-slate-300">
+                        OVO / GoPay
+                      </p>
+                      <div className="mt-2 flex items-center justify-between gap-3">
+                        <code className="rounded bg-black/40 px-3 py-1 text-sm text-slate-100">
+                          0812-XXXX-XXXX
+                        </code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText("0812-XXXX-XXXX")}
+                          className="text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                        >
+                          Salin
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-slate-800/30 border border-slate-700 text-center">
-                  <div className="text-slate-400 text-sm">E-wallet</div>
-                  <div className="font-semibold text-lg mt-2">OVO / GoPay • 0812xxxx</div>
-                  <div className="text-slate-300 text-sm mt-2">QRIS tersedia saat acara</div>
-                </div>
+                {/* ====================================== */}
+                {/* WISHLIST + ALAMAT                      */}
+                {/* ====================================== */}
+                <div className="rounded-2xl bg-slate-800/30 border border-slate-700 p-6">
+                  <h4 className="text-lg font-semibold text-slate-100">
+                    Wishlist Hadiah
+                  </h4>
 
-                <div className="p-6 rounded-2xl bg-slate-800/30 border border-slate-700 text-center">
-                  <div className="text-slate-400 text-sm">Ingin Hadiah Lain?</div>
-                  <div className="font-semibold mt-2">Gift Registry</div>
-                  <div className="text-slate-300 text-sm mt-2">Link ke daftar hadiah jika ada</div>
+                  {/* Alamat */}
+                  <div className="mt-3 rounded-xl bg-black/30 border border-slate-700 p-4">
+                    <p className="text-xs uppercase tracking-wider text-slate-400">
+                      Alamat Pengiriman
+                    </p>
+                    <p className="mt-1 text-sm text-slate-200 leading-relaxed">
+                      Nama Mempelai Jl. Contoh Bahagia No. 12 Jakarta Selatan, 12345 Indonesia
+                    </p>
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(
+                          "Nama Mempelai, Jl. Contoh Bahagia No. 12, Jakarta Selatan, 12345, Indonesia"
+                        )
+                      }
+                      className="mt-2 text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                    >
+                      Salin Alamat
+                    </button>
+                  </div>
+
+                  <p className="mt-2 text-sm text-slate-300">
+                    Berikut beberapa referensi hadiah. Tidak ada kewajiban —
+                    kehadiran Anda tetap yang utama.
+                  </p>
+
+                  {/* Wishlist items */}
+                  <div className="mt-5 grid md:grid-cols-3 gap-5">
+                    {[
+                      {
+                        name: 'Set Peralatan Makan',
+                        price: 'Rp 1.500.000',
+                        qty: 1,
+                        url: '#',
+                      },
+                      {
+                        name: 'Sprei Premium King',
+                        price: 'Rp 2.200.000',
+                        qty: 1,
+                        url: '#',
+                      },
+                      {
+                        name: 'Lampu Meja Minimalis',
+                        price: 'Rp 850.000',
+                        qty: 2,
+                        url: '#',
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl bg-black/30 border border-slate-700 p-4"
+                      >
+                        <div className="text-sm font-medium text-slate-100">
+                          {item.name}
+                        </div>
+                        <div className="mt-1 text-xs text-slate-300 space-y-0.5">
+                          <p>Harga: {item.price}</p>
+                          <p>Jumlah: {item.qty} unit</p>
+                        </div>
+
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300/40 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/10 transition"
+                        >
+                          Lihat Referensi
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination UI */}
+                  <div className="mt-6 flex flex-col items-center gap-3">
+                    <div className="flex gap-2">
+                      <button className="h-8 w-8 rounded-full bg-amber-300 text-xs font-semibold text-slate-900">
+                        1
+                      </button>
+                      <button className="h-8 w-8 rounded-full border-2 border-slate-800 text-xs text-slate-300">
+                        2
+                      </button>
+                      <button className="h-8 w-8 rounded-full border-2 border-slate-800 text-xs text-slate-300">
+                        3
+                      </button>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button className="flex-1 rounded-md border-2 border-slate-800 px-3 py-2 text-xs text-slate-300">
+                        Prev
+                      </button>
+                      <button className="flex-1 rounded-md border-2 border-slate-800 px-3 py-2 text-xs text-slate-300">
+                        Next
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>

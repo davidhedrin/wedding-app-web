@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Playfair_Display, Great_Vibes, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -96,8 +97,21 @@ const sections = [
   { id: "faq", label: "FAQ" },
 ];
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 // ---------- Page ----------
 export default function WeddingInvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // Countdown
   const countDown = useCountdown(WEDDING_DATE.toString());
 
@@ -149,8 +163,51 @@ export default function WeddingInvitationPage() {
   return (
     <main className={`${inter.variable} ${playfair.variable} ${greatVibes.variable} font-sans bg-emerald-950 text-emerald-50 min-h-screen overflow-x-hidden`}>
       {/* Decorative gradient + noise overlay */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-20 bg-gradient-to-b from-emerald-900 via-emerald-950 to-black"></div>
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-20 bg-linear-to-b from-emerald-900 via-emerald-950 to-black"></div>
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 mix-blend-overlay opacity-20 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,.08),transparent_40%),radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,.06),transparent_40%)]"></div>
+
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-emerald-950/70 bg-linear-to-b from-black/40 via-transparent to-emerald-950/90 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+
+              <h1 className="mt-3 font-display text-4xl sm:text-6xl tracking-wide">
+                Rama <span className="text-amber-300">&</span> Aisyah
+              </h1>
+              <p className="mt-4 text-lg text-emerald-100/90">{formatDate(WEDDING_DATE, "full", "short")}</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className="btn-shimmer floaty inline-flex items-center gap-2 rounded-full bg-amber-300/90 px-6 py-3 text-emerald-950 font-medium ring-2 ring-amber-200/50 hover:-translate-y-0.5 transition"
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sticky Header */}
       <Header active={active} />
@@ -352,7 +409,7 @@ function Hero({ countDown }: {
           <div key={i} className="hero-slide" style={{ backgroundImage: `url(${src})` }} />
         ))}
         <div className="absolute inset-0 bg-emerald-950/70" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-emerald-950/90" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-emerald-950/90" />
       </div>
 
       <div className="mx-auto max-w-5xl px-5">
@@ -410,7 +467,7 @@ function Hero({ countDown }: {
             href="#mempelai"
             className="btn-shimmer floaty inline-flex items-center gap-2 rounded-full bg-amber-300/90 px-6 py-3 text-emerald-950 font-medium ring-2 ring-amber-200/50 hover:-translate-y-0.5 transition"
           >
-            ✨ Buka Undangan
+            ✨ Lihat Undangan
           </a>
         </div>
       </div>
@@ -426,7 +483,7 @@ function Hero({ countDown }: {
 function TimeBox({ label, value }: { label: string; value: number }) {
   const padded = String(value).padStart(2, "0");
   return (
-    <div className="relative grid min-w-[66px] place-items-center rounded-xl bg-black/30 px-3 py-2 ring-1 ring-white/10">
+    <div className="relative grid min-w-16.5 place-items-center rounded-xl bg-black/30 px-3 py-2 ring-1 ring-white/10">
       <div className="text-2xl font-display tabular-nums">{padded}</div>
       <div className="text-[10px] uppercase tracking-[0.2em] text-emerald-100/80">{label}</div>
       <span aria-hidden className="absolute inset-0 rounded-xl ring-1 ring-white/10 pointer-events-none" />
@@ -457,8 +514,8 @@ function Mempelai() {
       />
       <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-6 px-6 sm:grid-cols-2">
         {[COUPLE.bride, COUPLE.groom].map((p, i) => (
-          <div key={i} className="group glass rounded-3xl p-4 sm:p-6 transition hover:translate-y-[-4px]">
-            <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl ring-1 ring-white/10">
+          <div key={i} className="group glass rounded-3xl p-4 sm:p-6 transition hover:-translate-y-1">
+            <div className="aspect-4/3 w-full overflow-hidden rounded-2xl ring-1 ring-white/10">
               <img src={p.img} alt={p.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
             </div>
             <h3 className="mt-4 font-display text-2xl">{p.name}</h3>
@@ -502,7 +559,7 @@ function Acara() {
       </div>
 
       <div className="mx-auto mt-8 max-w-6xl px-6">
-        <div className="aspect-[16/9] overflow-hidden rounded-3xl ring-1 ring-white/10">
+        <div className="aspect-video overflow-hidden rounded-3xl ring-1 ring-white/10">
           <iframe
             title="Lokasi Acara"
             src={VENUE.mapsEmbed}
@@ -535,9 +592,9 @@ function Galeri() {
           >
             {GALLERY_IMAGES.map((src, i) => (
               <div key={i} className="snap-center shrink-0 w-[78%] sm:w-[48%] md:w-[38%] lg:w-[30%]">
-                <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                <div className="group relative aspect-4/5 overflow-hidden rounded-2xl ring-1 ring-white/10">
                   <img src={src} alt={`Galeri ${i + 1}`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-emerald-950/40 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-emerald-950/40 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
                 </div>
               </div>
             ))}
@@ -617,7 +674,7 @@ function RSVP({
                 required
                 value={rsvp.name}
                 onChange={(e) => setRsvp((s: any) => ({ ...s, name: e.target.value }))}
-                className="input"
+                className="input w-full border border-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200/40"
                 placeholder="Nama Anda"
               />
             </Field>
@@ -626,7 +683,7 @@ function RSVP({
                 required
                 value={rsvp.phone}
                 onChange={(e) => setRsvp((s: any) => ({ ...s, phone: e.target.value }))}
-                className="input"
+                className="input w-full border border-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200/40"
                 placeholder="08xxxxxxxxxx"
                 inputMode="tel"
               />
@@ -635,7 +692,7 @@ function RSVP({
               <select
                 value={rsvp.attendance}
                 onChange={(e) => setRsvp((s: any) => ({ ...s, attendance: e.target.value }))}
-                className="input"
+                className="input w-full border border-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200/40"
               >
                 <option>Hadir</option>
                 <option>Tidak Hadir</option>
@@ -649,19 +706,19 @@ function RSVP({
                 max={10}
                 value={rsvp.guests}
                 onChange={(e) => setRsvp((s: any) => ({ ...s, guests: Number(e.target.value) }))}
-                className="input"
-              />
-            </Field>
-            <Field label="Ucapan / Pesan" full>
-              <textarea
-                rows={4}
-                value={rsvp.message}
-                onChange={(e) => setRsvp((s: any) => ({ ...s, message: e.target.value }))}
-                className="input resize-y"
-                placeholder="Doa & pesan untuk kedua mempelai…"
+                className="input w-full border border-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200/40"
               />
             </Field>
           </div>
+          <Field label="Ucapan / Pesan" full>
+            <textarea
+              rows={4}
+              value={rsvp.message}
+              onChange={(e) => setRsvp((s: any) => ({ ...s, message: e.target.value }))}
+              className="input resize-y w-full border border-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200/40"
+              placeholder="Doa & pesan untuk kedua mempelai…"
+            />
+          </Field>
 
           <div className="flex items-center justify-between gap-3">
             <div className="text-xs text-emerald-100/70">
@@ -701,30 +758,180 @@ function Field({ label, children, full }: { label: string; children: React.React
   );
 }
 
-function Hadiah({ onCopy, copiedIndex }: { onCopy: (text: string, idx: number) => void; copiedIndex: number | null }) {
+function Hadiah({
+  onCopy,
+  copiedIndex,
+}: {
+  onCopy: (text: string, idx: number) => void;
+  copiedIndex: number | null;
+}) {
   return (
-    <div className="relative py-16 sm:py-20">
-      <SectionTitle title="Hadiah" subtitle="Doa restu adalah yang utama. Jika berkenan, Anda juga dapat mengirim hadiah." />
-      <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-4 px-6">
-        {GIFTS.map((g, i) => (
-          <div key={i} className="glass rounded-2xl p-4 flex items-center justify-between gap-3">
-            <div className="text-sm text-emerald-100/90">{g.label}</div>
+    <section className="relative py-16 sm:py-20">
+      <SectionTitle
+        title="Hadiah"
+        subtitle="Doa restu adalah yang utama. Jika berkenan, Anda juga dapat mengirim hadiah."
+      />
+
+      <div className="mx-auto mt-10 max-w-5xl space-y-8">
+        {/* ================================================= */}
+        {/* KADO DIGITAL                                     */}
+        {/* ================================================= */}
+        <div className="glass rounded-3xl p-6">
+          <h4 className="mb-3 font-serif text-lg text-emerald-50">
+            Kado Digital
+          </h4>
+
+          <p className="mb-5 text-sm text-emerald-100/80">
+            Kehadiran Anda sudah lebih dari cukup. Namun bila berkenan,
+            tanda kasih dapat disampaikan melalui informasi berikut:
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {GIFTS.map((g, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between gap-4 rounded-2xl bg-black/30 p-4 ring-1 ring-white/10"
+              >
+                <div className="text-sm text-emerald-100/90">
+                  {g.label}
+                </div>
+
+                <button
+                  onClick={() => onCopy(g.copy, i)}
+                  className="
+                    rounded-full
+                    bg-black/40
+                    px-3 py-1.5
+                    text-xs
+                    ring-1 ring-white/10
+                    transition
+                    hover:bg-black/60
+                  "
+                >
+                  {copiedIndex === i ? 'Disalin ✓' : 'Salin'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ================================================= */}
+        {/* WISHLIST + ALAMAT                                */}
+        {/* ================================================= */}
+        <div className="glass rounded-3xl p-6">
+          <h4 className="mb-2 font-serif text-lg text-emerald-50">
+            Wishlist Hadiah
+          </h4>
+
+          {/* Alamat Pengiriman */}
+          <div className="rounded-2xl bg-black/30 p-4 ring-1 ring-white/10">
+            <p className="text-xs uppercase tracking-wider text-emerald-100/60">
+              Alamat Pengiriman
+            </p>
+            <p className="mt-1 text-sm text-emerald-50 leading-relaxed">
+              Nama Penerima Jl. Contoh Bahagia No. 12 Jakarta Selatan, 12345 Indonesia
+            </p>
+
             <button
-              onClick={() => onCopy(g.copy, i)}
-              className="rounded-full bg-black/30 px-3 py-1.5 text-xs ring-1 ring-white/10 hover:bg-black/40 transition"
+              onClick={() =>
+                onCopy(
+                  'Nama Penerima, Jl. Contoh Bahagia No. 12, Jakarta Selatan, 12345, Indonesia',
+                  999
+                )
+              }
+              className="mt-3 text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
             >
-              {copiedIndex === i ? "Disalin ✓" : "Salin"}
+              Salin Alamat
             </button>
           </div>
-        ))}
-        <a
-          href="#rsvp"
-          className="mt-2 inline-flex items-center justify-center rounded-2xl bg-amber-300/90 px-5 py-3 text-emerald-950 font-medium ring-2 ring-amber-200/50 hover:-translate-y-0.5 transition"
-        >
-          Kirim Ucapan
-        </a>
+
+          <p className="my-5 text-sm text-emerald-100/80">
+            Berikut beberapa referensi hadiah yang mungkin bermanfaat
+            bagi kami. Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+          </p>
+
+          {/* Wishlist Items */}
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                name: 'Set Peralatan Makan',
+                price: 'Rp 1.500.000',
+                qty: 1,
+                url: '#',
+              },
+              {
+                name: 'Sprei Premium King Size',
+                price: 'Rp 2.200.000',
+                qty: 1,
+                url: '#',
+              },
+              {
+                name: 'Lampu Meja Minimalis',
+                price: 'Rp 850.000',
+                qty: 2,
+                url: '#',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-black/30 p-4 ring-1 ring-white/10"
+              >
+                <p className="text-sm font-medium text-emerald-50">
+                  {item.name}
+                </p>
+
+                <div className="mt-1 text-xs text-emerald-100/70 space-y-0.5">
+                  <p>Perkiraan Harga: {item.price}</p>
+                  <p>Jumlah: {item.qty} unit</p>
+                </div>
+
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    mt-3 inline-flex w-full justify-center
+                    rounded-xl
+                    border border-amber-300/40
+                    px-4 py-2
+                    text-xs
+                    text-amber-200
+                    transition
+                    hover:bg-amber-300/10
+                  "
+                >
+                  Lihat Referensi
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination UI */}
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <div className="flex gap-2">
+              <button className="h-8 w-8 rounded-full bg-amber-300 text-xs font-semibold text-emerald-950">
+                1
+              </button>
+              <button className="h-8 w-8 rounded-full ring-1 ring-white/20 text-xs text-emerald-100/70">
+                2
+              </button>
+              <button className="h-8 w-8 rounded-full ring-1 ring-white/20 text-xs text-emerald-100/70">
+                3
+              </button>
+            </div>
+
+            <div className="flex w-full gap-3">
+              <button className="flex-1 rounded-xl ring-1 ring-white/20 px-3 py-2 text-xs text-emerald-100/70">
+                Prev
+              </button>
+              <button className="flex-1 rounded-xl ring-1 ring-white/20 px-3 py-2 text-xs text-emerald-100/70">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 

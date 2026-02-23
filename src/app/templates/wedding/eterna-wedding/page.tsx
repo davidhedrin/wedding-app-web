@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
 import { formatDate } from "@/lib/utils";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -35,7 +36,20 @@ const GALLERY = new Array(8).fill(
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+}
+
 export default function WeddingInvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // Carousel (Hero)
   const [heroIndex, setHeroIndex] = useState(0);
   useEffect(() => {
@@ -130,6 +144,48 @@ export default function WeddingInvitationPage() {
     <main className="scroll-smooth bg-fixed bg-cover bg-center" style={{ backgroundImage: `url(${bgImage.src})` }}>
       {/* Overlay theme */}
       <div className="min-h-screen bg-stone-900/60 text-stone-100">
+        <AnimatePresence>
+          {!opened && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src={bgImage.src}
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" />
+              </div>
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
+              >
+                <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+                <h1 className="mt-4 font-serif text-4xl md:text-6xl leading-tight">
+                  Aisyah & Bagas
+                </h1>
+                <p className="mt-4 text-lg text-amber-300">{formatDate(WEDDING_DATE, "full", "short")}</p>
+                <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+                <button
+                  onClick={() => setOpened(true)}
+                  className="mt-10 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
+                >
+                  Buka Undangan
+                  <ArrowDownIcon />
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <header className="sticky top-0 z-50">
           <nav className="backdrop-blur-xl bg-stone-900/60 border-b border-white/10">
@@ -188,11 +244,11 @@ export default function WeddingInvitationPage() {
                 key={i}
                 src={src}
                 alt="Background"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-out ${i === heroIndex ? "opacity-100" : "opacity-0"
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ease-out ${i === heroIndex ? "opacity-100" : "opacity-0"
                   }`}
               />
             ))}
-            <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-stone-950/70 to-stone-950"></div>
+            <div className="absolute inset-0 bg-linear-to-b from-stone-950/40 via-stone-950/70 to-stone-950"></div>
           </div>
 
           {/* Content */}
@@ -217,7 +273,7 @@ export default function WeddingInvitationPage() {
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 md:p-6 transition hover:translate-y-[-2px]"
+                  className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-4 md:p-6 transition hover:-translate-y-0.5"
                 >
                   <div className="text-2xl md:text-4xl font-semibold tracking-wider">
                     {isExpired ? "0" : String(item.value).padStart(2, "0")}
@@ -263,7 +319,7 @@ export default function WeddingInvitationPage() {
                 key={i}
                 className="group rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition"
               >
-                <div className="relative aspect-[4/3]">
+                <div className="relative aspect-4/3">
                   <img
                     src={IMAGES[0]}
                     alt={p.name}
@@ -334,7 +390,7 @@ export default function WeddingInvitationPage() {
           sectionsRef={sectionsRef}
         >
           <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5">
-            <div className="relative aspect-[16/9]">
+            <div className="relative aspect-video">
               {/* Slides */}
               {GALLERY.map((src, i) => (
                 <img
@@ -411,7 +467,7 @@ export default function WeddingInvitationPage() {
               },
             ].map((ev, i) => (
               <li key={i} className="mb-10 ms-2">
-                <span className="absolute -left-[7px] mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
+                <span className="absolute -left-1.75 mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition backdrop-blur-md">
                   <div className="flex items-baseline justify-between">
                     <h4 className="font-serif text-xl">{ev.title}</h4>
@@ -496,50 +552,154 @@ export default function WeddingInvitationPage() {
           subtitle="Doa restu adalah hadiah terindah. Namun bila berkenan berbagi kebahagiaan, berikut informasi hadiah."
           sectionsRef={sectionsRef}
         >
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-8">
+            {/* ========================================= */}
+            {/* TRANSFER REKENING                         */}
+            {/* ========================================= */}
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-              <h4 className="font-serif text-xl">Transfer Rekening</h4>
-              <div className="mt-3 space-y-2 text-stone-300">
-                <p>Bank BCA · A/N Aisyah Putri</p>
-                <div className="flex items-center gap-3">
-                  <code className="bg-black/30 rounded px-3 py-1">
-                    1234567890
-                  </code>
-                  <button
-                    onClick={() => copyText("1234567890")}
-                    className="text-sm underline underline-offset-4 hover:no-underline"
-                  >
-                    Salin
-                  </button>
+              <h4 className="font-serif text-xl text-white">
+                Transfer Rekening
+              </h4>
+
+              <p className="mt-2 text-sm text-stone-300 leading-relaxed">
+                Kehadiran Anda sudah lebih dari cukup. Namun bila berkenan
+                mengirimkan tanda kasih, berikut informasi rekening kami.
+              </p>
+
+              <div className="mt-5 grid md:grid-cols-3 gap-5">
+                {/* Rekening Item */}
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  <p className="text-sm text-stone-200">
+                    Bank BCA · A/N Aisyah Putri
+                  </p>
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
+                      1234567890
+                    </code>
+                    <button
+                      onClick={() => copyText("1234567890")}
+                      className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </div>
+
+                {/* Rekening Item */}
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  <p className="text-sm text-stone-200">
+                    Bank Mandiri · A/N Rizky Pratama
+                  </p>
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
+                      9876543210
+                    </code>
+                    <button
+                      onClick={() => copyText("9876543210")}
+                      className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
+                    >
+                      Salin
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* ========================================= */}
+            {/* WISHLIST + ALAMAT                         */}
+            {/* ========================================= */}
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-              <h4 className="font-serif text-xl">E-Wallet / Link Hadiah</h4>
-              <div className="mt-3 space-y-2 text-stone-300">
-                <p>OVO / GoPay / Dana</p>
-                <div className="flex items-center gap-3">
-                  <code className="bg-black/30 rounded px-3 py-1">
-                    089876543210
-                  </code>
-                  <button
-                    onClick={() => copyText("089876543210")}
-                    className="text-sm underline underline-offset-4 hover:no-underline"
+              <h4 className="font-serif text-xl text-white">
+                Wishlist
+              </h4>
+
+              {/* Alamat Pengiriman */}
+              <div className="my-3 rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-xs uppercase tracking-wider text-stone-400">
+                  Alamat Pengiriman
+                </p>
+                <p className="my-3 text-sm text-stone-200 leading-relaxed">
+                  Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia
+                </p>
+                <button className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
+                  Salin
+                </button>
+              </div>
+
+              <p className="my-2 text-sm text-stone-300 leading-relaxed">
+                Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi
+                kami. Tidak ada kewajiban — kehadiran dan doa Anda tetap yang utama.
+              </p>
+
+              {/* Wishlist Cards */}
+              <div className="mt-5 grid md:grid-cols-3 gap-5">
+                {[
+                  {
+                    name: 'Set Peralatan Makan Keramik',
+                    price: 'Rp 1.500.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Sprei Premium King Size',
+                    price: 'Rp 2.200.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Lampu Meja Minimalis',
+                    price: 'Rp 850.000',
+                    qty: 2,
+                    url: '#',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20"
                   >
-                    Salin
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-stone-100">
+                        {item.name}
+                      </p>
+                      <div className="text-xs text-stone-300 space-y-0.5">
+                        <p>Harga: {item.price}</p>
+                        <p>Jumlah: {item.qty} unit</p>
+                      </div>
+
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                      >
+                        Lihat Referensi
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination UI */}
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <div className="flex gap-2">
+                  <button className="h-8 w-8 rounded-full bg-white text-xs font-semibold text-black">
+                    1
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
+                    2
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
+                    3
                   </button>
                 </div>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert("Tautan hadiah bisa diarahkan ke halaman pembayaran.");
-                  }}
-                  className="inline-flex items-center gap-2 mt-3 rounded-full bg-white text-stone-900 px-5 py-2 hover:bg-stone-100 transition"
-                >
-                  Buka Link Hadiah
-                  <ExternalLinkIcon />
-                </a>
+
+                <div className="flex gap-3">
+                  <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                    Prev
+                  </button>
+                  <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>

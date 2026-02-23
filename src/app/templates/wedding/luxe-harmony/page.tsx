@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -32,7 +33,20 @@ TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const formatNumber = (n: number) => String(n).padStart(2, "0");
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 export default function InvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // Countdown state
   const target = useMemo(() => new Date(TARGET_DATE), []);
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
@@ -96,7 +110,47 @@ export default function InvitationPage() {
       </Head>
 
       {/* Page wrapper */}
-      <div className="min-h-screen bg-gradient-to-b from-rose-50 via-amber-50 to-emerald-50 text-slate-800 font-sans scroll-smooth">
+      <div className="min-h-screen bg-linear-to-b from-rose-50 via-amber-50 to-emerald-50 text-slate-800 font-sans scroll-smooth">
+        <AnimatePresence>
+          {!opened && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-b from-rose-50 via-amber-50 to-emerald-50 backdrop-blur-sm" />
+              </div>
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
+              >
+                <p className="tracking-widest uppercase text-sm mb-4">Wedding Invitation</p>
+                <h1 className="text-4xl sm:text-5xl font-playfair leading-none">Rina & Arif</h1>
+                <p className="mt-4 text-lg">{formatDate(TARGET_DATE, "full", "short")}</p>
+                <p className="mt-2 italic">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1">Nama Tamu</p>
+
+                <button
+                  onClick={() => setOpened(true)}
+                  className="inline-flex items-center gap-3 rounded-full bg-white/90 text-slate-900 px-5 py-3 font-medium shadow-lg hover:scale-[1.02] transition"
+                >
+                  Buka Undangan
+                  <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Sticky navigation */}
         <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-md bg-white/30 dark:bg-slate-900/40 border-b border-white/20">
           <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,7 +229,7 @@ export default function InvitationPage() {
                     />
                     {/* Overlay gradasi supaya teks tetap terbaca */}
                     {isActive && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40 rounded-2xl" />
+                      <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/20 to-black/40 rounded-2xl" />
                     )}
                   </div>
                 );
@@ -215,11 +269,11 @@ export default function InvitationPage() {
                           <div className="text-2xl sm:text-3xl font-semibold text-white">{formatNumber(hours)}</div>
                           <div className="text-xs text-white/80">Jam</div>
                         </div>
-                        <div className="text-center px-3 hidden sm:block">
+                        <div className="text-center px-3">
                           <div className="text-2xl sm:text-3xl font-semibold text-white">{formatNumber(minutes)}</div>
                           <div className="text-xs text-white/80">Menit</div>
                         </div>
-                        <div className="text-center px-3 hidden sm:block">
+                        <div className="text-center px-3">
                           <div className="text-2xl sm:text-3xl font-semibold text-white">{formatNumber(seconds)}</div>
                           <div className="text-xs text-white/80">Detik</div>
                         </div>
@@ -233,7 +287,7 @@ export default function InvitationPage() {
                       className="inline-flex items-center gap-3 rounded-full bg-white/90 text-slate-900 px-5 py-3 font-medium shadow-lg hover:scale-[1.02] transition"
                       aria-label="Buka undangan"
                     >
-                      Buka Undangan
+                      Lihat Undangan
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 opacity-80" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V5a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0V9h2a1 1 0 100-2h-2z" clipRule="evenodd" />
                       </svg>
@@ -364,7 +418,7 @@ export default function InvitationPage() {
                   <button
                     key={i}
                     onClick={() => setGalleryIndex(i)}
-                    className={`flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 ${i === galleryIndex ? "border-amber-400" : "border-white/30"} shadow-sm transform hover:scale-105 transition`}
+                    className={`shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 ${i === galleryIndex ? "border-amber-400" : "border-white/30"} shadow-sm transform hover:scale-105 transition`}
                   >
                     <img src={s} alt={`thumb-${i}`} className="w-full h-full object-cover" />
                   </button>
@@ -466,29 +520,170 @@ export default function InvitationPage() {
           </section>
 
           {/* Hadiah */}
-          <section id="hadiah" className="mb-24 bg-white/50 backdrop-blur-sm rounded-2xl p-6 md:p-10 shadow-lg border border-white/30">
-            <h3 className="text-2xl font-playfair font-bold">Hadiah</h3>
-            <p className="mt-2 text-sm text-slate-700">Bila ingin memberikan hadiah, berikut informasi rekening dan e-wallet kami.</p>
+          <section
+            id="hadiah"
+            className="mb-24 rounded-2xl bg-white/60 backdrop-blur-md p-6 md:p-10 shadow-lg border border-white/40"
+          >
+            {/* ================= HEADER ================= */}
+            <h3 className="text-2xl font-playfair font-bold text-slate-800">
+              Hadiah
+            </h3>
+            <p className="mt-2 text-sm text-slate-700">
+              Kehadiran dan doa restu Anda adalah hadiah terindah. Namun bila berkenan
+              berbagi kebahagiaan, berikut informasi hadiah dari kami.
+            </p>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <div className="text-sm font-semibold">Bank BCA</div>
-                <div className="mt-1 text-sm">a/n Rina Nur — 123 456 7890</div>
-                <button className="mt-3 text-xs rounded-full px-3 py-1 bg-white/90 hover:bg-white transition">Salin Nomor</button>
+            {/* ================= TRANSFER ================= */}
+            <div className="mt-8">
+              <h4 className="text-lg font-semibold text-slate-800 mb-4">
+                Kado Digital
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Bank */}
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                  <div className="text-sm font-semibold text-slate-800">
+                    Bank BCA
+                  </div>
+                  <div className="mt-1 text-sm text-slate-700">
+                    a.n. Rina Nur
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <code className="rounded bg-white px-3 py-1 text-sm text-slate-800 border">
+                      1234567890
+                    </code>
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText('1234567890')
+                      }
+                      className="text-xs rounded-full px-3 py-1 bg-white hover:bg-amber-100 transition"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </div>
+
+                {/* E-Wallet */}
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                  <div className="text-sm font-semibold text-slate-800">
+                    GoPay / OVO
+                  </div>
+                  <div className="mt-1 text-sm text-slate-700">
+                    a.n. Rina Nur
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <code className="rounded bg-white px-3 py-1 text-sm text-slate-800 border">
+                      0812-3456-7890
+                    </code>
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText('081234567890')
+                      }
+                      className="text-xs rounded-full px-3 py-1 bg-white hover:bg-amber-100 transition"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ================= WISHLIST ================= */}
+            <div className="mt-10">
+              <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                Wishlist Hadiah
+              </h4>
+
+              {/* ================= ALAMAT ================= */}
+              <div className="rounded-xl bg-amber-50 border border-amber-100 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  Alamat Pengiriman
+                </p>
+                <p className="mt-1 text-sm text-slate-700 leading-relaxed">
+                  Rina Nur Jl. Melati No. 10 Bandung, 40123 Indonesia
+                </p>
+
+                <button
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      'Rina Nur, Jl. Melati No. 10, Bandung, 40123, Indonesia'
+                    )
+                  }
+                  className="mt-3 text-xs rounded-full px-3 py-1 bg-white hover:bg-amber-100 transition"
+                >
+                  Salin Alamat
+                </button>
               </div>
 
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <div className="text-sm font-semibold">GoPay / OVO</div>
-                <div className="mt-1 text-sm">0812-3456-7890</div>
-                <button className="mt-3 text-xs rounded-full px-3 py-1 bg-white/90 hover:bg-white transition">Buka Aplikasi</button>
+              <p className="mt-5 text-sm text-slate-700 mb-5">
+                Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+                Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  {
+                    name: 'Set Peralatan Makan',
+                    price: 'Rp 1.500.000',
+                    qty: 1
+                  },
+                  {
+                    name: 'Sprei Premium',
+                    price: 'Rp 2.200.000',
+                    qty: 1
+                  },
+                  {
+                    name: 'Lampu Meja Minimalis',
+                    price: 'Rp 850.000',
+                    qty: 1
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl bg-amber-50 border border-amber-100 p-4"
+                  >
+                    <p className="text-sm font-medium text-slate-800">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600">
+                      Perkiraan harga: {item.price}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-600">Jumlah: {item.qty} unit</p>
+
+                    <a
+                      href="#"
+                      className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300 px-3 py-2 text-xs text-slate-700 hover:bg-amber-100 transition"
+                    >
+                      Lihat Referensi
+                    </a>
+                  </div>
+                ))}
               </div>
 
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <div className="text-sm font-semibold">Link Hadiah</div>
-                <div className="mt-1 text-sm">Toko Online / Gift Registry (opsional)</div>
-                <a className="mt-3 inline-block text-xs rounded-full px-3 py-1 bg-white/90 hover:bg-white transition" href="#">
-                  Buka Link
-                </a>
+              {/* ================= PAGINATION ================= */}
+              <div className="mt-8 flex flex-col items-center gap-3">
+                <div className="flex gap-2">
+                  <button className="h-8 w-8 rounded-full bg-amber-400 text-xs font-semibold text-slate-900">
+                    1
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-amber-300 text-xs text-slate-700">
+                    2
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-amber-300 text-xs text-slate-700">
+                    3
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="rounded-md border border-amber-300 px-4 py-2 text-xs text-slate-700 hover:bg-amber-100 transition">
+                    Prev
+                  </button>
+                  <button className="rounded-md border border-amber-300 px-4 py-2 text-xs text-slate-700 hover:bg-amber-100 transition">
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </section>

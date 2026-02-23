@@ -51,11 +51,14 @@ Spesifikasi:
 - Gunakan kombinasi beberapa font elegan (misal serif + script style)
 - Jangan gunakan tema putih dominan
 - Gunakan warna yang elegan untuk latar belakang seluruh halaman (kalau bisa jangan tema warna putih, dan boleh warna apa saja dengan)
+- Pada section acara, buatkan ui yang nantinya bisa dinamis untuk maksimal 2 acara. Untuk Wedding Blessing Ceremony dan Traditional/Reception ceremony. Karna ada kemungkinan 1 bisa juga 2 acara sekaligus
+- Pada section Hadiah/Gift itu, Buatkan untuk 2 tipe hadiah, yaitu transfer bank dan satu lagi design untuk daftar wishlist permintaan barang dimana terdapat alamat nya (Serta tombol copy untuk alamat). Untuk design wishlist itu buatkan card. Dimana terdapat informasi nama barang, harga, banyaknya unit yg direquest, dan ada tombol url yg mengarah ke halaman ecommerce tertentu sebagai refrensi. Serta buatkan hanya ui paginage dibawah wishlist itu tanpa fungsi.
 3. Halaman Opening Screen:
 - Full screen fixed overlay
 - Tidak bisa scroll background sebelum tombol diklik
 - Animasi fade out saat dibuka
 - Tampilkan: Nama kedua mempelai, Tanggal, Nama tamu, Tombol buka undangan.
+- Berikan latar belakang yang elegan dan futuristik yang sesuai dan serasi dengan halaman home nya
 4. Hero Section:
 - Background image carousel auto slide
 - Countdown dengan 3 mode desain: Sebelum hari H, Saat hari H, Setelah hari H
@@ -69,7 +72,7 @@ Spesifikasi:
 - RSVP (form dengan validasi sederhana)
 - Hadiah
 - FAQ (accordion interaktif)
-- Footer dengan navigasi lengkap
+- Footer dengan 3 colomn kata ucapan dari mempelai, navigasi lengkap, dan informasi kontak
 6. Gunakan gambar ini untuk SEMUA gambar: http://localhost:3005/assets/img/2149043983.jpg
 7. Tambahkan banyak detail kecil:
 - Hover glow

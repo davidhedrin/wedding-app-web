@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Great_Vibes, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import useCountdown from '@/lib/countdown';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import bgImage from './bg.jpeg';
 
@@ -47,6 +48,16 @@ function classNames(...a: (string | false | null | undefined)[]) {
   return a.filter(Boolean).join(' ');
 }
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+}
+
 /**
  * =========================
  * Komponen Utama Halaman
@@ -56,6 +67,8 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 export default function WeddingInvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
   // Atur tanggal pernikahan di sini (format ISO agar aman):
 
   const [active, setActive] = useState<string>('mempelai');
@@ -120,9 +133,54 @@ export default function WeddingInvitationPage() {
   return (
     <main className={classNames('min-h-screen scroll-smooth', jakarta.className)}>
       {/* Background global */}
-      <div className={classNames('fixed inset-0 -z-10', `bg-gradient-to-br ${THEME.bgGradient}`)} />
+      <div className={classNames('fixed inset-0 -z-10', `bg-linear-to-br ${THEME.bgGradient}`)} />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.5),transparent_90%)]" />
       <div className="pointer-events-none fixed inset-0 -z-10 mix-blend-overlay" style={{ backgroundImage: `url(${bgImage.src})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={bgImage.src}
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+              <span className={classNames(greatVibes.className, 'text-5xl leading-none md:text-7xl', THEME.accent)}>Alya & Rizky</span>
+              <p className="mt-4 text-lg"><span className={THEME.accent}>21 Desember 2025</span></p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className={classNames(
+                  'group mt-8 inline-flex items-center gap-3 rounded-full px-6 py-3 text-black transition focus:outline-none focus:ring-4',
+                  THEME.accentBg, THEME.accentRing
+                )}
+              >
+                <span className="font-semibold">Buka Undangan</span>
+                <span className="rounded-full bg-black/10 p-1 transition group-hover:translate-x-0.5">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="m13 5l7 7l-7 7v-4H4v-6h9V5z" /></svg>
+                </span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Header */}
       <header ref={headerRef} className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
@@ -182,7 +240,7 @@ export default function WeddingInvitationPage() {
             <div
               key={idx}
               className={classNames(
-                'absolute inset-0 transition-opacity duration-[1200ms] ease-out',
+                'absolute inset-0 transition-opacity duration-1200 ease-out',
                 slide === idx ? 'opacity-100' : 'opacity-0'
               )}
             >
@@ -192,7 +250,7 @@ export default function WeddingInvitationPage() {
                 alt="Background"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/70" />
+              <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/40 to-black/70" />
               <div className="absolute inset-0 mix-blend-overlay opacity-30" style={{ backgroundImage: 'radial-gradient(circle at 20% 10%, rgba(255,255,255,0.15), transparent 35%)' }} />
             </div>
           ))}
@@ -241,7 +299,7 @@ export default function WeddingInvitationPage() {
                 THEME.accentBg, THEME.accentRing
               )}
             >
-              <span className="font-semibold">Buka Undangan</span>
+              <span className="font-semibold">Lihat Undangan</span>
               <span className="rounded-full bg-black/10 p-1 transition group-hover:translate-x-0.5">
                 <svg viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="m13 5l7 7l-7 7v-4H4v-6h9V5z" /></svg>
               </span>
@@ -271,10 +329,10 @@ export default function WeddingInvitationPage() {
                   'group relative overflow-hidden rounded-3xl border p-5 md:p-6',
                   THEME.borderSoft,
                   THEME.cardBg,
-                  'min-h-[350px]'
+                  'min-h-87.5'
                 )}
               >
-                <div className="relative w-full h-[250px] overflow-hidden rounded-2xl">
+                <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
                   <img
                     src={IMAGES[0]}
                     alt={p.name}
@@ -293,7 +351,7 @@ export default function WeddingInvitationPage() {
                 </div>
 
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
-                  <div className="absolute inset-0 bg-gradient-to-t from-amber-300/10 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-amber-300/10 via-transparent to-transparent" />
                 </div>
               </div>
             ))}
@@ -336,7 +394,7 @@ export default function WeddingInvitationPage() {
 
             {/* Maps */}
             <div className={classNames('overflow-hidden rounded-3xl border', THEME.borderSoft, THEME.cardBg)}>
-              <div className="aspect-[16/10] w-full">
+              <div className="aspect-16/10 w-full">
                 <iframe
                   title="Lokasi Acara"
                   className="h-full w-full"
@@ -409,7 +467,7 @@ export default function WeddingInvitationPage() {
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     {/* Overlay hover */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
+                    <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
                       <svg
                         className="h-10 w-10 text-amber-300 drop-shadow-md"
                         fill="currentColor"
@@ -522,27 +580,233 @@ export default function WeddingInvitationPage() {
       {/* Section: Hadiah */}
       <section id="hadiah" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Hadiah Kasih</h2>
-          <p className="mt-2 text-white/80">Kehadiran Anda sudah lebih dari cukup. Namun bila berkenan, berikut informasi untuk memberikan hadiah.</p>
+          {/* Header */}
+          <h2
+            className={classNames(
+              playfair.className,
+              'text-3xl text-white md:text-4xl'
+            )}
+          >
+            Hadiah Kasih
+          </h2>
+          <p className="mt-2 text-white/80 max-w-2xl">
+            Kehadiran Anda sudah lebih dari cukup. Namun bila berkenan, berikut informasi
+            untuk memberikan hadiah sebagai ungkapan kasih.
+          </p>
 
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {/* ====================================================== */}
+          {/* PRIMARY GIFT OPTIONS                                  */}
+          {/* ====================================================== */}
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[
               { label: 'Transfer Bank', desc: 'BCA • 1234567890 • a.n. Alya Putri' },
-              { label: 'E-Wallet', desc: 'OVO/Gopay/DANA • 0812-3456-7890' },
+              { label: 'E-Wallet', desc: 'OVO / Gopay / DANA • 0812-3456-7890' },
               { label: 'Kirim Kado', desc: 'Jl. Mawar No. 10, Jakarta' },
             ].map((h, i) => (
-              <div key={i} className={classNames('rounded-3xl border p-6 backdrop-blur', THEME.borderSoft, THEME.cardBg)}>
-                <div className={classNames('text-xs uppercase tracking-wider text-white/60')}>{h.label}</div>
-                <div className="mt-1 text-white">{h.desc}</div>
+              <div
+                key={i}
+                className={classNames(
+                  'rounded-3xl border p-6 backdrop-blur',
+                  THEME.borderSoft,
+                  THEME.cardBg
+                )}
+              >
+                <div className="text-xs uppercase tracking-wider text-white/60">
+                  {h.label}
+                </div>
+
+                <div className="mt-1 text-white leading-relaxed">
+                  {h.desc}
+                </div>
+
                 <button
                   onClick={() => navigator.clipboard?.writeText(h.desc)}
-                  className={classNames('mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black', THEME.accentBg, THEME.accentRing)}
+                  className={classNames(
+                    'mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
+                    THEME.accentBg,
+                    THEME.accentRing
+                  )}
                 >
                   Salin
-                  <svg viewBox="0 0 24 24" className="h-4 w-4"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z" /></svg>
+                  <svg viewBox="0 0 24 24" className="h-4 w-4">
+                    <path
+                      fill="currentColor"
+                      d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                    />
+                  </svg>
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* ====================================================== */}
+          {/* WISHLIST SECTION                                      */}
+          {/* ====================================================== */}
+          <div className="mt-16">
+            <h3
+              className={classNames(
+                playfair.className,
+                'text-2xl text-white mb-2'
+              )}
+            >
+              Wishlist Hadiah
+            </h3>
+
+            <div
+              className={classNames(
+                'relative rounded-3xl border p-6 md:p-8 backdrop-blur',
+                THEME.borderSoft,
+                THEME.cardBg
+              )}
+            >
+              {/* Decorative Accent */}
+              <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-white/60">
+                    Penerima
+                  </div>
+                  <div className="mt-1 text-white font-medium">
+                    Alya Putri
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs uppercase tracking-wider text-white/60">
+                    Alamat Lengkap
+                  </div>
+                  <div className="mt-1 text-white leading-relaxed">
+                    Jl. Mawar No. 10 Kel. Melati Indah Jakarta Selatan DKI Jakarta 12345 Indonesia
+                  </div>
+                </div>
+
+                <div>
+                  <button
+                    className={classNames(
+                      'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
+                      THEME.accentBg,
+                      THEME.accentRing
+                    )}
+                  >
+                    Salin Alamat
+                    <svg viewBox="0 0 24 24" className="h-4 w-4">
+                      <path
+                        fill="currentColor"
+                        d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <p className="mt-5 text-white/70 text-sm max-w-2xl mb-6">
+              Berikut adalah beberapa referensi hadiah yang mungkin bermanfaat bagi
+              kami. Tidak ada kewajiban sama sekali — kasih dan doa Anda adalah yang
+              utama.
+            </p>
+
+            {/* Wishlist Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  name: 'Set Peralatan Makan Keramik',
+                  price: 'Rp 1.500.000',
+                  qty: 1,
+                  url: '#',
+                },
+                {
+                  name: 'Sprei Premium King Size',
+                  price: 'Rp 2.200.000',
+                  qty: 1,
+                  url: '#',
+                },
+                {
+                  name: 'Vas Kaca Dekoratif',
+                  price: 'Rp 750.000',
+                  qty: 2,
+                  url: '#',
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className={classNames(
+                    'rounded-3xl border p-5 backdrop-blur transition',
+                    THEME.borderSoft,
+                    THEME.cardBg
+                  )}
+                >
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <div className="text-white font-medium leading-snug">
+                        {item.name}
+                      </div>
+
+                      <div className="mt-2 text-sm text-white/70 space-y-1">
+                        <div>
+                          <span className="text-white/80">Perkiraan Harga:</span>{' '}
+                          {item.price}
+                        </div>
+                        <div>
+                          <span className="text-white/80">Jumlah:</span>{' '}
+                          {item.qty} unit
+                        </div>
+                      </div>
+                    </div>
+
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={classNames(
+                        'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                        THEME.accentBg,
+                        THEME.accentRing,
+                        'text-black'
+                      )}
+                    >
+                      Lihat Referensi
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* ====================================================== */}
+            {/* PAGINATION UI (UI ONLY)                                */}
+            {/* ====================================================== */}
+            <div className="mt-10 flex flex-col items-center gap-4">
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  className={classNames(
+                    'h-10 w-10 rounded-full text-xs font-semibold text-black',
+                    THEME.accentBg
+                  )}
+                >
+                  1
+                </button>
+                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                  2
+                </button>
+                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                  3
+                </button>
+                <span className="px-2 text-white/50 text-xs self-center">…</span>
+                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                  8
+                </button>
+              </div>
+
+              <div className="flex w-full max-w-xs gap-4">
+                <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                  Prev
+                </button>
+                <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

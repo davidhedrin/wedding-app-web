@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Playfair_Display, Lora, Great_Vibes } from "next/font/google";
 import useCountdown from "@/lib/countdown";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -56,11 +57,24 @@ const scrollToId = (id: string) => {
   window.scrollTo({ top: y, behavior: "smooth" });
 };
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 // === COMPONENT ===
 export default function WeddingInvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // Countdown
   const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
 
@@ -119,6 +133,49 @@ export default function WeddingInvitationPage() {
 
   return (
     <main className={`${playfair.variable} ${lora.variable} ${greatVibes.variable} scroll-smooth min-h-screen bg-linear-to-br ${THEME.bgGradient}`}>
+
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-b from-black/60 via-slate-950/70 to-slate-950/95 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+              <h1 className={`mt-3 text-3xl sm:text-5xl md:text-6xl font-semibold ${THEME.heading} tracking-tight`}>
+                {COUPLE.groom.name} <span className="font-(--font-greatvibes) text-amber-300">&</span> {COUPLE.bride.name}
+              </h1>
+              <p className="mt-4 text-lg text-amber-300">20 Desember 2026</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium bg-amber-300 text-slate-900 shadow-lg shadow-amber-900/20 hover:shadow-amber-800/30 hover:-translate-y-px active:translate-y-0 transition"
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ===== Sticky Header ===== */}
       <header className="fixed top-0 inset-x-0 z-50">
         <div className="mx-auto max-w-6xl px-4">
@@ -186,7 +243,7 @@ export default function WeddingInvitationPage() {
         {/* Content */}
         <div className="relative z-10 h-full">
           <div className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center">
-            <p className="font-(--font-greatvibes) text-4xl sm:text-5xl md:text-6xl text-amber-300 drop-shadow">
+            <p className="font-(--font-greatvibes) sm:text-xl md:text-2xl text-amber-300 drop-shadow">
               Undangan Pernikahan
             </p>
             <h1 className={`mt-3 text-3xl sm:text-5xl md:text-6xl font-semibold ${THEME.heading} tracking-tight`}>
@@ -219,8 +276,7 @@ export default function WeddingInvitationPage() {
                 onClick={() => scrollToId("mempelai")}
                 className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium bg-amber-300 text-slate-900 shadow-lg shadow-amber-900/20 hover:shadow-amber-800/30 hover:-translate-y-px active:translate-y-0 transition"
               >
-                Buka Undangan
-                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+                Lihat Undangan
               </button>
               <button
                 onClick={() => scrollToId("rsvp")}
@@ -471,42 +527,126 @@ export default function WeddingInvitationPage() {
 
       {/* ===== Hadiah ===== */}
       <Section id="hadiah" title="Hadiah">
-        <div className={`grid gap-6 md:grid-cols-2`}>
+        <div className="space-y-8">
+          {/* ================================================= */}
+          {/* KADO DIGITAL                                      */}
+          {/* ================================================= */}
           <div className={`rounded-3xl ${THEME.card} ${THEME.ring} p-6`}>
-            <h4 className="text-lg font-semibold text-slate-100">Kado Digital</h4>
-            <p className="mt-2 text-slate-200/90">
-              Kehadiran dan doa adalah hadiah terbaik. Namun bila berkenan, Anda dapat mengirimkan tanda kasih melalui:
+            <h4 className="text-lg font-semibold text-slate-100">
+              Kado Digital
+            </h4>
+
+            <p className="mt-2 text-slate-200/90 leading-relaxed">
+              Kehadiran dan doa Anda adalah hadiah terbaik bagi kami.
+              Namun bila berkenan, tanda kasih dapat disampaikan melalui
+              informasi berikut:
             </p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {/* Contoh Rekening/E-Wallet */}
+
+            <div className="mt-5 grid md:grid-cols-4 gap-5">
               <GiftCard bank="BCA" name="Anindya Sarasvati" number="1234567890" />
               <GiftCard bank="BCA" name="Fajar Pratama" number="0987654321" />
               <GiftCard bank="DANA" name="Anindya" number="0812-xxxx-xxxx" />
               <GiftCard bank="OVO" name="Fajar" number="0813-xxxx-xxxx" />
             </div>
-            <div className="mt-4 flex gap-3">
-              <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-xl border border-amber-300/50 px-4 py-2 text-sm text-amber-200 hover:bg-amber-200/10 transition"
-              >
-                Salin Semua Info
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-xl bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:brightness-110 transition"
-              >
-                Kirim via Link
-              </a>
-            </div>
           </div>
 
-          <div className={`overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring} p-0`}>
-            <div className="relative h-full min-h-70">
-              <img src={PLACEHOLDER_IMG} alt="Hadiah" className="object-cover" />
-              <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="font-(--font-greatvibes) text-3xl text-amber-300">Terima kasih</p>
-                <p className="text-slate-200/90">Atas doa, dukungan, dan kasih sayang yang Anda berikan.</p>
+          {/* ================================================= */}
+          {/* WISHLIST + ALAMAT                                 */}
+          {/* ================================================= */}
+          <div className={`rounded-3xl ${THEME.card} ${THEME.ring} p-6`}>
+            <h4 className="text-lg font-semibold text-slate-100">
+              Wishlist Hadiah
+            </h4>
+
+            {/* Alamat Pengiriman */}
+            <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+              <div className="text-xs uppercase tracking-wider text-slate-400">
+                Alamat
+              </div>
+              <p className="my-2 text-sm text-slate-200 leading-relaxed">
+                Anindya & Fajar Jl. Melati Indah No. 12 Jakarta Selatan, 12345 Indonesia
+              </p>
+              <button
+                className="rounded-lg bg-amber-300 px-3 py-2 text-xs font-semibold text-slate-900 hover:brightness-110 transition"
+              >
+                Salin
+              </button>
+            </div>
+
+            <p className="my-2 text-slate-200/90 leading-relaxed">
+              Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi
+              kami. Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+            </p>
+
+            {/* Wishlist Cards */}
+            <div className="grid md:grid-cols-3 gap-5">
+              {[
+                {
+                  name: 'Set Peralatan Makan Keramik',
+                  price: 'Rp 1.500.000',
+                  qty: 1,
+                  url: '#',
+                },
+                {
+                  name: 'Sprei Premium King Size',
+                  price: 'Rp 2.200.000',
+                  qty: 1,
+                  url: '#',
+                },
+                {
+                  name: 'Lampu Meja Minimalis',
+                  price: 'Rp 850.000',
+                  qty: 2,
+                  url: '#',
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-white/10 bg-slate-900/40 p-4 transition hover:border-amber-300/40"
+                >
+                  <div className="space-y-2">
+                    <div className="text-slate-100 font-medium">
+                      {item.name}
+                    </div>
+
+                    <div className="text-sm text-slate-300/80">
+                      <div>Harga: {item.price}</div>
+                      <div>Jumlah: {item.qty} unit</div>
+                    </div>
+
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs font-semibold text-amber-200 transition hover:bg-amber-300/10"
+                    >
+                      Lihat Referensi
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination UI */}
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <div className="flex gap-2">
+                <button className="h-8 w-8 rounded-full bg-amber-300 text-xs font-semibold text-slate-900">
+                  1
+                </button>
+                <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-slate-300">
+                  2
+                </button>
+                <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-slate-300">
+                  3
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-slate-300">
+                  Prev
+                </button>
+                <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-slate-300">
+                  Next
+                </button>
               </div>
             </div>
           </div>
@@ -533,8 +673,8 @@ export default function WeddingInvitationPage() {
               </button>
               <div
                 className={`overflow-hidden transition-all duration-300 ease-out ${openFaq === idx
-                    ? "max-h-250 opacity-100"
-                    : "max-h-0 opacity-0"
+                  ? "max-h-250 opacity-100"
+                  : "max-h-0 opacity-0"
                   }`}
               >
                 <div className="px-4 pb-4 text-slate-200/90">{f.a}</div>

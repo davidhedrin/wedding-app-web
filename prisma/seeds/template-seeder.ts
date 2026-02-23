@@ -278,6 +278,57 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
         is_active: true,
         createdBy: "SEEDER"
       },
+      {
+        slug: "eternal-vow",
+        name: "Eternal Vow",
+        price: 179000,
+        disc_price: null,
+        short_desc: "A timeless luxury wedding invitation with dark elegance and golden vows.",
+        desc: `
+          <h1 style="text-align: center;">Eternal Vow: A Promise Without End</h1>
+          <p style="text-align: left;">
+            The <strong>Eternal Vow</strong> wedding invitation template is crafted for
+            couples who believe in timeless love and refined elegance.
+            Built with a dark luxurious atmosphere, layered shadows, and warm golden
+            accents, this template delivers a modern yet classic wedding experience.
+          </p>
+          <p style="text-align: left;">
+            Every section is thoughtfully designed to guide guests through your story —
+            from the opening screen, heartfelt moments, sacred ceremonies, to thoughtful
+            gift options — all presented with smooth animations and graceful transitions.
+          </p>
+          <h2 style="text-align: left;">Highlights</h2>
+          <ul>
+            <li>Dark luxury theme with gold and amber accents</li>
+            <li>Mobile-first, fully responsive layout</li>
+            <li>Opening screen with guest personalization</li>
+            <li>Multiple event support (ceremony & reception)</li>
+            <li>Interactive gallery, story timeline, RSVP, and gift sections</li>
+            <li>Elegant typography pairing serif and modern styles</li>
+            <li>Smooth scroll navigation with subtle micro-interactions</li>
+          </ul>
+          <h3 style="text-align: left;">Perfect For</h3>
+          <ol>
+            <li>Couples seeking a timeless and elegant wedding invitation</li>
+            <li>Luxury ballroom, modern, or classic weddings</li>
+            <li>Those who want a premium, story-driven digital invitation</li>
+          </ol>
+          <p style="text-align: center;">
+            <em>“Eternal Vow felt like a reflection of our love — elegant, deep, and meaningful.”</em><br />
+            <strong>— Clara &amp; Jonathan</strong>
+          </p>
+        `,
+        ctg_key: "wed",
+        ctg_name: "Wedding",
+        url: "templates/wedding/eternal-vow",
+        flag_name: null,
+        flag_color: null,
+        language: "Indonesia",
+        layouts: "Mobile & Desktop",
+        colors: `[{name: "Black", value: "#0B0B0B"},{name: "Gold", value: "#FFD700"},{name: "Amber", value: "#F59E0B"}]`,
+        is_active: true,
+        createdBy: "SEEDER"
+      },
       
       // Birthday Templates
       {

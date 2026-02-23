@@ -3,6 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -33,7 +34,20 @@ const navItems = [
   { id: "faq", label: "FAQ" },
 ];
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+}
+
 export default function Page() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   const [activeId, setActiveId] = useState<string>("mempelai");
   const [isMenuOpen, setMenuOpen] = useState(false);
 
@@ -145,13 +159,58 @@ export default function Page() {
       {/* Global Background (gradient + subtle texture via overlay image blur) */}
       <div
         aria-hidden
-        className="fixed inset-0 -z-20 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950"
+        className="fixed inset-0 -z-20 bg-linear-to-br from-emerald-900 via-emerald-800 to-emerald-950"
       />
       <div
         aria-hidden
         className="fixed inset-0 -z-10 opacity-[0.08] bg-cover bg-center blur-3xl"
         style={{ backgroundImage: `url(${PLACEHOLDER_IMG})` }}
       />
+
+
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-br from-emerald-900 via-emerald-800 to-emerald-950 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-wide [text-shadow:0_1px_12px_rgba(0,0,0,.25)]">
+                <span className="inline-block animate-fade-in">Aisyah</span>
+                <span className="mx-3 inline-block text-emerald-300/90">&</span>
+                <span className="inline-block animate-fade-in [animation-delay:.15s]">Brahma</span>
+              </h1>
+              <p className="mt-4 text-lg text-amber-300">20 Desember 2026</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className="group inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-6 py-3 text-sm font-medium tracking-wide hover:bg-emerald-400/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sticky Header */}
       <header className="fixed top-0 left-0 right-0 z-50">
@@ -230,14 +289,14 @@ export default function Page() {
           {heroImages.map((src, i) => (
             <div
               key={i}
-              className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[2000ms] ${i === heroIndex ? "opacity-100" : "opacity-0"
+              className={`absolute inset-0 bg-cover bg-center transition-opacity duration-2000 ${i === heroIndex ? "opacity-100" : "opacity-0"
                 }`}
               style={{ backgroundImage: `url(${src})` }}
               aria-hidden
             />
           ))}
           <div className="absolute inset-0 bg-emerald-950/60 mix-blend-multiply" aria-hidden />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-emerald-950/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-emerald-950/70 to-transparent" />
         </div>
 
         {/* Floating particles */}
@@ -344,7 +403,7 @@ export default function Page() {
             ].map((p, i) => (
               <div
                 key={p.name}
-                className="group rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-4 sm:p-6 backdrop-blur-xl transition hover:translate-y-[-2px] hover:border-emerald-300/30"
+                className="group rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-4 sm:p-6 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-emerald-300/30"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -410,7 +469,7 @@ export default function Page() {
             <div
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
-              className="relative aspect-[16/9] max-h-[70vh] w-full"
+              className="relative aspect-video max-h-[70vh] w-full"
             >
               {galleryImages.map((img, i) => (
                 <img
@@ -423,7 +482,7 @@ export default function Page() {
                 />
               ))}
               {/* Overlay gradient */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-emerald-950/60 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-emerald-950/60 to-transparent" />
             </div>
 
             {/* Controls */}
@@ -592,41 +651,148 @@ export default function Page() {
       <section id="hadiah" className="section">
         <Container>
           <SectionHeading eyebrow="With Love" title="Hadiah">
-            Doa restu adalah hadiah terbaik. Jika berkenan mengirim hadiah, berikut opsinya.
+            Doa restu adalah hadiah terbaik. Jika berkenan mengirim hadiah, berikut
+            beberapa opsi yang kami sediakan dengan penuh rasa terima kasih.
           </SectionHeading>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="mt-8 space-y-8">
+            {/* ===================================================== */}
+            {/* TRANSFER BANK                                        */}
+            {/* ===================================================== */}
             <div className="rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-6 backdrop-blur-xl">
-              <h4 className="font-serif text-xl mb-3">Transfer Bank</h4>
-              <div className="grid gap-3">
+              <h4 className="font-serif text-xl mb-4 text-white">
+                Transfer Bank
+              </h4>
+
+              <div className="grid md:grid-cols-4 gap-5">
                 <GiftRow
                   bank="BCA"
                   name="Aisyah Putri"
                   number="1234567890"
-                  onCopy={() => copyText("BCA 1234567890 a.n. Aisyah Putri")}
+                  onCopy={() =>
+                    copyText("BCA 1234567890 a.n. Aisyah Putri")
+                  }
                 />
                 <GiftRow
                   bank="Mandiri"
                   name="Brahma Pradana"
                   number="9876543210"
-                  onCopy={() => copyText("Mandiri 9876543210 a.n. Brahma Pradana")}
+                  onCopy={() =>
+                    copyText("Mandiri 9876543210 a.n. Brahma Pradana")
+                  }
                 />
               </div>
             </div>
 
+            {/* ===================================================== */}
+            {/* WISHLIST                                             */}
+            {/* ===================================================== */}
             <div className="rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-6 backdrop-blur-xl">
-              <h4 className="font-serif text-xl mb-3">E-Wallet / QRIS</h4>
-              <div className="flex items-center gap-4">
-                <img
-                  src={PLACEHOLDER_IMG}
-                  alt="QRIS"
-                  className="h-36 w-36 rounded-xl object-cover ring-1 ring-emerald-300/30"
-                />
-                <div className="grid gap-2">
-                  <a href="#" className="btn-chip">OVO</a>
-                  <a href="#" className="btn-chip">GoPay</a>
-                  <a href="#" className="btn-chip">DANA</a>
-                  <a href="#" className="btn-chip">LinkAja</a>
+              <h4 className="font-serif text-xl mb-2 text-white">
+                Wishlist
+              </h4>
+              <div className="rounded-2xl border border-emerald-200/20 bg-emerald-950/40 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-950/60">
+                <div className="text-xs uppercase tracking-wider text-slate-400">
+                  Alamat
+                </div>
+                <p className="my-2 text-sm text-slate-200 leading-relaxed">
+                  Anindya & Fajar Jl. Melati Indah No. 12 Jakarta Selatan, 12345 Indonesia
+                </p>
+                <button className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20">
+                  Salin
+                </button>
+              </div>
+
+              <p className="text-sm text-emerald-100/70 mb-6">
+                Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+                Tidak ada kewajiban — kehadiran dan doa Anda adalah yang utama.
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-5">
+                {[
+                  {
+                    name: 'Set Peralatan Makan Keramik',
+                    price: 'Rp 1.500.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Sprei Premium King Size',
+                    price: 'Rp 2.200.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Vas Kaca Dekoratif',
+                    price: 'Rp 750.000',
+                    qty: 2,
+                    url: '#',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-emerald-200/20 bg-emerald-950/40 p-4 transition hover:border-emerald-300/40 hover:bg-emerald-950/60"
+                  >
+                    <div className="flex flex-col gap-3">
+                      <div>
+                        <div className="text-white font-medium leading-snug">
+                          {item.name}
+                        </div>
+
+                        <div className="mt-1 space-y-1 text-sm text-emerald-100/70">
+                          <div>
+                            <span className="text-emerald-100/80">
+                              Perkiraan Harga:
+                            </span>{' '}
+                            {item.price}
+                          </div>
+                          <div>
+                            <span className="text-emerald-100/80">
+                              Jumlah:
+                            </span>{' '}
+                            {item.qty} unit
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        className="inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
+                      >
+                        Lihat Referensi
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button className="h-9 w-9 rounded-full bg-emerald-300 text-emerald-950 text-xs font-semibold">
+                    1
+                  </button>
+                  <button className="h-9 w-9 rounded-full border border-emerald-200/30 text-xs text-emerald-100/70">
+                    2
+                  </button>
+                  <button className="h-9 w-9 rounded-full border border-emerald-200/30 text-xs text-emerald-100/70">
+                    3
+                  </button>
+                  <span className="px-1 text-xs text-emerald-100/50 self-center">
+                    …
+                  </span>
+                  <button className="h-9 w-9 rounded-full border border-emerald-200/30 text-xs text-emerald-100/70">
+                    8
+                  </button>
+                </div>
+
+                <div className="flex w-full max-w-xs gap-3">
+                  <button className="flex-1 rounded-full border border-emerald-200/30 px-4 py-2.5 text-xs text-emerald-100/70">
+                    Prev
+                  </button>
+                  <button className="flex-1 rounded-full border border-emerald-200/30 px-4 py-2.5 text-xs text-emerald-100/70">
+                    Next
+                  </button>
                 </div>
               </div>
             </div>
@@ -747,7 +913,7 @@ export default function Page() {
 
       {/* Toast */}
       <div
-        className={`fixed left-1/2 top-20 z-[60] -translate-x-1/2 transform rounded-full border border-emerald-300/20 bg-emerald-950/80 px-4 py-2 text-sm shadow-lg backdrop-blur-xl transition ${toastMsg ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+        className={`fixed left-1/2 top-20 z-60 -translate-x-1/2 transform rounded-full border border-emerald-300/20 bg-emerald-950/80 px-4 py-2 text-sm shadow-lg backdrop-blur-xl transition ${toastMsg ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
           }`}
         role="status"
         aria-live="polite"
@@ -873,7 +1039,6 @@ function GiftRow({
       </div>
       <div className="flex items-center gap-2">
         <button onClick={onCopy} className="btn-chip">Salin</button>
-        <a href="#" className="btn-chip">Kirim</a>
       </div>
     </div>
   );
@@ -909,17 +1074,6 @@ function Accordion({ question, answer }: { question: string; answer: string }) {
 }
 
 /* ------------------------ Utilities ------------------------ */
-
-function getCountdown(dateStr: string): Countdown {
-  const now = new Date().getTime();
-  const target = new Date(dateStr).getTime();
-  const diff = Math.max(0, target - now);
-  const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
-  const seconds = Math.floor((diff % (60 * 1000)) / 1000);
-  return { days, hours, minutes, seconds };
-}
 
 function zeroPad(n: number) {
   return String(n).padStart(2, "0");

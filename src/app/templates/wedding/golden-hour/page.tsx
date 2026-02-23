@@ -5,6 +5,7 @@ import React, { JSX, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -28,15 +29,27 @@ function pad(n: number) {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 /* ---------------------------- COMPONENT ---------------------------- */
 export default function WeddingInvitePage(): JSX.Element {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   const [tick, setTick] = useState(0); // simple re-render every second
   const [heroIdx, setHeroIdx] = useState(0);
   const [rsvpName, setRsvpName] = useState("");
   const [rsvpGuestCount, setRsvpGuestCount] = useState(1);
   const [rsvpNote, setRsvpNote] = useState("");
   const [rsvpStatus, setRsvpStatus] = useState<null | "success" | "error">(null);
-  const [openInvite, setOpenInvite] = useState(false);
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
 
   // Countdown
@@ -101,7 +114,7 @@ export default function WeddingInvitePage(): JSX.Element {
   ];
 
   // color theme classes (elegant, not white)
-  const BG = "bg-gradient-to-br from-[#0b1221] via-[#1b2330] to-[#2b3441] text-slate-100";
+  const BG = "bg-linear-to-br from-[#0b1221] via-[#1b2330] to-[#2b3441] text-slate-100";
   const ACCENT = "text-amber-300"; // accent color for highlights
 
   return (
@@ -121,6 +134,50 @@ export default function WeddingInvitePage(): JSX.Element {
       </Head>
 
       <div className={`min-h-screen ${BG} font-body`}>
+        <AnimatePresence>
+          {!opened && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-b from-black/60 via-slate-950/70 to-slate-950/95 backdrop-blur-sm" />
+              </div>
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
+              >
+                <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+
+                <h2 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-serif" style={{ fontFamily: "var(--ff-heading)" }}>
+                  Betrice Anastasya <br />
+                  <span className="text-amber-300">•</span><br />
+                  Jhonson Derullo
+                </h2>
+                <p className="mt-4 text-lg"><strong className="text-amber-200">Tanggal:</strong> {formatDate(WEDDING_DATE, "long")}</p>
+                <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+                <button
+                  onClick={() => setOpened(true)}
+                  className="px-4 py-2 rounded-md bg-amber-300 text-[#0b1221] font-semibold shadow hover:-translate-y-0.5 transition transform"
+                >
+                  Buka Undangan
+                  <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Sticky Nav */}
         <header className="fixed top-0 left-0 right-0 z-40">
@@ -133,7 +190,7 @@ export default function WeddingInvitePage(): JSX.Element {
                     className="flex items-center gap-2"
                     aria-label="Buka undangan"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300/70 to-rose-400/60 flex items-center justify-center shadow-lg">
+                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-300/70 to-rose-400/60 flex items-center justify-center shadow-lg">
                       <span className="font-serif text-sm text-[#0b1221]">W</span>
                     </div>
                     <div className="hidden sm:block">
@@ -159,16 +216,10 @@ export default function WeddingInvitePage(): JSX.Element {
 
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setOpenInvite((s) => !s)}
-                    className="px-3 py-1.5 rounded-md bg-amber-300/95 text-[#0b1221] font-semibold shadow hover:scale-[1.02] transform transition"
-                  >
-                    Buka Undangan
-                  </button>
-                  <button
                     onClick={() => scrollToId("rsvp")}
-                    className="hidden sm:inline text-sm text-slate-200/80 hover:text-white transition-colors"
+                    className="px-4 py-2 rounded-md border border-white/10 text-sm text-slate-100/90 hover:text-white cursor-pointer flex items-center gap-2"
                   >
-                    Konfirmasi
+                    RSVP
                   </button>
                   {/* Mobile menu trigger */}
                 </div>
@@ -195,7 +246,7 @@ export default function WeddingInvitePage(): JSX.Element {
               ))}
 
               {/* subtle overlay patterns */}
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/60" />
+              <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/30 to-black/60" />
               <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,rgba(255,200,120,0.06),transparent 25%)]" />
             </div>
 
@@ -233,19 +284,19 @@ export default function WeddingInvitePage(): JSX.Element {
                         <div className="text-center">
                           <p className="text-xs uppercase text-amber-200/90">Hari H dalam</p>
                           <div className="flex gap-2 mt-2">
-                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-[68px]">
+                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-17">
                               <div className="text-lg font-semibold">{days}</div>
                               <div className="text-xs text-slate-300">Hari</div>
                             </div>
-                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-[68px]">
+                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-17">
                               <div className="text-lg font-semibold">{pad(hours)}</div>
                               <div className="text-xs text-slate-300">Jam</div>
                             </div>
-                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-[68px]">
+                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-17">
                               <div className="text-lg font-semibold">{pad(minutes)}</div>
                               <div className="text-xs text-slate-300">Menit</div>
                             </div>
-                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-[68px]">
+                            <div className="px-3 py-2 rounded bg-white/5 text-center min-w-17">
                               <div className="text-lg font-semibold">{pad(seconds)}</div>
                               <div className="text-xs text-slate-300">Detik</div>
                             </div>
@@ -257,10 +308,10 @@ export default function WeddingInvitePage(): JSX.Element {
                     {/* CTA */}
                     <div className="flex gap-3">
                       <button
-                        onClick={() => setOpenInvite(true)}
+                        onClick={() => scrollToId("acara")}
                         className="px-4 py-2 rounded-md bg-amber-300 text-[#0b1221] font-semibold shadow hover:-translate-y-0.5 transition transform"
                       >
-                        Buka Undangan
+                        Lihat Undangan
                       </button>
                       <a
                         onClick={() => scrollToId("rsvp")}
@@ -282,7 +333,7 @@ export default function WeddingInvitePage(): JSX.Element {
                 <div className="relative">
                   <div className="rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/5 transform hover:scale-[1.01] transition">
                     <img src={HERO_IMAGES[heroIdx]} alt="mempelai" className="w-full h-72 object-cover sm:h-96" />
-                    <div className="p-4 bg-gradient-to-t from-black/50 to-transparent">
+                    <div className="p-4 bg-linear-to-t from-black/50 to-transparent">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-xs text-amber-200">Kami</p>
@@ -462,25 +513,194 @@ export default function WeddingInvitePage(): JSX.Element {
 
           {/* Hadiah */}
           <section id="hadiah" className="max-w-5xl mx-auto px-4 py-12 sm:py-16">
-            <div className="bg-white/5 rounded-2xl p-6 shadow-lg border border-white/6">
-              <h2 className="text-2xl font-serif mb-4" style={{ fontFamily: "var(--ff-heading)" }}>Hadiah</h2>
-              <p className="text-slate-300 mb-4">Jika Anda berkehendak memberi hadiah, dengan senang hati kami sampaikan info rekening / e-wallet berikut:</p>
+            <div className="bg-white/5 rounded-2xl p-6 sm:p-8 shadow-lg border border-white/10 backdrop-blur-md">
+              <h2
+                className="text-2xl font-serif mb-3 text-white"
+                style={{ fontFamily: 'var(--ff-heading)' }}
+              >
+                Hadiah
+              </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-white/6 border border-white/6">
-                  <p className="text-sm text-amber-200">Rekening Bank</p>
-                  <p className="font-medium">Bank Contoh • 123-456-7890</p>
-                  <p className="text-xs text-slate-300">a.n. Nama Penerima</p>
-                </div>
-                <div className="p-4 rounded-lg bg-white/6 border border-white/6">
-                  <p className="text-sm text-amber-200">E-Wallet</p>
-                  <p className="font-medium">OVO / GoPay / Dana • 0812xxxx</p>
-                  <p className="text-xs text-slate-300">Nama tertera</p>
-                </div>
-              </div>
+              <p className="text-slate-300 mb-8 leading-relaxed">
+                Doa dan kehadiran Anda adalah hadiah terindah bagi kami.
+                Namun bila berkenan berbagi kebahagiaan, berikut informasi
+                yang dapat digunakan.
+              </p>
 
-              <div className="mt-4">
-                <a className="inline-block px-4 py-2 rounded bg-white/6 border border-white/10 text-sm" href="#" onClick={(e) => { e.preventDefault(); alert("Terima kasih atas niat baik Anda! Silakan transfer ke rekening tertera.") }}>Buka opsi hadiah</a>
+              <div className="space-y-8">
+                {/* ===================================== */}
+                {/* TRANSFER / E-WALLET                   */}
+                {/* ===================================== */}
+                <div className="rounded-xl bg-white/6 border border-white/10 p-5">
+                  <h4 className="font-serif text-lg text-white mb-3">
+                    Kado Digital
+                  </h4>
+
+                  <div className="grid md:grid-cols-3 gap-5">
+                    {/* Bank */}
+                    <div className="rounded-lg bg-black/30 border border-white/10 p-4">
+                      <p className="text-sm text-amber-200">
+                        Transfer Bank
+                      </p>
+                      <p className="font-medium text-white mt-1">
+                        Bank Contoh
+                      </p>
+                      <p className="text-sm text-slate-300">
+                        a.n. Nama Penerima
+                      </p>
+
+                      <div className="my-1">
+                        <code className="rounded bg-black/40 px-3 py-1 text-sm text-slate-100">
+                          123-456-7890
+                        </code>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText('123-456-7890')
+                          }
+                          className="text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                        >
+                          Salin
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* E-Wallet */}
+                    <div className="rounded-lg bg-black/30 border border-white/10 p-4">
+                      <p className="text-sm text-amber-200">
+                        E-Wallet
+                      </p>
+                      <p className="font-medium text-white mt-1">
+                        Bank
+                      </p>
+                      <p className="text-sm text-slate-300">
+                        a.n. Nama Tertera
+                      </p>
+
+                      <div className="my-1">
+                        <code className="rounded bg-black/40 px-3 py-1 text-sm text-slate-100">
+                          123-456-7890
+                        </code>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText('123-456-7890')
+                          }
+                          className="text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                        >
+                          Salin
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ===================================== */}
+                {/* WISHLIST + ALAMAT                     */}
+                {/* ===================================== */}
+                <div className="rounded-xl bg-white/6 border border-white/10 p-5">
+                  <h4 className="font-serif text-lg text-white mb-2">
+                    Wishlist Hadiah
+                  </h4>
+
+                  {/* Alamat Pengiriman */}
+                  <div className="my-3 rounded-lg bg-black/30 border border-white/10 p-4">
+                    <p className="text-xs uppercase tracking-wider text-slate-400">
+                      Alamat Pengiriman
+                    </p>
+                    <p className="text-sm text-slate-200 leading-relaxed">
+                      Nama Penerima Jl. Contoh Bahagia No. 12 Jakarta Selatan, 12345 Indonesia
+                    </p>
+
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(
+                          'Nama Penerima, Jl. Contoh Bahagia No. 12, Jakarta Selatan, 12345, Indonesia'
+                        )
+                      }
+                      className="mt-3 text-xs text-amber-300 underline underline-offset-4 hover:no-underline"
+                    >
+                      Salin Alamat
+                    </button>
+                  </div>
+
+                  <p className="text-sm text-slate-300 mb-5">
+                    Berikut beberapa referensi hadiah yang mungkin bermanfaat
+                    bagi kami. Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+                  </p>
+
+                  {/* Wishlist Items */}
+                  <div className="grid md:grid-cols-3 gap-5">
+                    {[
+                      {
+                        name: 'Set Peralatan Makan',
+                        price: 'Rp 1.500.000',
+                        qty: 1,
+                        url: '#',
+                      },
+                      {
+                        name: 'Sprei Premium King Size',
+                        price: 'Rp 2.200.000',
+                        qty: 1,
+                        url: '#',
+                      },
+                      {
+                        name: 'Lampu Meja Minimalis',
+                        price: 'Rp 850.000',
+                        qty: 2,
+                        url: '#',
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="rounded-lg bg-black/30 border border-white/10 p-4"
+                      >
+                        <p className="text-sm font-medium text-white">
+                          {item.name}
+                        </p>
+                        <div className="mt-1 text-xs text-slate-300 space-y-0.5">
+                          <p>Perkiraan Harga: {item.price}</p>
+                          <p>Jumlah: {item.qty} unit</p>
+                        </div>
+
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300/40 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/10 transition"
+                        >
+                          Lihat Referensi
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination UI */}
+                  <div className="mt-6 flex flex-col items-center gap-3">
+                    <div className="flex gap-2">
+                      <button className="h-8 w-8 rounded-full bg-amber-300 text-xs font-semibold text-slate-900">
+                        1
+                      </button>
+                      <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-slate-300">
+                        2
+                      </button>
+                      <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-slate-300">
+                        3
+                      </button>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button className="flex-1 rounded-md border border-white/20 px-3 py-2 text-xs text-slate-300">
+                        Prev
+                      </button>
+                      <button className="flex-1 rounded-md border border-white/20 px-3 py-2 text-xs text-slate-300">
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -535,30 +755,6 @@ export default function WeddingInvitePage(): JSX.Element {
             </div>
           </footer>
         </main>
-
-        {/* Modal / Invitation Panel */}
-        {openInvite && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40" onClick={() => setOpenInvite(false)} />
-            <div className="relative max-w-3xl w-full rounded-2xl overflow-hidden shadow-2xl bg-black/80 border border-white/6">
-              <div className="p-6">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-xl font-serif" style={{ fontFamily: "var(--ff-heading)" }}>Undangan</h3>
-                  <button onClick={() => setOpenInvite(false)} className="text-sm text-slate-300">Tutup</button>
-                </div>
-                <div className="mt-4 text-slate-200">
-                  <p>Dengan hormat, kami mengundang Anda untuk hadir pada...</p>
-                  <p className="mt-3 text-sm text-slate-300">Silakan konfirmasi kehadiran melalui form RSVP.</p>
-                </div>
-                <div className="mt-6 flex gap-3">
-                  <a className="px-4 py-2 rounded bg-amber-300 text-[#0b1221]" onClick={() => { setOpenInvite(false); scrollToId("acara"); }}>Lihat Detail Acara</a>
-                  <a className="px-4 py-2 rounded border border-white/6" onClick={() => { setOpenInvite(false); scrollToId("rsvp"); }}>Konfirmasi</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
       </div>
     </>
   );
@@ -619,7 +815,7 @@ function PhotoCarousel({ images }: { images: string[] }) {
 function StoryItem({ date, title, text, img }: { date: string; title: string; text: string; img: string }) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+      <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
         <img src={img} alt={title} className="w-full h-full object-cover" />
       </div>
       <div>
