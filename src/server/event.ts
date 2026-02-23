@@ -131,22 +131,31 @@ export async function GetDataEventByCode(code: string): Promise<Events & {
   template: Templates & { captures: { file_path: string }[] | null } | null,
   tr: Tr | null 
 } | null> {
-  const getData = await db.events.findUnique({
-    where: { tmp_code: code },
-    include: {
-      template: {
-        include: {
-          captures: {
-            take: 1,
-            orderBy: { index: "asc" },
-            select: { file_path: true },
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    if(!user) throw new Error("Authentication credential not Found!");
+
+    const getData = await db.events.findUnique({
+      where: { tmp_code: code, user_id: Number(user.id) },
+      include: {
+        template: {
+          include: {
+            captures: {
+              take: 1,
+              orderBy: { index: "asc" },
+              select: { file_path: true },
+            }
           }
-        }
-      },
-      tr: true
-    }
-  });
-  return getData;
+        },
+        tr: true
+      }
+    });
+    return getData;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 };
 
 function ParamSnapMidtrans({ orderId, amount, event }: { orderId: string, amount: number, event: Events & {template: Templates, user: User} }): DtoSnapMidtrans {

@@ -12,6 +12,7 @@ import { User } from "next-auth";
 import pLimit from "p-limit";
 import { stringWithTimestamp } from "@/lib/utils";
 
+// Groom Bride Info
 export async function GetGroomBrideDataByEventId(event_id: number) : Promise<GroomBrideInfo[]> {
   const getData = await db.groomBrideInfo.findMany({ where: { event_id } });
   return getData;
@@ -154,7 +155,9 @@ async function upsertGroomBride({
     };
   };
 };
+// End Groom Bride Info
 
+// Schedule Info
 export async function GetScheduleByEventId(event_id: number): Promise<ScheduleInfo[]> {
   const getData = await db.scheduleInfo.findMany({ where: { event_id } });
   return getData;
@@ -233,7 +236,9 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
     throw new Error(error.message);
   }
 };
+// End Schedule Info
 
+// Event Galleries
 export async function StoreEventGalleries(event_id: number, formData: DtoEventGallery[]) {
   try{
     const session = await auth();
@@ -320,7 +325,9 @@ export async function DeleteEventGalleryById(event_id: number, gallery_id: numbe
     throw new Error(error.message);
   }
 };
+// End Event Galleries
 
+// Event Histories
 type GetDataEventHistoriesParams = {
   where?: Prisma.EventHistoriesWhereInput;
   orderBy?: Prisma.EventHistoriesOrderByWithRelationInput | Prisma.EventHistoriesOrderByWithRelationInput[];
@@ -409,7 +416,9 @@ export async function DeleteDataEventHistories(id: number) {
     throw new Error(error.message);
   }
 };
+// End Event Histories
 
+// Event Gifts
 type GetDataEventGiftsParams = {
   where?: Prisma.EventGiftsWhereInput;
   orderBy?: Prisma.EventGiftsOrderByWithRelationInput | Prisma.EventGiftsOrderByWithRelationInput[];
@@ -497,7 +506,9 @@ export async function DeleteDataEventGifts(id: number) {
     throw new Error(error.message);
   }
 };
+// End Event Gifts
 
+// Event FAQ
 type GetDataEventFAQParams = {
   where?: Prisma.EventFAQWhereInput;
   orderBy?: Prisma.EventFAQOrderByWithRelationInput | Prisma.EventFAQOrderByWithRelationInput[];
@@ -576,8 +587,9 @@ export async function DeleteDataEventFAQ(id: number) {
     throw new Error(error.message);
   }
 };
+// End Event FAQ
 
-
+// Event RSVP
 type GetDataEventRsvpParams = {
   where?: Prisma.EventRsvpWhereInput;
   orderBy?: Prisma.EventRsvpOrderByWithRelationInput | Prisma.EventRsvpOrderByWithRelationInput[];
@@ -657,3 +669,4 @@ export async function DeleteDataEventRsvp(id: number) {
     throw new Error(error.message);
   }
 };
+// End Event RSVP

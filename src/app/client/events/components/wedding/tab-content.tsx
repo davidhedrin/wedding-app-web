@@ -1937,7 +1937,8 @@ function HistoryTabContent(event_id: number) {
                   <div className="relative w-full h-44 md:h-52">
                     {
                       x.gallery ? <img
-                        src="https://picsum.photos/500/600?random=1"
+                        // src="https://picsum.photos/500/600?random=1"
+                        src={x.gallery.img_path ?? ""}
                         alt="Card image"
                         className="w-full h-full object-cover"
                       /> : <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400">
@@ -2035,7 +2036,7 @@ function HistoryTabContent(event_id: number) {
                         // <img key={i} src={x.img_path ?? ""} alt={`image-${i}`} className="w-full h-24 object-cover rounded-md border border-gray-200" />
                         <div key={i} className="relative rounded-md overflow-hidden border border-gray-200">
                           <img
-                            src="https://picsum.photos/400/300"
+                            src={x.img_path ?? ""}
                             alt={`image-${i}`}
                             className="w-full h-24 object-cover cursor-pointer"
                             onClick={() => setSelectedImgHistory(prev => prev === x.id ? null : x.id)}
@@ -2956,7 +2957,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             }
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                               <span onClick={() => {
-                                const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
+                                const craateUrl = `${Configs.base_url}/${url}?id=${data.event_id}&code=${data.barcode}`;
                                 copyToClipboard(craateUrl);
                                 toast({
                                   type: "success",
