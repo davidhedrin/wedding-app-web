@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -27,7 +28,20 @@ type RSVPData = {
   attending: "yes" | "no" | "maybe";
 };
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 export default function WeddingInvite() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   /* Countdown logic */
   const target = useMemo(() => new Date(WEDDING_DATE), []);
   const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
@@ -114,7 +128,49 @@ export default function WeddingInvite() {
         `}</style>
       </Head>
 
-      <div className="min-h-screen font-inter text-gray-100 bg-gradient-to-b from-[#0b0f10] via-[#121313] to-[#1b1d1f]">
+      <div className="min-h-screen font-inter text-gray-100 bg-linear-to-b from-[#0b0f10] via-[#121313] to-[#1b1d1f]">
+        <AnimatePresence>
+          {!opened && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            >
+              <div className="absolute inset-0">
+                <img
+                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-b from-[#0b0f10] via-[#121313] to-[#1b1d1f]/60 backdrop-blur-sm" />
+              </div>
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
+              >
+                <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+                <h1 className="font-playfair text-3xl sm:text-4xl font-medium leading-tight drop-shadow-lg">
+                  Nadian Anisa &amp; Stephen Angga
+                </h1>
+                <p className="mt-4 text-lg">20 Desember 2021</p>
+                <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+                <button
+                  onClick={() => setOpened(true)}
+                  className="px-5 py-3 rounded-full bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold shadow hover:scale-[1.02] transition transform"
+                >
+                  Buka Undangan
+                  <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition"></span>
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Sticky nav */}
         <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8">
           <nav className="max-w-5xl mx-auto flex items-center justify-between bg-black backdrop-blur-smooth border border-white/6 rounded-xl p-3 shadow-lg">
@@ -158,7 +214,7 @@ export default function WeddingInvite() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => scrollTo("rsvp")}
-                className="hidden sm:inline-block px-4 py-2 rounded-md bg-gradient-to-r from-[#b8846b] to-[#a46d49] text-sm font-semibold shadow hover:brightness-105 transform hover:-translate-y-0.5 transition"
+                className="hidden sm:inline-block px-4 py-2 rounded-md bg-linear-to-r from-[#b8846b] to-[#a46d49] text-sm font-semibold shadow hover:brightness-105 transform hover:-translate-y-0.5 transition"
               >
                 RSVP
               </button>
@@ -178,7 +234,7 @@ export default function WeddingInvite() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               {/* Background carousel */}
-              <div className="relative h-screen sm:h-[480px] md:h-[420px] lg:h-[520px]">
+              <div className="relative h-screen sm:h-120 md:h-105 lg:h-130">
                 {heroImages.map((src, i) => (
                   <img
                     key={i}
@@ -191,7 +247,7 @@ export default function WeddingInvite() {
                 ))}
 
                 {/* overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+                <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/20 to-black/60"></div>
 
                 {/* content */}
                 <div className="absolute inset-0 flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between p-6 md:p-12 gap-6">
@@ -257,9 +313,9 @@ export default function WeddingInvite() {
                     <div className="mt-4 flex flex-col sm:flex-row gap-3 items-center">
                       <button
                         onClick={() => scrollTo("mempelai")}
-                        className="px-5 py-3 rounded-full bg-gradient-to-r from-[#b8846b] to-[#a46d49] font-semibold shadow hover:scale-[1.02] transition transform"
+                        className="px-5 py-3 rounded-full bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold shadow hover:scale-[1.02] transition transform"
                       >
-                        Buka Undangan
+                        Lihat Undangan
                       </button>
 
                       <a
@@ -285,9 +341,7 @@ export default function WeddingInvite() {
                       />
                       <div>
                         <div className="text-sm text-white/80">Kami yang berbahagia</div>
-                        <div className="font-playfair text-lg">Nadian</div>
-                        <div className="font-playfair text-lg"> &amp; </div>
-                        <div className="font-playfair text-lg">Stephen</div>
+                        <div className="font-playfair text-lg">Nadian &amp; Stephen</div>
                         <div className="text-xs text-white/60 mt-1">{formattedDate}</div>
                       </div>
                     </div>
@@ -383,7 +437,7 @@ export default function WeddingInvite() {
                   <p className="text-xs text-white/60">Sabtu, 12 Desember 2025 • 09.00 WIB</p>
                   <p className="text-xs text-white/70 mt-1">Gedung Ceria, Jl. Contoh No.123, Kota</p>
 
-                  <div className="mt-3 aspect-[16/9] rounded-md overflow-hidden border border-white/5">
+                  <div className="mt-3 aspect-video rounded-md overflow-hidden border border-white/5">
                     <iframe
                       src={`https://www.google.com/maps?q=Gedung+Contoh+Jakarta&output=embed`}
                       width="100%"
@@ -421,7 +475,7 @@ export default function WeddingInvite() {
                   <p className="text-xs text-white/60">Sabtu, 12 Desember 2025 • 11.00 – 14.00 WIB</p>
                   <p className="text-xs text-white/70 mt-1">Gedung Ceria, Jl. Contoh No.123, Kota</p>
 
-                  <div className="mt-3 aspect-[16/9] rounded-md overflow-hidden border border-white/5">
+                  <div className="mt-3 aspect-video rounded-md overflow-hidden border border-white/5">
                     <iframe
                       src={`https://www.google.com/maps?q=Gedung+Contoh+Jakarta&output=embed`}
                       width="100%"
@@ -467,7 +521,7 @@ export default function WeddingInvite() {
                 <div className="mt-4 text-xs">
                   <button
                     onClick={() => scrollTo("faq")}
-                    className="text-sm px-3 py-2 rounded-md bg-gradient-to-r from-[#b8846b] to-[#a46d49] font-semibold"
+                    className="text-sm px-3 py-2 rounded-md bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold"
                   >
                     Lihat FAQ
                   </button>
@@ -605,7 +659,7 @@ export default function WeddingInvite() {
                   <textarea
                     value={rsvp.message}
                     onChange={(e) => setRsvp({ ...rsvp, message: e.target.value })}
-                    className="mt-1 w-full rounded-md bg-white/5 border border-white/6 p-3 text-white text-sm min-h-[90px]"
+                    className="mt-1 w-full rounded-md bg-white/5 border border-white/6 p-3 text-white text-sm min-h-22.5"
                     placeholder="Tulis pesan singkat..."
                   />
                 </div>
@@ -613,7 +667,7 @@ export default function WeddingInvite() {
                 <div className="md:col-span-2 flex items-center gap-3">
                   <button
                     type="submit"
-                    className={`px-5 py-3 rounded-full bg-gradient-to-r from-[#b8846b] to-[#a46d49] font-semibold shadow transform hover:-translate-y-0.5 transition ${rsvpStatus === "sending" ? "opacity-70 pointer-events-none" : ""
+                    className={`px-5 py-3 rounded-full bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold shadow transform hover:-translate-y-0.5 transition ${rsvpStatus === "sending" ? "opacity-70 pointer-events-none" : ""
                       }`}
                   >
                     {rsvpStatus === "sending" ? "Mengirim..." : "Kirim Konfirmasi"}
@@ -630,40 +684,149 @@ export default function WeddingInvite() {
           <section id="hadiah">
             <div className="bg-white/3 rounded-2xl p-5 md:p-8 border border-white/6 shadow-lg">
               <h2 className="font-playfair text-2xl text-white">Hadiah</h2>
-              <p className="text-sm text-white/70">Informasi rekening / e-wallet untuk memberi hadiah</p>
+              <p className="text-sm text-white/70">
+                Informasi rekening, e-wallet, dan wishlist hadiah
+              </p>
 
-              <div className="mt-4 grid md:grid-cols-2 gap-4">
-                <div className="bg-white/5 p-4 rounded-xl">
-                  <div className="text-sm text-white/60">Bank / Rekening</div>
-                  <div className="mt-2 font-semibold text-white">Nama Bank — 1234567890</div>
-                  <div className="text-xs text-white/60 mt-1">Atas nama: Nama Penerima</div>
+              {/* ================= TRANSFER ================= */}
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                {/* Bank */}
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                  <div className="text-xs uppercase tracking-wide text-white/50">
+                    Transfer Bank
+                  </div>
+                  <div className="mt-2 font-semibold text-white">
+                    BCA · 1234567890
+                  </div>
+                  <div className="text-xs text-white/60 mt-1">
+                    a.n. Nama Penerima
+                  </div>
 
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard?.writeText("1234567890");
-                        alert("Nomor rekening disalin");
-                      }}
-                      className="px-3 py-2 rounded-md bg-white/6"
+                  <button
+                    onClick={() =>
+                      navigator.clipboard?.writeText("1234567890")
+                    }
+                    className="mt-3 inline-flex rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs hover:bg-white/10 transition"
+                  >
+                    Salin Rekening
+                  </button>
+                </div>
+
+                {/* E-Wallet */}
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                  <div className="text-xs uppercase tracking-wide text-white/50">
+                    E-Wallet
+                  </div>
+                  <div className="mt-2 font-semibold text-white">
+                    GoPay · 081234567890
+                  </div>
+                  <div className="text-xs text-white/60 mt-1">
+                    a.n. Nama Penerima
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      navigator.clipboard?.writeText("081234567890")
+                    }
+                    className="mt-3 inline-flex rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs hover:bg-white/10 transition"
+                  >
+                    Salin Nomor
+                  </button>
+                </div>
+              </div>
+
+              {/* ================= WISHLIST ================= */}
+              <div className="mt-8 bg-white/5 p-5 rounded-xl border border-white/10">
+                <h4 className="font-playfair text-lg text-white">
+                  Wishlist Hadiah
+                </h4>
+
+                {/* ================= ALAMAT ================= */}
+                <div className="mt-3 bg-black/20 p-4 rounded-xl border border-white/10">
+                  <div className="text-xs uppercase tracking-wide text-white/50">
+                    Alamat Pengiriman
+                  </div>
+                  <p className="mt-1 text-sm text-white/80 leading-relaxed">
+                    Nama Penerima Jl. Mawar No. 10 Jakarta Selatan, 12345 Indonesia
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      navigator.clipboard?.writeText(
+                        "Nama Penerima, Jl. Mawar No. 10, Jakarta Selatan, 12345, Indonesia"
+                      )
+                    }
+                    className="mt-3 inline-flex rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs hover:bg-white/10 transition"
+                  >
+                    Salin Alamat
+                  </button>
+                </div>
+
+                <p className="text-sm text-white/60 mt-3">
+                  Beberapa referensi hadiah di bawah ini bersifat opsional.
+                  Kehadiran dan doa Anda tetap yang utama.
+                </p>
+
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {[
+                    { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
+                    { name: "Sprei Premium", price: "Rp 2.200.000", qty: 1 },
+                    { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl border border-white/10 bg-black/20 p-4 flex flex-col justify-between hover:bg-black/30 transition"
                     >
-                      Salin Rekening
+                      <div>
+                        <p className="font-medium text-white">
+                          {item.name}
+                        </p>
+                        <p className="mt-1 text-sm text-white/60">
+                          Estimasi harga: {item.price}
+                        </p>
+                        <p className="mt-1 text-sm text-white/60">
+                          Jumlah: {item.qty}
+                        </p>
+                      </div>
+
+                      <a
+                        href="#"
+                        className="mt-4 inline-flex justify-center rounded-full border border-white/10 px-3 py-2 text-xs hover:bg-white/10 transition"
+                      >
+                        Lihat Referensi
+                      </a>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ================= PAGINATION ================= */}
+                <div className="mt-8 flex flex-col items-center gap-4">
+                  <div className="flex gap-2">
+                    <button className="h-8 w-8 rounded-full bg-white text-black text-xs font-semibold">
+                      1
                     </button>
-                    <a href="#" className="px-3 py-2 rounded-md border border-white/6">
-                      Buka Transfer
-                    </a>
+                    <button className="h-8 w-8 rounded-full border border-white/20 text-xs">
+                      2
+                    </button>
+                    <button className="h-8 w-8 rounded-full border border-white/20 text-xs">
+                      3
+                    </button>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button className="rounded-lg border border-white/10 px-4 py-2 text-xs hover:bg-white/10 transition">
+                      Prev
+                    </button>
+                    <button className="rounded-lg border border-white/10 px-4 py-2 text-xs hover:bg-white/10 transition">
+                      Next
+                    </button>
                   </div>
                 </div>
-
-                <div className="bg-white/5 p-4 rounded-xl">
-                  <div className="text-sm text-white/60">E-Wallet</div>
-                  <div className="mt-2 font-semibold text-white">Gopay / OVO / Dana: 081234567890</div>
-                  <div className="text-xs text-white/60 mt-1">Nama penerima</div>
-                </div>
               </div>
 
-              <div className="mt-4 text-xs text-white/60">
-                Terima kasih untuk niat baik dan kebaikan Anda — kehadiran saja sudah lebih dari cukup.
-              </div>
+              <p className="mt-6 text-xs text-white/60 text-center">
+                Terima kasih atas niat baik dan doa Anda. Kehadiran Anda sudah lebih dari cukup.
+              </p>
             </div>
           </section>
 

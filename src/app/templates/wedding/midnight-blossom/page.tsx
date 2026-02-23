@@ -3,6 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -35,7 +36,20 @@ function classNames(...c: (string | false | null | undefined)[]) {
   return c.filter(Boolean).join(" ");
 }
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 export default function UndanganPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   const [active, setActive] = useState<string>(navItems[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -114,7 +128,7 @@ export default function UndanganPage() {
       {/* Elegant radial gradient + subtle overlay */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-neutral-800 via-neutral-800 to-black"
+        className="pointer-events-none fixed inset-0 -z-10 bg-linear-to-b from-neutral-800 via-neutral-800 to-black"
       />
       <div
         aria-hidden
@@ -125,10 +139,54 @@ export default function UndanganPage() {
         }}
       />
 
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-b from-neutral-80/60 via-neutral-800 to-black backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-rose-200/90">Wedding Invitation</p>
+              <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl leading-tight">
+                <span className="bg-clip-text text-transparent bg-linear-to-b from-neutral-50 to-neutral-300">
+                  Aisyah & Raka
+                </span>
+              </h1>
+              <p className="mt-4 text-lg">{formatDate(WEDDING_DATE, "full", "short")}</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className="px-4 py-2 rounded-md bg-rose-200 text-[#0b1221] font-semibold shadow hover:-translate-y-0.5 transition transform"
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sticky Header */}
       <header className="sticky top-0 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <nav className="mt-4 mb-3 flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-black/20">
+          <nav className="mt-4 mb-3 flex items-center justify-between rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-black/20">
             <a
               href="#hero"
               onClick={(e) => {
@@ -137,7 +195,7 @@ export default function UndanganPage() {
               }}
               className="font-serif text-xl tracking-wide"
             >
-              <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-rose-300 via-rose-200 to-rose-100">
+              <span className="inline-block bg-clip-text text-transparent bg-linear-to-r from-rose-300 via-rose-200 to-rose-100">
                 The Wedding
               </span>
             </a>
@@ -231,7 +289,7 @@ export default function UndanganPage() {
             Undangan Pernikahan
           </p>
           <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl leading-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-300">
+            <span className="bg-clip-text text-transparent bg-linear-to-b from-neutral-50 to-neutral-300">
               Aisyah & Raka
             </span>
           </h1>
@@ -249,7 +307,7 @@ export default function UndanganPage() {
             ].map((d, i) => (
               <div
                 key={i}
-                className="text-center px-3 py-2 rounded-xl bg-white/5 min-w-[70px]"
+                className="text-center px-3 py-2 rounded-xl bg-white/5 min-w-17.5"
               >
                 <div className="text-3xl font-semibold tabular-nums">
                   {String(d.value).padStart(2, "0")}
@@ -279,11 +337,11 @@ export default function UndanganPage() {
       <Section id="mempelai" title="Mempelai" title2="Mempelai Berbahagia" sectionsRef={sectionsRef}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="relative">
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-rose-300/20 via-rose-200/0 to-cyan-200/10 blur-2xl" />
+            <div className="absolute -inset-2 rounded-3xl bg-linear-to-tr from-rose-300/20 via-rose-200/0 to-cyan-200/10 blur-2xl" />
             <img
               src={IMAGE_URL}
               alt="Foto Mempelai"
-              className="relative rounded-3xl border border-white/10 shadow-2xl w-full object-cover aspect-[4/3]"
+              className="relative rounded-3xl border border-white/10 shadow-2xl w-full object-cover aspect-4/3"
             />
           </div>
           <div>
@@ -292,7 +350,7 @@ export default function UndanganPage() {
               Putri dari Bapak Ahmad & Ibu Siti.
             </p>
 
-            <div className="my-6 h-px w-24 bg-gradient-to-r from-rose-300/70 to-transparent" />
+            <div className="my-6 h-px w-24 bg-linear-to-r from-rose-300/70 to-transparent" />
 
             <h3 className="font-serif text-3xl text-rose-200">Raka</h3>
             <p className="text-neutral-300">
@@ -381,7 +439,7 @@ export default function UndanganPage() {
                   <img
                     src={src}
                     alt={`Galeri ${i + 1}`}
-                    className="h-[600px] w-full object-cover"
+                    className="h-150 w-full object-cover"
                   />
                 </div>
               ))}
@@ -399,7 +457,7 @@ export default function UndanganPage() {
                 }
                 className="rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 transition text-sm"
               >
-                ‹ Prev
+                {"<"} Prev
               </button>
               <button
                 onClick={() =>
@@ -407,7 +465,7 @@ export default function UndanganPage() {
                 }
                 className="rounded-full border border-white/10 bg-white/5 px-4 py-2 hover:bg-white/10 transition text-sm"
               >
-                Next ›
+                Next {">"}
               </button>
             </div>
             <div className="flex gap-1">
@@ -471,71 +529,168 @@ export default function UndanganPage() {
 
       {/* HADIAH */}
       <Section id="hadiah" title="Hadiah" title2="Hadiah" sectionsRef={sectionsRef}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2">
-            <h4 className="font-serif text-2xl text-rose-100">
-              Beri Hadiah Kasih
+        <div className="space-y-8">
+
+          {/* ================= TRANSFER ================= */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="md:col-span-2">
+              <h4 className="font-serif text-2xl text-rose-100">
+                Beri Hadiah Kasih
+              </h4>
+              <p className="text-neutral-300 mt-2">
+                Doa dan kehadiran Anda adalah hadiah terindah. Namun bila berkenan,
+                Anda dapat mengirimkan tanda kasih melalui rekening berikut:
+              </p>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  {
+                    bank: "BCA",
+                    name: "Aisyah Putri",
+                    no: "1234567890",
+                  },
+                  {
+                    bank: "Mandiri",
+                    name: "Raka Pratama",
+                    no: "9876543210",
+                  },
+                ].map((acc, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-white/10 bg-white/5 p-4 flex items-center justify-between gap-4"
+                  >
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-neutral-400">
+                        {acc.bank}
+                      </div>
+                      <div className="font-medium text-lg text-white">
+                        {acc.no}
+                      </div>
+                      <div className="text-sm text-neutral-300">
+                        a.n. {acc.name}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => copyToClipboard(acc.no)}
+                      className="rounded-lg border border-white/10 bg-black/30 px-4 py-2 text-sm hover:bg-white/10 transition"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Visual / QR */}
+            <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-4">
+              <img
+                src={IMAGE_URL}
+                alt="QR / Kartu Ucapan"
+                className="rounded-xl aspect-square object-cover"
+              />
+            </div>
+          </div>
+
+          {/* ================= WISHLIST ================= */}
+          <Card>
+            <h4 className="font-serif text-xl text-rose-100 mb-1">
+              Wishlist Hadiah
             </h4>
-            <p className="text-neutral-300 mt-2">
-              Doa dan kehadiran Anda adalah hadiah terindah. Jika berkenan,
-              Anda juga dapat mengirimkan tanda kasih melalui rekening berikut:
+
+            {/* ================= ALAMAT ================= */}
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs uppercase tracking-wide text-neutral-400">
+                Alamat Pengiriman
+              </p>
+              <p className="mt-1 text-sm text-neutral-200 leading-relaxed">
+                Aisyah Putri Jl. Melati No. 10 Bandung, 40123 Indonesia
+              </p>
+
+              <button
+                onClick={() =>
+                  copyToClipboard(
+                    "Aisyah Putri, Jl. Melati No. 10, Bandung, 40123, Indonesia"
+                  )
+                }
+                className="mt-3 rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs hover:bg-white/10 transition"
+              >
+                Salin Alamat
+              </button>
+            </div>
+
+            <p className="mt-5 text-sm text-neutral-300">
+              Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+              Tidak ada kewajiban — kehadiran Anda tetap yang utama.
             </p>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[
                 {
-                  bank: "BCA",
-                  name: "Aisyah Putri",
-                  no: "1234567890",
+                  name: "Set Peralatan Makan",
+                  price: "Rp 1.500.000",
+                  qty: 1
                 },
                 {
-                  bank: "Mandiri",
-                  name: "Raka Pratama",
-                  no: "9876543210",
+                  name: "Sprei Premium",
+                  price: "Rp 2.200.000",
+                  qty: 1
                 },
-              ].map((acc, i) => (
+                {
+                  name: "Lampu Meja Minimalis",
+                  price: "Rp 850.000",
+                  qty: 1
+                },
+              ].map((item, i) => (
                 <div
                   key={i}
-                  className="rounded-xl border border-white/10 bg-white/5 p-4 flex items-center justify-between"
+                  className="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="text-sm text-neutral-300">{acc.bank}</div>
-                    <div className="font-medium">{acc.no}</div>
-                    <div className="text-sm text-neutral-300">{acc.name}</div>
+                    <p className="font-medium text-white">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-sm text-neutral-400">
+                      Estimasi harga: {item.price}
+                    </p>
+                    <p className="mt-1 text-sm text-neutral-400">Jumlah: {item.qty} unit</p>
                   </div>
-                  <button
-                    onClick={() => copyToClipboard(acc.no)}
-                    className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm hover:bg-white/10 transition"
+
+                  <a
+                    href="#"
+                    className="mt-4 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
                   >
-                    Salin
-                  </button>
+                    Lihat Referensi
+                  </a>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <a
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                className="rounded-xl border border-white/10 bg-rose-200/10 px-4 py-2 text-sm hover:bg-rose-200/20 transition"
-              >
-                E-Wallet (OVO/DANA/Gopay)
-              </a>
-              <a
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 transition"
-              >
-                Kirim Hadiah via Link
-              </a>
+
+            {/* ================= PAGINATION ================= */}
+            <div className="mt-7 flex flex-col items-center gap-4">
+              <div className="flex gap-2">
+                <button className="h-8 w-8 rounded-full bg-rose-300 text-sm font-semibold text-rose-950">
+                  1
+                </button>
+                <button className="h-8 w-8 rounded-full border border-white/20 text-sm">
+                  2
+                </button>
+                <button className="h-8 w-8 rounded-full border border-white/20 text-sm">
+                  3
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/10 transition">
+                  Prev
+                </button>
+                <button className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/10 transition">
+                  Next
+                </button>
+              </div>
             </div>
           </Card>
 
-          <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-4">
-            <img
-              src={IMAGE_URL}
-              alt="QR / Kartu Ucapan"
-              className="rounded-xl aspect-square object-cover"
-            />
-          </div>
         </div>
       </Section>
 

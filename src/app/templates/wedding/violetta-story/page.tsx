@@ -2,8 +2,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Playfair_Display, Cormorant_Garamond, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
+import { AnimatePresence, motion } from 'framer-motion';
 
 import bgImage from './bg.jpg';
+import { formatDate } from "@/lib/utils";
 
 /**
  * Invitation Type: Wedding
@@ -85,8 +87,21 @@ const Pill: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </span>
 );
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 // === HALAMAN ===
 export default function WeddingInvitationPage() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // Smooth fade-in saat scroll
   const revealRef = useRef<Record<string, Element | null>>({});
   useEffect(() => {
@@ -221,6 +236,51 @@ export default function WeddingInvitationPage() {
           backdrop-filter: blur(8px);
         }
       `}</style>
+
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src={bgImage.src}
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-fuchsia-900/50 to-purple-800/80 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+              <h1
+                className={`mt-4 text-4xl sm:text-5xl lg:text-6xl leading-tight ${playfair.className}`}
+              >
+                <span className={THEME.accent}>Aisyah</span> &{" "}
+                <span className={THEME.accent}>Zidan</span>
+              </h1>
+              <p className="mt-4 text-lg"><strong className={THEME.accent}>Tanggal:</strong> {formatDate(WEDDING_DATE, "long")}</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className={`btn ${THEME.btn}`}
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* NAVIGATION */}
       <header
@@ -388,7 +448,7 @@ export default function WeddingInvitationPage() {
                   onClick={() => goToSection("mempelai")}
                   className={`btn ${THEME.btn}`}
                 >
-                  Buka Undangan
+                  Lihat Undangan
                 </button>
                 <button
                   onClick={() => goToSection("acara")}
@@ -750,69 +810,147 @@ export default function WeddingInvitationPage() {
 
       {/* HADIAH */}
       <section id="hadiah" className="relative">
-        <div className="mx-auto max-w-4xl px-4 py-14 sm:py-18 md:py-20">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20 md:py-24">
           <SectionTitle
             title="Hadiah"
             subtitle="Doa restu adalah yang utama. Namun bagi yang berkenan memberi hadiah:"
           />
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="reveal card rounded-2xl p-6" ref={(el) => {
-              if (el) revealRef.current["gift-1"] = el
-            }}>
-              <h4 className={`text-xl ${playfair.className}`}>Transfer Bank</h4>
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center justify-between rounded-xl bg-black/30 border border-white/10 p-3">
-                  <div>
-                    <p>Bank BCA</p>
-                    <p className="text-white/70 text-sm">No. Rek: 1234567890</p>
-                    <p className="text-white/70 text-sm">a.n. Aisyah Rahma</p>
-                  </div>
-                  <button
-                    className="btn bg-white/10"
-                    onClick={() => navigator.clipboard.writeText("1234567890")}
-                  >
-                    Salin
-                  </button>
-                </div>
-                <div className="flex items-center justify-between rounded-xl bg-black/30 border border-white/10 p-3">
-                  <div>
-                    <p>Bank BRI</p>
-                    <p className="text-white/70 text-sm">No. Rek: 9876543210</p>
-                    <p className="text-white/70 text-sm">a.n. Zidan Arya</p>
-                  </div>
-                  <button
-                    className="btn bg-white/10"
-                    onClick={() => navigator.clipboard.writeText("9876543210")}
-                  >
-                    Salin
-                  </button>
-                </div>
-              </div>
-            </div>
+          {/* ================= TRANSFER ================= */}
+          <div className="relative mt-10">
+            {/* BANK */}
+            <div ref={(el) => {
+              if (el) revealRef.current["gift-bank"] = el
+            }}
+              className="reveal card rounded-2xl p-6"
+            >
+              <h4 className={`text-xl mb-4 ${playfair.className}`}>
+                Transfer Bank
+              </h4>
 
-            <div className="reveal card rounded-2xl p-6" ref={(el) => {
-              if (el) revealRef.current["gift-2"] = el
-            }}>
-              <h4 className={`text-xl ${playfair.className}`}>E-Wallet / Link</h4>
-              <div className="mt-3 grid gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
-                  { name: "OVO", link: "#" },
-                  { name: "GoPay", link: "#" },
-                  { name: "DANA", link: "#" },
-                ].map((w) => (
-                  <a
-                    key={w.name}
-                    href={w.link}
-                    className="rounded-xl bg-black/30 border border-white/10 p-3 hover:bg-black/40 transition"
+                  {
+                    bank: "Bank BCA",
+                    no: "1234567890",
+                    name: "Aisyah Rahma",
+                  },
+                  {
+                    bank: "Bank BRI",
+                    no: "9876543210",
+                    name: "Zidan Arya",
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between gap-4 rounded-xl bg-black/30 border border-white/10 p-4"
                   >
-                    {w.name} — Klik untuk memberi
-                  </a>
+                    <div className="text-sm">
+                      <p className="font-medium">{item.bank}</p>
+                      <p className="text-white/70">No. Rek: {item.no}</p>
+                      <p className="text-white/50">a.n. {item.name}</p>
+                    </div>
+
+                    <button
+                      className="btn bg-white/10 text-sm px-4 py-2 rounded-full"
+                      onClick={() => navigator.clipboard.writeText(item.no)}
+                    >
+                      Salin
+                    </button>
+                  </div>
                 ))}
               </div>
-              <p className="text-white/70 text-sm mt-3">
-                *Tautan di atas dapat disesuaikan.
+            </div>
+          </div>
+
+          <div className="relative">
+            {/* ================= WISHLIST ================= */}
+            <div ref={(el) => {
+              if (el) revealRef.current["gift-wishlist"] = el
+            }} className="mt-14 reveal card rounded-2xl p-6 md:p-8">
+              <h4 className={`text-xl mb-2 ${playfair.className}`}>
+                Wishlist Hadiah
+              </h4>
+
+              {/* ================= ALAMAT ================= */}
+              <div className="mt-3 rounded-xl bg-black/30 border border-white/10 p-4">
+                <p className="text-xs uppercase tracking-wide text-white/50">
+                  Alamat Pengiriman
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  Aisyah Rahma Jl. Melati No. 10 Bandung 40123 Indonesia
+                </p>
+
+                <button
+                  className="btn bg-white/10 text-sm px-4 py-2 rounded-full mt-3"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      "Aisyah Rahma, Jl. Melati No. 10, Bandung 40123, Indonesia"
+                    )
+                  }
+                >
+                  Salin Alamat
+                </button>
+              </div>
+
+              <p className="mt-3 text-sm text-white/70">
+                Beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+                Tidak ada kewajiban — kehadiran Anda tetap yang utama 🤍
               </p>
+
+              <div className="mt-6 grid md:grid-cols-3 gap-5">
+                {[
+                  { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
+                  { name: "Sprei Premium King Size", price: "Rp 2.200.000", qty: 1 },
+                  { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl bg-black/30 border border-white/10 p-4 flex flex-col justify-between"
+                  >
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-white/60 mt-1">
+                        Estimasi: {item.price}
+                      </p>
+                      <p className="text-sm text-white/60 mt-1">
+                        Jumlah: {item.qty}
+                      </p>
+                    </div>
+
+                    <a
+                      href="#"
+                      className="mt-4 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
+                    >
+                      Lihat Detail
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              {/* ================= PAGINATION (UI ONLY) ================= */}
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <div className="flex gap-2">
+                  <button className="w-8 h-8 rounded-full bg-white text-black text-xs font-semibold">
+                    1
+                  </button>
+                  <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
+                    2
+                  </button>
+                  <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
+                    3
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
+                    Prev
+                  </button>
+                  <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

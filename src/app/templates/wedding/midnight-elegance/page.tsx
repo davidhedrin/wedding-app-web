@@ -2,6 +2,7 @@
 
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -23,8 +24,20 @@ const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
 
 export default function Page() {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   // --- Refs for nav ---
   const sections = {
     mempelai: useRef<HTMLDivElement | null>(null),
@@ -101,7 +114,7 @@ export default function Page() {
   };
 
   return (
-    <main className={`min-h-screen bg-gradient-to-b ${THEME.bg} text-white relative`}>
+    <main className={`min-h-screen bg-linear-to-b ${THEME.bg} text-white relative`}>
       {/* Global smooth scroll & decorative noise */}
       <style>{`
         html { scroll-behavior: smooth; }
@@ -113,8 +126,50 @@ export default function Page() {
         }
       `}</style>
 
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-b from-[#0B1220]/40 via-[#0E1627]/80 to-[#121A2E] backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white/70">Wedding Invitation</p>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight">
+                <span className={THEME.accent}>Alya</span> & <span className={THEME.accent}>Raka</span>
+              </h1>
+              <p className="mt-4 text-lg">{WEDDING_DATE.toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <button
+                onClick={() => setOpened(true)}
+                className={`px-6 py-3 rounded-full ${THEME.accentBg} text-[#1B2236] font-medium shadow-lg shadow-black/20 hover:scale-[1.03] active:scale-[0.98] transition text-sm md:text-base`}
+              >
+                Buka Undangan
+                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sticky Navigation */}
-      <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-[#0C1323]/60 bg-[#0C1323]/80 border-b border-white/10">
+      <header className="sticky top-0 z-50 backdrop-blur supports-backdrop-filter:bg-[#0C1323]/60 bg-[#0C1323]/80 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-full ${THEME.accentBg} grid place-items-center ring-2 ${THEME.accentRing}`}>
@@ -157,13 +212,13 @@ export default function Page() {
       </header>
 
       {/* Hero with background carousel + countdown */}
-      <section className="relative h-[88vh] min-h-[560px] w-full overflow-hidden">
+      <section className="relative h-[88vh] min-h-140 w-full overflow-hidden">
         {/* Background carousel */}
         <div className="absolute inset-0">
           {heroImages.map((src, i) => (
             <div
               key={i}
-              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-out will-change-opacity ${i === heroIndex ? "opacity-100" : "opacity-0"
+              className={`absolute inset-0 transition-opacity duration-1200 ease-out will-change-opacity ${i === heroIndex ? "opacity-100" : "opacity-0"
                 }`}
               style={{
                 backgroundImage: `linear-gradient(180deg, rgba(11,18,32,.65), rgba(11,18,32,.85)), url(${src})`,
@@ -176,8 +231,8 @@ export default function Page() {
 
         {/* Floating decorations */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-20 bg-[#F2C265]" />
-          <div className="absolute -bottom-24 -left-24 w-[380px] h-[380px] rounded-full blur-3xl opacity-10 bg-[#F2C265]" />
+          <div className="absolute -top-24 -right-24 w-105 h-105 rounded-full blur-3xl opacity-20 bg-[#F2C265]" />
+          <div className="absolute -bottom-24 -left-24 w-95 h-95 rounded-full blur-3xl opacity-10 bg-[#F2C265]" />
         </div>
 
         {/* Content */}
@@ -245,7 +300,7 @@ export default function Page() {
             ].map((p, i) => (
               <div key={i} className="group relative rounded-3xl overflow-hidden ring-1 ring-white/10">
                 <img src={p.img} alt={p.name} className="h-72 md:h-96 w-full object-cover group-hover:scale-[1.03] transition duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220] via-[#0B1220]/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0B1220] via-[#0B1220]/40 to-transparent" />
                 <div className="absolute bottom-0 p-6 md:p-8">
                   <h3 className="font-serif text-2xl md:text-3xl">{p.name}</h3>
                   <p className={`${THEME.soft} mt-1`}>{p.role}</p>
@@ -300,7 +355,7 @@ export default function Page() {
             </div>
 
             {/* Map */}
-            <div className="relative overflow-hidden rounded-2xl ring-1 ring-white/10 aspect-[4/3]">
+            <div className="relative overflow-hidden rounded-2xl ring-1 ring-white/10 aspect-4/3">
               <iframe
                 className="w-full h-full"
                 loading="lazy"
@@ -308,7 +363,7 @@ export default function Page() {
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.317606346648!2d106.82715267603856!3d-6.2197248937606305!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3dfb3d5e0d9%3A0x3f4c9dd5b27d0b0b!2sJakarta%20Selatan!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid"
                 title="Lokasi Acara"
               />
-              <div className="absolute inset-x-0 bottom-0 p-3 text-xs text-center bg-gradient-to-t from-[#0B1220] to-transparent">
+              <div className="absolute inset-x-0 bottom-0 p-3 text-xs text-center bg-linear-to-t from-[#0B1220] to-transparent">
                 <span className="opacity-80">Gunakan peta di atas untuk navigasi.</span>
               </div>
             </div>
@@ -334,9 +389,9 @@ export default function Page() {
               className="snap-x snap-mandatory overflow-x-auto flex gap-4 scroll-px-4 pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-white/20 rounded-2xl"
             >
               {Array.from({ length: 10 }).map((_, idx) => (
-                <div key={idx} className="snap-start shrink-0 w-[78%] sm:w-[56%] md:w-[44%] lg:w-[32%] aspect-[4/5] rounded-2xl overflow-hidden ring-1 ring-white/10 relative group">
+                <div key={idx} className="snap-start shrink-0 w-[78%] sm:w-[56%] md:w-[44%] lg:w-[32%] aspect-4/5 rounded-2xl overflow-hidden ring-1 ring-white/10 relative group">
                   <img src={PLACEHOLDER_IMG} alt={`Galeri ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-[1.04] transition duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition" />
                 </div>
               ))}
             </div>
@@ -349,7 +404,7 @@ export default function Page() {
         <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-28 scroll-mt-24">
           <Header title="Cerita Kami" subtitle="Perjalanan cinta dalam waktu" />
           <div className="mt-10 relative">
-            <div className="absolute left-6 sm:left-1/2 sm:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
+            <div className="absolute left-6 sm:left-1/2 sm:-translate-x-1/2 top-0 bottom-0 w-px bg-linear-to-b from-white/20 via-white/10 to-transparent" />
             <div className="space-y-10">
               {[
                 { t: "2018", title: "Pertama Bertemu", desc: "Dipertemukan di kampus saat kegiatan organisasi." },
@@ -367,9 +422,9 @@ export default function Page() {
                       </div>
                     </div>
                     <div className={`sm:col-start-${i % 2 === 0 ? 2 : 1}`}>
-                      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden ring-1 ring-white/10">
+                      <div className="relative aspect-16/10 rounded-2xl overflow-hidden ring-1 ring-white/10">
                         <img src={PLACEHOLDER_IMG} alt={item.title} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
                       </div>
                     </div>
                   </div>
@@ -422,32 +477,121 @@ export default function Page() {
       <section ref={sections.hadiah} className="relative">
         <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-28 scroll-mt-24">
           <Header title="Hadiah" subtitle="Wujud kasih sayang Anda" />
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
+
+          <div className="mt-10 space-y-8">
+
+            {/* ================= TRANSFER & E-WALLET ================= */}
             <div className={`p-6 rounded-2xl ${THEME.softBg} ring-1 ring-white/10`}>
-              <h4 className="font-serif text-xl">Transfer Bank</h4>
-              <div className="mt-3 space-y-2 text-sm">
-                <RowItem label="Bank" value="BCA" />
-                <RowItem label="No. Rekening" value="1234567890" copyable onCopy={() => copy("1234567890")} />
-                <RowItem label="Atas Nama" value="Alya Putri" />
+              <h4 className="font-serif text-xl mb-4">Transfer & E-Wallet</h4>
+
+              <div className="grid sm:grid-cols-2 gap-6 text-sm">
+                <RowItem
+                  label="OVO"
+                  value="081234567890"
+                  an="Aisyah Putri"
+                  copyable
+                  onCopy={() => copy("081234567890")}
+                />
+                <RowItem
+                  label="GoPay"
+                  value="081234567891"
+                  an="Raka Pratama"
+                  copyable
+                  onCopy={() => copy("081234567891")}
+                />
+                <RowItem
+                  label="DANA"
+                  value="081234567892"
+                  an="Andika Ranita"
+                  copyable
+                  onCopy={() => copy("081234567892")}
+                />
               </div>
             </div>
+
+            {/* ================= WISHLIST ================= */}
             <div className={`p-6 rounded-2xl ${THEME.softBg} ring-1 ring-white/10`}>
-              <h4 className="font-serif text-xl">E-Wallet</h4>
-              <div className="mt-3 space-y-2 text-sm">
-                <RowItem label="OVO" value="081234567890" copyable onCopy={() => copy("081234567890")} />
-                <RowItem label="GoPay" value="081234567891" copyable onCopy={() => copy("081234567891")} />
-                <RowItem label="DANA" value="081234567892" copyable onCopy={() => copy("081234567892")} />
+              <h4 className="font-serif text-xl">Wishlist Hadiah</h4>
+
+              {/* ================= ALAMAT ================= */}
+              <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                <p className="text-xs uppercase tracking-wide text-white/50">
+                  Alamat Pengiriman
+                </p>
+                <p className="mt-1 text-sm leading-relaxed">
+                  Alya Putri Jl. Mawar No. 12 Jakarta Selatan, 12345 Indonesia
+                </p>
+
+                <button
+                  onClick={() =>
+                    copy(
+                      "Alya Putri, Jl. Mawar No. 12, Jakarta Selatan, 12345, Indonesia"
+                    )
+                  }
+                  className="mt-3 inline-flex rounded-full border border-white/10 bg-black/30 px-4 py-1.5 text-xs hover:bg-white/10 transition"
+                >
+                  Salin Alamat
+                </button>
+              </div>
+
+              <p className="mt-5 text-sm text-white/70">
+                Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+                Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+              </p>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
+                  { name: "Sprei Premium", price: "Rp 2.200.000", qty: 1 },
+                  { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col justify-between"
+                  >
+                    <div>
+                      <p className="font-medium">{item.name}</p>
+                      <p className="mt-1 text-sm text-white/60">
+                        Estimasi harga: {item.price}
+                      </p>
+                      <p className="mt-1 text-sm text-white/60">Jumlah: {item.qty} unit</p>
+                    </div>
+
+                    <a
+                      href="#"
+                      className="mt-4 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
+                    >
+                      Lihat Referensi
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              {/* ================= PAGINATION UI ================= */}
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <div className="flex gap-2">
+                  <button className="h-8 w-8 rounded-full bg-white text-xs font-semibold text-black">
+                    1
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs">
+                    2
+                  </button>
+                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs">
+                    3
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/10 transition">
+                    Prev
+                  </button>
+                  <button className="rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/10 transition">
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <a
-              href="#"
-              className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 transition"
-            >
-              Kirim Hadiah via Link
-            </a>
-            <div className={`${THEME.soft} text-sm`}>Terima kasih atas doa dan perhatiannya.</div>
+
           </div>
         </div>
       </section>
@@ -550,7 +694,7 @@ function Header({ title, subtitle }: { title: string; subtitle?: string }) {
     <div className="text-center">
       {subtitle && <div className="uppercase tracking-[0.35em] text-white/60 text-xs">{subtitle}</div>}
       <h2 className="font-serif text-3xl md:text-4xl mt-2">{title}</h2>
-      <div className="mx-auto mt-4 w-24 h-[2px] bg-gradient-to-r from-transparent via-[#F2C265] to-transparent" />
+      <div className="mx-auto mt-4 w-24 h-0.5 bg-linear-to-r from-transparent via-[#F2C265] to-transparent" />
     </div>
   );
 }
@@ -604,25 +748,29 @@ function Textarea({ label, className, ...props }: React.TextareaHTMLAttributes<H
 function RowItem({
   label,
   value,
+  an,
   copyable,
   onCopy,
 }: {
   label: string;
   value: string;
+  an: string;
   copyable?: boolean;
   onCopy?: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-2 border-b border-white/10 last:border-0">
-      <div className="opacity-70">{label}</div>
-      <div className="flex items-center gap-2">
-        <div className="font-mono">{value}</div>
-        {copyable && (
-          <button onClick={onCopy} className="px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/15 border border-white/20">
-            Salin
-          </button>
-        )}
+    <div className="py-2 border-b border-white/10 last:border-0">
+      <div className="flex items-center justify-between gap-3">
+        <div className="opacity-70">{label}</div>
+        <div className="flex items-center gap-2">
+          {copyable && (
+            <button onClick={onCopy} className="px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/15 border border-white/20">
+              Salin
+            </button>
+          )}
+        </div>
       </div>
+      <div className="font-mono">{value} - A/N: {an}</div>
     </div>
   );
 }
@@ -633,7 +781,7 @@ function Accordion({ question, answer }: { question: string; answer: string }) {
     <div className="bg-white/5">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-white/[.06] transition"
+        className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-white/6 transition"
       >
         <span className="font-medium">{question}</span>
         <span className={`transition-transform ${open ? "rotate-180" : ""}`}>⌄</span>

@@ -2,6 +2,7 @@
 
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * Invitation Type: Wedding
@@ -63,7 +64,7 @@ const Pill: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 /** Divider elegan */
 const Flourish: React.FC = () => (
   <div className="mx-auto my-10 flex items-center gap-4 w-full max-w-3xl">
-    <span className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+    <span className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-300 to-transparent" />
     <svg
       viewBox="0 0 24 24"
       className="w-8 h-8 opacity-60"
@@ -74,7 +75,7 @@ const Flourish: React.FC = () => (
         fill="currentColor"
       />
     </svg>
-    <span className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+    <span className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-300 to-transparent" />
   </div>
 );
 
@@ -102,8 +103,21 @@ const NAV = [
   { id: "faq", label: "FAQ" },
 ] as const;
 
+function useLockBodyScroll(isLocked: boolean) {
+  useEffect(() => {
+    if (isLocked) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [isLocked])
+};
+
 /** PAGE COMPONENT */
 const WeddingInvitationPage: React.FC = () => {
+  const [opened, setOpened] = useState(false)
+  useLockBodyScroll(!opened)
+
   const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
   const active = useScrollSpy(NAV.map((n) => n.id));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -160,6 +174,44 @@ const WeddingInvitationPage: React.FC = () => {
 
   return (
     <main className="scroll-smooth bg-[radial-gradient(1250px_circle_at_10%_10%,#ffffff,rgba(244,244,245,0.8))] text-neutral-800 antialiased">
+      <AnimatePresence>
+        {!opened && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+          >
+            <div className="absolute inset-0">
+              <img
+                src='http://localhost:3005/assets/img/2149043983.jpg'
+                alt="cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/20 to-white/40 backdrop-blur-sm" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="relative z-10 space-y-4"
+            >
+              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+              <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-serif tracking-tight text-white drop-shadow">
+                Aurel & Bagas
+              </h1>
+              <p className="mt-4 text-lg text-white">Sabtu, 10 Desember 2019</p>
+              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+
+              <PrimaryButton onClick={() => setOpened(true)}>
+                Buka Undangan
+              </PrimaryButton>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ===== Sticky Header ===== */}
       <header className="fixed top-0 inset-x-0 z-50">
         <div className="mx-auto max-w-7xl">
@@ -199,11 +251,10 @@ const WeddingInvitationPage: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => onNavigate(item.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:shadow ${
-                      active === item.id
-                        ? "bg-white shadow border border-neutral-200"
-                        : "border border-transparent"
-                    }`}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-white hover:shadow ${active === item.id
+                      ? "bg-white shadow border border-neutral-200"
+                      : "border border-transparent"
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -235,11 +286,10 @@ const WeddingInvitationPage: React.FC = () => {
                     <button
                       key={item.id}
                       onClick={() => onNavigate(item.id)}
-                      className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all hover:bg-white hover:shadow ${
-                        active === item.id
-                          ? "bg-white shadow border border-neutral-200"
-                          : "border border-neutral-200/40"
-                      }`}
+                      className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all hover:bg-white hover:shadow ${active === item.id
+                        ? "bg-white shadow border border-neutral-200"
+                        : "border border-neutral-200/40"
+                        }`}
                     >
                       {item.label}
                     </button>
@@ -263,12 +313,11 @@ const WeddingInvitationPage: React.FC = () => {
               key={i}
               src={src}
               alt={`Hero ${i + 1}`}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ${
-                heroIdx === i ? "opacity-100" : "opacity-0"
-              }`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1200 ${heroIdx === i ? "opacity-100" : "opacity-0"
+                }`}
             />
           ))}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-white/40" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/20 to-white/40" />
         </div>
 
         {/* Hero content */}
@@ -323,9 +372,8 @@ const WeddingInvitationPage: React.FC = () => {
                 key={i}
                 onClick={() => setHeroIdx(i)}
                 aria-label={`Hero slide ${i + 1}`}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  heroIdx === i ? "w-6 bg-white" : "bg-white/60"
-                }`}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${heroIdx === i ? "w-6 bg-white" : "bg-white/60"
+                  }`}
               />
             ))}
           </div>
@@ -334,7 +382,7 @@ const WeddingInvitationPage: React.FC = () => {
 
       {/* ===== MEMPELAI ===== */}
       <section id="mempelai" className="relative py-20 md:py-24">
-        <div className="absolute inset-x-0 top-0 -mt-20 h-20 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 -mt-20 h-20 bg-linear-to-b from-white/40 to-transparent pointer-events-none" />
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center">
             <Pill>Mempelai</Pill>
@@ -356,7 +404,7 @@ const WeddingInvitationPage: React.FC = () => {
                 <img
                   src={PLACEHOLDER_IMG}
                   alt="Mempelai wanita"
-                  className="w-full h-72 md:h-[420px] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  className="w-full h-72 md:h-105 object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
               </div>
               <div className="mt-5">
@@ -377,7 +425,7 @@ const WeddingInvitationPage: React.FC = () => {
                 <img
                   src={PLACEHOLDER_IMG}
                   alt="Mempelai pria"
-                  className="w-full h-72 md:h-[420px] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  className="w-full h-72 md:h-105 object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
               </div>
               <div className="mt-5">
@@ -503,7 +551,7 @@ const WeddingInvitationPage: React.FC = () => {
           </div>
 
           <div className="mt-12 relative">
-            <div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-neutral-300 via-neutral-300/50 to-transparent" />
+            <div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-linear-to-b from-neutral-300 via-neutral-300/50 to-transparent" />
             <ol className="space-y-10">
               {[
                 {
@@ -529,14 +577,12 @@ const WeddingInvitationPage: React.FC = () => {
               ].map((item, i) => (
                 <li key={i} className="relative">
                   <div
-                    className={`md:grid md:grid-cols-2 md:gap-10 items-start ${
-                      i % 2 === 0 ? "" : "md:direction-rtl"
-                    }`}
+                    className={`md:grid md:grid-cols-2 md:gap-10 items-start ${i % 2 === 0 ? "" : "md:direction-rtl"
+                      }`}
                   >
                     <div
-                      className={`md:col-span-1 ${
-                        i % 2 === 0 ? "" : "md:order-2"
-                      }`}
+                      className={`md:col-span-1 ${i % 2 === 0 ? "" : "md:order-2"
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow">
@@ -547,9 +593,8 @@ const WeddingInvitationPage: React.FC = () => {
                       <p className="mt-3 text-neutral-700">{item.d}</p>
                     </div>
                     <div
-                      className={`md:col-span-1 mt-4 md:mt-0 ${
-                        i % 2 === 0 ? "" : "md:order-1"
-                      }`}
+                      className={`md:col-span-1 mt-4 md:mt-0 ${i % 2 === 0 ? "" : "md:order-1"
+                        }`}
                     >
                       <div className="rounded-2xl overflow-hidden ring-1 ring-neutral-200 shadow-sm">
                         <img
@@ -681,50 +726,115 @@ const WeddingInvitationPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
-            <div className="rounded-2xl border bg-white/80 p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="font-semibold">Transfer Bank</h3>
-              <div className="mt-3 space-y-2 text-neutral-700">
-                <div>BCA — 1234567890</div>
-                <div>a.n. Aurel Rahma</div>
+          {/* ================= TRANSFER ================= */}
+          <div className="mt-10 grid md:grid-cols-3 gap-6">
+            <div className="rounded-2xl border bg-white/80 p-4 shadow-sm hover:shadow-md transition">
+              <div className="text-sm text-neutral-500">BCA</div>
+
+              <div className="mt-1 space-y-1 text-neutral-700">
+                <div className="font-medium text-lg">1234567890</div>
+                <div className="text-sm">a.n. Aurel Rahma</div>
               </div>
-              <div className="mt-4">
+
+              <div className="mt-2">
                 <CopyButton text="BCA 1234567890 a.n. Aurel Rahma" />
               </div>
             </div>
 
-            <div className="rounded-2xl border bg-white/80 p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="font-semibold">E-Wallet</h3>
-              <div className="mt-3 space-y-2 text-neutral-700">
-                <div>OVO — 0812-3456-7890</div>
-                <div>DANA — 0812-3456-7891</div>
-                <div>GoPay — 0812-3456-7892</div>
+            <div className="rounded-2xl border bg-white/80 p-4 shadow-sm hover:shadow-md transition">
+              <div className="text-sm text-neutral-500">GoPay / OVO</div>
+
+              <div className="mt-1 text-neutral-700">
+                <div className="font-medium text-lg">0812-3456-7890</div>
+                <div className="text-sm">a.n. Aurel Rahma</div>
               </div>
-              <div className="mt-4">
-                <CopyButton text="OVO 081234567890 / DANA 081234567891 / GoPay 081234567892" />
+
+              <div className="mt-2">
+                <CopyButton text="081234567890 a.n. Aurel Rahma" />
               </div>
             </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                alert("Fitur pembayaran link dapat dikaitkan ke payment page kamu.");
-              }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full border bg-white/80 hover:bg-white transition shadow-sm"
-            >
-              <svg viewBox="0 0 24 24" className="w-5 h-5">
-                <path
-                  d="M12 1v22M1 12h22"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
+          {/* ================= WISHLIST ================= */}
+          <div className="mt-12 rounded-2xl border bg-white/80 p-6 shadow-sm">
+            <h3 className="font-semibold text-lg">Wishlist Hadiah</h3>
+
+            {/* ================= ALAMAT ================= */}
+            <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Alamat Pengiriman
+              </p>
+              <p className="mt-1 text-sm text-neutral-700 leading-relaxed">
+                Aurel Rahma Jl. Melati No. 10 Bandung, 40123 Indonesia
+              </p>
+
+              <div className="mt-3">
+                <CopyButton
+                  text="Aurel Rahma, Jl. Melati No. 10, Bandung, 40123, Indonesia"
                 />
-              </svg>
-              Beri Hadiah via Link
-            </a>
+              </div>
+            </div>
+
+            <p className="mt-3 text-sm text-neutral-600">
+              Berikut beberapa referensi hadiah yang mungkin bermanfaat bagi kami.
+              Tidak ada kewajiban — kehadiran Anda tetap yang utama.
+            </p>
+
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
+                { name: "Sprei Premium King Size", price: "Rp 2.200.000", qty: 1 },
+                { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-neutral-200 bg-white p-4 flex flex-col justify-between hover:shadow-sm transition"
+                >
+                  <div>
+                    <p className="font-medium text-neutral-800">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-sm text-neutral-500">
+                      Estimasi harga: {item.price}
+                    </p>
+                    <p className="mt-1 text-sm text-neutral-500">
+                      Jumlah: {item.qty}
+                    </p>
+                  </div>
+
+                  <a
+                    href="#"
+                    className="mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
+                  >
+                    Lihat Referensi
+                  </a>
+                </div>
+              ))}
+            </div>
+
+            {/* ================= PAGINATION (UI ONLY) ================= */}
+            <div className="mt-8 flex flex-col items-center gap-4">
+              <div className="flex gap-2">
+                <button className="h-8 w-8 rounded-full bg-neutral-900 text-xs font-semibold text-white">
+                  1
+                </button>
+                <button className="h-8 w-8 rounded-full border border-neutral-300 text-xs text-neutral-600">
+                  2
+                </button>
+                <button className="h-8 w-8 rounded-full border border-neutral-300 text-xs text-neutral-600">
+                  3
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition">
+                  Prev
+                </button>
+                <button className="rounded-lg border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition">
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -751,9 +861,8 @@ const WeddingInvitationPage: React.FC = () => {
                   >
                     <span className="font-medium">{f.q}</span>
                     <span
-                      className={`transition-transform ${
-                        open ? "rotate-45" : ""
-                      }`}
+                      className={`transition-transform ${open ? "rotate-45" : ""
+                        }`}
                     >
                       <svg viewBox="0 0 24 24" className="w-5 h-5">
                         <path
@@ -766,9 +875,8 @@ const WeddingInvitationPage: React.FC = () => {
                     </span>
                   </button>
                   <div
-                    className={`grid transition-[grid-template-rows] duration-300 ${
-                      open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-                    }`}
+                    className={`grid transition-[grid-template-rows] duration-300 ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                      }`}
                   >
                     <div className="overflow-hidden">
                       <p className="mt-3 text-neutral-700">{f.a}</p>
@@ -863,7 +971,7 @@ const GalleryCarousel: React.FC<{ images: string[] }> = ({ images }) => {
                   alt={`Foto ${i + 1}`}
                   className="w-full h-64 md:h-80 object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition" />
               </div>
             </div>
           ))}
@@ -883,9 +991,8 @@ const GalleryCarousel: React.FC<{ images: string[] }> = ({ images }) => {
               key={i}
               onClick={() => slideTo(i)}
               aria-label={`Slide ${i + 1}`}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                index === i ? "w-6 bg-neutral-800" : "bg-neutral-400/60"
-              }`}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${index === i ? "w-6 bg-neutral-800" : "bg-neutral-400/60"
+                }`}
             />
           ))}
           <button
