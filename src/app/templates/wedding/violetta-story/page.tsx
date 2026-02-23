@@ -74,7 +74,7 @@ const SectionTitle: React.FC<{ title: string; subtitle?: string }> = ({
       <p className={`mt-2 text-white/70 ${inter.className}`}>{subtitle}</p>
     )}
     <div className="mt-6 flex justify-center">
-      <span className="h-[2px] w-24 bg-gradient-to-r from-white/0 via-white/60 to-white/0" />
+      <span className="h-0.5 w-24 bg-linear-to-r from-white/0 via-white/60 to-white/0" />
     </div>
   </div>
 );
@@ -175,7 +175,7 @@ export default function WeddingInvitationPage() {
       {/* BACKGROUND GRADIENT */}
       <div
         aria-hidden
-        className={`fixed inset-0 -z-30 bg-gradient-to-b ${THEME.primary}`}
+        className={`fixed inset-0 -z-30 bg-linear-to-b ${THEME.primary}`}
       />
 
       {/* BACKGROUND HERO CAROUSEL (blur + parallax-ish) */}
@@ -187,7 +187,7 @@ export default function WeddingInvitationPage() {
           style={{ transform: "scale(1.05)" }}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/30 to-black/70" />
       </div>
 
       {/* GLOBAL smooth scroll fallback */}
@@ -250,7 +250,7 @@ export default function WeddingInvitationPage() {
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-fuchsia-900/50 to-purple-800/80 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-linear-to-b from-purple-900/30 via-fuchsia-900/50 to-purple-800/80 backdrop-blur-sm" />
             </div>
 
             <motion.div
@@ -471,7 +471,7 @@ export default function WeddingInvitationPage() {
                 alt="Foto prewedding"
                 className="h-80 sm:h-96 w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex items-center gap-2">
                   <span className={`text-sm ${THEME.accent}`}>#AisyahZidan</span>
@@ -509,7 +509,7 @@ export default function WeddingInvitationPage() {
                     alt={p.name}
                     className="h-72 w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                 </div>
                 <div className="p-6">
                   <h3 className={`text-2xl ${playfair.className}`}>{p.name}</h3>
@@ -595,7 +595,7 @@ export default function WeddingInvitationPage() {
             <iframe
               title="Lokasi Acara"
               src="https://www.google.com/maps?q=Monas%20Jakarta&output=embed"
-              className="w-full h-[320px] md:h-[420px]"
+              className="w-full h-80 md:h-105"
               loading="lazy"
             />
           </div>
@@ -623,7 +623,7 @@ export default function WeddingInvitationPage() {
                     }`}
                 />
               ))}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
 
               {/* Controls */}
               <button
