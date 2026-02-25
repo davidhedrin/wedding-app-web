@@ -15,12 +15,20 @@ function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo)
 };
 
 function getCompressionParams(sizeKB: number) {
-  if (sizeKB >= 4096) return { quality: 50, effort: 4 };
-  if (sizeKB >= 2048) return { quality: 80, effort: 4 };
-  if (sizeKB >= 1024) return { quality: 100, effort: 3 };
-  if (sizeKB >= 500) return { quality: 140, effort: 3 };
-  // < 500 KB
-  return { quality: 165, effort: 2 };
+  // if (sizeKB >= 4000) return { quality: 55, effort: 6 };
+  // if (sizeKB >= 2000) return { quality: 65, effort: 6 };
+  // if (sizeKB >= 1000) return { quality: 75, effort: 5 };
+  // if (sizeKB >= 500)  return { quality: 85, effort: 4 };
+
+  // return { quality: 90, effort: 3 };
+
+  const quality = Math.max(55, 95 - sizeKB / 80);
+  const effort = sizeKB > 2000 ? 6 : sizeKB > 1000 ? 5 : 4;
+
+  return {
+    quality: Math.round(Math.min(95, quality)),
+    effort,
+  };
 };
 
 export async function compressImage(
@@ -119,7 +127,8 @@ export async function UploadFileCompress(
     const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
       quality,
       effort,
-      chromaSubsampling: "4:2:0"
+      chromaSubsampling: "4:2:0",
+      smartSubsample: true
     }).toBuffer();
 
     const uploadsDir = path.join(process.cwd(), loc);
@@ -175,7 +184,8 @@ export async function CloudflareUploadFile(
     const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
       quality,
       effort,
-      chromaSubsampling: "4:2:0"
+      chromaSubsampling: "4:2:0",
+      smartSubsample: true
     }).toBuffer();
 
     const randomName = stringWithTimestamp(5, true);

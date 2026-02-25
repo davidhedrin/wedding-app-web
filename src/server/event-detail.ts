@@ -263,6 +263,7 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
 
     if(uploadPromises.length === 0) return;
     const results = await Promise.all(uploadPromises);
+    console.log(results)
 
     const createData = results.map(x => ({
       event_id,
@@ -670,3 +671,20 @@ export async function DeleteDataEventRsvp(id: number) {
   }
 };
 // End Event RSVP
+
+export async function UpdateShippingAddress(event_id: number, address: string) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    await db.events.update({
+      where: { id: event_id },
+      data: {
+        wishlist_address: address
+      }
+    });
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

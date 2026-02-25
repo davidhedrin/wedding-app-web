@@ -8,7 +8,7 @@ import { CartCheckoutProps, stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
-import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
+import { EventRsvp, Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
 import { CheckVoucherById } from "./systems/voucher";
 
 // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
@@ -125,6 +125,18 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
   } catch (error: any) {
     throw new Error(error.message);
   }
+};
+
+export async function GetDataEventWithSelect({event_id, select} : {
+  event_id: number;
+  select?: Prisma.EventsSelect<DefaultArgs> | undefined;
+}) {
+  const getData = await db.events.findUnique({
+    where: { id: event_id},
+    select
+  });
+
+  return getData;
 };
 
 export async function GetDataEventByCode(code: string): Promise<Events & {
@@ -356,4 +368,20 @@ export async function CancelOrderEvent(eventId: number) {
   } catch (error: any) {
     throw new Error(error.message);
   }
-}
+};
+
+type EventRsvpWithEvent = Prisma.EventRsvpGetPayload<{
+  include: { event: true };
+}>;
+export async function GetEventRsvpData(barcode: string): Promise<EventRsvpWithEvent | null> {
+  try{
+    const getData = await db.eventRsvp.findUnique({
+      where: { barcode },
+      include: { event: true }
+    });
+
+    return getData;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};

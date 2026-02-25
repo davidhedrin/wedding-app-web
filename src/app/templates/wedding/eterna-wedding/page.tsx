@@ -4,8 +4,12 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { formatDate } from "@/lib/utils";
+import { formatDate, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSearchParams } from "next/navigation";
+import { InvitationParams } from "@/lib/model-types";
+import { useLoading } from "@/components/loading/loading-context";
+import { GetEventRsvpData } from "@/server/event";
 
 /**
  * Invitation Type: Wedding
@@ -47,8 +51,35 @@ function useLockBodyScroll(isLocked: boolean) {
 }
 
 export default function WeddingInvitationPage() {
-  const [opened, setOpened] = useState(false)
-  useLockBodyScroll(!opened)
+  const { setLoading } = useLoading();
+  const searchParams = useSearchParams();
+  const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
+
+  const openInvitation = async () => {
+    if (invtParams.code !== undefined && invtParams.code.trim() !== "") {
+      setLoading(true, "bg-stone-900", false);
+      try {
+        const findData = await GetEventRsvpData(invtParams.code);
+        if (!findData) toast({
+          type: "info",
+          title: "Unknown Invitation",
+          message: "We are sorry, your invitation was not recognized!"
+        });
+      } catch (error: any) {
+        toast({
+          type: "warning",
+          title: "Something's gone wrong",
+          message: "We can't proccess your request, Please try again"
+        });
+      }
+      setLoading(false);
+    }
+    setOpened(true);
+  };
+  //--------------------------------------------------------------------
+
+  const [opened, setOpened] = useState(false);
+  useLockBodyScroll(!opened);
 
   // Carousel (Hero)
   const [heroIndex, setHeroIndex] = useState(0);
@@ -172,10 +203,10 @@ export default function WeddingInvitationPage() {
                 </h1>
                 <p className="mt-4 text-lg text-amber-300">{formatDate(WEDDING_DATE, "full", "short")}</p>
                 <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+                <p className="font-semibold text-xl mt-1 text-white">{invtParams.name ?? "Guest"}</p>
 
                 <button
-                  onClick={() => setOpened(true)}
+                  onClick={() => openInvitation()}
                   className="mt-10 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
                 >
                   Buka Undangan

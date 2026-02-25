@@ -187,7 +187,8 @@ model Events {
   contact_phone   String?
   music_url       String?
 
-  schedule_note String?
+  schedule_note    String?
+  wishlist_address String?
 
   createdBy String?
   updatedBy String?
@@ -356,12 +357,12 @@ model EventFAQ {
 }
 
 model EventRsvp {
-  id       Int     @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   event_id Int
   name     String
   phone    String?
   rsvp     Boolean?
-  barcode  String? @unique
+  barcode  String?  @unique
 
   createdBy String?
   updatedBy String?

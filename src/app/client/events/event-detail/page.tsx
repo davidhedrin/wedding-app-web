@@ -446,7 +446,7 @@ export default function Page() {
                             type="checkbox" id="hs-xs-switch-add-ons" className="peer sr-only"
                           />
                           <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                          <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                          <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                         </label>
                         <label htmlFor="hs-xs-switch-add-ons" className="text-sm text-gray-500">WA-Invitation (IDR {Configs.priceAddOn1.toLocaleString("id-ID")})</label>
                       </div>
@@ -504,37 +504,36 @@ export default function Page() {
                 </div>
 
                 <div className="relative min-h-75 mt-6">
-                  <div className="p-1.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
-                      {/* Text Section */}
-                      <div>
-                        <div className="font-semibold text-lg">Event Details</div>
-                        <p className="text-gray-500 text-sm">
-                          Customize and manage your event detail design. Choose the section tab information to modify your event.
-                        </p>
-                      </div>
-
-                      {/* Preview Button */}
-                      <a href={`/${dataEvent.template.url}`} target='_blank' className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
-                        Preview
-                      </a>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+                    {/* Text Section */}
+                    <div>
+                      <div className="font-semibold text-lg">Event Details</div>
+                      <p className="text-gray-500 text-sm">
+                        Customize and manage your event detail design. Choose the section tab information to modify your event.
+                      </p>
                     </div>
 
-                    <hr className="my-3 text-gray-300" />
+                    {/* Preview Button */}
+                    <a href={`/${dataEvent.template.url}`} target='_blank' className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                      Preview
+                    </a>
+                  </div>
 
-                    <div className="w-full">
-                      {
-                        (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") &&
-                        <div className="flex flex-col sm:flex-row ">
-                          <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
-                            <TabListWraper event_type={dataEvent.tmp_ctg_key} />
-                          </div>
+                  <hr className="my-3 text-gray-300" />
 
-                          <div className="w-full sm:border-s border-gray-200 sm:ps-4 pt-3 sm:pt-0">
-                            <TabContentWraper dataEvent={dataEvent} url={dataEvent.template.url} />
-                          </div>
+                  <div className="w-full">
+                    {
+                      (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") &&
+                      <div className="flex flex-col sm:flex-row ">
+                        <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
+                          <TabListWraper event_type={dataEvent.tmp_ctg_key} />
+                        </div>
 
-                          {/* <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
+                        <div className="w-full sm:border-s border-gray-200 sm:ps-4 pt-3 sm:pt-0">
+                          <TabContentWraper dataEvent={dataEvent} url={dataEvent.template.url} />
+                        </div>
+
+                        {/* <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
                             <nav className="flex flex-wrap justify-center sm:flex-col gap-2" aria-label="Tabs" role="tablist" aria-orientation="vertical">
                               <button type="button" id="main-info-item" aria-selected="true" data-hs-tab="#main-info-tab" aria-controls="main-info-tab" className="hs-tab-active:border-blue-500 hs-tab-active:text-blue-600 py-2 pe-3 inline-flex items-center gap-x-2 border-b-2 sm:border-b-0 sm:border-e-2 border-transparent text-sm text-gray-500 hover:text-blue-600 focus:outline-hidden active" role="tab">
                                 <i className="bx bx-info-circle text-lg"></i>
@@ -602,10 +601,8 @@ export default function Page() {
                               <p className="text-gray-500 text-sm">This is the <em className="font-semibold text-gray-800">FAQ</em> tab body.</p>
                             </div>
                           </div> */}
-                        </div>
-                      }
-                    </div>
-
+                      </div>
+                    }
                   </div>
 
                   {/* Overlay blur + terkunci */}

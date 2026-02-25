@@ -77,3 +77,8 @@ export type PaymentMethodProps = {
   icon: string;
   status: boolean;
 };
+
+export type InvitationParams = {
+  name?: number;
+  code?: string;
+};

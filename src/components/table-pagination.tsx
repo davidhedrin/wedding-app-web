@@ -56,7 +56,7 @@ export default function TablePagination({
       {
         perPage !== undefined && <div className="flex-1 text-sm flex">
           <div className="items-center gap-2 flex">
-            <span className="text-sm text-muted">
+            <span className="text-sm text-muted hidden md:block">
               Show
             </span>
             <div>
@@ -70,7 +70,7 @@ export default function TablePagination({
                 ))}
               </select>
             </div>
-            <span className="hidden text-sm lg:block text-muted">
+            <span className="hidden text-sm md:block text-muted">
               rows of {totalCount} entries
             </span>
           </div>

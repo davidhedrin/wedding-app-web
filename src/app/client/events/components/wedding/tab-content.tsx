@@ -16,8 +16,9 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule } from "@/server/event-detail";
+import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
+import { GetDataEventWithSelect } from "@/server/event";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -30,7 +31,7 @@ export default function TabContentWedding({ dataEvent, url }: { dataEvent: Event
     { id: "scheduler", content: SchedulerTabContent({ dataEvent }) },
     { id: "gallery", content: GalleryTabContent(dataEvent.id) },
     { id: "history", content: HistoryTabContent(dataEvent.id) },
-    { id: "gift", content: GiftTabContent(dataEvent.id) },
+    { id: "gift", content: GiftTabContent({ dataEvent }) },
     { id: "rsvp", content: RSVPTabContent({ event_id: dataEvent.id, url }) },
     { id: "faq", content: FAQTabContent(dataEvent.id) },
   ];
@@ -901,6 +902,13 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
       };
     });
 
+    const getSchadule = await GetDataEventWithSelect({
+      event_id: dataEvent.id, select: {
+        schedule_note: true
+      }
+    });
+    setScheduleNote(getSchadule ? getSchadule.schedule_note ?? "" : "");
+
     if (isLoading) setLoading(false);
   };
 
@@ -1041,7 +1049,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                   type="checkbox" id="hs-xs-switch-tr-ceremony" className="peer sr-only"
                 />
                 <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
               </label>
             </div>
           </div>
@@ -1106,7 +1114,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                           }}
                           type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
                         <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                        <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                        <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                       </label>
                       <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
                     </div>
@@ -1244,7 +1252,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       <label htmlFor={`hs-xs-switch-loc-cst-${i}`} className="relative inline-block w-9 h-5 cursor-pointer">
                         <input type="checkbox" id={`hs-xs-switch-loc-cst-${i}`} className="peer sr-only" />
                         <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                        <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                        <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                       </label>
                       <label htmlFor={`hs-xs-switch-loc-cst-${i}`} className="text-sm text-gray-500">Use Marriage Blessing Location</label>
                     </div>
@@ -1991,7 +1999,7 @@ function HistoryTabContent(event_id: number) {
       />
 
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
@@ -2088,11 +2096,15 @@ function HistoryTabContent(event_id: number) {
   )
 };
 
-function GiftTabContent(event_id: number) {
+function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
   const { setLoading } = useLoading();
   const { activeIdxTab } = useTabEventDetail();
   const modalAddEdit = "modal-add-edit-gift-wedding";
   const btnCloseModal = "btn-close-modal-gift-wedding";
+
+  const modalWishlistAddress = "modal-add-edit-wishlist-address";
+  const btnCloseModalWishlistAddress = "btn-close-modal-wishlist-address";
+
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
   const [stateFormGift, setStateFormGift] = useState<FormState>({ success: false, errors: {} });
@@ -2112,6 +2124,10 @@ function GiftTabContent(event_id: number) {
   const [productPrice, setProductPrice] = useState("");
   // End For Wishlist Gift
 
+  const [stateFormShippingAddress, setStateFormShippingAddress] = useState<FormState>({ success: false, errors: {} });
+  const [shippingAddress, setShippingAddress] = useState<string>(dataEvent.wishlist_address ?? "");
+  const [isHaveShippingAdd, setIsHaveShippingAdd] = useState<boolean>(dataEvent.wishlist_address != null ? true : false);
+
   const createDtoData = (): DtoEventGift => {
     const data = {
       id: addEditId,
@@ -2130,6 +2146,17 @@ function GiftTabContent(event_id: number) {
   };
 
   const openModalAddEdit = async (type: EventGiftTypeEnum, id?: number) => {
+    if (type === "Wishlist") {
+      if (isHaveShippingAdd === false) {
+        toast({
+          type: "warning",
+          title: "Shipping Address Needed!",
+          message: "Please enter the shipping address before adding wishlist."
+        });
+        return;
+      }
+    }
+
     setGiftType(type);
 
     setTfMethod("");
@@ -2164,6 +2191,74 @@ function GiftTabContent(event_id: number) {
 
     setStateFormGift({ success: true, errors: {} });
     modalAction(`btn-${modalAddEdit}`);
+  };
+
+  const openModalWishlistAddress = async () => {
+    setStateFormShippingAddress({ success: true, errors: {} });
+    setShippingAddress("");
+    setLoading(true);
+    const getSchadule = await GetDataEventWithSelect({
+      event_id: dataEvent.id, select: {
+        wishlist_address: true
+      }
+    });
+    setShippingAddress(getSchadule ? getSchadule.wishlist_address ?? "" : "");
+    setIsHaveShippingAdd(getSchadule ? getSchadule.wishlist_address != null ? true : false : false);
+    setLoading(false);
+
+    modalAction(`btn-${modalWishlistAddress}`);
+  };
+
+  const FormSchemaWishlistAddress = z.object({
+    shipping_address: z.string().min(1, { message: 'Address is required field.' }).trim(),
+  });
+  const handleSubmitFormWishlistAddress = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = Object.fromEntries(formData);
+    const valResult = FormSchemaWishlistAddress.safeParse(data);
+    if (!valResult.success) {
+      setStateFormShippingAddress({
+        success: false,
+        errors: valResult.error.flatten().fieldErrors,
+      });
+      return;
+    };
+    setStateFormShippingAddress({ success: true, errors: {} });
+
+    modalAction(btnCloseModalWishlistAddress);
+    const confirmed = await showConfirm({
+      title: 'Submit Confirmation?',
+      message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+      confirmText: 'Yes, Submit',
+      cancelText: 'No, Go Back',
+      icon: 'bx bx-error bx-tada text-blue-500'
+    });
+    if (!confirmed) {
+      modalAction(`btn-${modalWishlistAddress}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await UpdateShippingAddress(dataEvent.id, shippingAddress.trim());
+      setIsHaveShippingAdd(true);
+      toast({
+        type: "success",
+        title: "Submit successfully",
+        message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+      modalAction(`btn-${modalWishlistAddress}`);
+    }
+    setLoading(false);
   };
 
   const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -2212,7 +2307,7 @@ function GiftTabContent(event_id: number) {
     setLoading(true);
     try {
       const createDto = createDtoData();
-      await StoreUpdateGift(event_id, createDto);
+      await StoreUpdateGift(dataEvent.id, createDto);
 
       if (createDto.type === EventGiftTypeEnum.Transfer) await fatchDatasTf();
       else if (createDto.type === EventGiftTypeEnum.Wishlist) await fatchDatasWs();
@@ -2254,7 +2349,7 @@ function GiftTabContent(event_id: number) {
     const orderObj = sortListToOrderBy(tblSortListTf);
 
     try {
-      const result = await GetDataEventGifts(event_id, {
+      const result = await GetDataEventGifts(dataEvent.id, {
         curPage: page,
         perPage: countPage,
         where: {
@@ -2321,7 +2416,7 @@ function GiftTabContent(event_id: number) {
     const orderObj = sortListToOrderBy(tblSortListWs);
 
     try {
-      const result = await GetDataEventGifts(event_id, {
+      const result = await GetDataEventGifts(dataEvent.id, {
         curPage: page,
         perPage: countPage,
         where: {
@@ -2345,6 +2440,14 @@ function GiftTabContent(event_id: number) {
       setInputPageWs(result.meta.page.toString());
 
       setDatasWs(result.data);
+
+      const getSchadule = await GetDataEventWithSelect({
+        event_id: dataEvent.id, select: {
+          wishlist_address: true
+        }
+      });
+      setShippingAddress(getSchadule ? getSchadule.wishlist_address ?? "" : "");
+      setIsHaveShippingAdd(getSchadule ? getSchadule.wishlist_address != null ? true : false : false);
     } catch (error: any) {
       toast({
         type: "warning",
@@ -2419,7 +2522,6 @@ function GiftTabContent(event_id: number) {
         <p className="text-sm text-gray-500">
           Add and manage gift options or bank account details that will be displayed on your wedding invitation.
         </p>
-        <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
@@ -2514,21 +2616,29 @@ function GiftTabContent(event_id: number) {
               <i className="bx bx-gift text-xl text-pink-600"></i>
               Wishlist Gift
             </div>
-            <p className="text-sm text-gray-500 max-w-md">
-              Create a wishlist of gifts that guests can choose from.
+            <p className="text-sm text-gray-500 max-w-lg">
+              Create a wishlist of gifts that guests can choose from. And don't forgot to enter your shipping address
             </p>
           </div>
 
-          <button
-            onClick={() => openModalAddEdit(EventGiftTypeEnum.Wishlist)}
-            type="button"
-            className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 focus:outline-none focus:bg-pink-200 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            <i className="bx bx-plus text-lg"></i>
-            Add Wishlist
-          </button>
+          <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+            <button
+              onClick={() => openModalWishlistAddress()}
+              type="button"
+              className={`w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg ${isHaveShippingAdd ? "bg-green-100 text-green-800 hover:bg-green-200 focus:bg-green-200" : "bg-gray-100 text-gray-800 hover:bg-gray-200 focus:bg-gray-200"} focus:outline-none disabled:opacity-50 disabled:pointer-events-none`}
+            >
+              Shipping Address
+            </button>
+            <button
+              onClick={() => openModalAddEdit(EventGiftTypeEnum.Wishlist)}
+              type="button"
+              className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center gap-1 text-sm font-medium rounded-lg bg-pink-100 text-pink-800 hover:bg-pink-200 focus:outline-none focus:bg-pink-200 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <i className="bx bx-plus text-lg"></i>
+              Add Wishlist
+            </button>
+          </div>
         </div>
-
 
         <TableTopToolbar
           inputSearch={inputSearchWs}
@@ -2598,8 +2708,9 @@ function GiftTabContent(event_id: number) {
         />
       </div>
 
+      <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
@@ -2687,6 +2798,45 @@ function GiftTabContent(event_id: number) {
                 </div>
                 <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
                   <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalAddEdit}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </UiPortal>
+
+      <button id={`btn-${modalWishlistAddress}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalWishlistAddress} data-hs-overlay={`#${modalWishlistAddress}`} className="hidden">-</button>
+      <UiPortal>
+        <div id={modalWishlistAddress} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-sm hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitFormWishlistAddress} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    Shipping Address Form
+                  </div>
+                  <p className='text-xs text-muted'>Form entry shipping address for wishlist gift</p>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalWishlistAddress}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <Textarea value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} id="shipping_address" placeholder="Enter the shipping address" rows={3} />
+                {stateFormShippingAddress.errors?.shipping_address && <ZodErrors err={stateFormShippingAddress.errors?.shipping_address} />}
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModalWishlistAddress} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalWishlistAddress}`}>
                     Close
                   </button>
                   <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
@@ -2951,13 +3101,13 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
                             {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
                             {
-                              'rsvp' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.rsvp != null && (data.rsvp === true ? "text-green-600" : "text-red-600")} font-semibold`}>
-                                {data.rsvp != null ? data.rsvp === true ? "Present" : "Absent" : "-"}
+                              'rsvp' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.rsvp != null && (data.rsvp === true ? "text-green-600" : "text-red-600")} ${data.rsvp == null && "italic text-gray-800"}`}>
+                                {data.rsvp != null ? data.rsvp === true ? "Present" : "Absent" : "Not Respon"}
                               </td>
                             }
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                               <span onClick={() => {
-                                const craateUrl = `${Configs.base_url}/${url}?id=${data.event_id}&code=${data.barcode}`;
+                                const craateUrl = `${Configs.base_url}/${url}?name=${data.name}&code=${data.barcode}`;
                                 copyToClipboard(craateUrl);
                                 toast({
                                   type: "success",
@@ -3012,7 +3162,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         -
       </button>
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-sm hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
@@ -3360,7 +3510,7 @@ function FAQTabContent(event_id: number) {
       />
 
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
