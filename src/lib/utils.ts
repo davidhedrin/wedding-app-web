@@ -11,6 +11,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 };
 
+export const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+export async function ExecuteMinimumDelay<T>(
+  promise: Promise<T>,
+  ms: number
+): Promise<T> {
+  const [result] = await Promise.all([
+    promise,
+    delay(ms),
+  ]);
+
+  return result;
+};
+
 export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: StatusType }> = {
   PENDING: {
     name: "Pending",
@@ -336,3 +350,12 @@ export function getMonthName(
     month: format,
   });
 };
+
+export function CombineDateAndTime(date: Date, time: string): Date {
+  const [hours, minutes] = time.split(":").map(Number);
+
+  const result = new Date(date); // clone
+  result.setHours(hours, minutes, 0, 0);
+
+  return result;
+}

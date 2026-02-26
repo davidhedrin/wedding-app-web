@@ -4,12 +4,13 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { formatDate, toast } from "@/lib/utils";
+import { delay, ExecuteMinimumDelay, formatDate, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
-import { InvitationParams } from "@/lib/model-types";
+import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
 import { useLoading } from "@/components/loading/loading-context";
-import { GetEventRsvpData } from "@/server/event";
+import { GetSplashScreenEventData } from "@/server/event";
+import LoadingUI from "@/components/loading/loading-ui";
 
 /**
  * Invitation Type: Wedding
@@ -51,31 +52,47 @@ function useLockBodyScroll(isLocked: boolean) {
 }
 
 export default function WeddingInvitationPage() {
-  const { setLoading } = useLoading();
+  const [isLoading, setIsloading] = useState(true);
   const searchParams = useSearchParams();
   const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
+  const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
+  const [groom, setGroom] = useState<GroomBrideProps | null>(null);
+  const [bride, setBride] = useState<GroomBrideProps | null>(null);
 
-  const openInvitation = async () => {
-    if (invtParams.code !== undefined && invtParams.code.trim() !== "") {
-      setLoading(true, "bg-stone-900", false);
-      try {
-        const findData = await GetEventRsvpData(invtParams.code);
-        if (!findData) toast({
-          type: "info",
-          title: "Unknown Invitation",
-          message: "We are sorry, your invitation was not recognized!"
-        });
-      } catch (error: any) {
-        toast({
-          type: "warning",
-          title: "Something's gone wrong",
-          message: "We can't proccess your request, Please try again"
-        });
+  useEffect(() => {
+    const delayMs = 2000;
+    const fatchData = async () => {
+      if (invtParams.code !== undefined && invtParams.code.trim() !== "") {
+        try {
+          const findData = await ExecuteMinimumDelay(
+            GetSplashScreenEventData(invtParams.code),
+            delayMs
+          );
+
+          if(findData){
+            setEventDatas(findData);
+            const groomData = findData.gb_info.find(x => x.type === "Groom");
+            const brideData = findData.gb_info.find(x => x.type === "Bride");
+            setGroom(groomData ?? null);
+            setBride(brideData ?? null);
+          }
+        } catch (error: any) {
+          await delay(delayMs);
+          toast({
+            type: "warning",
+            title: "Unknown Invitation",
+            message: error?.message ?? "We are sorry, your invitation was not recognized!"
+          });
+        }
+      } else {
+        await delay(delayMs);
       }
-      setLoading(false);
-    }
-    setOpened(true);
-  };
+
+      setIsloading(false);
+    };
+
+    fatchData();
+  }, []);
   //--------------------------------------------------------------------
 
   const [opened, setOpened] = useState(false);
@@ -91,7 +108,7 @@ export default function WeddingInvitationPage() {
   }, []);
 
   // Countdown
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(eventDatas?.event_time ?? WEDDING_DATE);
 
   // Smooth scroll + Active section (scroll spy)
   const sectionOrder: { id: SectionKey; label: string }[] = [
@@ -171,6 +188,8 @@ export default function WeddingInvitationPage() {
     }
   };
 
+  if (isLoading) return <LoadingUI className="bg-stone-900" activeTitle={false} />
+
   return (
     <main className="scroll-smooth bg-fixed bg-cover bg-center" style={{ backgroundImage: `url(${bgImage.src})` }}>
       {/* Overlay theme */}
@@ -180,7 +199,7 @@ export default function WeddingInvitationPage() {
             <motion.div
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+              className="fixed inset-0 z-98 flex items-center justify-center text-center px-6"
             >
               <div className="absolute inset-0">
                 <img
@@ -195,18 +214,18 @@ export default function WeddingInvitationPage() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 1 }}
-                className="relative z-10 space-y-4"
+                className="relative z-10 space-y-5"
               >
                 <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
                 <h1 className="mt-4 font-serif text-4xl md:text-6xl leading-tight">
-                  Aisyah & Bagas
+                  {groom?.shortname ?? "Aisyah"} & {bride?.shortname ?? "Bagas"}
                 </h1>
-                <p className="mt-4 text-lg text-amber-300">{formatDate(WEDDING_DATE, "full", "short")}</p>
+                <p className="mt-4 text-lg text-amber-300">{formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}</p>
                 <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <p className="font-semibold text-xl mt-1 text-white">{invtParams.name ?? "Guest"}</p>
+                <p className="font-semibold text-xl mt-1 text-white">{eventDatas?.event_rsvp.name ?? "Guest"}</p>
 
                 <button
-                  onClick={() => openInvitation()}
+                  onClick={() => setOpened(true)}
                   className="mt-10 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
                 >
                   Buka Undangan
@@ -229,7 +248,7 @@ export default function WeddingInvitationPage() {
                 }}
                 className="font-serif tracking-wide text-xl md:text-2xl"
               >
-                A & B
+                {groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "B"}
               </a>
               <ul className="hidden md:flex items-center gap-2">
                 {sectionOrder.map(({ id, label }) => (
@@ -288,10 +307,10 @@ export default function WeddingInvitationPage() {
               Undangan Pernikahan
             </p>
             <h1 className="mt-4 font-serif text-4xl md:text-6xl leading-tight">
-              Aisyah & Bagas
+              {groom?.shortname ?? "Aisyah"} & {bride?.shortname ?? "Bagas"}
             </h1>
             <p className="mt-3 text-stone-300">
-              {formatDate(WEDDING_DATE, "full", "short")}
+              {formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full", "short")}
             </p>
 
             {/* Countdown */}

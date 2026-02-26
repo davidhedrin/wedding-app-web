@@ -13,7 +13,7 @@ export default function MainHeader() {
       <nav className="px-4 sm:px-5.5 flex basis-full items-center w-full mx-auto">
         <div className="w-full flex items-center gap-x-1.5">
           <ul className="flex items-center gap-1.5">
-            <li className="inline-flex items-center relative gap-6 pe-1.5 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
+            <li className="inline-flex items-center relative gap-6 pe-1.5 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:inset-e-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
               <a href="/" onClick={() => smartLink("/")}>
                 <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-auto w-28" />
               </a>
@@ -26,13 +26,13 @@ export default function MainHeader() {
           </ul>
 
           <ul className="flex flex-row items-center gap-x-3 ms-auto">
-            <li className="hidden lg:inline-flex items-center gap-1.5 relative text-gray-500 pe-3 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
+            <li className="hidden lg:inline-flex items-center gap-1.5 relative text-gray-500 pe-3 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:inset-e-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
               <a className="flex items-center gap-x-1.5 py-1.5 px-2 text-sm text-gray-800 rounded-lg hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200" href="#">
                 {userData ? userData.user?.email : "-"}
               </a>
             </li>
 
-            <li className="inline-flex items-center gap-1.5 relative text-gray-500 pe-3 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:end-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
+            <li className="inline-flex items-center gap-1.5 relative text-gray-500 pe-3 last:pe-0 last:after:hidden after:absolute after:top-1/2 after:inset-e-0 after:inline-block after:w-px after:h-3.5 after:bg-gray-300 after:rounded-full after:-translate-y-1/2 after:rotate-12">
               <div className="h-8">
                 <div className="hs-dropdown inline-flex [--strategy:absolute] [--auto-close:inside] [--placement:bottom-right] relative text-start">
                   <button id="hs-dnad" type="button" className="cursor-pointer p-0.5 inline-flex shrink-0 items-center gap-x-3 text-start rounded-full hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">

@@ -3107,7 +3107,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             }
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                               <span onClick={() => {
-                                const craateUrl = `${Configs.base_url}/${url}?name=${data.name}&code=${data.barcode}`;
+                                const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
                                 copyToClipboard(craateUrl);
                                 toast({
                                   type: "success",

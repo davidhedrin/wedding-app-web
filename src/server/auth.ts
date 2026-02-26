@@ -82,7 +82,7 @@ export async function signUpAction(formData: DtoSignUp) {
     });
     if (uniqueErr) throw new Error(uniqueErr);
     
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -97,7 +97,7 @@ export async function checkTokenEmail(token: string) {
 
     if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -132,7 +132,7 @@ export async function emailVerify(formData: DtoOtpVerify) {
       });
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -169,7 +169,7 @@ export async function resendEmailVerify(token: string) {
 
     await EmailVerification(findUser.email, token, otpCode);
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -185,7 +185,7 @@ export async function checkTokenResetPass(token: string) {
 
     if(!findData) throw new Error("Looks like something wrong with your url. The token may be incorrect or no longer valid.");
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -224,6 +224,6 @@ export async function resetPassword(formData: DtoResetPassword) {
       });
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };

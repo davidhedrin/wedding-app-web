@@ -129,7 +129,7 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     });
 
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -167,7 +167,7 @@ export async function DeleteDataTemplates(id: number) {
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 

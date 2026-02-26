@@ -36,7 +36,7 @@ export async function EmailVerification(email: string, token: string, otpCode: s
     });
   } catch (error: any) {
     console.log("😡Email2:", error);
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -101,6 +101,6 @@ export async function EmailForgotPassword(email: string) {
     });
   } catch (error: any) {
     console.log("😡Email2:", error);
-    throw new Error(error.message);
+    throw error;
   }
 };

@@ -1,14 +1,14 @@
 "use server";
 
-import { CommonParams, PaginateResult } from "@/lib/model-types";
+import { CommonParams, EventInitProps, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
-import { CartCheckoutProps, stringWithTimestamp } from "@/lib/utils";
+import { CartCheckoutProps, CombineDateAndTime, stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
-import { EventRsvp, Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
+import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
 import { CheckVoucherById } from "./systems/voucher";
 
 // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
@@ -46,50 +46,6 @@ export async function GetDataEvents(params: GetDataEventsParams): Promise<Pagina
       totalPages: Math.ceil(total/perPage)
     }
   };
-  
-  // const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
-  // const skip = (curPage - 1) * perPage;
-
-  // const finalSelect: Prisma.EventsSelect = {
-  //   ...(select || {}),
-  // };
-
-  // if (select?.template) {
-  //   const userTemplateSelect =
-  //     typeof select.template === "object" && "select" in select.template ? select.template.select : {};
-
-  //   finalSelect.template = {
-  //     select: {
-  //       ...userTemplateSelect,
-  //       captures: {
-  //         take: 1,
-  //         orderBy: { index: "asc" },
-  //         select: { file_path: true },
-  //       },
-  //     },
-  //   };
-  // }
-
-  // const [data, total] = await Promise.all([
-  //   db.events.findMany({
-  //     skip,
-  //     take: perPage,
-  //     where,
-  //     orderBy,
-  //     select: finalSelect,
-  //   }),
-  //   db.events.count({ where }),
-  // ]);
-
-  // return {
-  //   data,
-  //   meta: {
-  //     page: curPage,
-  //     limit: perPage,
-  //     total,
-  //     totalPages: Math.ceil(total / perPage),
-  //   },
-  // };
 };
 
 export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string | null> {
@@ -123,7 +79,7 @@ export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string
 
     return action.tmp_code;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -166,7 +122,7 @@ export async function GetDataEventByCode(code: string): Promise<Events & {
     });
     return getData;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -205,7 +161,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
         user: true
       }
     });
-    if(!getDataEvent) throw new Error("Event data not found!");
+    if(!getDataEvent) throw new Error("Event data was not found!");
 
     const findIsTr = await db.tr.findFirst({
       where: {
@@ -342,7 +298,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
 
     return transDb;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -366,22 +322,164 @@ export async function CancelOrderEvent(eventId: number) {
 
     await db.events.delete({ where: { id: eventId } });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
-type EventRsvpWithEvent = Prisma.EventRsvpGetPayload<{
-  include: { event: true };
-}>;
-export async function GetEventRsvpData(barcode: string): Promise<EventRsvpWithEvent | null> {
-  try{
-    const getData = await db.eventRsvp.findUnique({
+export async function GetSplashScreenEventData(barcode: string): Promise<EventInitProps | null> {
+  try {
+    const data = await db.eventRsvp.findUnique({
       where: { barcode },
-      include: { event: true }
+      select: {
+        event_id: true,
+        name: true,
+        phone: true,
+        rsvp: true,
+      }
     });
+    if (!data) throw new Error("Invitation was not recognized!");
 
-    return getData;
-  } catch (error: any) {
-    throw new Error(error.message);
+    const findEvent = await db.events.findUnique({
+      where: { id: data.event_id },
+      select: {
+        tmp_ctg_key: true,
+
+        greeting_msg: true,
+        couple_img_name: true,
+        couple_img_path: true,
+        contact_email: true,
+        contact_phone: true,
+        music_url: true,
+        schedule_note: true,
+        wishlist_address: true,
+
+        gb_info: {
+          select: {
+            type: true,
+            fullname: true,
+            shortname: true,
+            birth_place: true,
+            birth_date: true,
+            birth_order: true,
+            father_name: true,
+            mother_name: true,
+            place_origin: true,
+            occupation: true,
+            personal_msg: true,
+            img_name: true,
+            img_path: true,
+          }
+        },
+        schedule_info: {
+          select: {
+            type: true,
+            date: true,
+            start_time: true,
+            end_time: true,
+            location: true,
+            address: true,
+            latitude: true,
+            longitude: true,
+            notes: true,
+            ceremony_type: true,
+            use_main_loc: true,
+          }
+        },
+        event_galleries: {
+          select: {
+            img_name: true,
+            img_path: true,
+          }
+        },
+        event_histories: {
+          select: {
+            name: true,
+            month: true,
+            year: true,
+            desc: true,
+            gallery: {
+              select: {
+                img_path: true,
+              }
+            }
+          }
+        },
+        event_gifts: {
+          select: {
+            type: true,
+            name: true,
+            account: true,
+            no_rek: true,
+            qty: true,
+            product_url: true,
+            product_price: true,
+            reserve_qty: true,
+          }
+        },
+        event_faq: {
+          select: {
+            question: true,
+            answer: true,
+          }
+        }
+      }
+    });
+    if (!findEvent) throw new Error("Event data was not found!");
+
+    const { tmp_ctg_key, ...eventWithoutType } = findEvent;
+
+    if (findEvent.tmp_ctg_key === "wed") {
+      const eventDate = findEvent.schedule_info.find(x => x.type === "WED_MB");
+      const eventTime = CombineDateAndTime(eventDate?.date ?? new Date(), eventDate?.start_time ?? "00:00");
+
+      return { ...eventWithoutType, event_time: eventTime, event_rsvp: { ...data } };
+    }
+
+    return null;
+    //return {...findEvent, event_rsvp: {...data}};
+    // if (!data) throw new Error("Invitation was not recognized!");
+    // if (!data.event) throw new Error("Event data was not found!");
+
+    // const event = data.event;
+    // if (event.tmp_ctg_key === "wed") {
+    //   const eventDate = event.schedule_info.find(x => x.type === "WED_MB");
+    //   const gbInfo = await db.groomBrideInfo.findMany({
+    //     where: {
+    //       event_id: event.id,
+    //     },
+    //     select: {
+    //       type: true,
+    //       shortname: true,
+    //     },
+    //   });
+
+    //   const groom = gbInfo.find(x => x.type === "Groom");
+    //   const bride = gbInfo.find(x => x.type === "Bride");
+    //   const eventTime = CombineDateAndTime(eventDate?.date ?? new Date(), eventDate?.start_time ?? "00:00");
+    // }
+
+    
+  // guest_name: string;
+  // event_time: Date | undefined;
+  // own_name1: string;
+  // own_name2?: string;
+  } catch (error) {
+    throw error;
   }
-};
+}
+
+// type EventRsvpWithEvent = Prisma.EventRsvpGetPayload<{
+//   include: { event: true };
+// }>;
+// export async function GetEventRsvpData(barcode: string): Promise<EventRsvpWithEvent | null> {
+//   try{
+//     const getData = await db.eventRsvp.findUnique({
+//       where: { barcode },
+//       include: { event: true }
+//     });
+
+//     return getData;
+//   } catch (error: any) {
+//     throw error;
+//   }
+// };

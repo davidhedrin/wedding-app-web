@@ -19,7 +19,8 @@ import React, {
 
 const IMAGE_URL = 'http://localhost:3005/assets/img/2149043983.jpg'
 
-const WEDDING_DATE = new Date('2026-06-20T09:00:00')
+const WEDDING_DATE = new Date();
+WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 /* -------------------------------------------------------------------------- */
 /*                               TYPE DEFINITIONS                              */

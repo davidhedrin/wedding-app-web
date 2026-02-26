@@ -90,7 +90,7 @@ export async function UpdateDataUser(formData: DtoUser) {
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -120,6 +120,6 @@ export async function DeleteDataUser(id: number) {
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };

@@ -52,7 +52,7 @@ export default function Page() {
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   // Countdown
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE);
 
   // Hero background carousel
   const heroImages = useMemo(
@@ -173,7 +173,7 @@ export default function Page() {
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-9999 flex items-center justify-center text-center px-6"
+            className="fixed inset-0 z-98 flex items-center justify-center text-center px-6"
           >
             <div className="absolute inset-0">
               <img

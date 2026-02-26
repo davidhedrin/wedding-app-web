@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function useCountdown(targetDate: string) {
+export default function useCountdown(targetDate: Date) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -14,14 +14,12 @@ export default function useCountdown(targetDate: string) {
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date();
-      const target = new Date(targetDate);
-      const diff = target.getTime() - now.getTime();
+      const diff = targetDate.getTime() - now.getTime();
 
-      // cek apakah hari ini
       const isSameDay =
-        now.getFullYear() === target.getFullYear() &&
-        now.getMonth() === target.getMonth() &&
-        now.getDate() === target.getDate();
+        now.getFullYear() === targetDate.getFullYear() &&
+        now.getMonth() === targetDate.getMonth() &&
+        now.getDate() === targetDate.getDate();
 
       if (diff <= 0) {
         setTimeLeft({
@@ -50,11 +48,10 @@ export default function useCountdown(targetDate: string) {
       });
     };
 
-    updateCountdown(); // langsung hitung saat mount
+    updateCountdown(); // hitung langsung
     const timer = setInterval(updateCountdown, 1000);
-
     return () => clearInterval(timer);
   }, [targetDate]);
 
   return timeLeft;
-};
+}

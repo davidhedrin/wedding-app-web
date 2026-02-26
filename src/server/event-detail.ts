@@ -63,7 +63,7 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
       await Promise.all(tasksGroomBride);
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -233,7 +233,7 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
       });
     }
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Schedule Info
@@ -273,7 +273,7 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
     }));
     await db.eventGalleries.createMany({data: createData});
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -323,7 +323,7 @@ export async function DeleteEventGalleryById(event_id: number, gallery_id: numbe
       where: { id: gallery_id, event_id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Event Galleries
@@ -400,7 +400,7 @@ export async function StoreUpdateHistory(event_id: number, formData: DtoEventHis
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -414,7 +414,7 @@ export async function DeleteDataEventHistories(id: number) {
       where: { id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Event Histories
@@ -490,7 +490,7 @@ export async function StoreUpdateGift(event_id: number, formData: DtoEventGift) 
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -504,7 +504,7 @@ export async function DeleteDataEventGifts(id: number) {
       where: { id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Event Gifts
@@ -571,7 +571,7 @@ export async function StoreUpdateEventFAQ(event_id: number, formData: DtoEventFA
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -585,7 +585,7 @@ export async function DeleteDataEventFAQ(id: number) {
       where: { id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Event FAQ
@@ -646,7 +646,7 @@ export async function StoreUpdateEventRSVP(event_id: number, formData: DtoEventR
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -667,7 +667,7 @@ export async function DeleteDataEventRsvp(id: number) {
       where: { id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 // End Event RSVP
@@ -685,6 +685,6 @@ export async function UpdateShippingAddress(event_id: number, address: string) {
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };

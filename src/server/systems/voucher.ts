@@ -73,7 +73,7 @@ export async function StoreUpdateDataVouchers(formData: DtoVouchers) {
       }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -94,7 +94,7 @@ export async function DeleteDataVouchers(id: number) {
       where: { id }
     });
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -116,7 +116,7 @@ export async function CheckVoucherCode(code:string): Promise<Vouchers | null> {
 
     return voucher;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
 
@@ -138,6 +138,6 @@ export async function CheckVoucherById(id:number): Promise<Vouchers | null> {
 
     return voucher;
   } catch (error: any) {
-    throw new Error(error.message);
+    throw error;
   }
 };
