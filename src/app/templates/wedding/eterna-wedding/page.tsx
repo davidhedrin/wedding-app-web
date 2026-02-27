@@ -4,7 +4,7 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { CombineDateAndTime, delay, ExecuteMinimumDelay, formatDate, toast } from "@/lib/utils";
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, formatDate, getMonthName, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
@@ -185,8 +185,10 @@ export default function WeddingInvitationPage() {
 
   // Gallery slider
   const [gIndex, setGIndex] = useState(0);
-  const slideTo = (idx: number) =>
-    setGIndex(((idx % GALLERY.length) + GALLERY.length) % GALLERY.length);
+  const slideTo = (idx: number) => {
+    const length = eventDatas ? eventDatas.event_galleries.length : GALLERY.length;
+    return setGIndex(((idx % length) + length) % length)
+  };
 
   // RSVP form (dummy handler)
   const [sending, setSending] = useState(false);
@@ -313,19 +315,6 @@ export default function WeddingInvitationPage() {
 
         {/* Hero */}
         <section className="relative min-h-[80vh] flex items-center justify-center">
-          {/* Background carousel */}
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            {IMAGES.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt="Background"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ease-out ${i === heroIndex ? "opacity-100" : "opacity-0"}`}
-              />
-            ))}
-            <div className="absolute inset-0 bg-linear-to-b from-stone-950/40 via-stone-950/70 to-stone-950"></div>
-          </div>
-
           {/* Content */}
           <div className="max-w-4xl mx-auto px-6 text-center">
             <p className="uppercase tracking-[0.3em] text-xs md:text-sm text-stone-300">
@@ -540,45 +529,85 @@ export default function WeddingInvitationPage() {
           sectionsRef={sectionsRef}
         >
           <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5">
-            <div className="relative aspect-video">
-              {/* Slides */}
-              {GALLERY.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`Foto ${i + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === gIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                />
-              ))}
-              {/* Controls */}
-              <button
-                onClick={() => slideTo(gIndex - 1)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                aria-label="Sebelumnya"
-              >
-                <ChevronLeftIcon />
-              </button>
-              <button
-                onClick={() => slideTo(gIndex + 1)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                aria-label="Berikutnya"
-              >
-                <ChevronRightIcon />
-              </button>
-              {/* Dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {GALLERY.map((_, i) => (
-                  <button
+            {
+              eventDatas ? <div className="relative aspect-video">
+                {/* Slides */}
+                {eventDatas.event_galleries.map((x, i) => (
+                  <img
                     key={i}
-                    onClick={() => slideTo(i)}
-                    aria-label={`Slide ${i + 1}`}
-                    className={`h-2 w-2 rounded-full transition ${i === gIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
+                    src={x.img_path ?? ""}
+                    alt={`Foto ${i + 1}`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === gIndex ? "opacity-100" : "opacity-0"
                       }`}
                   />
                 ))}
+                {/* Controls */}
+                <button
+                  onClick={() => slideTo(gIndex - 1)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
+                  aria-label="Sebelumnya"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <button
+                  onClick={() => slideTo(gIndex + 1)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
+                  aria-label="Berikutnya"
+                >
+                  <ChevronRightIcon />
+                </button>
+                {/* Dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {eventDatas.event_galleries.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => slideTo(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2 w-2 rounded-full transition ${i === gIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
+                        }`}
+                    />
+                  ))}
+                </div>
+              </div> : <div className="relative aspect-video">
+                {/* Slides */}
+                {GALLERY.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Foto ${i + 1}`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === gIndex ? "opacity-100" : "opacity-0"
+                      }`}
+                  />
+                ))}
+                {/* Controls */}
+                <button
+                  onClick={() => slideTo(gIndex - 1)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
+                  aria-label="Sebelumnya"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                <button
+                  onClick={() => slideTo(gIndex + 1)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
+                  aria-label="Berikutnya"
+                >
+                  <ChevronRightIcon />
+                </button>
+                {/* Dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {GALLERY.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => slideTo(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2 w-2 rounded-full transition ${i === gIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
+                        }`}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            }
           </div>
         </Section>
 
@@ -589,47 +618,85 @@ export default function WeddingInvitationPage() {
           subtitle="Perjalanan yang membawa kami ke pelaminan."
           sectionsRef={sectionsRef}
         >
-          <ol className="relative border-s border-white/10 ms-3">
-            {[
-              {
-                t: "2018",
-                title: "Pertemuan Pertama",
-                body:
-                  "Kami berkenalan saat kegiatan kampus. Dari sapaan singkat, tumbuh rasa yang hangat.",
-              },
-              {
-                t: "2019",
-                title: "Mulai Serius",
-                body:
-                  "Berjalan bersama melewati suka duka, saling menguatkan mimpi satu sama lain.",
-              },
-              {
-                t: "2023",
-                title: "Lamaran",
-                body:
-                  "Keluarga bertemu, doa dipanjatkan, niat kami dimantapkan.",
-              },
-              {
-                t: "2025",
-                title: "Menuju Pelaminan",
-                body:
-                  "Dengan restu orang tua dan sahabat, kami melangkah ke babak baru.",
-              },
-            ].map((ev, i) => (
-              <li key={i} className="mb-10 ms-2">
-                <span className="absolute -left-1.75 mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition backdrop-blur-md">
-                  <div className="flex items-baseline justify-between">
-                    <h4 className="font-serif text-xl">{ev.title}</h4>
-                    <span className="text-xs uppercase tracking-widest text-stone-300">
-                      {ev.t}
-                    </span>
+          {
+            eventDatas ? <ol className="relative border-s border-white/10 ms-3">
+              {eventDatas.event_histories.map((ev, i) => (
+                <li key={i} className="mb-10 ms-5">
+                  <span className="absolute -left-1.75 mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition backdrop-blur-md">
+                    <div className="flex items-baseline justify-between">
+                      <h4 className="font-serif text-xl">{ev.name}</h4>
+                      <span className="text-xs uppercase tracking-widest text-stone-300">
+                        {getMonthName(ev.month)} - {ev.year}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-12 gap-6 items-start">
+                      <div className={`col-span-12 ${ev.gallery?.img_path ? "md:col-span-6" : "md:col-span-12"}`}>
+                        <p className="text-stone-300">
+                          {ev.desc}
+                        </p>
+                      </div>
+
+                      {ev.gallery?.img_path && (
+                        <div className="col-span-12 md:col-span-6">
+                          <div className="overflow-hidden rounded-xl border border-white/10">
+                            <div className="aspect-4/3 w-full md:aspect-3/2">
+                              <img
+                                src={ev.gallery.img_path}
+                                alt={ev.name}
+                                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-2 text-stone-300">{ev.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+                </li>
+              ))}
+            </ol> : <ol className="relative border-s border-white/10 ms-3">
+              {[
+                {
+                  m: "05",
+                  t: "2018",
+                  title: "Pertemuan Pertama",
+                  body: "Kami berkenalan saat kegiatan kampus. Dari sapaan singkat, tumbuh rasa yang hangat.",
+                },
+                {
+                  m: "08",
+                  t: "2019",
+                  title: "Mulai Serius",
+                  body: "Berjalan bersama melewati suka duka, saling menguatkan mimpi satu sama lain.",
+                },
+                {
+                  m: "03",
+                  t: "2023",
+                  title: "Lamaran",
+                  body: "Keluarga bertemu, doa dipanjatkan, niat kami dimantapkan.",
+                },
+                {
+                  m: "06",
+                  t: "2025",
+                  title: "Menuju Pelaminan",
+                  body: "Dengan restu orang tua dan sahabat, kami melangkah ke babak baru.",
+                },
+              ].map((ev, i) => (
+                <li key={i} className="mb-10 ms-5">
+                  <span className="absolute -left-1.75 mt-1 h-3 w-3 rounded-full bg-white/80 border border-white/30"></span>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition backdrop-blur-md">
+                    <div className="flex items-baseline justify-between">
+                      <h4 className="font-serif text-xl">{ev.title}</h4>
+                      <span className="text-xs uppercase tracking-widest text-stone-300">
+                        {getMonthName(ev.m)} - {ev.t}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-stone-300">{ev.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          }
         </Section>
 
         {/* RSVP */}
@@ -727,7 +794,14 @@ export default function WeddingInvitationPage() {
                       1234567890
                     </code>
                     <button
-                      onClick={() => copyText("1234567890")}
+                      onClick={() => {
+                        copyToClipboard("1234567890");
+                        toast({
+                          type: "success",
+                          title: "Copy to Clipboard",
+                          message: "Well done, Text copied to clipboard.",
+                        });
+                      }}
                       className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
                     >
                       Salin
@@ -745,7 +819,14 @@ export default function WeddingInvitationPage() {
                       9876543210
                     </code>
                     <button
-                      onClick={() => copyText("9876543210")}
+                      onClick={() => {
+                        copyToClipboard("1234567890");
+                        toast({
+                          type: "success",
+                          title: "Copy to Clipboard",
+                          message: "Well done, Text copied to clipboard.",
+                        });
+                      }}
                       className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
                     >
                       Salin
@@ -771,7 +852,15 @@ export default function WeddingInvitationPage() {
                 <p className="my-3 text-sm text-stone-200 leading-relaxed">
                   Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia
                 </p>
-                <button className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
+                <button
+                  onClick={() => {
+                    copyToClipboard("Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia");
+                    toast({
+                      type: "success",
+                      title: "Copy to Clipboard",
+                      message: "Well done, Text copied to clipboard.",
+                    });
+                  }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
                   Salin
                 </button>
               </div>
@@ -863,7 +952,7 @@ export default function WeddingInvitationPage() {
           sectionsRef={sectionsRef}
         >
           <Accordion
-            items={[
+            items={eventDatas ? eventDatas.event_faq.map(x => ({ q: x.question, a: x.answer })) : [
               {
                 q: "Apakah boleh membawa anak?",
                 a: "Tentu, kami dengan senang hati menyambut keluarga.",
@@ -890,7 +979,7 @@ export default function WeddingInvitationPage() {
             Terima kasih atas doa & kehadiran Anda. Sampai jumpa di hari bahagia
             kami!
           </p>
-          <p className="mt-2 text-xs">© {new Date().getFullYear()} Aisyah & Bagas</p>
+          <p className="mt-2 text-xs">© {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} Aisyah & Bagas</p>
         </footer>
       </div>
     </main>
