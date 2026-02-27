@@ -69,7 +69,7 @@ export default function WeddingInvitePage() {
   }, []);
 
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
 
   // active nav highlight (simple)
   const [active, setActive] = useState<string>("#hero");

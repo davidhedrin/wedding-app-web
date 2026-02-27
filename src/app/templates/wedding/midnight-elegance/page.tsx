@@ -78,7 +78,7 @@ export default function Page() {
   };
 
   // --- Countdown ---
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE);
 
   // --- Hero background carousel (auto-play) ---
   const heroImages = useMemo(() => [PLACEHOLDER_IMG, PLACEHOLDER_IMG, PLACEHOLDER_IMG], []);

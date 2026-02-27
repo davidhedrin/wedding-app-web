@@ -54,7 +54,7 @@ export default function UndanganPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE);
 
   // Smooth scroll handler
   const handleNavClick = (id: string) => (e: React.MouseEvent) => {
@@ -511,7 +511,7 @@ export default function UndanganPage() {
             },
           ].map((it, i) => (
             <li key={i}>
-              <span className="absolute -start-1.5 mt-1 h-3 w-3 rounded-full bg-rose-300 ring-4 ring-rose-300/20" />
+              <span className="absolute -inset-s-1.5 mt-1 h-3 w-3 rounded-full bg-rose-300 ring-4 ring-rose-300/20" />
               <time className="text-sm text-neutral-400">{it.t}</time>
               <h4 className="mt-1 font-serif text-xl text-rose-100">
                 {it.title}

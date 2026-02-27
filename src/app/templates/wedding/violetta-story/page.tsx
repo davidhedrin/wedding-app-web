@@ -119,7 +119,7 @@ export default function WeddingInvitationPage() {
   }, []);
 
   // Countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
 
   const goToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });

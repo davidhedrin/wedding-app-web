@@ -50,7 +50,7 @@ export default function WeddingInvite() {
   }, []);
 
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
 
   // gallery slider
   const [galleryIdx, setGalleryIdx] = useState(0);

@@ -11,7 +11,7 @@ export default function PrelineProvider() {
       if (typeof window === 'undefined') return;
 
       // Import build version (penting)
-      await import('preline/dist/preline.js');
+      await import('preline');
 
       // Destroy semua instance lama dulu (penting untuk SPA)
       if ((window as any).HSStaticMethods?.destroy) {
@@ -22,7 +22,9 @@ export default function PrelineProvider() {
       (window as any).HSStaticMethods?.autoInit();
     };
 
-    initPreline();
+    setTimeout(() => {
+      initPreline();
+    }, 100);
   }, [pathname]);
 
   return null;

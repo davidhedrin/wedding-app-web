@@ -368,6 +368,9 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             personal_msg: true,
             img_name: true,
             img_path: true,
+          },
+          orderBy: {
+            id: "asc"
           }
         },
         schedule_info: {
@@ -383,6 +386,9 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             notes: true,
             ceremony_type: true,
             use_main_loc: true,
+          },
+          orderBy: {
+            id: "asc"
           }
         },
         event_galleries: {

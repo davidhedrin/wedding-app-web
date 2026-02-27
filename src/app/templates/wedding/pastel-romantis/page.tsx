@@ -41,7 +41,7 @@ export default function WeddingInvitationPage() {
   const [opened, setOpened] = useState(false)
   useLockBodyScroll(!opened)
 
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(weddingDate.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(weddingDate);
 
   // Smooth scroll offset handling
   const headerRef = useRef<HTMLDivElement | null>(null);

@@ -75,7 +75,7 @@ export default function WeddingInvitationPage() {
   const [navOpen, setNavOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // Hero background carousel
   const [slide, setSlide] = useState(0);

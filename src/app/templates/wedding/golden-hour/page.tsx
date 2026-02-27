@@ -53,7 +53,7 @@ export default function WeddingInvitePage(): JSX.Element {
   const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
 
   // Countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
 
   // auto-advance hero carousel
   useEffect(() => {

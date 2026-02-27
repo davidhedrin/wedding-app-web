@@ -44,7 +44,7 @@ export default function WeddingInvite() {
 
   /* Countdown logic */
   const target = useMemo(() => new Date(WEDDING_DATE), []);
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
 
   /* Hero carousel (simple) */
   const heroImages = [IMAGE_SRC, IMAGE_SRC, IMAGE_SRC]; // can add multiple unique urls

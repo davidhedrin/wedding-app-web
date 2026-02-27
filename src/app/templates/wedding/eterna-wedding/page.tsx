@@ -4,13 +4,14 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { delay, ExecuteMinimumDelay, formatDate, toast } from "@/lib/utils";
+import { CombineDateAndTime, delay, ExecuteMinimumDelay, formatDate, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
 import { useLoading } from "@/components/loading/loading-context";
 import { GetSplashScreenEventData } from "@/server/event";
 import LoadingUI from "@/components/loading/loading-ui";
+import { GenProfileDescWedding } from "../../utils";
 
 /**
  * Invitation Type: Wedding
@@ -56,8 +57,12 @@ export default function WeddingInvitationPage() {
   const searchParams = useSearchParams();
   const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
   const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
+
   const [groom, setGroom] = useState<GroomBrideProps | null>(null);
   const [bride, setBride] = useState<GroomBrideProps | null>(null);
+  const [groomProfile, setGroomProfile] = useState<string>();
+  const [brideProfile, setBrideProfile] = useState<string>();
+  const [longlatLoc, setLonglatLoc] = useState<string>();
 
   useEffect(() => {
     const delayMs = 2000;
@@ -69,12 +74,33 @@ export default function WeddingInvitationPage() {
             delayMs
           );
 
-          if(findData){
+          if (findData) {
             setEventDatas(findData);
             const groomData = findData.gb_info.find(x => x.type === "Groom");
             const brideData = findData.gb_info.find(x => x.type === "Bride");
             setGroom(groomData ?? null);
             setBride(brideData ?? null);
+
+            if (groomData) setGroomProfile(GenProfileDescWedding({
+              type: groomData.type,
+              birth_order: groomData.birth_order,
+              father_name: groomData.father_name,
+              mother_name: groomData.mother_name,
+              place_origin: groomData.place_origin,
+              occupation: groomData.occupation,
+            }));
+
+            if (brideData) setBrideProfile(GenProfileDescWedding({
+              type: brideData.type,
+              birth_order: brideData.birth_order,
+              father_name: brideData.father_name,
+              mother_name: brideData.mother_name,
+              place_origin: brideData.place_origin,
+              occupation: brideData.occupation,
+            }));
+
+            const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
+            if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
           }
         } catch (error: any) {
           await delay(delayMs);
@@ -294,8 +320,7 @@ export default function WeddingInvitationPage() {
                 key={i}
                 src={src}
                 alt="Background"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ease-out ${i === heroIndex ? "opacity-100" : "opacity-0"
-                  }`}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1500 ease-out ${i === heroIndex ? "opacity-100" : "opacity-0"}`}
               />
             ))}
             <div className="absolute inset-0 bg-linear-to-b from-stone-950/40 via-stone-950/70 to-stone-950"></div>
@@ -349,40 +374,68 @@ export default function WeddingInvitationPage() {
         <Section
           id="mempelai"
           title="Mempelai"
-          subtitle="Dengan penuh syukur, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada hari bahagia kami."
+          subtitle={eventDatas ? (eventDatas.greeting_msg ?? "-") : "Dengan penuh syukur, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan memberikan doa restu pada hari bahagia kami."}
           sectionsRef={sectionsRef}
         >
-          <div className="grid md:grid-cols-2 gap-6 md:gap-10">
-            {[
+          {
+            eventDatas ? <div className="grid md:grid-cols-2 gap-6 md:gap-10">
               {
-                name: "Aisyah Putri",
-                desc:
-                  "Putri pertama dari Bapak Ahmad & Ibu Siti. Lahir dan besar di Jakarta, berkarier di bidang kreatif.",
-              },
-              {
-                name: "Bagas Pratama",
-                desc:
-                  "Putra kedua dari Bapak Budi & Ibu Rina. Seorang penggiat teknologi yang menyukai fotografi.",
-              },
-            ].map((p, i) => (
-              <div
-                key={i}
-                className="group rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition"
-              >
-                <div className="relative aspect-4/3">
-                  <img
-                    src={IMAGES[0]}
-                    alt={p.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  />
+                eventDatas.gb_info.map((x, i) => {
+                  return <div key={i} className="group rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition">
+                    <div className="relative aspect-4/3">
+                      <img
+                        src={x.img_path ?? ""}
+                        alt={x.shortname}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="font-serif text-2xl">{x.fullname}</h3>
+                      <p className="mt-2 text-stone-300">
+                        {x.type === "Bride" ? groomProfile : brideProfile}
+                      </p>
+                      {
+                        x.personal_msg && <p className="mt-2 italic text-stone-300">
+                          {`“${x.personal_msg}”`}
+                        </p>
+                      }
+                    </div>
+                  </div>
+                })
+              }
+
+            </div> : <div className="grid md:grid-cols-2 gap-6 md:gap-10">
+              {[
+                {
+                  name: "Aisyah Putri",
+                  desc:
+                    "Putri pertama dari Bapak Ahmad & Ibu Siti. Lahir dan besar di Jakarta, berkarier di bidang kreatif.",
+                },
+                {
+                  name: "Bagas Pratama",
+                  desc:
+                    "Putra kedua dari Bapak Budi & Ibu Rina. Seorang penggiat teknologi yang menyukai fotografi.",
+                },
+              ].map((p, i) => (
+                <div
+                  key={i}
+                  className="group rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition"
+                >
+                  <div className="relative aspect-4/3">
+                    <img
+                      src={IMAGES[0]}
+                      alt={p.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-serif text-2xl">{p.name}</h3>
+                    <p className="mt-2 text-stone-300">{p.desc}</p>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-serif text-2xl">{p.name}</h3>
-                  <p className="mt-2 text-stone-300">{p.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          }
         </Section>
 
         {/* Acara */}
@@ -392,44 +445,91 @@ export default function WeddingInvitationPage() {
           subtitle="Berikut rangkaian acara pada hari bahagia kami."
           sectionsRef={sectionsRef}
         >
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <InfoCard
-                title="Akad Nikah"
-                time="Sabtu, 20 Desember 2025 · 10.00 WIB"
-                place="Balai Kartini, Ballroom"
-                extra="Mohon hadir 15 menit lebih awal."
-              />
-              <InfoCard
-                title="Resepsi"
-                time="Sabtu, 20 Desember 2025 · 12.00 – 15.00 WIB"
-                place="Balai Kartini, Ballroom"
-                extra="Dress code: Formal / Palet warna netral elegan."
-              />
-              <div className="rounded-3xl border border-white/10 p-6 bg-white/5 backdrop-blur-md">
-                <h4 className="font-serif text-xl">Informasi Tambahan</h4>
-                <ul className="mt-3 list-disc list-inside text-stone-300 space-y-1">
-                  <li>Mohon menjaga protokol kebersihan.</li>
-                  <li>Parkir tersedia di basement dan area timur.</li>
-                  <li>Ucapan & doa dapat dititipkan pada buku tamu.</li>
-                </ul>
+          {
+            eventDatas ? <div className="grid lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                {
+                  eventDatas.schedule_info.map((x, i) => {
+                    let title = "";
+                    if (x.type === "WED_MB") title = "Akad Nikah";
+                    else if (x.type === "WED_TOR") {
+                      if (x.ceremony_type === "Reception") title = "Resepsi";
+                      else if (x.ceremony_type === "Traditional") title = "Tradisional / Adat";
+                    }
+
+                    return <InfoCard
+                      key={i}
+                      title={title}
+                      time={`${formatDate(CombineDateAndTime(x.date, x.start_time), "full", "short")} - ${x.end_time}`}
+                      place={`${x.location} · ${x.address}`}
+                      extra={x.notes.length > 0 ? x.notes.join(", ") : undefined}
+                      lat={x.latitude ?? undefined}
+                      long={x.longitude ?? undefined}
+                    />
+                  })
+                }
+                {
+                  eventDatas.schedule_note !== null && <div className="rounded-3xl border border-white/10 p-6 bg-white/5 backdrop-blur-md">
+                    <h4 className="font-serif text-xl">Informasi Tambahan</h4>
+                    <p className="mt-3 text-stone-300">
+                      {(eventDatas.schedule_note)}
+                    </p>
+                  </div>
+                }
               </div>
-            </div>
-            <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5">
-              <div className="aspect-video">
-                <iframe
-                  className="w-full h-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2104161705646!2d106.825908!3d-6.236658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e3d7d9a0a7%3A0x5c8b2b94a3055f0!2sBalai%20Kartini!5e0!3m2!1sen!2sid!4v1699999999999"
-                  allowFullScreen
+              <div className="h-100 md:h-auto rounded-3xl overflow-hidden border border-white/10 bg-white/5">
+                <div className="h-full">
+                  <iframe
+                    className="w-full h-full"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.google.com/maps?q=${longlatLoc}&z=18&output=embed`}
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-4 text-sm text-stone-300">
+                  Lokasi: Balai Kartini, Jakarta.
+                </div>
+              </div>
+            </div> : <div className="grid lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <InfoCard
+                  title="Akad Nikah"
+                  time="Sabtu, 20 Desember 2025 · 10.00 WIB"
+                  place="Balai Kartini, Ballroom"
+                  extra="Mohon hadir 15 menit lebih awal."
                 />
+                <InfoCard
+                  title="Resepsi"
+                  time="Sabtu, 20 Desember 2025 · 12.00 - 15.00 WIB"
+                  place="Balai Kartini, Ballroom"
+                  extra="Dress code: Formal / Palet warna netral elegan."
+                />
+                <div className="rounded-3xl border border-white/10 p-6 bg-white/5 backdrop-blur-md">
+                  <h4 className="font-serif text-xl">Informasi Tambahan</h4>
+                  <ul className="mt-3 list-disc list-inside text-stone-300 space-y-1">
+                    <li>Mohon menjaga protokol kebersihan.</li>
+                    <li>Parkir tersedia di basement dan area timur.</li>
+                    <li>Ucapan & doa dapat dititipkan pada buku tamu.</li>
+                  </ul>
+                </div>
               </div>
-              <div className="p-4 text-sm text-stone-300">
-                Lokasi: Balai Kartini, Jakarta.
+              <div className="h-100 md:h-auto rounded-3xl overflow-hidden border border-white/10 bg-white/5">
+                <div className="h-full">
+                  <iframe
+                    className="w-full h-full"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2104161705646!2d106.825908!3d-6.236658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e3d7d9a0a7%3A0x5c8b2b94a3055f0!2sBalai%20Kartini!5e0!3m2!1sen!2sid!4v1699999999999"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-4 text-sm text-stone-300">
+                  Lokasi: Balai Kartini, Jakarta.
+                </div>
               </div>
             </div>
-          </div>
+          }
         </Section>
 
         {/* Galeri */}
@@ -836,23 +936,39 @@ function InfoCard({
   time,
   place,
   extra,
+  long,
+  lat
 }: {
   title: string;
   time: string;
   place: string;
   extra?: string;
+  long?: string;
+  lat?: string;
 }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 backdrop-blur-md transition">
       <h4 className="font-serif text-xl">{title}</h4>
       <div className="mt-2 space-y-1 text-stone-300">
-        <p className="flex items-center gap-2">
+        <p className="flex items-start gap-2">
           <ClockIcon /> {time}
         </p>
-        <p className="flex items-center gap-2">
-          <MapPinIcon /> {place}
+        <p className="flex items-start gap-2">
+          <MapPinIcon />
+          <div>
+            {place}. {
+              long !== undefined && lat !== undefined && long.trim() !== "" && lat.trim() !== "" && <a
+                href={`https://www.google.com/maps?q=${lat},${long}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                Lihat Lokasi
+              </a>
+            }
+          </div>
         </p>
-        {extra && <p className="text-sm">{extra}</p>}
+        {extra && <p>{extra}</p>}
       </div>
     </div>
   );
@@ -964,14 +1080,14 @@ function ChevronRightIcon() {
 }
 function ClockIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="opacity-80">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" className="opacity-80">
       <path d="M12 1a11 11 0 1 0 11 11A11.013 11.013 0 0 0 12 1Zm1 12h-5V7h2v4h3Z" />
     </svg>
   );
 }
 function MapPinIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="opacity-80">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="opacity-80">
       <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 14.5 9 2.5 2.5 0 0 1 12 11.5Z" />
     </svg>
   );

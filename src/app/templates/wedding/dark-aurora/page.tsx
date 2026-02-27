@@ -76,7 +76,7 @@ export default function WeddingInvitationPage() {
   useLockBodyScroll(!opened)
 
   // Countdown
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE);
 
   // Hero background carousel sederhana
   const [heroIdx, setHeroIdx] = useState(0);

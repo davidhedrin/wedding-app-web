@@ -49,7 +49,7 @@ export default function InvitationPage() {
 
   // Countdown state
   const target = useMemo(() => new Date(TARGET_DATE), []);
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // Hero carousel
   const [heroIndex, setHeroIndex] = useState(0);

@@ -113,7 +113,7 @@ export default function WeddingInvitationPage() {
   useLockBodyScroll(!opened)
 
   // Countdown
-  const countDown = useCountdown(WEDDING_DATE.toString());
+  const countDown = useCountdown(WEDDING_DATE);
 
   const [active, setActive] = useState<string>("mempelai");
   const [openAccordion, setOpenAccordion] = useState<number | null>(0);
@@ -637,7 +637,7 @@ function Cerita() {
         <ol className="relative border-s border-emerald-800/60 ps-6">
           {timeline.map((t, i) => (
             <li key={i} className="mb-10 ms-4">
-              <span className="absolute -start-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/90 text-emerald-950 ring-2 ring-amber-200/60">
+              <span className="absolute -inset-s-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/90 text-emerald-950 ring-2 ring-amber-200/60">
                 <span className="text-[10px] font-bold">{i + 1}</span>
               </span>
               <h3 className="font-display text-xl">{t.title}</h3>

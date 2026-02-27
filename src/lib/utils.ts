@@ -177,7 +177,7 @@ export function formatDate(dateString: string | Date, dtStyle?: "short" | "full"
   const timeFormatter = tmStyle ? new Intl.DateTimeFormat("id-ID", { timeStyle: tmStyle }) : null;
 
   const formattedDate = dateFormatter ? dateFormatter.format(date) : "";
-  const formattedTime = timeFormatter ? `- ${timeFormatter.format(date)}` : "";
+  const formattedTime = timeFormatter ? `. ${timeFormatter.format(date)}` : "";
 
   return tmStyle ? `${formattedDate} ${formattedTime}` : formattedDate;
 };
@@ -358,4 +358,4 @@ export function CombineDateAndTime(date: Date, time: string): Date {
   result.setHours(hours, minutes, 0, 0);
 
   return result;
-}
+};

@@ -118,7 +118,7 @@ const WeddingInvitationPage: React.FC = () => {
   const [opened, setOpened] = useState(false)
   useLockBodyScroll(!opened)
 
-  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE.toString());
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(WEDDING_DATE);
   const active = useScrollSpy(NAV.map((n) => n.id));
   const [menuOpen, setMenuOpen] = useState(false);
 
