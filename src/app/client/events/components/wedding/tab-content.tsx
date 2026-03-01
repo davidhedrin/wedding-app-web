@@ -2,13 +2,13 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { copyToClipboard, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { copyToClipboard, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, rsvpLabels, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
 import TableTopToolbar from "@/components/table-top-toolbar";
-import { FormState, TableShortList, TableThModel } from "@/lib/model-types";
+import { FormState, RsvpStatsParams, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
 import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
@@ -16,7 +16,7 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
+import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 import { GetDataEventWithSelect } from "@/server/event";
 
@@ -2870,8 +2870,17 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
     { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
-    { name: "Attandance", key: "rsvp", key_sort: "rsvp", IsVisible: true },
+    { name: "Attandance", key: "att_status", key_sort: "att_status", IsVisible: true },
   ]);
+  const [dataRsvpStas, setDataRsvpStas] = useState<RsvpStatsParams>({
+    total: 0,
+    present: 0,
+    absent: 0,
+    unknown: 0,
+    no_response: 0,
+    present_persons: 0,
+  });
+  const [respondedPercentage, setRespondedPercentage] = useState<number>(0);
 
   const [stateFormRsvp, setStateFormRsvp] = useState<FormState>({ success: false, errors: {} });
   const [addEditId, setAddEditId] = useState<number | null>(null);
@@ -2977,16 +2986,24 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         select: {
           id: true,
           event_id: true,
+          att_number: true,
           ...selectObj
         },
         orderBy: orderObj
       });
+
+      const getStats = await GetDataRsvpCountStatistics(event_id);
+
       setTotalPage(result.meta.totalPages);
       setTotalCount(result.meta.total);
       setPageTable(result.meta.page);
       setInputPage(result.meta.page.toString());
 
       setDatas(result.data);
+      setDataRsvpStas(getStats);
+
+      const respondedPercentage = getStats.total > 0 ? ((getStats.total - getStats.no_response) / getStats.total) * 100 : 0
+      setRespondedPercentage(respondedPercentage);
     } catch (error: any) {
       toast({
         type: "warning",
@@ -3060,6 +3077,113 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         </p>
       </div>
 
+      <div className="mb-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
+          <div className="relative bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md hover:scale-105 transition">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-400">
+                  Total
+                </p>
+                <h3 className="text-2xl font-bold text-gray-800 mt-1">
+                  {dataRsvpStas.total}
+                </h3>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                <i className="bx bx-envelope text-2xl text-indigo-600"></i>
+              </div>
+            </div>
+            <div className="mt-1 h-1 w-full bg-indigo-100 rounded-full transition-all">
+              <div
+                className="bg-blue-600 h-1 rounded-full"
+                style={{
+                  width: `${respondedPercentage}%`
+                }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {respondedPercentage.toFixed(0)}% have responded
+            </p>
+          </div>
+
+          <div className="relative bg-green-50 rounded-2xl border border-green-100 px-4 py-3 shadow-sm hover:shadow-md hover:scale-105 transition">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-green-600">
+                  Present
+                </p>
+                <h3 className="text-2xl font-bold text-green-700 mt-1">
+                  {dataRsvpStas.present}
+                </h3>
+                <p className="text-xs text-green-600 mt-1">
+                  <span className="font-bold">{dataRsvpStas.present_persons}</span> person{dataRsvpStas.present_persons > 0 && "s"}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <i className="bx bx-check-circle text-2xl text-green-600"></i>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative bg-red-50 rounded-2xl border border-red-100 px-4 py-3 shadow-sm hover:shadow-md hover:scale-105 transition">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-red-600">
+                  Not Present
+                </p>
+                <h3 className="text-2xl font-bold text-red-700 mt-1">
+                  {dataRsvpStas.absent}
+                </h3>
+                <p className="text-xs text-red-700/70 mt-1">
+                  Invitation
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <i className="bx bx-x-circle text-2xl text-red-600"></i>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative bg-yellow-50 rounded-2xl border border-yellow-100 px-4 py-3 shadow-sm hover:shadow-md hover:scale-105 transition">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-yellow-600">
+                  Maybe
+                </p>
+                <h3 className="text-2xl font-bold text-yellow-600 mt-1">
+                  {dataRsvpStas.unknown}
+                </h3>
+                <p className="text-xs text-yellow-600/70 mt-1">
+                  Invitation
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <i className="bx bx-help-circle text-2xl text-yellow-500"></i>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative bg-gray-50 rounded-2xl border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md hover:scale-105 transition">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  No Response
+                </p>
+                <h3 className="text-2xl font-bold text-gray-700 mt-1">
+                  {dataRsvpStas.no_response}
+                </h3>
+                <p className="text-xs text-gray-700/70 mt-1">
+                  Invitation
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <i className="bx bx-time-five text-2xl text-gray-600"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-xl p-3">
         <div className="flex-1 min-w-0 flex flex-col">
           <TableTopToolbar
@@ -3101,8 +3225,8 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
                             {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
                             {
-                              'rsvp' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm ${data.rsvp != null && (data.rsvp === true ? "text-green-600" : "text-red-600")} ${data.rsvp == null && "italic text-gray-800"}`}>
-                                {data.rsvp != null ? data.rsvp === true ? "Present" : "Absent" : "Not Respon"}
+                              'att_status' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm text-gray-800 ${data.att_status == null && "italic"}`}>
+                                {data.att_status ?? "Not Respon"}{data.att_status && data.att_status === "PRESENCE" ? (data.att_number ? ` (${data.att_number} Person)` : "") : ""}
                               </td>
                             }
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">

@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
 import { StatusType, TableShortList, TableThModel } from "./model-types";
-import { DiscTypeEnum, EventStatusEnum, Vouchers } from "@/generated/prisma";
+import { DiscTypeEnum, EventStatusEnum, RsvpStatusEnum, Vouchers } from "@/generated/prisma";
 import Configs from "./config";
 
 export function cn(...inputs: ClassValue[]) {
@@ -23,6 +23,12 @@ export async function ExecuteMinimumDelay<T>(
   ]);
 
   return result;
+};
+
+export const rsvpLabels: Record<RsvpStatusEnum, string> = {
+  PRESENCE: 'Hadir',
+  ABSENCE: 'Tidak Hadir',
+  UNKNOWN: 'Belum Pasti'
 };
 
 export const eventStatusLabels: Record<EventStatusEnum, { name: string; color: StatusType }> = {

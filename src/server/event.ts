@@ -2,7 +2,7 @@
 
 import { CommonParams, EventInitProps, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
-import { DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
+import { DtoAttendanceRsvp, DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { CartCheckoutProps, CombineDateAndTime, stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
@@ -334,7 +334,9 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
         event_id: true,
         name: true,
         phone: true,
-        rsvp: true,
+        att_status: true,
+        att_number: true,
+        desc: true,
       }
     });
     if (!data) throw new Error("Invitation was not recognized!");
@@ -474,18 +476,18 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
   }
 }
 
-// type EventRsvpWithEvent = Prisma.EventRsvpGetPayload<{
-//   include: { event: true };
-// }>;
-// export async function GetEventRsvpData(barcode: string): Promise<EventRsvpWithEvent | null> {
-//   try{
-//     const getData = await db.eventRsvp.findUnique({
-//       where: { barcode },
-//       include: { event: true }
-//     });
-
-//     return getData;
-//   } catch (error: any) {
-//     throw error;
-//   }
-// };
+export async function UpadateRsvp(barcode: string, formData: DtoAttendanceRsvp) {
+  try {
+    await db.eventRsvp.update({
+      where: { barcode },
+      data: {
+        phone: formData.rsvp_hp,
+        att_status: formData.rsvp_att,
+        att_number: formData.rsvp_att_number,
+        desc: formData.rsvp_desc
+      }
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}

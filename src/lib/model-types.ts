@@ -1,4 +1,4 @@
-import { EventGiftTypeEnum, GroomBrideEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
+import { EventGiftTypeEnum, GroomBrideEnum, RsvpStatusEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
 
 export type BreadcrumbType = {
   url: string | null;
@@ -150,10 +150,21 @@ export type EventInitProps = {
     name: string;
     event_id: number;
     phone: string | null;
-    rsvp: boolean | null;
+    att_status: RsvpStatusEnum | null;
+    att_number: number | null;
+    desc: string | null;
   };
 };
 
 export type InvitationParams = {
   code?: string;
+};
+
+export type RsvpStatsParams = {
+  total: number;
+  present: number;
+  absent: number;
+  unknown: number;
+  no_response: number;
+  present_persons: number;
 };

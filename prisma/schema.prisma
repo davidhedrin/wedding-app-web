@@ -61,6 +61,12 @@ enum EventGiftTypeEnum {
   Wishlist
 }
 
+enum RsvpStatusEnum {
+  PRESENCE
+  ABSENCE
+  UNKNOWN
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique
@@ -357,12 +363,14 @@ model EventFAQ {
 }
 
 model EventRsvp {
-  id       Int      @id @default(autoincrement())
-  event_id Int
-  name     String
-  phone    String?
-  rsvp     Boolean?
-  barcode  String?  @unique
+  id         Int             @id @default(autoincrement())
+  event_id   Int
+  name       String
+  phone      String?
+  att_status RsvpStatusEnum?
+  att_number Int?
+  barcode    String?         @unique
+  desc       String?
 
   createdBy String?
   updatedBy String?

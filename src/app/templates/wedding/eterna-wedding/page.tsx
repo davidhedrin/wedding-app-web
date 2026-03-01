@@ -9,9 +9,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
 import { useLoading } from "@/components/loading/loading-context";
-import { GetSplashScreenEventData } from "@/server/event";
+import { GetSplashScreenEventData, UpadateRsvp } from "@/server/event";
 import LoadingUI from "@/components/loading/loading-ui";
 import { GenProfileDescWedding } from "../../utils";
+import { RsvpStatusEnum } from "@/generated/prisma";
 
 /**
  * Invitation Type: Wedding
@@ -64,6 +65,12 @@ export default function WeddingInvitationPage() {
   const [brideProfile, setBrideProfile] = useState<string>();
   const [longlatLoc, setLonglatLoc] = useState<string>();
 
+  const [rsvpName, setRsvpName] = useState<string>("");
+  const [rsvpHp, setRsvpHp] = useState<string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
+  const [rsvpDesc, setRsvpDesc] = useState<string>("");
+
   useEffect(() => {
     const delayMs = 2000;
     const fatchData = async () => {
@@ -76,6 +83,12 @@ export default function WeddingInvitationPage() {
 
           if (findData) {
             setEventDatas(findData);
+            setRsvpName(findData.event_rsvp.name);
+            setRsvpHp(findData.event_rsvp.phone ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
+            setRsvpDesc(findData.event_rsvp.desc ?? "");
+
             const groomData = findData.gb_info.find(x => x.type === "Groom");
             const brideData = findData.gb_info.find(x => x.type === "Bride");
             setGroom(groomData ?? null);
@@ -193,17 +206,31 @@ export default function WeddingInvitationPage() {
   // RSVP form (dummy handler)
   const [sending, setSending] = useState(false);
   const onSubmitRSVP = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(form.entries());
-    setSending(true);
-    // Simulasi submit
-    await new Promise((r) => setTimeout(r, 1000));
-    setSending(false);
-    alert(
-      `Terima kasih, ${payload.nama || "Tamu"}! Konfirmasi Anda telah tercatat.`
-    );
-    (e.target as HTMLFormElement).reset();
+    if (invtParams.code !== undefined && eventDatas !== null) {
+      e.preventDefault();
+      const form = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(form.entries());
+      setSending(true);
+
+      await ExecuteMinimumDelay(
+        UpadateRsvp(invtParams.code, {
+          rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
+          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
+          rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
+        }),
+        2000
+      );
+
+      setSending(false);
+      (e.target as HTMLFormElement).reset();
+    }
+
+    toast({
+      type: "success",
+      title: "Submit successfully",
+      message: "Your submission has been successfully completed"
+    });
   };
 
   // Copy to clipboard (Hadiah)
@@ -710,29 +737,39 @@ export default function WeddingInvitationPage() {
             onSubmit={onSubmitRSVP}
             className="grid md:grid-cols-2 gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
           >
-            <Field label="Nama" name="nama" placeholder="Nama lengkap" />
+            <Field disabled={eventDatas !== null} value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} label="Nama" id="nama" placeholder="Nama lengkap" required />
             <Field
+              value={rsvpHp} onChange={(e) => setRsvpHp(e.target.value)}
               label="No. HP/WA"
-              name="kontak"
+              id="kontak"
               placeholder="08xxxxxxxxxx"
               inputMode="tel"
             />
             <div>
               <Label>Konfirmasi Kehadiran</Label>
               <select
+                value={rsvpAtt} onChange={(e) => setRsvpAtt(e.target.value as RsvpStatusEnum)}
                 name="status"
                 required
                 className="mt-2 w-full rounded-xl bg-stone-900/70 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-white/20"
               >
                 <option value="">Pilih salah satu</option>
-                <option value="hadir">Hadir</option>
-                <option value="tidak_hadir">Tidak hadir</option>
-                <option value="belum_pasti">Belum pasti</option>
+                <option value={RsvpStatusEnum.PRESENCE}>Hadir</option>
+                <option value={RsvpStatusEnum.ABSENCE}>Tidak hadir</option>
+                <option value={RsvpStatusEnum.UNKNOWN}>Belum pasti</option>
               </select>
             </div>
             <Field
+              value={rsvpAttNumber} onChange={(e) => {
+                const value = e.target.value;
+                if (value === "") {
+                  setRsvpAttNumber(1);
+                  return;
+                }
+                setRsvpAttNumber(parseInt(value));
+              }}
               label="Jumlah Tamu"
-              name="jumlah"
+              id="jumlah"
               type="number"
               min={1}
               placeholder="1"
@@ -740,6 +777,8 @@ export default function WeddingInvitationPage() {
             <div className="md:col-span-2">
               <Label>Catatan</Label>
               <textarea
+                value={rsvpDesc} onChange={(e) => setRsvpDesc(e.target.value)}
+                id="catatan"
                 name="catatan"
                 rows={4}
                 className="mt-2 w-full rounded-xl bg-stone-900/70 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-white/20"
@@ -1042,7 +1081,7 @@ function InfoCard({
         <p className="flex items-start gap-2">
           <ClockIcon /> {time}
         </p>
-        <p className="flex items-start gap-2">
+        <div className="flex items-start gap-2">
           <MapPinIcon />
           <div>
             {place}. {
@@ -1056,7 +1095,7 @@ function InfoCard({
               </a>
             }
           </div>
-        </p>
+        </div>
         {extra && <p>{extra}</p>}
       </div>
     </div>
@@ -1065,30 +1104,21 @@ function InfoCard({
 
 function Field({
   label,
-  name,
-  type = "text",
-  placeholder,
-  inputMode,
-  min,
+  type,
+  ...props
 }: {
   label: string;
-  name: string;
-  type?: string;
-  placeholder?: string;
-  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
-  min?: number;
-}) {
+} & React.ComponentProps<"input">) {
+  const inpId = props.id;
   return (
     <div>
       <Label>{label}</Label>
       <input
-        name={name}
         type={type}
-        inputMode={inputMode}
-        min={min}
-        required
-        placeholder={placeholder}
+        id={inpId}
+        name={inpId}
         className="mt-2 w-full rounded-xl bg-stone-900/70 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-white/20"
+        {...props}
       />
     </div>
   );

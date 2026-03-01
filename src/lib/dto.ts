@@ -1,4 +1,4 @@
-import { DiscTypeEnum, EventGiftTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
+import { DiscTypeEnum, EventGiftTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, RsvpStatusEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
 
 export type DtoSignIn = {
   email: string;
@@ -198,4 +198,11 @@ export type DtoEventRsvp = {
   id: number | null;
   name: string;
   phone: string | null;
+};
+
+export type DtoAttendanceRsvp = {
+  rsvp_hp: string | null;
+  rsvp_att: RsvpStatusEnum | null;
+  rsvp_att_number: number | null;
+  rsvp_desc: string | null;
 };

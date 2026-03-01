@@ -1,6 +1,6 @@
 "use server";
 
-import { CommonParams, PaginateResult, UploadFileRespons } from "@/lib/model-types";
+import { CommonParams, PaginateResult, RsvpStatsParams, UploadFileRespons } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
@@ -621,6 +621,30 @@ export async function GetDataEventRsvp(event_id: number, params: GetDataEventRsv
       totalPages: Math.ceil(total/perPage)
     }
   };
+};
+
+export async function GetDataRsvpCountStatistics(event_id: number): Promise<RsvpStatsParams> {
+  const getCount = await db.eventRsvp.groupBy({
+    by: ['att_status'],
+    _count: true,
+    _sum: {
+      att_number: true
+    },
+    where: {
+      event_id
+    }
+  });
+
+  const stats = {
+    total: getCount.reduce((sum, g) => sum + g._count, 0),
+    present: getCount.find(g => g.att_status === "PRESENCE")?._count || 0,
+    absent: getCount.find(g => g.att_status === "ABSENCE")?._count || 0,
+    unknown: getCount.find(g => g.att_status === "UNKNOWN")?._count || 0,
+    no_response: getCount.find(g => g.att_status === null)?._count || 0,
+
+    present_persons: getCount.find(g => g.att_status === "PRESENCE")?._sum.att_number || 0,
+  }
+  return stats;
 };
 
 export async function StoreUpdateEventRSVP(event_id: number, formData: DtoEventRsvp) {
