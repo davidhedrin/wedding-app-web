@@ -903,12 +903,19 @@ function GiftSection() {
                 <p className="mt-1 text-sm text-slate-500">Jumlah: {item.qty} unit</p>
               </div>
 
-              <a
-                href="#"
-                className="mt-4 inline-flex justify-center rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition"
-              >
-                Lihat Referensi
-              </a>
+              <div className='flex justify-between items-center gap-3'>
+                <a
+                  href="#"
+                  className="mt-3 inline-flex justify-center rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Referensi
+                </a>
+                <button
+                  className="flex-1 mt-3 inline-flex justify-center rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Reservasi
+                </button>
+              </div>
             </div>
           ))}
         </div>

@@ -885,23 +885,19 @@ function Hadiah({
                   <p>Jumlah: {item.qty} unit</p>
                 </div>
 
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="
-                    mt-3 inline-flex w-full justify-center
-                    rounded-xl
-                    border border-amber-300/40
-                    px-4 py-2
-                    text-xs
-                    text-amber-200
-                    transition
-                    hover:bg-amber-300/10
-                  "
-                >
-                  Lihat Referensi
-                </a>
+                <div className='flex justify-between items-center gap-3'>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 mt-3 inline-flex w-full justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs text-amber-200 transition hover:bg-amber-300/10">
+                    Referensi
+                  </a>
+                  <button
+                    className="mt-3 inline-flex w-full justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs text-amber-200 transition hover:bg-amber-300/10">
+                    Reservasi
+                  </button>
+                </div>
               </div>
             ))}
           </div>

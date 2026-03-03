@@ -944,13 +944,20 @@ export default function WeddingInvitationPage() {
                         <p>Jumlah: {item.qty} unit</p>
                       </div>
 
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
-                      >
-                        Lihat Referensi
-                      </a>
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                        >
+                          Referensi
+                        </a>
+                        <button
+                          className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                        >
+                          Reservasi
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

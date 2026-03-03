@@ -49,7 +49,7 @@ export default function Invitation(): JSX.Element {
   }, []);
 
   // Countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // scroll reveal - simple fade/slide
   useEffect(() => {

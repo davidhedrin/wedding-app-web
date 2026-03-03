@@ -557,12 +557,19 @@ export default function Page() {
                       <p className="mt-1 text-sm text-white/60">Jumlah: {item.qty} unit</p>
                     </div>
 
-                    <a
-                      href="#"
-                      className="mt-4 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
-                    >
-                      Lihat Referensi
-                    </a>
+                    <div className='flex justify-between items-center gap-3'>
+                      <a
+                        href="#"
+                        className="mt-3 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
+                      >
+                        Referensi
+                      </a>
+                      <button
+                        className="flex-1 mt-3 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
+                      >
+                        Reservasi
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

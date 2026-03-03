@@ -48,7 +48,7 @@ function useScrollReveal(refs: React.RefObject<HTMLElement | null>[]) {
 
 export default function InvitationPage(): JSX.Element {
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // carousel
   const [index, setIndex] = useState(0);

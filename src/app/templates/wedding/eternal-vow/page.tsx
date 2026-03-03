@@ -956,7 +956,7 @@ const GiftSection: React.FC = () => {
         {/* ================================================================ */}
         {/* BANK TRANSFER                                                     */}
         {/* ================================================================ */}
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-10">
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
           <h3 className="font-serif text-2xl text-amber-300 mb-6 text-center md:text-left">
             Bank Transfer
           </h3>
@@ -999,7 +999,7 @@ const GiftSection: React.FC = () => {
         {/* ================================================================ */}
         {/* WISHLIST                                                         */}
         {/* ================================================================ */}
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-10">
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
           <h3 className="font-serif text-2xl text-amber-300 mb-3 text-center md:text-left">
             Gift Wishlist
           </h3>
@@ -1052,24 +1052,19 @@ const GiftSection: React.FC = () => {
                     </div>
                   </div>
 
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="
-                      w-full
-                      inline-flex items-center justify-center
-                      px-6 py-3
-                      rounded-full
-                      border border-amber-400/40
-                      text-amber-300
-                      text-xs uppercase tracking-widest
-                      transition
-                      hover:bg-amber-400 hover:text-black
-                    "
-                  >
-                    View Reference
-                  </a>
+                  <div className='flex justify-between items-center gap-3'>
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 w-full inline-flex items-center justify-center px-4 py-3 rounded-full border border-amber-400/40 text-amber-300 text-xs uppercase tracking-widest transition hover:bg-amber-400 hover:text-black">
+                      Refs
+                    </a>
+                    <button
+                      className="w-full inline-flex items-center justify-center px-4 py-3 rounded-full border border-amber-400/40 text-amber-300 text-xs uppercase tracking-widest transition hover:bg-amber-400 hover:text-black">
+                      Reservasi
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

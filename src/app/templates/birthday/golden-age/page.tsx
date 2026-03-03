@@ -37,7 +37,7 @@ export default function Invitation(): JSX.Element {
   }, []);
 
   // Countdown state
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // Hero image carousel state
   const [heroIndex, setHeroIndex] = useState(0);

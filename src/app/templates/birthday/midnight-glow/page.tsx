@@ -27,7 +27,7 @@ TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 const Invitation: NextPage = () => {
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // navigation active
   const [active, setActive] = useState("hero");

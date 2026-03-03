@@ -802,12 +802,19 @@ const WeddingInvitationPage: React.FC = () => {
                     </p>
                   </div>
 
-                  <a
-                    href="#"
-                    className="mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
-                  >
-                    Lihat Referensi
-                  </a>
+                  <div className='flex justify-between items-center gap-3'>
+                    <a
+                      href="#"
+                      className="mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
+                    >
+                      Refs
+                    </a>
+                    <button
+                      className="flex-1 mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
+                    >
+                      Reservasi
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

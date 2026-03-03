@@ -665,14 +665,21 @@ export default function WeddingInvitePage(): JSX.Element {
                           <p>Jumlah: {item.qty} unit</p>
                         </div>
 
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300/40 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/10 transition"
-                        >
-                          Lihat Referensi
-                        </a>
+                        <div className='flex justify-between items-center gap-3'>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 mt-3 inline-flex w-full justify-center rounded-md border border-amber-300/40 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/10 transition"
+                          >
+                            Referensi
+                          </a>
+                          <button
+                            className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300/40 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/10 transition"
+                          >
+                            Reservasi
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

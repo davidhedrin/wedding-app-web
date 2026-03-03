@@ -581,17 +581,7 @@ export default function Page() {
                   required
                   name="name"
                   placeholder="Nama Anda"
-                  className="input"
-                />
-              </Field>
-
-              <Field label="Email">
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  placeholder="email@contoh.com"
-                  className="input"
+                  className="input border border-emerald-300/40 rounded-lg px-3 py-2 focus:outline-none focus:ring"
                 />
               </Field>
 
@@ -600,12 +590,12 @@ export default function Page() {
                   type="tel"
                   name="phone"
                   placeholder="+62..."
-                  className="input"
+                  className="input border border-emerald-300/40 rounded-lg px-3 py-2 focus:outline-none focus:ring"
                 />
               </Field>
 
               <Field label="Kehadiran">
-                <select name="attendance" className="input">
+                <select name="attendance" className="input border border-emerald-300/40 rounded-lg px-3 py-2 focus:outline-none focus:ring">
                   <option value="hadir">Hadir</option>
                   <option value="tidak">Tidak dapat hadir</option>
                 </select>
@@ -617,31 +607,23 @@ export default function Page() {
                   min={1}
                   name="guests"
                   placeholder="1"
-                  className="input"
-                />
-              </Field>
-
-              <Field label="Ucapan">
-                <input
-                  name="message"
-                  placeholder="Doa & ucapan untuk mempelai"
-                  className="input"
+                  className="input border border-emerald-300/40 rounded-lg px-3 py-2 focus:outline-none focus:ring"
                 />
               </Field>
             </div>
 
+            <Field label="Ucapan">
+              <input
+                name="message"
+                placeholder="Doa & ucapan untuk mempelai"
+                className="input border border-emerald-300/40 rounded-lg px-3 py-2 focus:outline-none focus:ring"
+              />
+            </Field>
+
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button type="submit" className="btn-primary">
+              <button type="submit" className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 px-6 py-3 text-sm tracking-wide hover:bg-emerald-300/10 transition">
                 Kirim Konfirmasi
               </button>
-              <a
-                href="https://forms.gle/"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-ghost"
-              >
-                Isi via Google Form
-              </a>
             </div>
           </form>
         </Container>
@@ -755,13 +737,20 @@ export default function Page() {
                         </div>
                       </div>
 
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        className="inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
-                      >
-                        Lihat Referensi
-                      </a>
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          className="flex-1 inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
+                        >
+                          Referensi
+                        </a>
+                        <button
+                          className="inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
+                        >
+                          Reservasi
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

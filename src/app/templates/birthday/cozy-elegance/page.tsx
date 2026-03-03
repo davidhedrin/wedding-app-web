@@ -27,7 +27,7 @@ const HERO_IMG = "http://localhost:3005/assets/img/birthday-hero1.jpg";
 
 export default function InvitationPage(): JSX.Element {
   // Countdown state
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // Navigation smooth scroll refs
   const homeRef = useRef<HTMLElement | null>(null);

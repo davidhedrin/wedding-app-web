@@ -755,19 +755,30 @@ export default function WeddingInvitationPage() {
                       </div>
                     </div>
 
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={classNames(
-                        'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
-                        THEME.accentBg,
-                        THEME.accentRing,
-                        'text-black'
-                      )}
-                    >
-                      Lihat Referensi
-                    </a>
+                    <div className='flex justify-between items-center gap-3'>
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={classNames(
+                          'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                          'border border-amber-300 text-amber-300',
+                          'flex-1'
+                        )}
+                      >
+                        Referensi
+                      </a>
+                      <button
+                        className={classNames(
+                          'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                          THEME.accentBg,
+                          THEME.accentRing,
+                          'text-black',
+                        )}
+                      >
+                        Reservasi
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

@@ -142,7 +142,7 @@ export default function WeddingInvite() {
                   alt="cover"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-linear-to-b from-[#0b0f10] via-[#121313] to-[#1b1d1f]/60 backdrop-blur-sm" />
+                <div className="absolute inset-0 bg-linear-to-b from-[#a46d49]/80 via-[#121313] to-[#1b1d1f]/60 backdrop-blur-sm" />
               </div>
 
               <motion.div
@@ -789,12 +789,19 @@ export default function WeddingInvite() {
                         </p>
                       </div>
 
-                      <a
-                        href="#"
-                        className="mt-4 inline-flex justify-center rounded-full border border-white/10 px-3 py-2 text-xs hover:bg-white/10 transition"
-                      >
-                        Lihat Referensi
-                      </a>
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href="#"
+                          className="mt-3 inline-flex justify-center rounded-full border border-white/10 px-3 py-2 text-xs hover:bg-white/10 transition"
+                        >
+                          Referensi
+                        </a>
+                        <button
+                          className="flex-1 mt-3 inline-flex justify-center rounded-full border border-white/10 px-3 py-2 text-xs hover:bg-white/10 transition"
+                        >
+                          Reservasi
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

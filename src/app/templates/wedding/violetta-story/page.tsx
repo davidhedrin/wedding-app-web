@@ -918,12 +918,19 @@ export default function WeddingInvitationPage() {
                       </p>
                     </div>
 
-                    <a
-                      href="#"
-                      className="mt-4 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
-                    >
-                      Lihat Detail
-                    </a>
+                    <div className='flex justify-between items-center gap-3'>
+                      <a
+                        href="#"
+                        className="mt-3 text-center text-sm rounded-full border border-white/20 py-2 px-3 hover:bg-white/10 transition"
+                      >
+                        Referensi
+                      </a>
+                      <button
+                        className="flex-1 mt-3 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
+                      >
+                        Reservasi
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

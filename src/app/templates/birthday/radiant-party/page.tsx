@@ -30,7 +30,7 @@ const HERO_IMAGES = [
 
 export default function InvitationPage() {
   // Countdown state
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // hero carousel
   const [heroIdx, setHeroIdx] = useState(0);

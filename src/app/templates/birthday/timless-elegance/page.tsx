@@ -52,7 +52,7 @@ export default function Invitation() {
   ];
 
   // countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // carousel autoplay
   useEffect(() => {

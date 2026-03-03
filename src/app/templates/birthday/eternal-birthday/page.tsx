@@ -39,7 +39,7 @@ export default function InvitationPage() {
   // --- Countdown state and logic ------------------------------------------------
   // Set target date/time (UTC or local). Ganti tanggal sesuai kebutuhan.
   // Contoh: hari ulang tahun 2025-12-05 18:00 (local)
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE.toString());
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
 
   // --- Carousel (hero background) ------------------------------------------------
   const bgImages = [HERO_BG, ...galleryImages];
