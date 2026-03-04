@@ -425,9 +425,7 @@ type GetDataEventGiftsParams = {
   orderBy?: Prisma.EventGiftsOrderByWithRelationInput | Prisma.EventGiftsOrderByWithRelationInput[];
   select?: Prisma.EventGiftsSelect<DefaultArgs> | undefined;
 } & CommonParams;
-export async function GetDataEventGifts(event_id: number, params: GetDataEventGiftsParams): Promise<PaginateResult<EventGifts & {
-  gallery?: EventGalleries | null
-}>> {
+export async function GetDataEventGifts(event_id: number, params: GetDataEventGiftsParams): Promise<PaginateResult<EventGifts>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
   const [data, total] = await Promise.all([
@@ -515,9 +513,7 @@ type GetDataEventFAQParams = {
   orderBy?: Prisma.EventFAQOrderByWithRelationInput | Prisma.EventFAQOrderByWithRelationInput[];
   select?: Prisma.EventFAQSelect<DefaultArgs> | undefined;
 } & CommonParams;
-export async function GetDataEventFAQ(event_id: number, params: GetDataEventFAQParams): Promise<PaginateResult<EventFAQ & {
-  gallery?: EventGalleries | null
-}>> {
+export async function GetDataEventFAQ(event_id: number, params: GetDataEventFAQParams): Promise<PaginateResult<EventFAQ>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
   const [data, total] = await Promise.all([
@@ -596,9 +592,7 @@ type GetDataEventRsvpParams = {
   orderBy?: Prisma.EventRsvpOrderByWithRelationInput | Prisma.EventRsvpOrderByWithRelationInput[];
   select?: Prisma.EventRsvpSelect<DefaultArgs> | undefined;
 } & CommonParams;
-export async function GetDataEventRsvp(event_id: number, params: GetDataEventRsvpParams): Promise<PaginateResult<EventRsvp & {
-  gallery?: EventGalleries | null
-}>> {
+export async function GetDataEventRsvp(event_id: number, params: GetDataEventRsvpParams): Promise<PaginateResult<EventRsvp>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
   const [data, total] = await Promise.all([

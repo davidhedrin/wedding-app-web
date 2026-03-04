@@ -4,7 +4,7 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, formatDate, getMonthName, toast } from "@/lib/utils";
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, formatDate, getMonthName, playMusic, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
@@ -12,7 +12,9 @@ import { useLoading } from "@/components/loading/loading-context";
 import { GetSplashScreenEventData, UpadateRsvp } from "@/server/event";
 import LoadingUI from "@/components/loading/loading-ui";
 import { GenProfileDescWedding } from "../../utils";
-import { RsvpStatusEnum } from "@/generated/prisma";
+import { EventGifts, RsvpStatusEnum } from "@/generated/prisma";
+import { GetDataEventGifts } from "@/server/event-detail";
+import FloatingActionButton from "@/app/client/events/components/floating-action";
 
 /**
  * Invitation Type: Wedding
@@ -71,6 +73,43 @@ export default function WeddingInvitationPage() {
   const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
+  const [pageTableWs, setPageTableWs] = useState(1);
+  const [perPageWs, setPerPageWs] = useState(2);
+  const [totalPageWs, setTotalPageWs] = useState(0);
+  const [datasWs, setDatasWs] = useState<EventGifts[] | null>(null);
+
+  const fatchWishlist = async (event_id: number, page: number = pageTableWs, countPage: number = perPageWs) => {
+    const getWishlistGift = await GetDataEventGifts(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        type: "Wishlist"
+      },
+      select: {
+        id: true,
+        name: true,
+        product_price: true,
+        qty: true,
+        product_url: true,
+      },
+      orderBy: {
+        id: "asc"
+      }
+    });
+
+    setTotalPageWs(getWishlistGift.meta.totalPages);
+    setPageTableWs(getWishlistGift.meta.page);
+    setDatasWs(getWishlistGift.data);
+  };
+  const changePaginateWs = async (page: number) => {
+    if (eventDatas) {
+      setPageTableWs(page);
+      await fatchWishlist(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [isMusic, setIsMusic] = useState(false);
+
   useEffect(() => {
     const delayMs = 2000;
     const fatchData = async () => {
@@ -114,7 +153,10 @@ export default function WeddingInvitationPage() {
 
             const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
             if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+
+            await fatchWishlist(findData.event_rsvp.event_id);
           }
+
         } catch (error: any) {
           await delay(delayMs);
           toast({
@@ -233,16 +275,6 @@ export default function WeddingInvitationPage() {
     });
   };
 
-  // Copy to clipboard (Hadiah)
-  const copyText = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      alert("Disalin ke clipboard.");
-    } catch {
-      alert("Gagal menyalin, silakan salin manual.");
-    }
-  };
-
   if (isLoading) return <LoadingUI className="bg-stone-900" activeTitle={false} />
 
   return (
@@ -280,7 +312,13 @@ export default function WeddingInvitationPage() {
                 <p className="font-semibold text-xl mt-1 text-white">{eventDatas?.event_rsvp.name ?? "Guest"}</p>
 
                 <button
-                  onClick={() => setOpened(true)}
+                  onClick={() => {
+                    if (eventDatas && eventDatas.music_url) {
+                      playMusic(eventDatas.music_url);
+                      setIsMusic(prev => !prev);
+                    }
+                    setOpened(prev => !prev);
+                  }}
                   className="mt-10 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
                 >
                   Buka Undangan
@@ -911,81 +949,147 @@ export default function WeddingInvitationPage() {
 
               {/* Wishlist Cards */}
               <div className="mt-5 grid md:grid-cols-3 gap-5">
-                {[
-                  {
-                    name: 'Set Peralatan Makan Keramik',
-                    price: 'Rp 1.500.000',
-                    qty: 1,
-                    url: '#',
-                  },
-                  {
-                    name: 'Sprei Premium King Size',
-                    price: 'Rp 2.200.000',
-                    qty: 1,
-                    url: '#',
-                  },
-                  {
-                    name: 'Lampu Meja Minimalis',
-                    price: 'Rp 850.000',
-                    qty: 2,
-                    url: '#',
-                  },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20"
-                  >
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-stone-100">
-                        {item.name}
-                      </p>
-                      <div className="text-xs text-stone-300 space-y-0.5">
-                        <p>Harga: {item.price}</p>
-                        <p>Jumlah: {item.qty} unit</p>
-                      </div>
+                {
+                  datasWs !== null ? datasWs.map((x, i) => (
+                    <div
+                      key={i}
+                      className="rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20"
+                    >
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-stone-100">
+                          {x.name}
+                        </p>
+                        <div className="text-xs text-stone-300 space-y-0.5">
+                          <p>Harga: {x.product_price}</p>
+                          <p>Jumlah: {x.qty} unit</p>
+                        </div>
 
-                      <div className='flex justify-between items-center gap-3'>
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
-                        >
-                          Referensi
-                        </a>
-                        <button
-                          className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
-                        >
-                          Reservasi
-                        </button>
+                        <div className='flex justify-between items-center gap-3'>
+                          <a
+                            href={x.product_url ?? ""}
+                            target="_blank"
+                            className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                          >
+                            Referensi
+                          </a>
+                          <button
+                            className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                          >
+                            Reservasi
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )) : [
+                    {
+                      name: 'Set Peralatan Makan Keramik',
+                      price: 'Rp 1.500.000',
+                      qty: 1,
+                      url: '#',
+                    },
+                    {
+                      name: 'Sprei Premium King Size',
+                      price: 'Rp 2.200.000',
+                      qty: 1,
+                      url: '#',
+                    },
+                    {
+                      name: 'Lampu Meja Minimalis',
+                      price: 'Rp 850.000',
+                      qty: 2,
+                      url: '#',
+                    },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20"
+                    >
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-stone-100">
+                          {item.name}
+                        </p>
+                        <div className="text-xs text-stone-300 space-y-0.5">
+                          <p>Harga: {item.price}</p>
+                          <p>Jumlah: {item.qty} unit</p>
+                        </div>
+
+                        <div className='flex justify-between items-center gap-3'>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                          >
+                            Referensi
+                          </a>
+                          <button
+                            className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
+                          >
+                            Reservasi
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
               </div>
 
               {/* Pagination UI */}
-              <div className="mt-6 flex flex-col items-center gap-3">
-                <div className="flex gap-2">
-                  <button className="h-8 w-8 rounded-full bg-white text-xs font-semibold text-black">
-                    1
-                  </button>
-                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
-                    2
-                  </button>
-                  <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
-                    3
-                  </button>
-                </div>
+              {
+                datasWs !== null ? <div className="mt-6 flex flex-col items-center gap-3">
+                  <div className="flex gap-2">
+                    {
+                      Array.from({ length: totalPageWs }, (x, i) => {
+                        const numberPage = i + 1;
+                        return <button key={i}
+                          onClick={() => changePaginateWs(numberPage)}
+                          className={`h-8 w-8 rounded-full text-xs ${pageTableWs === numberPage ? "bg-white font-semibold text-black" : "border border-white/20 text-stone-300"}`}>
+                          {numberPage}
+                        </button>
+                      })
+                    }
+                  </div>
 
-                <div className="flex gap-3">
-                  <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
-                    Prev
-                  </button>
-                  <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
-                    Next
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      disabled={pageTableWs <= 1}
+                      onClick={() => {
+                        if (pageTableWs >= 1) changePaginateWs(pageTableWs - 1);
+                      }}
+                      className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                      Prev
+                    </button>
+                    <button
+                      disabled={pageTableWs >= totalPageWs}
+                      onClick={() => {
+                        if (pageTableWs <= totalPageWs) changePaginateWs(pageTableWs + 1);
+                      }}
+                      className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                      Next
+                    </button>
+                  </div>
+                </div> : <div className="mt-6 flex flex-col items-center gap-3">
+                  <div className="flex gap-2">
+                    <button className="h-8 w-8 rounded-full bg-white text-xs font-semibold text-black">
+                      1
+                    </button>
+                    <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
+                      2
+                    </button>
+                    <button className="h-8 w-8 rounded-full border border-white/20 text-xs text-stone-300">
+                      3
+                    </button>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                      Prev
+                    </button>
+                    <button className="flex-1 rounded-xl border border-white/20 px-3 py-2 text-xs text-stone-300">
+                      Next
+                    </button>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </Section>
@@ -1022,12 +1126,20 @@ export default function WeddingInvitationPage() {
         {/* Footer */}
         <footer className="py-12 text-center text-stone-400">
           <p className="text-sm">
-            Terima kasih atas doa & kehadiran Anda. Sampai jumpa di hari bahagia
-            kami!
+            Terima kasih atas doa & kehadiran Anda. Sampai jumpa di hari bahagia kami!
           </p>
           <p className="mt-2 text-xs">© {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} Aisyah & Bagas</p>
         </footer>
       </div>
+
+      <FloatingActionButton
+        isMusic={isMusic}
+        setIsMusic={setIsMusic}
+        musicUrl={eventDatas ? eventDatas.music_url ?? "adsf" : "asdf"}
+        qrValue={invtParams.code ?? "Wedlyvite"}
+        guestName={eventDatas?.event_rsvp.name ?? "Thomas Edison"}
+        eventDate={formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}
+      />
     </main>
   );
 }

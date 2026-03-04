@@ -330,9 +330,7 @@ export const playMusic = (url: string) => {
   }
 
   audio.loop = true;
-  audio.play().catch(err => {
-    console.log("Autoplay error:", err);
-  });
+  audio.play().catch(err => { });
 };
 
 export const stopMusic = () => {

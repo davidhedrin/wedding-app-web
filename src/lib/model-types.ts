@@ -132,16 +132,6 @@ export type EventInitProps = {
       img_path: string | null;
     } | null;
   }[];
-  event_gifts: {
-    name: string;
-    type: EventGiftTypeEnum;
-    account: string | null;
-    no_rek: string | null;
-    qty: number | null;
-    product_url: string | null;
-    product_price: number | null;
-    reserve_qty: number;
-  }[];
   event_faq: {
     question: string;
     answer: string;

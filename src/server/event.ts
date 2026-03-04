@@ -412,18 +412,6 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             }
           }
         },
-        event_gifts: {
-          select: {
-            type: true,
-            name: true,
-            account: true,
-            no_rek: true,
-            qty: true,
-            product_url: true,
-            product_price: true,
-            reserve_qty: true,
-          }
-        },
         event_faq: {
           select: {
             question: true,
