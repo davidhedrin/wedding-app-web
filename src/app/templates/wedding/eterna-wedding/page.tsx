@@ -14,7 +14,8 @@ import LoadingUI from "@/components/loading/loading-ui";
 import { GenProfileDescWedding } from "../../utils";
 import { EventGifts, RsvpStatusEnum } from "@/generated/prisma";
 import { GetDataEventGifts } from "@/server/event-detail";
-import FloatingActionButton from "@/app/client/events/components/floating-action";
+import FloatingActionButton from "@/app/templates/floating-action";
+import { ModalWishlist } from "../../modal-wishlist";
 
 /**
  * Invitation Type: Wedding
@@ -109,6 +110,12 @@ export default function WeddingInvitationPage() {
   };
 
   const [isMusic, setIsMusic] = useState(false);
+  const [openedModalWs, setOpenedModalWs] = useState(false);
+  const [wishlistActiveId, setWishlistActiveId] = useState<number>(0);
+  const openModalWislist = (wislist_id: number) => {
+    setWishlistActiveId(wislist_id);
+    setOpenedModalWs(true);
+  }
 
   useEffect(() => {
     const delayMs = 2000;
@@ -446,7 +453,7 @@ export default function WeddingInvitationPage() {
                     <div className="p-6">
                       <h3 className="font-serif text-2xl">{x.fullname}</h3>
                       <p className="mt-2 text-stone-300">
-                        {x.type === "Bride" ? groomProfile : brideProfile}
+                        {x.type === "Groom" ? groomProfile : brideProfile}
                       </p>
                       {
                         x.personal_msg && <p className="mt-2 italic text-stone-300">
@@ -973,6 +980,7 @@ export default function WeddingInvitationPage() {
                             Referensi
                           </a>
                           <button
+                            onClick={() => openModalWislist(x.id)}
                             className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
                           >
                             Reservasi
@@ -1091,6 +1099,8 @@ export default function WeddingInvitationPage() {
                 </div>
               }
             </div>
+            
+            <ModalWishlist open={openedModalWs} setOpen={setOpenedModalWs} wishlist_id={wishlistActiveId} />
           </div>
         </Section>
 
