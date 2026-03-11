@@ -470,7 +470,7 @@ export async function StoreUpdateGift(event_id: number, formData: DtoEventGift) 
         name: formData.name,
         account: formData.account,
         no_rek: formData.no_rek,
-        qty: formData.qty,
+        qty: formData.qty ?? 0,
         product_url: formData.product_url,
         product_price: formData.product_price,
         updatedBy: user?.email
@@ -481,7 +481,7 @@ export async function StoreUpdateGift(event_id: number, formData: DtoEventGift) 
         name: formData.name,
         account: formData.account,
         no_rek: formData.no_rek,
-        qty: formData.qty,
+        qty: formData.qty ?? 0,
         product_url: formData.product_url,
         product_price: formData.product_price,
         createdBy: user?.email

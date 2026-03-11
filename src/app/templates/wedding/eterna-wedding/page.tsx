@@ -16,6 +16,7 @@ import { EventGifts, RsvpStatusEnum } from "@/generated/prisma";
 import { GetDataEventGifts } from "@/server/event-detail";
 import FloatingActionButton from "@/app/templates/floating-action";
 import { ModalWishlist } from "../../modal-wishlist";
+import { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -57,6 +58,9 @@ function useLockBodyScroll(isLocked: boolean) {
 }
 
 export default function WeddingInvitationPage() {
+  const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
+  const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
+
   const [isLoading, setIsloading] = useState(true);
   const searchParams = useSearchParams();
   const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
@@ -92,6 +96,7 @@ export default function WeddingInvitationPage() {
         product_price: true,
         qty: true,
         product_url: true,
+        reserve_qty: true,
       },
       orderBy: {
         id: "asc"
@@ -320,10 +325,9 @@ export default function WeddingInvitationPage() {
 
                 <button
                   onClick={() => {
-                    if (eventDatas && eventDatas.music_url) {
-                      playMusic(eventDatas.music_url);
-                      setIsMusic(prev => !prev);
-                    }
+                    if (eventDatas && eventDatas.music_url) playMusic(eventDatas.music_url);
+                    else playMusic(musicThemeWedding?.items[0].url ?? "");
+                    setIsMusic(prev => !prev);
                     setOpened(prev => !prev);
                   }}
                   className="mt-10 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
@@ -867,57 +871,85 @@ export default function WeddingInvitationPage() {
                 mengirimkan tanda kasih, berikut informasi rekening kami.
               </p>
 
-              <div className="mt-5 grid md:grid-cols-3 gap-5">
-                {/* Rekening Item */}
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-sm text-stone-200">
-                    Bank BCA · A/N Aisyah Putri
-                  </p>
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
-                      1234567890
-                    </code>
-                    <button
-                      onClick={() => {
-                        copyToClipboard("1234567890");
-                        toast({
-                          type: "success",
-                          title: "Copy to Clipboard",
-                          message: "Well done, Text copied to clipboard.",
-                        });
-                      }}
-                      className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
-                    >
-                      Salin
-                    </button>
+              {
+                eventDatas ? <div className="mt-5 grid md:grid-cols-3 gap-5">
+                  {
+                    eventDatas.event_gifts.map((x, i) => (
+                      <div key={i} className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <div className="flex items-center gap-3">
+                          <img className="h-5" src={allPaymentMethod.find(m => m.key === x.name)?.icon} /> · <span className="text-sm text-stone-200">A/N {x.account}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-3">
+                          <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
+                            {x.no_rek}
+                          </code>
+                          <button
+                            onClick={() => {
+                              copyToClipboard(x.no_rek ?? "");
+                              toast({
+                                type: "success",
+                                title: "Copy to Clipboard",
+                                message: "Well done, Text copied to clipboard.",
+                              });
+                            }}
+                            className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
+                          >
+                            Salin
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div> : <div className="mt-5 grid md:grid-cols-3 gap-5">
+                  <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                    <div className="flex items-center gap-3">
+                      <img className="h-5" src={allPaymentMethod.find(m => m.key === "bca")?.icon} /> · <span className="text-sm text-stone-200">A/N Aisyah Putri</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
+                        1234567890
+                      </code>
+                      <button
+                        onClick={() => {
+                          copyToClipboard("1234567890");
+                          toast({
+                            type: "success",
+                            title: "Copy to Clipboard",
+                            message: "Well done, Text copied to clipboard.",
+                          });
+                        }}
+                        className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
+                      >
+                        Salin
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Rekening Item */}
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-sm text-stone-200">
-                    Bank Mandiri · A/N Rizky Pratama
-                  </p>
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
-                      9876543210
-                    </code>
-                    <button
-                      onClick={() => {
-                        copyToClipboard("1234567890");
-                        toast({
-                          type: "success",
-                          title: "Copy to Clipboard",
-                          message: "Well done, Text copied to clipboard.",
-                        });
-                      }}
-                      className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
-                    >
-                      Salin
-                    </button>
+                  <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                    <div className="flex items-center gap-3">
+                      <img className="h-5" src={allPaymentMethod.find(m => m.key === "mandiri")?.icon} /> · <span className="text-sm text-stone-200">A/N Rizky Pratama</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <code className="rounded bg-black/40 px-3 py-1 text-sm text-stone-100">
+                        9876543210
+                      </code>
+                      <button
+                        onClick={() => {
+                          copyToClipboard("1234567890");
+                          toast({
+                            type: "success",
+                            title: "Copy to Clipboard",
+                            message: "Well done, Text copied to clipboard.",
+                          });
+                        }}
+                        className="text-xs text-stone-300 underline underline-offset-4 hover:no-underline"
+                      >
+                        Salin
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
 
             {/* ========================================= */}
@@ -964,11 +996,11 @@ export default function WeddingInvitationPage() {
                     >
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-stone-100">
-                          {x.name}
+                          {x.name}{x.qty === x.reserve_qty && " (FULL)"}
                         </p>
                         <div className="text-xs text-stone-300 space-y-0.5">
                           <p>Harga: {x.product_price}</p>
-                          <p>Jumlah: {x.qty} unit</p>
+                          <p>Jumlah: {x.qty} Unit • Direservasi: {x.reserve_qty} Unit</p>
                         </div>
 
                         <div className='flex justify-between items-center gap-3'>
@@ -977,13 +1009,13 @@ export default function WeddingInvitationPage() {
                             target="_blank"
                             className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
                           >
-                            Referensi
+                            Lihat
                           </a>
                           <button
                             onClick={() => openModalWislist(x.id)}
                             className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
                           >
-                            Reservasi
+                            Reservasi <i className='bx bx-gift text-base ml-1'></i>
                           </button>
                         </div>
                       </div>
@@ -1018,7 +1050,7 @@ export default function WeddingInvitationPage() {
                         </p>
                         <div className="text-xs text-stone-300 space-y-0.5">
                           <p>Harga: {item.price}</p>
-                          <p>Jumlah: {item.qty} unit</p>
+                          <p>Jumlah: {item.qty} Unit • Direservasi: 1 Unit</p>
                         </div>
 
                         <div className='flex justify-between items-center gap-3'>
@@ -1027,12 +1059,13 @@ export default function WeddingInvitationPage() {
                             target="_blank"
                             className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
                           >
-                            Referensi
+                            Lihat
                           </a>
                           <button
+                            onClick={() => openModalWislist(0)}
                             className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10"
                           >
-                            Reservasi
+                            Reservasi <i className='bx bx-gift text-base ml-1'></i>
                           </button>
                         </div>
                       </div>
@@ -1099,8 +1132,14 @@ export default function WeddingInvitationPage() {
                 </div>
               }
             </div>
-            
-            <ModalWishlist open={openedModalWs} setOpen={setOpenedModalWs} wishlist_id={wishlistActiveId} />
+
+            <ModalWishlist
+              open={openedModalWs}
+              setOpen={setOpenedModalWs}
+              wishlist_id={wishlistActiveId}
+              barcode={invtParams.code ?? ""}
+              fatchWishlist={fatchWishlist}
+            />
           </div>
         </Section>
 
@@ -1145,7 +1184,7 @@ export default function WeddingInvitationPage() {
       <FloatingActionButton
         isMusic={isMusic}
         setIsMusic={setIsMusic}
-        musicUrl={eventDatas ? eventDatas.music_url ?? "adsf" : "asdf"}
+        musicUrl={eventDatas ? eventDatas.music_url ?? (musicThemeWedding?.items[0].url ?? "") : (musicThemeWedding?.items[0].url ?? "")}
         qrValue={invtParams.code ?? "Wedlyvite"}
         guestName={eventDatas?.event_rsvp.name ?? "Thomas Edison"}
         eventDate={formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}

@@ -206,3 +206,12 @@ export type DtoAttendanceRsvp = {
   rsvp_att_number: number | null;
   rsvp_desc: string | null;
 };
+
+export type DtoReservation = {
+  gift_id: number;
+  barcode: string;
+  qty: number;
+  name: string | null;
+  email_wa: string | null;
+  message: string | null;
+};

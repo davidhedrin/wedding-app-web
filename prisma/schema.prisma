@@ -335,9 +335,9 @@ model EventGifts {
   name          String
   account       String?
   no_rek        String?
-  qty           Int?
   product_url   String?
   product_price Int?
+  qty           Int               @default(0)
   reserve_qty   Int               @default(0)
 
   createdBy String?
@@ -345,7 +345,8 @@ model EventGifts {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  event            Events                @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  wishlist_reserve WishlistReservation[]
 }
 
 model EventFAQ {
@@ -378,4 +379,17 @@ model EventRsvp {
   updatedAt DateTime? @updatedAt
 
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+}
+
+model WishlistReservation {
+  id          Int    @id @default(autoincrement())
+  gift_id     Int
+  barcode     String
+  reserve_qty Int
+
+  name        String?
+  email_or_wa String?
+  message     String?
+
+  event_gift EventGifts @relation(fields: [gift_id], references: [id], onDelete: Cascade)
 }

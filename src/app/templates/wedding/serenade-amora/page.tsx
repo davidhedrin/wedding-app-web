@@ -798,7 +798,7 @@ const WeddingInvitationPage: React.FC = () => {
                       Estimasi harga: {item.price}
                     </p>
                     <p className="mt-1 text-sm text-neutral-500">
-                      Jumlah: {item.qty}
+                      Jumlah: {item.qty} Unit • Direservasi: 1 Unit
                     </p>
                   </div>
 
@@ -807,12 +807,12 @@ const WeddingInvitationPage: React.FC = () => {
                       href="#"
                       className="mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
                     >
-                      Refs
+                      Lihat
                     </a>
                     <button
                       className="flex-1 mt-2 inline-flex justify-center rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 transition"
                     >
-                      Reservasi
+                      Reservasi <i className='bx bx-gift text-base ml-1'></i>
                     </button>
                   </div>
                 </div>

@@ -136,6 +136,11 @@ export type EventInitProps = {
     question: string;
     answer: string;
   }[];
+  event_gifts: {
+    name: string;
+    account: string | null;
+    no_rek: string | null;
+  }[];
   event_rsvp: {
     name: string;
     event_id: number;

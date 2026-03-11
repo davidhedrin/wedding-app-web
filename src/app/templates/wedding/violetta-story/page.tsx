@@ -914,7 +914,7 @@ export default function WeddingInvitationPage() {
                         Estimasi: {item.price}
                       </p>
                       <p className="text-sm text-white/60 mt-1">
-                        Jumlah: {item.qty}
+                        Jumlah: {item.qty} Unit • Direservasi: 1 Unit
                       </p>
                     </div>
 
@@ -923,12 +923,12 @@ export default function WeddingInvitationPage() {
                         href="#"
                         className="mt-3 text-center text-sm rounded-full border border-white/20 py-2 px-3 hover:bg-white/10 transition"
                       >
-                        Referensi
+                        Lihat
                       </a>
                       <button
                         className="flex-1 mt-3 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
                       >
-                        Reservasi
+                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
                       </button>
                     </div>
                   </div>

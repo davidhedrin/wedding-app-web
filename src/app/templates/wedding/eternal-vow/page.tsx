@@ -1047,7 +1047,7 @@ const GiftSection: React.FC = () => {
                       </p>
                       <p>
                         <span className="text-neutral-300">Requested:</span>{' '}
-                        {item.quantity} unit
+                        {item.quantity} Unit • Direservasi: 1 Unit
                       </p>
                     </div>
                   </div>
@@ -1058,11 +1058,11 @@ const GiftSection: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 w-full inline-flex items-center justify-center px-4 py-3 rounded-full border border-amber-400/40 text-amber-300 text-xs uppercase tracking-widest transition hover:bg-amber-400 hover:text-black">
-                      Refs
+                      Lihat
                     </a>
                     <button
                       className="w-full inline-flex items-center justify-center px-4 py-3 rounded-full border border-amber-400/40 text-amber-300 text-xs uppercase tracking-widest transition hover:bg-amber-400 hover:text-black">
-                      Reservasi
+                      Reservasi <i className='bx bx-gift text-base ml-1'></i>
                     </button>
                   </div>
                 </div>

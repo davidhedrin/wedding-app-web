@@ -882,7 +882,7 @@ function Hadiah({
 
                 <div className="mt-1 text-xs text-emerald-100/70 space-y-0.5">
                   <p>Perkiraan Harga: {item.price}</p>
-                  <p>Jumlah: {item.qty} unit</p>
+                  <p>Jumlah: {item.qty} Unit • Direservasi: 1 Unit</p>
                 </div>
 
                 <div className='flex justify-between items-center gap-3'>
@@ -891,11 +891,11 @@ function Hadiah({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 mt-3 inline-flex w-full justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs text-amber-200 transition hover:bg-amber-300/10">
-                    Referensi
+                    Lihat
                   </a>
                   <button
                     className="mt-3 inline-flex w-full justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs text-amber-200 transition hover:bg-amber-300/10">
-                    Reservasi
+                    Reservasi <i className='bx bx-gift text-base ml-1'></i>
                   </button>
                 </div>
               </div>

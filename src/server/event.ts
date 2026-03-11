@@ -2,7 +2,7 @@
 
 import { CommonParams, EventInitProps, PaginateResult } from "@/lib/model-types";
 import { db } from "../../prisma/db-init";
-import { DtoAttendanceRsvp, DtoEvents, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
+import { DtoAttendanceRsvp, DtoEvents, DtoReservation, DtoSnapMidtrans, DtoTr, MidtransSnapResponse } from "@/lib/dto";
 import { auth } from "@/app/api/auth/auth-setup";
 import { CartCheckoutProps, CombineDateAndTime, stringWithTimestamp } from "@/lib/utils";
 import { ulid } from "ulid";
@@ -354,7 +354,7 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
         music_url: true,
         schedule_note: true,
         wishlist_address: true,
-
+        
         gb_info: {
           select: {
             type: true,
@@ -412,6 +412,16 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             }
           }
         },
+        event_gifts: {
+          where: {
+            type: "Transfer"
+          },
+          select: {
+            name: true,
+            account: true,
+            no_rek: true,
+          }
+        },
         event_faq: {
           select: {
             question: true,
@@ -462,7 +472,7 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
   } catch (error) {
     throw error;
   }
-}
+};
 
 export async function UpadateRsvp(barcode: string, formData: DtoAttendanceRsvp) {
   try {
@@ -474,6 +484,42 @@ export async function UpadateRsvp(barcode: string, formData: DtoAttendanceRsvp) 
         att_number: formData.rsvp_att_number,
         desc: formData.rsvp_desc
       }
+    });
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export async function ReservastionWishlist(formData:DtoReservation) {
+  try{
+    const findWishlist = await db.eventGifts.findUnique({
+      where: { id: formData.gift_id }
+    });
+    if(!findWishlist) throw new Error("Data wishlist tidak ditemukan!");
+
+    await db.$transaction(async (tr) => {
+      const reminderQty = findWishlist.qty - findWishlist.reserve_qty;
+      if(formData.qty > reminderQty) throw new Error("Jumlah reservasi melebihi sisa yang tersedia.");
+
+      await tr.eventGifts.update({
+        where: { id: formData.gift_id },
+        data: {
+          reserve_qty: {
+            increment: formData.qty
+          }
+        }
+      });
+
+      await tr.wishlistReservation.create({
+        data: {
+          gift_id: formData.gift_id,
+          barcode: formData.barcode,
+          reserve_qty: formData.qty,
+          name: formData.name,
+          email_or_wa: formData.email_wa,
+          message: formData.message,
+        }
+      });
     });
   } catch (error: any) {
     throw error;

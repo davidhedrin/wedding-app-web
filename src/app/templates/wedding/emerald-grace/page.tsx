@@ -732,7 +732,7 @@ export default function Page() {
                             <span className="text-emerald-100/80">
                               Jumlah:
                             </span>{' '}
-                            {item.qty} unit
+                            {item.qty} Unit • Direservasi: 1 Unit
                           </div>
                         </div>
                       </div>
@@ -743,12 +743,12 @@ export default function Page() {
                           target="_blank"
                           className="flex-1 inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
                         >
-                          Referensi
+                          Lihat
                         </a>
                         <button
                           className="inline-flex w-full items-center justify-center rounded-full border border-emerald-300/40 px-5 py-2.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
                         >
-                          Reservasi
+                          Reservasi <i className='bx bx-gift text-base ml-1'></i>
                         </button>
                       </div>
                     </div>

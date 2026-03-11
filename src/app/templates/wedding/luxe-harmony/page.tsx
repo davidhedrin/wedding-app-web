@@ -650,19 +650,19 @@ export default function InvitationPage() {
                     <p className="mt-1 text-xs text-slate-600">
                       Perkiraan harga: {item.price}
                     </p>
-                    <p className="mt-1 text-xs text-slate-600">Jumlah: {item.qty} unit</p>
+                    <p className="mt-1 text-xs text-slate-600">Jumlah: {item.qty} Unit • Direservasi: 1 Unit</p>
 
                     <div className='flex justify-between items-center gap-3'>
                       <a
                         href="#"
                         className="flex-1 mt-3 inline-flex w-full justify-center rounded-md border border-amber-300 px-3 py-2 text-xs text-slate-700 hover:bg-amber-100 transition"
                       >
-                        Referensi
+                        Lihat
                       </a>
                       <button
                         className="mt-3 inline-flex w-full justify-center rounded-md border border-amber-300 px-3 py-2 text-xs text-slate-700 hover:bg-amber-100 transition"
                       >
-                        Reservasi
+                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
                       </button>
                     </div>
                   </div>

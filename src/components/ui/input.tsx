@@ -64,14 +64,14 @@ export default function Input({
 
           {/* prefix icon */}
           {prefixIcon && (
-            <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3">
+            <div className="absolute inset-y-0 inset-s-0 flex items-center pointer-events-none ps-3">
               {prefixIcon}
             </div>
           )}
 
           {/* sufix icon */}
           {sufixIcon && (
-            <div className="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
+            <div className="absolute inset-y-0 inset-e-0 flex items-center pointer-events-none pe-3">
               {sufixIcon}
             </div>
           )}

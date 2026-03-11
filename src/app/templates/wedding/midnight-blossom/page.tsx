@@ -653,7 +653,7 @@ export default function UndanganPage() {
                     <p className="mt-1 text-sm text-neutral-400">
                       Estimasi harga: {item.price}
                     </p>
-                    <p className="mt-1 text-sm text-neutral-400">Jumlah: {item.qty} unit</p>
+                    <p className="mt-1 text-sm text-neutral-400">Jumlah: {item.qty} Unit • Direservasi: 1 Unit</p>
                   </div>
 
                   <div className='flex justify-between items-center gap-3'>
@@ -661,12 +661,12 @@ export default function UndanganPage() {
                       href="#"
                       className="mt-3 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
                     >
-                      Referensi
+                      Lihat
                     </a>
                     <button
                       className="flex-1 mt-3 inline-flex justify-center rounded-lg border border-white/10 px-3 py-2 text-sm hover:bg-white/10 transition"
                     >
-                      Reservasi
+                      Reservasi <i className='bx bx-gift text-base ml-1'></i>
                     </button>
                   </div>
                 </div>

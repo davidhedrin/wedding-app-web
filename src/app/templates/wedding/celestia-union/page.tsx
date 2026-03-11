@@ -750,7 +750,7 @@ export default function WeddingInvitationPage() {
                         </div>
                         <div>
                           <span className="text-white/80">Jumlah:</span>{' '}
-                          {item.qty} unit
+                          {item.qty} Unit • Direservasi: 1 Unit
                         </div>
                       </div>
                     </div>
@@ -766,7 +766,7 @@ export default function WeddingInvitationPage() {
                           'flex-1'
                         )}
                       >
-                        Referensi
+                        Lihat
                       </a>
                       <button
                         className={classNames(
@@ -776,7 +776,7 @@ export default function WeddingInvitationPage() {
                           'text-black',
                         )}
                       >
-                        Reservasi
+                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
                       </button>
                     </div>
                   </div>

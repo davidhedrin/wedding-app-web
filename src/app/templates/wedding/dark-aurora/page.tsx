@@ -611,7 +611,7 @@ export default function WeddingInvitationPage() {
 
                     <div className="text-sm text-slate-300/80">
                       <div>Harga: {item.price}</div>
-                      <div>Jumlah: {item.qty} unit</div>
+                      <div>Jumlah: {item.qty} Unit • Direservasi: 1 Unit</div>
                     </div>
 
                     <div className="flex justify-between items-center gap-3">
@@ -620,12 +620,12 @@ export default function WeddingInvitationPage() {
                         target="_blank"
                         className="flex-1 inline-flex w-full items-center justify-center rounded-xl border border-amber-300/40 px-4 py-2 text-xs font-semibold text-amber-200 transition hover:bg-amber-300/10"
                       >
-                        Referensi
+                        Lihat
                       </a>
                       <button
                         className="inline-flex w-full items-center justify-center rounded-lg bg-amber-300 px-3 py-2 text-xs font-semibold text-slate-900 hover:brightness-110 transition"
                       >
-                        Reservasi
+                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
                       </button>
                     </div>
                   </div>

@@ -833,7 +833,7 @@ export default function WeddingInvitePage() {
                         </p>
                         <div className="mt-1 text-xs text-rose-200/80 space-y-0.5">
                           <p>Perkiraan Harga: {item.price}</p>
-                          <p>Jumlah: {item.qty} unit</p>
+                          <p>Jumlah: {item.qty} Unit • Direservasi: 1 Unit</p>
                         </div>
 
                         <div className='flex justify-between items-center gap-3'>
@@ -843,12 +843,12 @@ export default function WeddingInvitePage() {
                             rel="noopener noreferrer"
                             className="flex-1 mt-3 inline-flex w-full justify-center rounded-md border border-rose-400/40 px-3 py-2 text-xs text-rose-200 hover:bg-rose-800/40 transition"
                           >
-                            Referensi
+                            Lihat
                           </a>
                           <button
                             className="mt-3 inline-flex w-full justify-center rounded-md border border-rose-400/40 px-3 py-2 text-xs text-rose-200 hover:bg-rose-800/40 transition"
                           >
-                            Reservasi
+                            Reservasi <i className='bx bx-gift text-base ml-1'></i>
                           </button>
                         </div>
                       </div>
