@@ -79,7 +79,7 @@ export default function WeddingInvitationPage() {
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
   const [pageTableWs, setPageTableWs] = useState(1);
-  const [perPageWs, setPerPageWs] = useState(2);
+  const [perPageWs, setPerPageWs] = useState(6);
   const [totalPageWs, setTotalPageWs] = useState(0);
   const [datasWs, setDatasWs] = useState<EventGifts[] | null>(null);
 

@@ -490,18 +490,19 @@ export async function UpadateRsvp(barcode: string, formData: DtoAttendanceRsvp) 
   }
 };
 
-export async function ReservastionWishlist(formData:DtoReservation) {
+export async function ReservastionWishlist(formData: DtoReservation) {
   try{
     const findWishlist = await db.eventGifts.findUnique({
       where: { id: formData.gift_id }
     });
     if(!findWishlist) throw new Error("Data wishlist tidak ditemukan!");
 
+    const dataId = formData.id ?? 0;
     await db.$transaction(async (tr) => {
       const reminderQty = findWishlist.qty - findWishlist.reserve_qty;
-      if(formData.qty > reminderQty) throw new Error("Jumlah reservasi melebihi sisa yang tersedia.");
+      if(dataId === 0 && formData.qty > reminderQty) throw new Error("Jumlah reservasi melebihi sisa yang tersedia.");
 
-      await tr.eventGifts.update({
+      if(dataId === 0) await tr.eventGifts.update({
         where: { id: formData.gift_id },
         data: {
           reserve_qty: {
@@ -510,8 +511,14 @@ export async function ReservastionWishlist(formData:DtoReservation) {
         }
       });
 
-      await tr.wishlistReservation.create({
-        data: {
+      await tr.wishlistReservation.upsert({
+        where: { id: dataId},
+        update: {
+          name: formData.name,
+          email_or_wa: formData.email_wa,
+          message: formData.message,
+        },
+        create: {
           gift_id: formData.gift_id,
           barcode: formData.barcode,
           reserve_qty: formData.qty,
@@ -524,4 +531,30 @@ export async function ReservastionWishlist(formData:DtoReservation) {
   } catch (error: any) {
     throw error;
   }
-}
+};
+
+export async function CancelReservation(id: number) {
+  try{
+    const findRsp = await db.wishlistReservation.findUnique({
+      where: { id }
+    });
+    if(!findRsp) throw new Error("Data reservasi tidak ditemukan!");
+
+    await db.$transaction(async (tr) => {
+      await tr.eventGifts.update({
+        where: { id: findRsp.gift_id },
+        data: {
+          reserve_qty: {
+            decrement: findRsp.reserve_qty
+          }
+        }
+      });
+
+      await tr.wishlistReservation.delete({
+        where: { id }
+      });
+    });
+  } catch (error: any) {
+    throw error;
+  }
+};

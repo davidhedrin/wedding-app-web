@@ -7,7 +7,7 @@ import { auth } from "@/app/api/auth/auth-setup";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 import { stringWithTimestamp } from "@/lib/utils";
@@ -504,6 +504,17 @@ export async function DeleteDataEventGifts(id: number) {
   } catch (error: any) {
     throw error;
   }
+};
+
+export async function GetDataWishlistRsv(wishlist_id: number, barcode: string): Promise<WishlistReservation | null> {
+  const findData = await db.wishlistReservation.findFirst({
+    where: {
+      gift_id: wishlist_id,
+      barcode
+    }
+  });
+
+  return findData;
 };
 // End Event Gifts
 

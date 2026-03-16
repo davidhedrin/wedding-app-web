@@ -2,11 +2,11 @@
 
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
-import { EventGifts } from "@/generated/prisma";
+import { EventGifts, WishlistReservation } from "@/generated/prisma";
 import { DtoReservation } from "@/lib/dto";
 import { ExecuteMinimumDelay, showConfirm, toast } from "@/lib/utils";
-import { ReservastionWishlist } from "@/server/event";
-import { GetDataEventGiftsById } from "@/server/event-detail";
+import { CancelReservation, ReservastionWishlist } from "@/server/event";
+import { GetDataEventGiftsById, GetDataWishlistRsv } from "@/server/event-detail";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 type ModalWishlistProps = {
@@ -26,7 +26,8 @@ export const ModalWishlist = ({
 }: ModalWishlistProps) => {
   const [maxQty, setMaxQty] = useState<number>(1);
   const [reqQty, setReqQty] = useState<number>(1);
-  const [data, setData] = useState<EventGifts | null>(null);
+  const [dataGift, setDataGift] = useState<EventGifts | null>(null);
+  const [wishlistRsp, setWishlistRsp] = useState<WishlistReservation | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState<string>("");
@@ -36,12 +37,15 @@ export const ModalWishlist = ({
   const closeModal = () => {
     setMaxQty(1);
     setReqQty(1);
-    setData(null);
+    setDataGift(null);
     setOpen(false);
   };
 
+  const fatchWishlistRsv = async (id: number, barcode: string) => {
+  };
+
   useEffect(() => {
-    if (!open || data) return;
+    if (!open || dataGift) return;
 
     setName("");
     setEmailWa("");
@@ -50,14 +54,22 @@ export const ModalWishlist = ({
       setLoading(true);
 
       try {
-        const getData = await ExecuteMinimumDelay(
-          GetDataEventGiftsById(wishlist_id),
-          1100
-        );
+        const getData = await GetDataEventGiftsById(wishlist_id);
         if (!getData) return;
 
-        setData(getData);
+        setDataGift(getData);
         setMaxQty(getData.qty - getData.reserve_qty);
+
+        await fatchWishlistRsv(wishlist_id, barcode);
+
+        const getDataRsp = await GetDataWishlistRsv(wishlist_id, barcode);
+        setWishlistRsp(getDataRsp);
+        if (getDataRsp) {
+          setMaxQty(getDataRsp.reserve_qty);
+          setName(getDataRsp.name ?? "");
+          setEmailWa(getDataRsp.email_or_wa ?? "");
+          setMessage(getDataRsp.message ?? "");
+        }
       } catch (error) {
         console.error("Failed fetch wishlist:", error);
       } finally {
@@ -80,6 +92,7 @@ export const ModalWishlist = ({
 
   const createDtoData = (): DtoReservation => {
     const data = {
+      id: wishlistRsp?.id ?? null,
       gift_id: wishlist_id,
       barcode,
       qty: reqQty,
@@ -120,11 +133,41 @@ export const ModalWishlist = ({
         ReservastionWishlist(createDtoData()),
         1100
       );
-      await fatchWishlist(data?.event_id ?? 0);
       toast({
         type: "success",
         title: "Submit successfully",
         message: "Your submission has been successfully completed"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Request Failed",
+        message: error.message
+      });
+    }
+    await fatchWishlist(dataGift?.event_id ?? 0);
+    setLoading(false);
+    closeModal();
+  };
+
+  const cancelReservation = async (id: number) => {
+    const confirmed = await showConfirm({
+      title: 'Batalkan Reservasi?',
+      message: 'Apakah kamu sudah yakin membatalkan reservasimu!',
+      confirmText: 'Lanjutkan',
+      cancelText: 'Batal',
+      icon: 'bx bx-error bx-tada text-red-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await CancelReservation(id);
+      await fatchWishlist(dataGift?.event_id ?? 0);
+      toast({
+        type: "success",
+        title: "Canceled Complete",
+        message: "Your reservation has been canceled successfully"
       });
     } catch (error: any) {
       toast({
@@ -167,31 +210,33 @@ export const ModalWishlist = ({
           </div> : <div>
             <div className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                {/* <div className="col-span-12 mb-1">
-                  <div className="bg-teal-100/60 border-s-4 border-teal-600 rounded-lg p-3 dark:bg-teal-800/30" role="alert" aria-labelledby="hs-bordered-success-style-label">
-                    <div className="flex items-center">
-                      <div className="shrink-0 leading-0">
-                        <span className="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-600 dark:border-teal-900 dark:bg-teal-600 dark:text-teal-400">
-                          <i className='bx bx-badge-check text-4xl'></i>
-                        </span>
-                      </div>
-                      <div className="ms-2">
-                        <div className="text-foreground font-semibold text-sm">
-                          Terimakasih atas reservasi anda.
+                {
+                  wishlistRsp && <div className="col-span-12 mb-1">
+                    <div className="bg-teal-100/60 border-s-4 border-teal-600 rounded-lg p-3 dark:bg-teal-800/30" role="alert" aria-labelledby="hs-bordered-success-style-label">
+                      <div className="flex items-center">
+                        <div className="shrink-0 leading-0">
+                          <span className="inline-flex justify-center items-center size-8 rounded-full border-4 border-teal-100 bg-teal-200 text-teal-600 dark:border-teal-900 dark:bg-teal-600 dark:text-teal-400">
+                            <i className='bx bx-badge-check text-4xl'></i>
+                          </span>
                         </div>
-                        <p className="text-sm text-foreground">
-                          Hadiah terbaik dari anda sangat bermanfaat bagi kami.
-                        </p>
+                        <div className="ms-2">
+                          <div className="text-foreground font-semibold text-sm">
+                            Terimakasih atas reservasi anda.
+                          </div>
+                          <p className="text-sm text-foreground">
+                            Hadiah terbaik dari anda sangat bermanfaat bagi kami.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div> */}
+                }
 
                 <div className="col-span-12 md:col-span-6">
                   <p className="text-muted text-sm">Nama Item:</p>
                   <p className="font-semibold text-sm">
                     {
-                      data ? data.name : "Set Peralatan Makan Keramik"
+                      dataGift ? dataGift.name : "Set Peralatan Makan Keramik"
                     }
                   </p>
                 </div>
@@ -199,26 +244,28 @@ export const ModalWishlist = ({
                   <p className="text-muted text-sm">Jumlah Reservasi:</p>
                   <p className="font-semibold text-sm">
                     {
-                      data ? maxQty : "1"
+                      dataGift ? maxQty : "1"
                     } Unit / Item
                   </p>
                 </div>
 
-                <div className="col-span-12">
-                  <div className="border rounded-lg p-3 bg-gray-50">
-                    <p className="text-sm mb-1">Tentukan jumlah yang akan Anda kirim:</p>
+                {
+                  !wishlistRsp && <div className="col-span-12">
+                    <div className="border rounded-lg p-3 bg-gray-50">
+                      <p className="text-sm mb-1">Tentukan jumlah yang akan Anda kirim:</p>
 
-                    <div className="flex items-center gap-3">
-                      <button className="w-7 h-7 border border-blue-500 rounded text-blue-500 font-semibold bg-blue-200/40 hover:scale-105" type="button" onClick={() => incsDecsQty(false)}>-</button>
-                      <span className="font-semibold text-base">{reqQty}</span>
-                      <button className="w-7 h-7 border border-blue-500 rounded text-blue-500 font-semibold bg-blue-200/40 hover:scale-105" type="button" onClick={() => incsDecsQty(true)}>+</button>
+                      <div className="flex items-center gap-3">
+                        <button className="w-7 h-7 border border-blue-500 rounded text-blue-500 font-semibold bg-blue-200/40 hover:scale-105" type="button" onClick={() => incsDecsQty(false)}>-</button>
+                        <span className="font-semibold text-base">{reqQty}</span>
+                        <button className="w-7 h-7 border border-blue-500 rounded text-blue-500 font-semibold bg-blue-200/40 hover:scale-105" type="button" onClick={() => incsDecsQty(true)}>+</button>
 
-                      <span className="text-sm text-muted">
-                        dari <span className="font-semibold">{data ? maxQty : 1}</span> Unit / Item tersedia
-                      </span>
+                        <span className="text-sm text-muted">
+                          dari <span className="font-semibold">{dataGift ? maxQty : 1}</span> Unit / Item tersedia
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                }
               </div>
             </div>
 
@@ -234,14 +281,13 @@ export const ModalWishlist = ({
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
                 <div className="col-span-12 md:col-span-6">
-                  <Input value={name} onChange={(e) => setName(e.target.value)} type='text' id='faq_question' label='Nama' placeholder='Masukkan nama anda' />
-                  {/* {stateFormFaq.errors?.faq_question && <ZodErrors err={stateFormFaq.errors?.faq_question} />} */}
+                  <Input value={name} onChange={(e) => setName(e.target.value)} type='text' id='rsp_name' label='Nama' placeholder='Masukkan nama anda' />
                 </div>
                 <div className="col-span-12 md:col-span-6">
-                  <Input value={emailWa} onChange={(e) => setEmailWa(e.target.value)} type='text' id='faq_question' label='Email / WhatsApp' placeholder='Email atau no whatsapp' />
+                  <Input value={emailWa} onChange={(e) => setEmailWa(e.target.value)} type='text' id='rsp_email_wa' label='Email / WhatsApp' placeholder='Email atau no whatsapp' />
                 </div>
                 <div className="col-span-12">
-                  <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} id='faq_question' label='Ucapan & Doa' placeholder='Masukkan ucapan atau Doa jika ada' />
+                  <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} id='rsp_msg' label='Ucapan & Doa' placeholder='Masukkan ucapan atau Doa jika ada' />
                 </div>
               </div>
 
@@ -250,8 +296,13 @@ export const ModalWishlist = ({
                   Close
                 </button>
                 <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                  Konfirmasi
+                  {wishlistRsp ? "Update" : "Submit"}
                 </button>
+                {
+                  wishlistRsp && <button onClick={() => cancelReservation(wishlistRsp.id)} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 focus:outline-hidden focus:bg-red-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Cancel
+                  </button>
+                }
               </div>
             </form>
           </div>

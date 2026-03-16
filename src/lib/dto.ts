@@ -208,6 +208,7 @@ export type DtoAttendanceRsvp = {
 };
 
 export type DtoReservation = {
+  id: number | null;
   gift_id: number;
   barcode: string;
   qty: number;
