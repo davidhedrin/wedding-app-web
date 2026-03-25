@@ -126,6 +126,7 @@ export type DtoMainInfoWedding = {
   contact_email: string | null,
   contact_phone: string | null,
   music_url: string | null,
+  youtube_url: string | null,
   groom_bride: DtoGroomBride[];
 };
 
@@ -157,6 +158,7 @@ export type DtoScheduler = {
   loc_address: string;
   langLat: [number, number] | null;
   notes: string[];
+  youtube_url: string | null,
   
   use_main_loc: boolean;
   ceremon_type?: TradRecepType;

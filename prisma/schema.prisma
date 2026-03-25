@@ -192,6 +192,7 @@ model Events {
   contact_email   String?
   contact_phone   String?
   music_url       String?
+  youtube_url     String?
 
   schedule_note    String?
   wishlist_address String?
@@ -288,6 +289,7 @@ model ScheduleInfo {
   notes         String[]
   ceremony_type TradRecepType?
   use_main_loc  Boolean        @default(false)
+  youtube_url   String?
 
   createdBy String?
   updatedBy String?
@@ -372,6 +374,7 @@ model EventRsvp {
   att_number Int?
   barcode    String?         @unique
   desc       String?
+  show_desc  Boolean         @default(false)
 
   createdBy String?
   updatedBy String?

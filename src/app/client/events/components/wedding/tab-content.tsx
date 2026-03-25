@@ -50,6 +50,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   const [contactEmail, setContactEmail] = useState<string>(dataEvent.contact_email ?? "");
   const [contactPhone, setContactPhone] = useState<string>(dataEvent.contact_phone ?? "");
   const [musicTheme, setMusicTheme] = useState<string>(dataEvent.music_url ?? "");
+  const [ytVideoStory, setYtVideoStory] = useState<string>(dataEvent.youtube_url ?? "");
   const [imageFileCouple, setImageFileCouple] = useState<File | null>(null);
   const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(dataEvent.couple_img_path);
 
@@ -190,6 +191,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
       music_url: musicTheme.trim() != "" ? musicTheme : null,
+      youtube_url: ytVideoStory.trim() != "" ? ytVideoStory : null,
       groom_bride: [
         {
           id: groomId,
@@ -578,7 +580,13 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
               </div>
             </div>
           </div>
-
+          <div className="col-span-12">
+            <label className="block text-sm font-medium mb-1 dark:text-white" htmlFor="youtube_video_url">
+              Youtube Video Story
+              <p className='text-sm text-muted'>After upload your history love video on Youtube, you can paste the URL here. The embed video will be display on your gallery tab invitaion.</p>
+            </label>
+            <Input value={ytVideoStory} onChange={(e) => setYtVideoStory(e.target.value)} type='text' id='youtube_video_url' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
+          </div>
           <div className="col-span-12">
             <label className="block text-sm font-medium mb-1 dark:text-white">
               Couple Photo<span className="text-red-500">*</span>
@@ -701,6 +709,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
   const [locNameMb, setLocNameMb] = useState<string>("");
   const [locAddressMb, setLocAddressMb] = useState<string>("");
   const [latLangMb, setLatLangMb] = useState<[number, number] | null>(null);
+  const [ytLiveUrlMb, setYtLiveUrlMb] = useState<string>("");
   const [noteListMb, setNoteListMb] = useState<string[]>([""]);
 
   // Traditional Reception Props
@@ -714,6 +723,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
   const [locAddressTr, setLocAddressTr] = useState<string>("");
   const [latLangTr, setLatLangTr] = useState<[number, number] | null>(null);
   const [noteListTr, setNoteListTr] = useState<string[]>([""]);
+  const [ytLiveUrlTr, setYtLiveUrlTr] = useState<string>("");
   const [radioSelectTypeTr, setRadioSelectTypeTr] = useState<TradRecepType>(TradRecepType.Traditional);
 
   const [scheduleNote, setScheduleNote] = useState<string>(dataEvent.schedule_note ?? "");
@@ -746,6 +756,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
         langLat: null,
         use_main_loc: false,
         notes: [""],
+        youtube_url: ""
       }
     ]);
   };
@@ -762,6 +773,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
         loc_address: locAddressMb,
         langLat: latLangMb,
         notes: noteListMb.filter(x => x.trim() !== ""),
+        youtube_url: ytLiveUrlMb.trim() !== "" ? ytLiveUrlMb : null,
 
         use_main_loc: false,
       },
@@ -777,6 +789,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
       loc_address: locAddressTr,
       langLat: latLangTr,
       notes: noteListTr.filter(x => x.trim() !== ""),
+      youtube_url: ytLiveUrlTr.trim() !== "" ? ytLiveUrlTr : null,
 
       use_main_loc: isTrUsingLocMb,
       ceremon_type: radioSelectTypeTr,
@@ -885,6 +898,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
         setLocAddressMb(x.address ?? "");
         setLatLangMb(longLat);
         setNoteListMb(x.notes.length > 0 ? x.notes : [""]);
+        setYtLiveUrlMb(x.youtube_url ?? "");
       };
 
       if (schType === "WED_TOR") {
@@ -898,6 +912,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
         setLocAddressTr(x.address ?? "");
         setLatLangTr(longLat);
         setNoteListTr(x.notes.length > 0 ? x.notes : [""]);
+        setYtLiveUrlTr(x.youtube_url ?? "");
         setRadioSelectTypeTr(x.ceremony_type ?? "Traditional");
       };
     });
@@ -978,6 +993,9 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                   if (val !== latLangTr) switchMbLoc(false);
                   setLatLangMb([lat, lng]);
                 }} zoom={17} />}
+              </div>
+              <div className="col-span-12">
+                <Input value={ytLiveUrlMb} onChange={(e) => setYtLiveUrlMb(e.target.value)} type='text' id='mb_yt_url' label='Live Youtube URL' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -1146,6 +1164,9 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       if (val !== latLangMb) switchMbLoc(false);
                       setLatLangTr([lat, lng]);
                     }} zoom={17} />}
+                  </div>
+                  <div className="col-span-12">
+                    <Input value={ytLiveUrlTr} onChange={(e) => setYtLiveUrlTr(e.target.value)} type='text' id='tr_yt_url' label='Live Youtube URL' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
                   </div>
                   <div className="col-span-12">
                     <label className="block text-sm font-medium mb-2 dark:text-white">

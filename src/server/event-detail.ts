@@ -51,6 +51,7 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
           couple_img_name: formData.couple_img_name,
           couple_img_path: formData.couple_img_url,
           music_url: formData.music_url,
+          youtube_url: formData.youtube_url,
           updatedBy: user?.email
         }
       });
@@ -198,6 +199,7 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
               latitude: latitude.toString(),
               longitude: longitude.toString(),
               notes: x.notes,
+              youtube_url: x.youtube_url,
               ceremony_type: x.ceremon_type,
               use_main_loc: x.use_main_loc,
               updatedBy: user?.email,
@@ -213,6 +215,7 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
               latitude: latitude.toString(),
               longitude: longitude.toString(),
               notes: x.notes,
+              youtube_url: x.youtube_url,
               ceremony_type: x.ceremon_type,
               use_main_loc: x.use_main_loc,
               createdBy: user?.email,
