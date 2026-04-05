@@ -201,7 +201,6 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
               notes: x.notes,
               youtube_url: x.youtube_url,
               ceremony_type: x.ceremon_type,
-              use_main_loc: x.use_main_loc,
               updatedBy: user?.email,
             },
             create: {
@@ -217,7 +216,6 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
               notes: x.notes,
               youtube_url: x.youtube_url,
               ceremony_type: x.ceremon_type,
-              use_main_loc: x.use_main_loc,
               createdBy: user?.email,
             },
           });

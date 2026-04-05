@@ -380,7 +380,7 @@ export default function Page() {
         <i className='bx bx-plus-circle text-lg'></i> New
       </button>
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-lg hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
@@ -499,7 +499,7 @@ export default function Page() {
                       <label htmlFor="spa_detault_address" className="relative inline-block w-9 h-5 cursor-pointer">
                         <input checked={isOneUse} onChange={(e) => setIsOneUse(e.target.checked)} type="checkbox" id="spa_detault_address" className="peer sr-only" />
                         <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                        <span className="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                        <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
                       </label>
                       <label htmlFor="spa_detault_address" className="text-sm text-gray-500">One-Time Use</label>
                     </div>

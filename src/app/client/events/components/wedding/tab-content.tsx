@@ -728,18 +728,19 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
 
   const [scheduleNote, setScheduleNote] = useState<string>(dataEvent.schedule_note ?? "");
 
-  const switchMbLoc = (changeVal: boolean) => {
-    setTrUsingLocMb(changeVal);
-    if (changeVal) {
-      setLocNameTr(locNameMb);
-      setLocAddressTr(locAddressMb);
-      setLatLangTr(latLangMb);
-    } else {
-      setLocNameTr("");
-      setLocAddressTr("");
-      setLatLangTr(null);
-    }
-  };
+  // Remove this action
+  // const switchMbLoc = (changeVal: boolean) => {
+  //   setTrUsingLocMb(changeVal);
+  //   if (changeVal) {
+  //     setLocNameTr(locNameMb);
+  //     setLocAddressTr(locAddressMb);
+  //     setLatLangTr(latLangMb);
+  //   } else {
+  //     setLocNameTr("");
+  //     setLocAddressTr("");
+  //     setLatLangTr(null);
+  //   }
+  // };
 
   const [schedulerDtoData, setSchedulerDtoData] = useState<DtoScheduler[]>([]);
   const addMoreCeremony = () => {
@@ -774,8 +775,6 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
         langLat: latLangMb,
         notes: noteListMb.filter(x => x.trim() !== ""),
         youtube_url: ytLiveUrlMb.trim() !== "" ? ytLiveUrlMb : null,
-
-        use_main_loc: false,
       },
     ];
 
@@ -790,8 +789,6 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
       langLat: latLangTr,
       notes: noteListTr.filter(x => x.trim() !== ""),
       youtube_url: ytLiveUrlTr.trim() !== "" ? ytLiveUrlTr : null,
-
-      use_main_loc: isTrUsingLocMb,
       ceremon_type: radioSelectTypeTr,
     });
 
@@ -904,7 +901,6 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
       if (schType === "WED_TOR") {
         setEventTrId(x.id);
         setIsCheckedTr(true);
-        setTrUsingLocMb(x.use_main_loc);
         setDateRangeTr(x.date);
         setStartTimeTr(x.start_time);
         setEndTimeTr(x.end_time ?? "");
@@ -968,17 +964,10 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
               <div className="col-span-12">
                 <Input value={locNameMb} onChange={(e) => {
                   const val = e.target.value;
-                  if (val !== locNameTr) switchMbLoc(false);
+                  // if (val !== locNameTr) switchMbLoc(false);
                   setLocNameMb(val);
                 }} label="Location Name" id="mb_loc_name" placeholder="Enter Location Name" mandatory />
                 {stateFormShcedule.errors?.mb_loc_name && <ZodErrors err={stateFormShcedule.errors?.mb_loc_name} />}
-              </div>
-              <div className="col-span-12">
-                <Textarea value={locAddressMb} onChange={(e) => {
-                  const val = e.target.value;
-                  if (val !== locAddressTr) switchMbLoc(false);
-                  setLocAddressMb(val);
-                }} label="Location Address" id="mb_loc_address" placeholder="Enter Location Address" rows={3} />
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -988,10 +977,13 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                   </p>
                   {stateFormShcedule.errors?.mb_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.mb_loc_langlat} />}
                 </label>
-                {activeIdxTab === 1 && <MapPicker value={latLangMb} onChange={(lat, lng) => {
-                  const val = [lat, lng];
-                  if (val !== latLangTr) switchMbLoc(false);
-                  setLatLangMb([lat, lng]);
+                {activeIdxTab === 1 && <MapPicker value={latLangMb} address={locAddressMb} onChange={(data) => {
+                  const val = [data.lat, data.lng];
+                  // if (val !== latLangTr) switchMbLoc(false);
+                  setLatLangMb([data.lat, data.lng]);
+
+                  // if (data.address !== locAddressTr) switchMbLoc(false);
+                  setLocAddressMb(data.address);
                 }} zoom={17} />}
               </div>
               <div className="col-span-12">
@@ -1062,7 +1054,7 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                   onChange={(e) => {
                     const val = e.target.checked;
                     setIsCheckedTr(val);
-                    if (val === false) switchMbLoc(false);
+                    // if (val === false) switchMbLoc(false);
                   }}
                   type="checkbox" id="hs-xs-switch-tr-ceremony" className="peer sr-only"
                 />
@@ -1122,34 +1114,12 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                     <Input value={endTimeTr} onChange={(e) => setEndTimeTr(e.target.value)} type='time' id='tr_end_time' label='End Time' />
                   </div>
                   <div className="col-span-12">
-                    <div className="flex items-center gap-x-3 mb-3 mt-2">
-                      <label htmlFor="hs-xs-switch-loc-tr" className="relative inline-block w-9 h-5 cursor-pointer">
-                        <input
-                          checked={isTrUsingLocMb}
-                          onChange={(e) => {
-                            const val = e.target.checked;
-                            switchMbLoc(val);
-                          }}
-                          type="checkbox" id="hs-xs-switch-loc-tr" className="peer sr-only" />
-                        <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
-                        <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
-                      </label>
-                      <label htmlFor="hs-xs-switch-loc-tr" className="text-sm text-gray-500">Use Marriage Blessing Location</label>
-                    </div>
-
                     <Input value={locNameTr} onChange={(e) => {
                       const val = e.target.value;
-                      if (val !== locNameMb) switchMbLoc(false);
+                      // if (val !== locNameMb) switchMbLoc(false);
                       setLocNameTr(val);
                     }} label="Location Name" id="tr_loc_name" placeholder="Enter Location Name" mandatory />
                     {stateFormShcedule.errors?.tr_loc_name && <ZodErrors err={stateFormShcedule.errors?.tr_loc_name} />}
-                  </div>
-                  <div className="col-span-12">
-                    <Textarea value={locAddressTr} onChange={(e) => {
-                      const val = e.target.value;
-                      if (val !== locAddressMb) switchMbLoc(false);
-                      setLocAddressTr(val);
-                    }} label="Location Address" id="tr_loc_address" placeholder="Enter Location Address" rows={3} />
                   </div>
                   <div className="col-span-12">
                     <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -1159,10 +1129,13 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       </p>
                     </label>
                     {stateFormShcedule.errors?.tr_loc_langlat && <ZodErrors err={stateFormShcedule.errors?.tr_loc_langlat} />}
-                    {activeIdxTab === 1 && <MapPicker value={latLangTr} onChange={(lat, lng) => {
-                      const val = [lat, lng];
-                      if (val !== latLangMb) switchMbLoc(false);
-                      setLatLangTr([lat, lng]);
+                    {activeIdxTab === 1 && <MapPicker value={latLangTr} address={locAddressTr} onChange={(data) => {
+                      const val = [data.lat, data.lng];
+                      // if (val !== latLangMb) switchMbLoc(false);
+                      setLatLangTr([data.lat, data.lng]);
+                      
+                      // if (data.address !== locAddressMb) switchMbLoc(false);
+                      setLocAddressTr(data.address);
                     }} zoom={17} />}
                   </div>
                   <div className="col-span-12">

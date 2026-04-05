@@ -288,7 +288,6 @@ model ScheduleInfo {
   longitude     String?
   notes         String[]
   ceremony_type TradRecepType?
-  use_main_loc  Boolean        @default(false)
   youtube_url   String?
 
   createdBy String?

@@ -160,7 +160,6 @@ export type DtoScheduler = {
   notes: string[];
   youtube_url: string | null,
   
-  use_main_loc: boolean;
   ceremon_type?: TradRecepType;
 };
 
