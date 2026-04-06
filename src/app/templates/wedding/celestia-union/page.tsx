@@ -481,9 +481,43 @@ export default function WeddingInvitationPage() {
               ))}
             </div>
           </div>
+
+          <div className="text-center mt-12">
+            <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>
+              Video
+            </h2>
+            <p className="mt-2 text-white/80">Cuplikan momen spesial yang kami abadikan.</p>
+          </div>
+          <div className="snap-center shrink-0 mt-10">
+            <div
+              className={classNames(
+                'group relative h-72 w-full md:h-137.5 overflow-hidden rounded-2xl border shadow-lg',
+                THEME.borderSoft,
+                THEME.cardBg
+              )}
+            >
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/vtIGvGigw4g"
+                title="YouTube video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+
+              {/* Overlay play */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <svg
+                  className="h-12 w-12 text-white drop-shadow-lg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
 
       {/* Section: Cerita (Timeline) */}
       <section id="cerita" className="scroll-mt-24">

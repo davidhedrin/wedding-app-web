@@ -117,7 +117,6 @@ export type EventInitProps = {
     longitude: string | null;
     notes: string[];
     ceremony_type: TradRecepType | null;
-    use_main_loc: boolean;
   }[];
   event_galleries: {
     img_name: string | null;

@@ -2,7 +2,7 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { copyToClipboard, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, rsvpLabels, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { copyToClipboard, ExtractYtID, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, rsvpLabels, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -24,6 +24,17 @@ const MapPicker = dynamic(
   () => import("@/components/map-picker"),
   { ssr: false }
 );
+
+const HandleYtInput = (url: string): string | null => {
+  const id = ExtractYtID(url);
+  if (!id) toast({
+    type: "warning",
+    title: "Invalid YouTube Link",
+    message: "Follow this Youtube link format: https://youtu.be/VIDEO_ID?si=xxxxxx"
+  });
+
+  return id;
+};
 
 export default function TabContentWedding({ dataEvent, url }: { dataEvent: Events, url: string }) {
   const tabContents = [
@@ -585,7 +596,17 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
               Youtube Video Story
               <p className='text-sm text-muted'>After upload your history love video on Youtube, you can paste the URL here. The embed video will be display on your gallery tab invitaion.</p>
             </label>
-            <Input value={ytVideoStory} onChange={(e) => setYtVideoStory(e.target.value)} type='text' id='youtube_video_url' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
+            <Input
+              value={ytVideoStory}
+              onChange={(e) => setYtVideoStory(e.target.value)}
+              onBlur={() => {
+                const ytId = HandleYtInput(ytVideoStory);
+                if (!ytId && ytVideoStory.trim() !== "") setYtVideoStory("");
+              }}
+              type='text'
+              id='youtube_video_url'
+              placeholder="Example format: https://youtu.be/VIDEO_ID?si=xxxxxx"
+            />
           </div>
           <div className="col-span-12">
             <label className="block text-sm font-medium mb-1 dark:text-white">
@@ -987,7 +1008,18 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                 }} zoom={17} />}
               </div>
               <div className="col-span-12">
-                <Input value={ytLiveUrlMb} onChange={(e) => setYtLiveUrlMb(e.target.value)} type='text' id='mb_yt_url' label='Live Youtube URL' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
+                <Input
+                  value={ytLiveUrlMb}
+                  onChange={(e) => setYtLiveUrlMb(e.target.value)}
+                  onBlur={() => {
+                    const ytId = HandleYtInput(ytLiveUrlMb);
+                    if (!ytId && ytLiveUrlMb.trim() !== "") setYtLiveUrlMb("");
+                  }}
+                  type='text'
+                  id='mb_yt_url'
+                  label='Live Youtube URL'
+                  placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx"
+                />
               </div>
               <div className="col-span-12">
                 <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -1133,13 +1165,24 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
                       const val = [data.lat, data.lng];
                       // if (val !== latLangMb) switchMbLoc(false);
                       setLatLangTr([data.lat, data.lng]);
-                      
+
                       // if (data.address !== locAddressMb) switchMbLoc(false);
                       setLocAddressTr(data.address);
                     }} zoom={17} />}
                   </div>
                   <div className="col-span-12">
-                    <Input value={ytLiveUrlTr} onChange={(e) => setYtLiveUrlTr(e.target.value)} type='text' id='tr_yt_url' label='Live Youtube URL' placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx" />
+                    <Input
+                      value={ytLiveUrlTr}
+                      onChange={(e) => setYtLiveUrlTr(e.target.value)}
+                      onBlur={() => {
+                        const ytId = HandleYtInput(ytLiveUrlTr);
+                        if (!ytId && ytLiveUrlTr.trim() !== "") setYtLiveUrlTr("");
+                      }}
+                      type='text'
+                      id='tr_yt_url'
+                      label='Live Youtube URL'
+                      placeholder="Example: https://youtu.be/xxxxxx?si=xxxxx"
+                    />
                   </div>
                   <div className="col-span-12">
                     <label className="block text-sm font-medium mb-2 dark:text-white">

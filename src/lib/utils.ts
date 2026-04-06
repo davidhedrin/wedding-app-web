@@ -363,3 +363,14 @@ export function CombineDateAndTime(date: Date, time: string): Date {
 
   return result;
 };
+
+export function ExtractYtID(url: string): string | null {
+  const regex = /^https:\/\/youtu\.be\/([a-zA-Z0-9_-]{11})(\?.*)?$/;
+  const match = url.match(regex);
+
+  if (match && match[1]) {
+    return match[1];
+  }
+
+  return null;
+}

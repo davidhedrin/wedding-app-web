@@ -387,7 +387,6 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             longitude: true,
             notes: true,
             ceremony_type: true,
-            use_main_loc: true,
           },
           orderBy: {
             id: "asc"
