@@ -685,6 +685,29 @@ export default function WeddingInvitationPage() {
               </div>
             }
           </div>
+
+          <div className="snap-center shrink-0 mt-14">
+            <div className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/vtIGvGigw4g"
+                title="YouTube video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+
+              {/* Overlay play */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <svg
+                  className="h-12 w-12 text-white drop-shadow-lg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </Section>
 
         {/* Cerita (timeline) */}
@@ -1253,8 +1276,15 @@ function InfoCard({
           <MapPinIcon />
           <div>
             {place}. {
-              long !== undefined && lat !== undefined && long.trim() !== "" && lat.trim() !== "" && <a
+              long !== undefined && lat !== undefined && long.trim() !== "" && lat.trim() !== "" ? <a
                 href={`https://www.google.com/maps?q=${lat},${long}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                Lihat Lokasi
+              </a> : <a
+                href={`https://www.google.com/maps?q=1234,2345`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline"
@@ -1265,6 +1295,16 @@ function InfoCard({
           </div>
         </div>
         {extra && <p>{extra}</p>}
+
+        <a
+          href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+          target="_blank"
+          className="mt-2 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
+        >
+          <div className='flex items-center'>
+            <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+          </div>
+        </a>
       </div>
     </div>
   );

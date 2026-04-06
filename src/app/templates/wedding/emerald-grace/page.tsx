@@ -429,17 +429,69 @@ export default function Page() {
             Berikut ini adalah waktu dan lokasi acara. Mohon hadir dengan tepat waktu.
           </SectionHeading>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+          <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_.6fr]">
             <div className="rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-6 backdrop-blur-xl">
-              <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-4">
-                <InfoRow label="Akad Nikah" value="Minggu, 14 Des 2025 • 10:00 WIB" />
+              <dl className="grid grid-cols-12 gap-x-6 gap-y-4">
+                <div className="col-span-6 rounded-xl border border-emerald-300/10 bg-emerald-950/40 p-4">
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70">Akad Nikah</dt>
+                  <dd className="font-serif text-lg">Minggu, 14 Des 2025 • 10:00 WIB</dd>
+
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70 mt-1">Lokasi</dt>
+                  <dd className="font-serif text-lg">The Emerald Hall, Jl. Anggrek No. 12, Jakarta</dd>
+
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70 mt-1">Catatan</dt>
+                  <dd className="font-serif text-lg">Nuansa Navy/Gold</dd>
+
+                  <div className="mt-2">
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className="group inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-5 py-2 text-sm font-medium tracking-wide hover:bg-emerald-400/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="col-span-6 rounded-xl border border-emerald-300/10 bg-emerald-950/40 p-4">
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70">Resepsi</dt>
+                  <dd className="font-serif text-lg">Minggu, 14 Des 2025 • 10:00 WIB</dd>
+
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70 mt-1">Lokasi</dt>
+                  <dd className="font-serif text-lg">The Emerald Hall, Jl. Anggrek No. 12, Jakarta</dd>
+
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70 mt-1">Catatan</dt>
+                  <dd className="font-serif text-lg">Nuansa Navy/Gold</dd>
+
+                  <div className="mt-2">
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className="group inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-5 py-2 text-sm font-medium tracking-wide hover:bg-emerald-400/20 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+
+                <div className="col-span-12 rounded-xl border border-emerald-300/10 bg-emerald-950/40 p-4">
+                  <dt className="text-xs uppercase tracking-wider text-emerald-200/70">Catatan</dt>
+                  <dd className="font-serif text-lg">Harap menjaga ketenangan saat prosesi akad. Mohon konfirmasi kehadiran melalui form RSVP.</dd>
+                </div>
+
+                {/* <InfoRow label="Akad Nikah" value="Minggu, 14 Des 2025 • 10:00 WIB" />
                 <InfoRow label="Resepsi" value="Minggu, 14 Des 2025 • 12:00-15:00 WIB" />
                 <InfoRow label="Lokasi" value="The Emerald Hall, Jl. Anggrek No. 12, Jakarta" />
-                <InfoRow label="Dress Code" value="Formal • Nuansa Emerald & Champagne" />
-                <InfoRow
+                <InfoRow label="Dress Code" value="Formal • Nuansa Emerald & Champagne" /> */}
+                {/* <InfoRow
                   label="Catatan"
                   value="Harap menjaga ketenangan saat prosesi akad. Mohon konfirmasi kehadiran melalui form RSVP."
-                />
+                /> */}
               </dl>
             </div>
 
@@ -464,56 +516,87 @@ export default function Page() {
             Kenangan yang kami abadikan dalam perjalanan cinta kami.
           </SectionHeading>
 
-          <div className="relative mt-8 rounded-3xl overflow-hidden border border-emerald-300/20 bg-emerald-900/30 max-w-5xl px-4 xl:px-0 mx-auto">
-            {/* Slides */}
-            <div
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-              className="relative aspect-video max-h-[70vh] w-full"
-            >
-              {galleryImages.map((img, i) => (
-                <img
-                  key={i}
-                  src={img.src}
-                  alt={img.alt}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                  draggable={false}
-                />
-              ))}
-              {/* Overlay gradient */}
-              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-emerald-950/60 to-transparent" />
-            </div>
-
-            {/* Controls */}
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4">
-              <button
-                onClick={() =>
-                  setGalIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length)
-                }
-                aria-label="Sebelumnya"
-                className="control-btn"
+          <div className="max-w-5xl px-4 xl:px-0 mx-auto">
+            <div className="relative mt-8 rounded-3xl overflow-hidden border border-emerald-300/20 bg-emerald-900/30">
+              {/* Slides */}
+              <div
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                className="relative aspect-video max-h-[70vh] w-full"
               >
-                ‹
-              </button>
-              <div className="flex items-center gap-1.5">
-                {galleryImages.map((_, i) => (
-                  <button
+                {galleryImages.map((img, i) => (
+                  <img
                     key={i}
-                    onClick={() => setGalIndex(i)}
-                    aria-label={`Slide ${i + 1}`}
-                    className={`h-2.5 w-2.5 rounded-full transition ${i === galIndex ? "bg-emerald-300" : "bg-emerald-300/30 hover:bg-emerald-300/60"
+                    src={img.src}
+                    alt={img.alt}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIndex ? "opacity-100" : "opacity-0"
                       }`}
+                    draggable={false}
                   />
                 ))}
+                {/* Overlay gradient */}
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-emerald-950/60 to-transparent" />
               </div>
-              <button
-                onClick={() => setGalIndex((i) => (i + 1) % galleryImages.length)}
-                aria-label="Berikutnya"
-                className="control-btn"
+
+              {/* Controls */}
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4">
+                <button
+                  onClick={() =>
+                    setGalIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length)
+                  }
+                  aria-label="Sebelumnya"
+                  className="control-btn text-2xl"
+                >
+                  ‹
+                </button>
+                <div className="flex items-center gap-1.5">
+                  {galleryImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setGalIndex(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2.5 w-2.5 rounded-full transition ${i === galIndex ? "bg-emerald-300" : "bg-emerald-300/30 hover:bg-emerald-300/60"
+                        }`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() => setGalIndex((i) => (i + 1) % galleryImages.length)}
+                  aria-label="Berikutnya"
+                  className="control-btn text-2xl"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+
+            <div className="snap-center shrink-0 mt-16">
+              <SectionHeading title="Video">
+                Cuplikan momen spesial yang kami abadikan.
+              </SectionHeading>
+
+              <div
+                className="mt-6 bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
               >
-                ›
-              </button>
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/vtIGvGigw4g"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </Container>

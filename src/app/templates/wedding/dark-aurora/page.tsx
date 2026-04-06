@@ -330,19 +330,53 @@ export default function WeddingInvitationPage() {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div className={`rounded-3xl ${THEME.card} ${THEME.ring} p-6`}>
             <h4 className="text-xl font-semibold text-slate-100">Waktu & Tempat</h4>
-            <ul className="mt-4 space-y-3 text-slate-200/90">
+            <ul className="mt-4 space-y-1 text-slate-200/90">
               <li>
                 <span className="font-semibold">Akad:</span> Sabtu, 20 Desember 2025 — 10.00 WIB
               </li>
+              <li>
+                <span className="font-semibold">Tempat:</span> {COUPLE.venueName}, {COUPLE.venueAddress}
+              </li>
+              <li>
+                <span className="font-semibold">Catatan:</span> {COUPLE.dressCode}
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium border border-amber-300/50 text-amber-200 hover:bg-amber-200/10 transition"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+              </li>
+            </ul>
+
+            <ul className="mt-4 space-y-1 text-slate-200/90">
               <li>
                 <span className="font-semibold">Resepsi:</span> Sabtu, 20 Desember 2025 — 12.00-15.00 WIB
               </li>
               <li>
                 <span className="font-semibold">Tempat:</span> {COUPLE.venueName}, {COUPLE.venueAddress}
               </li>
+              <li>
+                <span className="font-semibold">Catatan:</span> {COUPLE.dressCode}
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium border border-amber-300/50 text-amber-200 hover:bg-amber-200/10 transition"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+              </li>
             </ul>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <InfoChip label="Dress Code" value={COUPLE.dressCode} />
+
+            <div className="mt-6 grid gap-3 grid-cols-1">
               <InfoChip label="Catatan" value={COUPLE.extraInfo} />
             </div>
           </div>
@@ -363,7 +397,7 @@ export default function WeddingInvitationPage() {
       <Section id="galeri" title="Galeri">
         <div className={`relative overflow-hidden rounded-3xl ${THEME.card} ${THEME.ring}`}>
           {/* Slides */}
-          <div className="relative h-[54svh] min-h-80 w-full">
+          <div className="relative h-[64svh] min-h-80 w-full">
             {GALLERY_IMAGES.map((src, i) => (
               <div
                 key={i}
@@ -407,6 +441,31 @@ export default function WeddingInvitationPage() {
           >
             ›
           </button>
+        </div>
+
+        <div className="snap-center shrink-0 mt-16">
+          <div
+            className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+          >
+            <iframe
+              className="h-full w-full"
+              src="https://www.youtube.com/embed/vtIGvGigw4g"
+              title="YouTube video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+
+            {/* Overlay play */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+              <svg
+                className="h-12 w-12 text-white drop-shadow-lg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         </div>
       </Section>
 

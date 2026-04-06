@@ -373,28 +373,47 @@ export default function WeddingInvitationPage() {
                   <h3 className={classNames(playfair.className, 'text-xl text-white')}>Akad Nikah</h3>
                   <p className="text-white/70">Minggu, 21 Desember 2025 • 10.00 WIB</p>
                   <p className="text-white/70">Masjid Al-Falah, Jl. Damai No. 21, Jakarta</p>
+                  <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
+                  <div>
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                      </div>
+                    </a>
+                  </div>
                 </div>
                 <div>
                   <h3 className={classNames(playfair.className, 'text-xl text-white')}>Resepsi</h3>
-                  <p className="text-white/70">Minggu, 21 Desember 2025 • 12.00 – 15.00 WIB</p>
+                  <p className="text-white/70">Minggu, 21 Desember 2025 • 12.00 - 15.00 WIB</p>
                   <p className="text-white/70">Gedung Graha Cinta, Jl. Bahagia No. 5, Jakarta</p>
+                  <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
+                  <div>
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                      </div>
+                    </a>
+                  </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
-                    <div className="text-sm">Dress Code</div>
-                    <div className="text-white">Semi-formal • Nuansa Navy/Gold</div>
-                  </div>
-                  <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
-                    <div className="text-sm">Catatan</div>
-                    <div className="text-white">Mohon hadir tepat waktu & menjaga ketertiban.</div>
-                  </div>
+
+                <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
+                  <div className="text-sm">Catatan</div>
+                  <div className="text-white">Mohon hadir tepat waktu & menjaga ketertiban.</div>
                 </div>
               </div>
             </div>
 
             {/* Maps */}
-            <div className={classNames('overflow-hidden rounded-3xl border', THEME.borderSoft, THEME.cardBg)}>
-              <div className="aspect-16/10 w-full">
+            <div className={classNames('overflow-hidden rounded-3xl border relative', THEME.borderSoft, THEME.cardBg)}>
+              <div className="h-full w-full">
                 <iframe
                   title="Lokasi Acara"
                   className="h-full w-full"
@@ -402,11 +421,16 @@ export default function WeddingInvitationPage() {
                   src="https://www.google.com/maps?q=-6.200000,106.816666&z=14&output=embed"
                 />
               </div>
-              <div className="p-4 text-center">
+
+              {/* Overlay Button */}
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
                 <a
                   href="https://maps.google.com/?q=Gedung%20Graha%20Cinta%20Jakarta"
                   target="_blank"
-                  className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                  className={classNames(
+                    'inline-block rounded-full px-5 py-2 text-sm font-semibold text-black shadow-lg transition',
+                    THEME.accentBg
+                  )}
                 >
                   Buka di Google Maps
                 </a>
@@ -491,7 +515,7 @@ export default function WeddingInvitationPage() {
           <div className="snap-center shrink-0 mt-10">
             <div
               className={classNames(
-                'group relative h-72 w-full md:h-137.5 overflow-hidden rounded-2xl border shadow-lg',
+                'group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg',
                 THEME.borderSoft,
                 THEME.cardBg
               )}
