@@ -294,7 +294,7 @@ export default function WeddingInvite() {
                   </button>
                   <button
                     onClick={() => scrollTo("rsvp")}
-                    className="px-5 py-3 rounded-full border-slate-800 border-2 text-slate-200 hover:bg-slate-800 transition"
+                    className="px-5 py-3 rounded-full border-slate-800 border-2 text-slate-200 bg-slate-800 hover:bg-slate-900 transition"
                   >
                     Konfirmasi Kehadiran
                   </button>
@@ -393,16 +393,38 @@ export default function WeddingInvite() {
                 <div className="space-y-4">
                   <div className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 shadow">
                     <div className="text-xs text-slate-400">Akad Nikah</div>
-                    <div className="font-semibold text-lg">Sabtu, 20 Desember 2025</div>
-                    <div className="text-slate-300 mt-2">Pukul 09.00 WIB</div>
-                    <div className="mt-3 text-sm text-slate-400">Tempat: Gedung Serbaguna / Masjid ...</div>
+                    <div className="font-semibold text-lg">Sabtu, 20 Desember 2025 - 09.00 WIB</div>
+                    <div className="text-slate-300">Tempat: Gedung Serbaguna / Masjid ...</div>
+                    <div className="text-sm text-slate-400">Parkir: Didalam gedung</div>
+                    <div className="mt-2">
+                      <a
+                        href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                        target="_blank"
+                        className="inline-flex items-center px-4 py-2 rounded-full border-slate-800 border-2 text-slate-200 bg-slate-800 hover:bg-slate-900 transition"
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
+                    </div>
                   </div>
 
                   <div className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 shadow">
                     <div className="text-xs text-slate-400">Resepsi</div>
-                    <div className="font-semibold text-lg">Sabtu, 20 Desember 2025</div>
-                    <div className="text-slate-300 mt-2">Pukul 11.00 - 14.00 WIB</div>
-                    <div className="mt-3 text-sm text-slate-400">Dress Code: Semi formal / Batik</div>
+                    <div className="font-semibold text-lg">Sabtu, 20 Desember 2025 - 11.00 s/d 14.00 WIB</div>
+                    <div className="text-slate-300">Tempat: Gedung Serbaguna / Masjid ...</div>
+                    <div className="text-sm text-slate-400">Dress Code: Semi formal / Batik</div>
+                    <div className="mt-2">
+                      <a
+                        href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                        target="_blank"
+                        className="inline-flex items-center px-4 py-2 rounded-full border-slate-800 border-2 text-slate-200 bg-slate-800 hover:bg-slate-900 transition"
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
+                    </div>
                   </div>
 
                   <div className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 shadow">
@@ -430,58 +452,89 @@ export default function WeddingInvite() {
             <section id="galeri">
               <h2 className="font-playfair text-3xl mb-6">Galeri</h2>
               <div className="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-800/30 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-slate-300">Kenangan & Foto Kami</div>
-                  <div className="text-sm text-slate-400">{galleryIdx + 1} / {galleryCount}</div>
-                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-slate-300">Kenangan & Foto Kami</div>
+                    <div className="text-sm text-slate-400">{galleryIdx + 1} / {galleryCount}</div>
+                  </div>
 
-                <div className="w-full overflow-hidden">
-                  <div
-                    className="flex transition-transform duration-700"
-                    style={{
-                      transform: `translateX(-${galleryIdx * 100}%)`,
-                    }}
-                  >
-                    {Array.from({ length: galleryCount }).map((_, i) => (
-                      <div key={i} className="w-full shrink-0 px-2">
-                        <div className="h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-700">
-                          <img
-                            src="http://localhost:3005/assets/img/2149043983.jpg"
-                            alt={`galeri-${i}`}
-                            className="w-full h-full object-cover"
-                          />
+                  <div className="w-full overflow-hidden">
+                    <div
+                      className="flex transition-transform duration-700"
+                      style={{
+                        transform: `translateX(-${galleryIdx * 100}%)`,
+                      }}
+                    >
+                      {Array.from({ length: galleryCount }).map((_, i) => (
+                        <div key={i} className="w-full shrink-0 px-2">
+                          <div className="h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-700">
+                            <img
+                              src="http://localhost:3005/assets/img/2149043983.jpg"
+                              alt={`galeri-${i}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setGalleryIdx((s) => (s - 1 + galleryCount) % galleryCount)}
+                        className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        onClick={() => setGalleryIdx((s) => (s + 1) % galleryCount)}
+                        className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
+                      >
+                        Next
+                      </button>
+                    </div>
+
+                    <div className="hidden sm:flex gap-2">
+                      {Array.from({ length: galleryCount }).map((_, i) => (
+                        <button
+                          key={i}
+                          className={`w-12 h-8 rounded overflow-hidden border ${i === galleryIdx ? 'ring-2 ring-amber-300' : 'border-slate-700'}`}
+                          onClick={() => setGalleryIdx(i)}
+                        >
+                          <img src="http://localhost:3005/assets/img/2149043983.jpg" alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setGalleryIdx((s) => (s - 1 + galleryCount) % galleryCount)}
-                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
-                    >
-                      Prev
-                    </button>
-                    <button
-                      onClick={() => setGalleryIdx((s) => (s + 1) % galleryCount)}
-                      className="px-3 py-2 rounded-md bg-slate-700/60 hover:bg-slate-800 transition"
-                    >
-                      Next
-                    </button>
+                <div className="mt-16">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-slate-300">Cuplikan Video Kami</div>
                   </div>
 
-                  <div className="hidden sm:flex gap-2">
-                    {Array.from({ length: galleryCount }).map((_, i) => (
-                      <button
-                        key={i}
-                        className={`w-12 h-8 rounded overflow-hidden border ${i === galleryIdx ? 'ring-2 ring-amber-300' : 'border-slate-700'}`}
-                        onClick={() => setGalleryIdx(i)}
+                  <div
+                    className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+                  >
+                    <iframe
+                      className="h-full w-full"
+                      src="https://www.youtube.com/embed/vtIGvGigw4g"
+                      title="YouTube video"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+
+                    {/* Overlay play */}
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                      <svg
+                        className="h-12 w-12 text-white drop-shadow-lg"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <img src="http://localhost:3005/assets/img/2149043983.jpg" alt={`thumb-${i}`} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>

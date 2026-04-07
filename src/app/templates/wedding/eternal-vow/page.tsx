@@ -547,20 +547,18 @@ const WEDDING_EVENTS: WeddingEvent[] = [
     title: 'Wedding Blessing',
     subtitle: 'Holy Matrimony',
     date: 'Saturday, June 20, 2026',
-    time: '09:00 AM – 11:00 AM',
+    time: '09:00 AM - 11:00 AM',
     venue: 'St. Royal Cathedral, Jakarta',
-    description:
-      'A sacred ceremony to bless the union of two souls before God.',
+    description: 'A sacred ceremony to bless the union of two souls before God.',
   },
   {
     id: 2,
     title: 'Reception',
     subtitle: 'Traditional Celebration',
     date: 'Saturday, June 20, 2026',
-    time: '18:30 PM – Finish',
+    time: '18:30 PM - Finish',
     venue: 'Grand Royal Hall, Jakarta',
-    description:
-      'A joyful evening celebrating love, family, and togetherness.',
+    description: 'A joyful evening celebrating love, family, and togetherness.',
   },
 ]
 
@@ -580,7 +578,7 @@ const EventSection: React.FC = () => {
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
         {/* Event Cards */}
         <div className="space-y-10">
           {WEDDING_EVENTS.map((event) => (
@@ -591,7 +589,7 @@ const EventSection: React.FC = () => {
               {/* Glow Effect */}
               <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition bg-linear-to-br from-amber-500/10 to-pink-500/10 blur-xl" />
 
-              <div className="relative">
+              <div className='relative'>
                 <span className="text-xs uppercase tracking-[0.3em] text-amber-400">
                   {event.subtitle}
                 </span>
@@ -600,14 +598,10 @@ const EventSection: React.FC = () => {
                   {event.title}
                 </h3>
 
-                <div className="space-y-2 text-neutral-400 leading-relaxed">
+                <div className="space-y-2 text-neutral-400">
                   <p>
                     <span className="text-neutral-300">Date:</span>{' '}
-                    {event.date}
-                  </p>
-                  <p>
-                    <span className="text-neutral-300">Time:</span>{' '}
-                    {event.time}
+                    {event.date} at {event.time}
                   </p>
                   <p>
                     <span className="text-neutral-300">Venue:</span>{' '}
@@ -616,23 +610,52 @@ const EventSection: React.FC = () => {
                 </div>
 
                 {event.description && (
-                  <p className="mt-4 text-sm text-neutral-500 leading-relaxed">
-                    {event.description}
+                  <p className="mt-2 text-sm text-neutral-500">
+                    Notes: {event.description}
                   </p>
                 )}
+
+                <div className='mt-4'>
+                  <a
+                    href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                    target="_blank"
+                    className="inline-flex items-center px-6 py-2 rounded-full border border-amber-400/40 text-amber-300 tracking-widest text-sm uppercase hover:bg-amber-400 hover:text-black transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,191,0,0.6)]"
+                  >
+                    <div className='flex items-center'>
+                      <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                    </div>
+                  </a>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Map */}
-        <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-          <iframe
-            title="Google Maps"
-            src="https://maps.google.com/maps?q=jakarta&t=&z=13&ie=UTF8&iwloc=&output=embed"
-            className="w-full h-105 grayscale hover:grayscale-0 transition duration-700"
-          />
-          <div className="absolute inset-0 pointer-events-none bg-linear-to-t from-black/60 via-transparent to-transparent" />
+        <div>
+          <div className="mb-10 relative group bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-xl transition hover:shadow-amber-500/30">
+            {/* Glow Effect */}
+            <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition bg-linear-to-br from-amber-500/10 to-pink-500/10 blur-xl" />
+
+            <div className='relative'>
+              <span className="text-xs uppercase tracking-[0.3em] text-amber-400">
+                Catatan
+              </span>
+
+              <div className="space-y-2 text-neutral-400">
+                Mohon hadir 15 menit sebelum acara dimulai.
+              </div>
+            </div>
+          </div>
+
+          {/* Map */}
+          <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+            <iframe
+              title="Google Maps"
+              src="https://maps.google.com/maps?q=jakarta&t=&z=13&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-105 grayscale hover:grayscale-0 transition duration-700"
+            />
+            <div className="absolute inset-0 pointer-events-none bg-linear-to-t from-black/60 via-transparent to-transparent" />
+          </div>
         </div>
       </div>
     </section>
@@ -760,6 +783,31 @@ const GalleryCarousel: React.FC = () => {
         >
           ›
         </button>
+      </div>
+
+      <div className="relative max-w-4xl mx-auto mt-20">
+        <div
+          className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+        >
+          <iframe
+            className="h-full w-full"
+            src="https://www.youtube.com/embed/vtIGvGigw4g"
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+
+          {/* Overlay play */}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+            <svg
+              className="h-12 w-12 text-white drop-shadow-lg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -393,50 +393,89 @@ export default function WeddingInvitePage(): JSX.Element {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-white/6 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2V11H3v6a2 2 0 002 2z" /></svg>
+                  {/* AKAD NIKAH */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 rounded-lg bg-white/6 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2V11H3v6a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="font-medium">Akad Nikah</h3>
-                      <p className="text-sm text-slate-300">{WEDDING_DATE.toLocaleDateString()} • {WEDDING_DATE.toLocaleTimeString()}</p>
+
+                    <div className="space-y-1">
+                      <h3 className="font-medium text-lg">Akad Nikah</h3>
+
+                      <p className="text-sm text-slate-300">
+                        📅 {WEDDING_DATE.toLocaleDateString()} - {WEDDING_DATE.toLocaleTimeString()}
+                      </p>
+
+                      <p className="text-sm text-slate-300">
+                        📍 Masjid Al-Barokah, Bekasi
+                      </p>
+
+                      <p className="text-sm text-slate-400">
+                        Catatan: Mohon hadir 15 menit lebih awal.
+                      </p>
+
+                      <a
+                        href="https://youtube.com/live/your-link-akad"
+                        target="_blank"
+                        className="inline-flex items-center px-4 py-2 rounded-md bg-amber-300 text-[#0b1221] font-semibold shadow hover:-translate-y-0.5 transition transform"
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-white/6 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7l6 6-6 6M21 7l-6 6 6 6" /></svg>
+                  {/* RESEPSI */}
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 rounded-lg bg-white/6 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7l6 6-6 6M21 7l-6 6 6 6" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="font-medium">Resepsi</h3>
-                      <p className="text-sm text-slate-300">Selesai akad • Dilanjutkan resepsi di [Nama Lokasi]</p>
+
+                    <div className="space-y-2">
+                      <h3 className="font-medium text-lg">Resepsi</h3>
+
+                      <p className="text-sm text-slate-300">
+                        📅 {WEDDING_DATE.toLocaleDateString()} - {WEDDING_DATE.toLocaleTimeString()}
+                      </p>
+
+                      <p className="text-sm text-slate-300">
+                        📍 Gedung Serbaguna Bahagia, Bekasi
+                      </p>
+
+                      <p className="text-sm text-slate-400">
+                        Catatan: Parkir terbatas, disarankan menggunakan transportasi bersama.
+                      </p>
+
+                      <a
+                        href="https://youtube.com/live/your-link-akad"
+                        target="_blank"
+                        className="inline-flex items-center px-4 py-2 rounded-md bg-amber-300 text-[#0b1221] font-semibold shadow hover:-translate-y-0.5 transition transform"
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-white/6 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Dress Code</h3>
-                      <p className="text-sm text-slate-300">Semi Formal • Tone: Pastel / Earthy</p>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-slate-300">Catatan penting: Mohon hadir 15 menit lebih awal. Parkir terbatas — gunakan transportasi bersama bila memungkinkan.</p>
+                  <p className="text-sm text-slate-300">Catatan penting: Mohon hadir 15 menit lebih awal. Parkir terbatas gunakan transportasi bersama bila memungkinkan.</p>
                 </div>
 
                 <div>
-                  <div className="rounded-lg overflow-hidden border border-white/6 shadow-sm">
+                  <div className="w-full h-full rounded-lg overflow-hidden border border-white/6 shadow-sm">
                     {/* Google Maps iframe — ganti src ke embed link lokasi sebenarnya */}
                     <iframe
                       title="lokasi"
                       src="https://www.google.com/maps?q=Monas%20Jakarta&output=embed"
-                      className="w-full h-64 border-0"
+                      className="w-full h-full border-0"
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-xs text-slate-300 mt-2">Klik pada peta untuk membuka di Google Maps.</p>
                 </div>
               </div>
             </div>
@@ -446,9 +485,31 @@ export default function WeddingInvitePage(): JSX.Element {
           <section id="galeri" className="max-w-5xl mx-auto px-4 py-12 sm:py-16">
             <div className="bg-white/5 rounded-2xl p-6 shadow-lg border border-white/6">
               <h2 className="text-2xl font-serif mb-4" style={{ fontFamily: "var(--ff-heading)" }}>Galeri</h2>
-
               <PhotoCarousel images={HERO_IMAGES} />
+
+              <h2 className="text-2xl font-serif mb-4 mt-10" style={{ fontFamily: "var(--ff-heading)" }}>Video</h2>
+              <div className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/vtIGvGigw4g"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
             </div>
+
           </section>
 
           {/* Cerita / Timeline */}
