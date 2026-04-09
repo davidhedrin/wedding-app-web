@@ -357,9 +357,66 @@ export default function InvitationPage() {
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 shadow-sm">
-                  <h4 className="text-sm font-semibold">Akad & Resepsi</h4>
-                  <p className="mt-1 text-sm text-slate-700">Akad: <strong>09:00 WIB</strong> — Resepsi: <strong>11:00 - 14:00 WIB</strong></p>
-                  <p className="mt-1 text-sm text-slate-700">Tanggal: <strong>{formatDate(TARGET_DATE, "full", "short")}</strong></p>
+                  <div className="flex justify-between">
+                    <h4 className="text-sm font-semibold">Akad Nikah</h4>
+
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className="inline-flex items-center gap-3 text-slate-900 font-medium"
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 text-sm leading-none underline'>Live Youtube</div><i className='bx bxl-youtube text-xl'></i>
+                      </div>
+                    </a>
+                  </div>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Tempat:</span><br />
+                    Gedung Serbaguna Bahagia Jl. Contoh No.123, Bekasi
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Tanggal & Waktu:</span><br />
+                    {formatDate(TARGET_DATE, "full")} at <strong>09:00 WIB</strong>
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Catatan:</span><br />
+                    Mohon hadir 30 menit sebelum acara dimulai.
+                  </p>
+                </div>
+
+                {/* Resepsi */}
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 shadow-sm">
+                  <div className="flex justify-between">
+                    <h4 className="text-sm font-semibold">Resepsi</h4>
+
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className="inline-flex items-center gap-3 text-slate-900 font-medium"
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 text-sm leading-none underline'>Live Youtube</div><i className='bx bxl-youtube text-xl'></i>
+                      </div>
+                    </a>
+                  </div>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Tempat:</span><br />
+                    Ballroom Grand Hotel Sejahtera Jl. Raya Utama No.45, Bekasi
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Tanggal & Waktu:</span><br />
+                    {formatDate(TARGET_DATE, "full")} at <strong>11:00 - 14:00 WIB</strong>
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-700">
+                    <span className="font-medium">Catatan:</span><br />
+                    Acara bersifat santai, tamu dipersilakan datang sesuai waktu yang diinginkan.
+                  </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-white border border-white/30 shadow-sm">
@@ -423,6 +480,32 @@ export default function InvitationPage() {
                     <img src={s} alt={`thumb-${i}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-playfair font-bold mt-10 mb-4">Video</h3>
+            <div className="snap-center shrink-0">
+              <div
+                className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+              >
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/vtIGvGigw4g"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </section>

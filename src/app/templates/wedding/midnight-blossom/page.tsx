@@ -368,7 +368,7 @@ export default function UndanganPage() {
 
       {/* ACARA */}
       <Section id="acara" title="Acara" title2="Susunan Acara" sectionsRef={sectionsRef}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <h4 className="font-serif text-2xl text-rose-100">Akad Nikah</h4>
@@ -376,6 +376,18 @@ export default function UndanganPage() {
                 Sabtu, 20 Desember 2025 · 09.00 WIB
               </p>
               <p className="text-neutral-300">Masjid Agung Jakarta</p>
+
+              <div className="mt-3">
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 hover:bg-white/10 transition text-sm"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+              </div>
             </Card>
             <Card>
               <h4 className="font-serif text-2xl text-rose-100">Resepsi</h4>
@@ -383,6 +395,18 @@ export default function UndanganPage() {
                 Sabtu, 20 Desember 2025 · 19.00 WIB
               </p>
               <p className="text-neutral-300">Grand Ballroom Jakarta</p>
+
+              <div className="mt-3">
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 hover:bg-white/10 transition text-sm"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+              </div>
             </Card>
             <Card>
               <h4 className="font-serif text-xl text-rose-100">Dress Code</h4>
@@ -402,24 +426,26 @@ export default function UndanganPage() {
               </ul>
             </Card>
           </div>
-          <div className="lg:col-span-1">
-            <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+          <div className="lg:col-span-2 relative">
+            <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 shadow-xl">
               <iframe
                 title="Lokasi Acara"
                 src="https://www.google.com/maps?q=-6.200000,106.816666&z=14&output=embed"
-                className="w-full h-80"
+                className="w-full h-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-            <a
-              href="https://maps.google.com/?q=Grand+Ballroom+Jakarta"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-block rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 transition"
-            >
-              Buka di Google Maps
-            </a>
+            <div className="absolute top-2 left-4">
+              <a
+                href="https://maps.google.com/?q=Grand+Ballroom+Jakarta"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-block rounded-xl border border-white/10 bg-neutral-800/80 px-4 py-2 text-sm hover:bg-neutral-800/90 transition"
+              >
+                Buka di Google Maps
+              </a>
+            </div>
           </div>
         </div>
       </Section>
@@ -480,6 +506,31 @@ export default function UndanganPage() {
                   aria-label={`Slide ${i + 1}`}
                 />
               ))}
+            </div>
+          </div>
+
+          <div className="snap-center shrink-0 mt-16">
+            <div
+              className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+            >
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/vtIGvGigw4g"
+                title="YouTube video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+
+              {/* Overlay play */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <svg
+                  className="h-12 w-12 text-white drop-shadow-lg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -824,12 +875,6 @@ function RSVPForm() {
             value={form.name}
             onChange={(v) => setForm((f) => ({ ...f, name: v }))}
             required
-          />
-          <Input
-            label="Email"
-            type="email"
-            value={form.email}
-            onChange={(v) => setForm((f) => ({ ...f, email: v }))}
           />
           <Input
             label="No. HP/WA"

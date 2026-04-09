@@ -342,6 +342,18 @@ export default function Page() {
                   <p className={`${THEME.soft} mt-2`}>{a.time}</p>
                   <p className="mt-2 font-medium">{a.place}</p>
                   <p className={`${THEME.soft}`}>{a.addr}</p>
+
+                  <div className="mt-3">
+                    <a
+                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                      target="_blank"
+                      className="inline-flex px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 transition backdrop-blur text-sm md:text-base"
+                    >
+                      <div className='flex items-center'>
+                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                      </div>
+                    </a>
+                  </div>
                 </div>
               ))}
               <div className={`p-6 rounded-2xl ${THEME.softBg} ring-1 ring-white/10 sm:col-span-2`}>
@@ -376,7 +388,7 @@ export default function Page() {
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-28 scroll-mt-24">
           <Header title="Galeri" subtitle="Jejak kenangan kami" />
           <div className="mt-8 relative">
-            <div className="flex justify-between mb-3">
+            <div className="flex justify-between items-end mb-3">
               <div className={`${THEME.soft}`}>Geser untuk menjelajah</div>
               <div className="flex gap-2">
                 <button onClick={prevSlide} className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/20">‹</button>
@@ -394,6 +406,31 @@ export default function Page() {
                   <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition" />
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="snap-center shrink-0 mt-16">
+            <div
+              className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+            >
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/vtIGvGigw4g"
+                title="YouTube video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+
+              {/* Overlay play */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <svg
+                  className="h-12 w-12 text-white drop-shadow-lg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>

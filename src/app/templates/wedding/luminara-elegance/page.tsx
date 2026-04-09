@@ -546,6 +546,18 @@ function Acara() {
             <p className="mt-2 text-sm text-emerald-100/85">{ev.time}</p>
             <p className="mt-1 text-sm text-emerald-100/85">{ev.place}</p>
             <p className="mt-3 text-xs text-emerald-100/70">{ev.note}</p>
+
+            <div className="mt-4">
+              <a
+                href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                target="_blank"
+                className="btn-shimmer floaty inline-flex items-center gap-2 rounded-full bg-amber-300/90 px-4 py-1.5 text-emerald-950 font-medium ring-2 ring-amber-200/50 hover:-translate-y-0.5 transition"
+              >
+                <div className='flex items-center'>
+                  <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                </div>
+              </a>
+            </div>
           </div>
         ))}
         <div className="glass rounded-3xl p-5">
@@ -588,7 +600,7 @@ function Galeri() {
         <div className="relative">
           <div
             ref={scrollerRef}
-            className="flex snap-x gap-3 overflow-x-auto scroll-px-4 rounded-3xl p-2"
+            className="flex snap-x gap-4 overflow-x-auto scroll-px-4 rounded-3xl scrollbar-hide"
           >
             {GALLERY_IMAGES.map((src, i) => (
               <div key={i} className="snap-center shrink-0 w-[78%] sm:w-[48%] md:w-[38%] lg:w-[30%]">
@@ -616,6 +628,31 @@ function Galeri() {
             >
               ›
             </button>
+          </div>
+        </div>
+
+        <div className="snap-center shrink-0 mt-16">
+          <div
+            className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+          >
+            <iframe
+              className="h-full w-full"
+              src="https://www.youtube.com/embed/vtIGvGigw4g"
+              title="YouTube video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+
+            {/* Overlay play */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+              <svg
+                className="h-12 w-12 text-white drop-shadow-lg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>

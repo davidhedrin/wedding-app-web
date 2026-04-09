@@ -457,8 +457,23 @@ export default function WeddingInvitePage() {
                       <div className="text-amber-300 text-2xl">💍</div>
                       <div>
                         <h3 className="font-semibold text-lg">Akad Nikah</h3>
-                        <p className="text-rose-200/80">Jumat, 10 Oktober 2025 • 09:00 WIB</p>
-                        <p className="mt-2 text-rose-200/70">Lokasi: Masjid Contoh, Jl. Contoh No.1, Kota</p>
+                        <p className="text-rose-200/80 mt-1">Jumat, 10 Oktober 2025 • 09:00 WIB</p>
+                        <p className="text-rose-200/70 mt-1">Lokasi: Masjid Contoh, Jl. Contoh No.1, Kota</p>
+                        <p className="text-sm text-rose-200/60 mt-1">
+                          Dress code: Smart Formal / Kebaya modern. Mohon hadir tepat waktu.
+                        </p>
+
+                        <div className="mt-2">
+                          <a
+                            href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                            target="_blank"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-rose-500 to-amber-400 text-slate-900 font-semibold shadow-lg transform hover:scale-105 transition"
+                          >
+                            <div className='flex items-center'>
+                              <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                            </div>
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -468,11 +483,23 @@ export default function WeddingInvitePage() {
                       <div className="text-amber-300 text-2xl">🎉</div>
                       <div>
                         <h3 className="font-semibold text-lg">Resepsi</h3>
-                        <p className="text-rose-200/80">Sabtu, 11 Oktober 2025 • 18:00 WIB</p>
-                        <p className="mt-2 text-rose-200/70">Lokasi: Ballroom Contoh, Jl. Resepsi No.2</p>
-                        <p className="mt-2 text-sm text-rose-200/60">
+                        <p className="text-rose-200/80 mt-1">Sabtu, 11 Oktober 2025 • 18:00 WIB</p>
+                        <p className="text-rose-200/70 mt-1">Lokasi: Ballroom Contoh, Jl. Resepsi No.2</p>
+                        <p className="text-sm text-rose-200/60 mt-1">
                           Dress code: Smart Formal / Kebaya modern. Mohon hadir tepat waktu.
                         </p>
+
+                        <div className="mt-2">
+                          <a
+                            href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                            target="_blank"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-rose-500 to-amber-400 text-slate-900 font-semibold shadow-lg transform hover:scale-105 transition"
+                          >
+                            <div className='flex items-center'>
+                              <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                            </div>
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -484,7 +511,7 @@ export default function WeddingInvitePage() {
                 </div>
 
                 <div>
-                  <div className="w-full h-80 rounded-xl overflow-hidden border border-rose-700/30 shadow-lg">
+                  <div className="w-full h-full rounded-xl overflow-hidden border border-rose-700/30 shadow-lg">
                     <iframe
                       title="Lokasi Pernikahan"
                       src={`https://maps.google.com/maps?q=${MAP_LAT},${MAP_LNG}&z=15&output=embed`}
@@ -545,6 +572,31 @@ export default function WeddingInvitePage() {
                       <img src={src} alt={`thumb-${i}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
+                </div>
+              </div>
+
+              <div className="snap-center shrink-0 mt-16">
+                <div
+                  className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+                >
+                  <iframe
+                    className="h-full w-full"
+                    src="https://www.youtube.com/embed/vtIGvGigw4g"
+                    title="YouTube video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+
+                  {/* Overlay play */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                    <svg
+                      className="h-12 w-12 text-white drop-shadow-lg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
