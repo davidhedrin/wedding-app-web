@@ -308,25 +308,17 @@ export default function WeddingInvitationPage() {
               <EventCard
                 title="Akad Nikah"
                 time="Sabtu, 20 Desember 2025"
-                desc="Pukul 10.00 WIB – selesai"
+                desc="Pukul 10.00 WIB - selesai"
                 place="Masjid Al-Ikhlas, Jakarta Selatan"
+                notes="Dress code: Red"
               />
               <EventCard
                 title="Resepsi"
                 time="Sabtu, 20 Desember 2025"
-                desc="Pukul 12.00 – 16.00 WIB"
+                desc="Pukul 12.00 - 16.00 WIB"
                 place="Gedung Graha Cinta, Jakarta Selatan"
+                notes="Parking Basement"
               />
-            </div>
-
-            {/* Info tambahan */}
-            <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
-              <h4 className="font-semibold text-lg">Informasi Tambahan</h4>
-              <ul className="mt-3 space-y-2 text-slate-600">
-                <li>• Mohon hadir 15 menit sebelum acara dimulai.</li>
-                <li>• Parkir tersedia di basement gedung.</li>
-                <li>• Dress code: Nuansa pastel elegan.</li>
-              </ul>
             </div>
 
             {/* Maps */}
@@ -365,11 +357,14 @@ export default function WeddingInvitationPage() {
               </a>
             </div>
 
+            {/* Info tambahan */}
             <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
-              <h4 className="font-semibold text-lg">Dress Code</h4>
-              <p className="text-slate-600 mt-2">
-                Pastel modern (elegan). Mohon menyesuaikan.
-              </p>
+              <h4 className="font-semibold text-lg">Informasi Tambahan</h4>
+              <ul className="mt-3 space-y-2 text-slate-600">
+                <li>• Mohon hadir 15 menit sebelum acara dimulai.</li>
+                <li>• Parkir tersedia di basement gedung.</li>
+                <li>• Dress code: Nuansa pastel elegan.</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -526,11 +521,13 @@ function EventCard({
   time,
   desc,
   place,
+  notes,
 }: {
   title: string;
   time: string;
   desc: string;
   place: string;
+  notes: string;
 }) {
   return (
     <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200 hover:shadow-xl transition">
@@ -540,9 +537,20 @@ function EventCard({
       </div>
       <p className="mt-2 text-slate-700">{time}</p>
       <p className="text-slate-500">{desc}</p>
-      <div className="mt-2 inline-flex items-center gap-2 text-slate-600">
+      <div className="inline-flex items-center gap-2 text-slate-600">
         <MapPinIcon className="w-4 h-4" /> {place}
       </div>
+      <p className="text-slate-500 mt-2">Catatan: {notes}</p>
+
+      <a
+        href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+        target="_blank"
+        className="mt-3 inline-flex items-center justify-center rounded-xl px-5 py-2 bg-linear-to-r from-indigo-500 to-rose-500 text-white hover:opacity-95 transition"
+      >
+        <div className='flex items-center'>
+          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+        </div>
+      </a>
     </div>
   );
 }
@@ -627,6 +635,31 @@ function Gallery({ images }: { images: string[] }) {
         >
           <ChevronRightIcon className="w-4 h-4" />
         </button>
+      </div>
+
+      <div className="snap-center shrink-0 mt-16">
+        <div
+          className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+        >
+          <iframe
+            className="h-full w-full"
+            src="https://www.youtube.com/embed/vtIGvGigw4g"
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+
+          {/* Overlay play */}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+            <svg
+              className="h-12 w-12 text-white drop-shadow-lg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   );

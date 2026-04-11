@@ -51,7 +51,7 @@ Spesifikasi:
 - Gunakan kombinasi beberapa font elegan (misal serif + script style)
 - Jangan gunakan tema putih dominan
 - Gunakan warna yang elegan untuk latar belakang seluruh halaman (kalau bisa jangan tema warna putih, dan boleh warna apa saja dengan)
-- Pada section acara, buatkan ui yang nantinya bisa dinamis untuk maksimal 2 acara. Untuk Wedding Blessing Ceremony dan Traditional/Reception ceremony. Karna ada kemungkinan 1 bisa juga 2 acara sekaligus
+- Pada section acara, buatkan ui untuk dua bagian, Untuk Wedding Blessing Ceremony dan Traditional/Reception ceremony. Masing masing bagian harus memiliki informasi tanggal dan waktu, alamat, catatan tambahan/notes (bisa lebih dari 1), memiliki tombol Live Youtube lengkap dengan icon ini "<i className='bx bxl-youtube text-2xl'></i>" yang redirect new blank halaman.
 - Pada section Hadiah/Gift itu, Buatkan untuk 2 tipe hadiah, yaitu transfer bank dan satu lagi design untuk daftar wishlist permintaan barang dimana terdapat alamat nya (Serta tombol copy untuk alamat). Untuk design wishlist itu buatkan card. Dimana terdapat informasi nama barang, harga, banyaknya unit yg direquest, dan ada tombol url yg mengarah ke halaman ecommerce tertentu sebagai refrensi. Serta buatkan hanya ui paginage dibawah wishlist itu tanpa fungsi.
 3. Halaman Opening Screen:
 - Full screen fixed overlay
@@ -66,7 +66,7 @@ Spesifikasi:
 - Terdapat tombol untuk Lihat undangan yang lengsung berpindah kebawah
 5. Section Urutan:
 - Mempelai
-- Acara (dengan Google Maps iframe)
+- Acara (dengan Google Maps iframe serta bagian informasi tambahan)
 - Galeri (interactive carousel)
 - Cerita (timeline zigzag layout)
 - RSVP (form dengan validasi sederhana)

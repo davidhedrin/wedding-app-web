@@ -482,6 +482,21 @@ const WeddingInvitationPage: React.FC = () => {
                 <p className="mt-1 text-neutral-700">
                   Aula Harmoni, Jl. Merpati No. 1, Jakarta
                 </p>
+
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex mt-2 px-4 py-2 rounded-full font-medium border border-gray-800/70 text-gray-800/95 hover:bg-white/10 hover:backdrop-blur transition"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Pill>Dress Code: Red</Pill>
+                  <Pill>Area Parkir Luas</Pill>
+                </div>
               </div>
 
               {/* Resepsi */}
@@ -491,13 +506,26 @@ const WeddingInvitationPage: React.FC = () => {
                 <p className="mt-1 text-neutral-700">
                   Aula Harmoni, Jl. Merpati No. 1, Jakarta
                 </p>
+
+                <a
+                  href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                  target="_blank"
+                  className="inline-flex mt-2 px-4 py-2 rounded-full font-medium border border-gray-800/70 text-gray-800/95 hover:bg-white/10 hover:backdrop-blur transition"
+                >
+                  <div className='flex items-center'>
+                    <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                  </div>
+                </a>
+
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Pill>Dress Code: Pastel / Netral</Pill>
                   <Pill>Buku Tamu & Photo Booth</Pill>
                   <Pill>Area Parkir Luas</Pill>
                 </div>
               </div>
+            </div>
 
+            <div className="space-y-5">
               {/* Tambahan */}
               <div className="rounded-2xl border bg-white/80 backdrop-blur p-6 shadow-sm hover:shadow-md transition">
                 <h3 className="text-lg font-semibold">Informasi Tambahan</h3>
@@ -510,16 +538,16 @@ const WeddingInvitationPage: React.FC = () => {
                   </li>
                 </ul>
               </div>
-            </div>
 
-            {/* Maps */}
-            <div className="rounded-3xl overflow-hidden border shadow-sm">
-              <iframe
-                src={MAPS_EMBED_SRC}
-                className="w-full h-full"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+              {/* Maps */}
+              <div className="h-96 rounded-3xl overflow-hidden border shadow-sm">
+                <iframe
+                  src={MAPS_EMBED_SRC}
+                  className="w-full h-96"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -537,6 +565,31 @@ const WeddingInvitationPage: React.FC = () => {
 
           {/* Carousel */}
           <GalleryCarousel images={Array.from({ length: 8 }, () => PLACEHOLDER_IMG)} />
+
+          <div className="snap-center shrink-0 mt-16">
+            <div
+              className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+            >
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/vtIGvGigw4g"
+                title="YouTube video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+
+              {/* Overlay play */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                <svg
+                  className="h-12 w-12 text-white drop-shadow-lg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -700,7 +753,7 @@ const WeddingInvitationPage: React.FC = () => {
                 Data Anda aman. Kami hanya menggunakannya untuk keperluan
                 kehadiran.
               </div>
-              <PrimaryButton type="submit">Kirim RSVP</PrimaryButton>
+              <PrimaryButton type="submit">Kirim</PrimaryButton>
             </div>
 
             {submitted && (

@@ -436,6 +436,16 @@ export default function WeddingInvite() {
                   <h4 className="font-semibold text-white">Akad Nikah</h4>
                   <p className="text-xs text-white/60">Sabtu, 12 Desember 2025 • 09.00 WIB</p>
                   <p className="text-xs text-white/70 mt-1">Gedung Ceria, Jl. Contoh No.123, Kota</p>
+                  <p className="text-xs text-white/70 mt-1">Catatan: Dress code Red</p>
+                  <a
+                    href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                    target="_blank"
+                    className="inline-flex mt-2 text-sm px-3 py-1 rounded-md bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold"
+                  >
+                    <div className='flex items-center'>
+                      <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                    </div>
+                  </a>
 
                   <div className="mt-3 aspect-video rounded-md overflow-hidden border border-white/5">
                     <iframe
@@ -474,6 +484,16 @@ export default function WeddingInvite() {
                   <h4 className="font-semibold text-white">Resepsi</h4>
                   <p className="text-xs text-white/60">Sabtu, 12 Desember 2025 • 11.00 – 14.00 WIB</p>
                   <p className="text-xs text-white/70 mt-1">Gedung Ceria, Jl. Contoh No.123, Kota</p>
+                  <p className="text-xs text-white/70 mt-1">Catatan: Parkiran Basement</p>
+                  <a
+                    href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                    target="_blank"
+                    className="inline-flex mt-2 text-sm px-3 py-1 rounded-md bg-linear-to-r from-[#b8846b] to-[#a46d49] font-semibold"
+                  >
+                    <div className='flex items-center'>
+                      <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                    </div>
+                  </a>
 
                   <div className="mt-3 aspect-video rounded-md overflow-hidden border border-white/5">
                     <iframe
@@ -538,7 +558,7 @@ export default function WeddingInvite() {
               <p className="text-sm text-white/70">Kumpulan foto kenangan</p>
 
               <div className="mt-6 relative">
-                <div ref={galleryRef} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth py-2">
+                <div ref={galleryRef} className="scrollbar-hide flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth py-2">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div
                       key={i}
@@ -552,7 +572,7 @@ export default function WeddingInvite() {
                 <div className="absolute -left-2 top-1/2 -translate-y-1/2">
                   <button
                     onClick={() => slideGallery("left")}
-                    className="rounded-full p-2 bg-black/40 hover:bg-black/60"
+                    className="rounded-full p-2 bg-linear-to-r from-[#b8846b] to-[#a46d49]"
                     aria-label="prev"
                   >
                     ‹
@@ -561,11 +581,36 @@ export default function WeddingInvite() {
                 <div className="absolute -right-2 top-1/2 -translate-y-1/2">
                   <button
                     onClick={() => slideGallery("right")}
-                    className="rounded-full p-2 bg-black/40 hover:bg-black/60"
+                    className="rounded-full p-2 bg-linear-to-r from-[#b8846b] to-[#a46d49]"
                     aria-label="next"
                   >
                     ›
                   </button>
+                </div>
+              </div>
+
+              <div className="snap-center shrink-0 mt-16">
+                <div
+                  className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+                >
+                  <iframe
+                    className="h-full w-full"
+                    src="https://www.youtube.com/embed/vtIGvGigw4g"
+                    title="YouTube video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+
+                  {/* Overlay play */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                    <svg
+                      className="h-12 w-12 text-white drop-shadow-lg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
