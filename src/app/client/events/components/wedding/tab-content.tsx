@@ -16,7 +16,7 @@ import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
+import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 import { GetDataEventWithSelect } from "@/server/event";
 
@@ -26,6 +26,8 @@ const MapPicker = dynamic(
 );
 
 const HandleYtInput = (url: string): string | null => {
+  if (url.trim() === "") return null;
+
   const id = ExtractYtID(url);
   if (!id) toast({
     type: "warning",
@@ -374,8 +376,8 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
 
   return (
     <div>
-      <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+      <div className="mb-4 mt-3">
+        <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-info-circle text-xl"></i> Main Information
         </div>
         <p className="text-sm text-gray-500">
@@ -950,8 +952,8 @@ function SchedulerTabContent({ dataEvent }: { dataEvent: Events }) {
 
   return (
     <div>
-      <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+      <div className="mb-4 mt-3">
+        <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-calendar-star text-xl"></i> Event Scheduler
         </div>
         <p className="text-sm text-gray-500">
@@ -1551,8 +1553,8 @@ function GalleryTabContent(event_id: number) {
 
   return (
     <div>
-      <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+      <div className="mb-4 mt-3">
+        <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-photo-album text-xl"></i> Memories Gallery
         </div>
         <p className="text-sm text-gray-500">
@@ -1935,18 +1937,22 @@ function HistoryTabContent(event_id: number) {
 
   return (
     <div>
-      <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
-          <i className="bx bx-book-heart text-xl"></i> Journey of Love
+      <div className="mb-4 mt-3">
+        <div className="flex justify-between items-end">
+          <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
+            <i className="bx bx-book-heart text-xl"></i> Journey of Love
+          </div>
+          <div>
+            <button onClick={() => openModalAddEdit()} type="button"
+              className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+              <i className='bx bx-plus text-lg'></i> New
+            </button>
+          </div>
         </div>
         <p className="text-sm text-gray-500">
           Share your love story and memorable moments leading up to your wedding day.
         </p>
 
-        <button onClick={() => openModalAddEdit()} type="button"
-          className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
-          <i className='bx bx-plus text-lg'></i> Add Story
-        </button>
         <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 
@@ -2552,8 +2558,8 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
 
   return (
     <div>
-      <div className="mb-7 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+      <div className="mb-4 mt-3">
+        <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-gift text-xl"></i> Gift Registry
         </div>
         <p className="text-sm text-gray-500">
@@ -2905,7 +2911,6 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
     { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
-    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
     { name: "Attandance", key: "att_status", key_sort: "att_status", IsVisible: true },
   ]);
@@ -3022,8 +3027,11 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         },
         select: {
           id: true,
+          name: true,
           event_id: true,
           att_number: true,
+          desc: true,
+          show_desc: true,
           ...selectObj
         },
         orderBy: orderObj
@@ -3079,6 +3087,35 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     setLoading(false);
   };
 
+  const postingDesc = async (id: number, status: boolean) => {
+    const confirmed = await showConfirm({
+      title: 'Posting Confirmation?',
+      message: 'Are your sure want to change this posting testimoni status?',
+      confirmText: 'Yes, Change',
+      cancelText: 'No, Cancel',
+      icon: 'bx bx-edit bx-tada text-blue-500'
+    });
+    if (!confirmed) return;
+
+    setLoading(true);
+    try {
+      await ChangeDataEventPosting(id, status);
+      await fatchDatas();
+      toast({
+        type: "success",
+        title: "Deletion Complete",
+        message: "The selected data has been removed successfully"
+      });
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (isFirstRender) return;
     if (tblSortList.length === 0) fatchDatas();
@@ -3105,8 +3142,8 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
 
   return (
     <div>
-      <div className="mb-6 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+      <div className="mb-4 mt-3">
+        <div className="flex justify-start items-center gap-1 text-lg font-semibold text-gray-800">
           <i className="bx bx-envelope text-xl"></i> RSVP Management
         </div>
         <p className="text-sm text-gray-500">
@@ -3223,19 +3260,34 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
         <div className="flex-1 min-w-0 flex flex-col">
-          <TableTopToolbar
-            inputSearch={inputSearch}
-            tblSortList={tblSortList}
-            thColomn={tblThColomns}
-            setTblThColomns={setTblThColomns}
-            setTblSortList={setTblSortList}
-            setInputSearch={setInputSearch}
-            fatchData={() => fatchDatas(pageTable)}
+          <div className="pb-4">
+            <TableTopToolbar
+              inputSearch={inputSearch}
+              tblSortList={tblSortList}
+              thColomn={tblThColomns}
+              setTblThColomns={setTblThColomns}
+              setTblSortList={setTblSortList}
+              setInputSearch={setInputSearch}
+              fatchData={() => fatchDatas(pageTable)}
 
-            openModal={openModalAddEdit}
+              openModal={openModalAddEdit}
+            />
+          </div>
+
+          <TablePagination
+            perPage={perPage}
+            pageTable={pageTable}
+            totalPage={totalPage}
+            totalCount={totalCount}
+            setPerPage={setPerPage}
+            setPageTable={setPageTable}
+            fatchData={fatchDatas}
+
+            inputPage={inputPage}
+            setInputPage={setInputPage}
           />
 
-          <div className="flex flex-col pt-5 pb-4 px-1.5">
+          <div className="flex flex-col pt-5 px-1.5">
             <div className="-m-1.5 overflow-x-auto">
               <div className="min-w-full inline-block align-middle">
                 <div className="border border-gray-200 rounded-lg shadow-xs overflow-hidden">
@@ -3303,19 +3355,63 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
               </div>
             </div>
           </div>
+        </div>
 
-          <TablePagination
-            perPage={perPage}
-            pageTable={pageTable}
-            totalPage={totalPage}
-            totalCount={totalCount}
-            setPerPage={setPerPage}
-            setPageTable={setPageTable}
-            fatchData={fatchDatas}
+        <div className="mt-5">
+          <div className="font-semibold text-gray-800">
+            Their Testimony
+          </div>
+          <p className="text-sm text-gray-500">
+            See what they are saying about your event and choose the message you want to post.
+          </p>
+        </div>
 
-            inputPage={inputPage}
-            setInputPage={setInputPage}
-          />
+        <div className="flex flex-col pt-5 px-1.5">
+          <div className="-m-1.5 overflow-x-auto">
+            <div className="min-w-full inline-block align-middle">
+              <div className="border border-gray-200 rounded-lg shadow-xs overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">#</th>
+                      <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">Name</th>
+                      <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">Message</th>
+                      <th scope="col" className="px-3 py-2.5 text-end text-xs font-medium text-gray-500 uppercase">Posting</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {
+                      datas.map((data, i) => (
+                        <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
+                          <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
+
+                          <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>
+                          <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.desc ?? "-"}</td>
+
+                          <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium space-x-1">
+                            <div className="flex items-center justify-end gap-x-2">
+                              <label htmlFor={`hs-xs-switch-posting-rsvp-${i}`} className="relative inline-block w-9 h-5 cursor-pointer">
+                                <input
+                                  checked={data.show_desc}
+                                  onChange={async (e) => {
+                                    const val = e.target.checked;
+                                    await postingDesc(data.id, val);
+                                  }}
+                                  type="checkbox" id={`hs-xs-switch-posting-rsvp-${i}`} className="peer sr-only"
+                                />
+                                <span className="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                                <span className="absolute top-1/2 inset-s-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full"></span>
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3574,17 +3670,20 @@ function FAQTabContent(event_id: number) {
 
   return (
     <div>
-      <div className="mb-6 mt-3 text-center">
-        <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
-          <i className="bx bx-help-circle text-xl"></i> Frequently Asked Questions
+      <div className="mb-4 mt-3">
+        <div className="flex justify-between items-end">
+          <div className="flex justify-center items-center gap-1 text-lg font-semibold text-gray-800">
+            <i className="bx bx-help-circle text-xl"></i> Frequently Asked Questions
+          </div>
+
+          <button onClick={() => openModalAddEdit()} type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
+            <i className='bx bx-plus text-lg'></i> New FAQ
+          </button>
         </div>
         <p className="text-sm text-gray-500">
           Create and manage FAQ for your wedding, so your guests can find important information easily.
         </p>
 
-        <button onClick={() => openModalAddEdit()} type="button" className="mt-2 py-1.5 px-3 inline-flex items-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none">
-          <i className='bx bx-plus text-lg'></i> Add FAQ
-        </button>
         <button id={`btn-${modalAddEdit}`} type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls={modalAddEdit} data-hs-overlay={`#${modalAddEdit}`} className="hidden">-</button>
       </div>
 

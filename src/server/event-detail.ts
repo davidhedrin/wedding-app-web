@@ -700,6 +700,23 @@ export async function DeleteDataEventRsvp(id: number) {
     throw error;
   }
 };
+
+export async function ChangeDataEventPosting(id: number, status: boolean) {
+  try {
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventRsvp.update({
+      where: { id },
+      data: {
+        show_desc: status
+      }
+    });
+  } catch (error: any) {
+    throw error;
+  }
+};
 // End Event RSVP
 
 export async function UpdateShippingAddress(event_id: number, address: string) {

@@ -4,7 +4,7 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, formatDate, getMonthName, playMusic, toast } from "@/lib/utils";
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
@@ -56,6 +56,30 @@ function useLockBodyScroll(isLocked: boolean) {
     }
   }, [isLocked])
 }
+
+const dummyMessages = [
+  {
+    id: "1",
+    name: "Andi Pratama",
+    message: "Selamat ya! Semoga lancar sampai hari H 🤍",
+    attendance: "Hadir",
+    createdAt: "2026-04-10",
+  },
+  {
+    id: "2",
+    name: "Siti Rahma",
+    message: "Maaf belum bisa hadir, tapi doaku selalu menyertai 🙏",
+    attendance: "Tidak hadir",
+    createdAt: "2026-04-09",
+  },
+  {
+    id: "3",
+    name: "Budi Santoso",
+    message: "InsyaAllah hadir, ditunggu yaa!",
+    attendance: "Belum pasti",
+    createdAt: "2026-04-08",
+  },
+];
 
 export default function WeddingInvitationPage() {
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
@@ -530,6 +554,7 @@ export default function WeddingInvitationPage() {
                       extra={x.notes.length > 0 ? x.notes.join(", ") : undefined}
                       lat={x.latitude ?? undefined}
                       long={x.longitude ?? undefined}
+                      yt={x.youtube_url}
                     />
                   })
                 }
@@ -686,28 +711,53 @@ export default function WeddingInvitationPage() {
             }
           </div>
 
-          <div className="snap-center shrink-0 mt-14">
-            <div className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/vtIGvGigw4g"
-                title="YouTube video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+          {
+            eventDatas ? (
+              eventDatas.youtube_url !== null && <div className="snap-center shrink-0 mt-14">
+                <div className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
+                  <iframe
+                    className="h-full w-full"
+                    src={`https://www.youtube.com/embed/${ExtractYtID(eventDatas.youtube_url)}`}
+                    title="YouTube video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
 
-              {/* Overlay play */}
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
-                <svg
-                  className="h-12 w-12 text-white drop-shadow-lg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+                  {/* Overlay play */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                    <svg
+                      className="h-12 w-12 text-white drop-shadow-lg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            ) : <div className="snap-center shrink-0 mt-14">
+              <div className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/vtIGvGigw4g"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </Section>
 
         {/* Cerita (timeline) */}
@@ -871,6 +921,68 @@ export default function WeddingInvitationPage() {
               </p>
             </div>
           </form>
+
+          <div className="mt-10">
+            <h3 className="font-serif text-2xl font-semibold text-white mb-4">
+              Ucapan & Doa
+            </h3>
+
+            <div className="space-y-4 pr-2">
+              {dummyMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium text-white">
+                      {msg.name}
+                    </p>
+                    <span className="text-xs text-stone-400">
+                      {new Date(msg.createdAt).toLocaleDateString("id-ID")}
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-stone-300 mb-2">
+                    {msg.message || "-"}
+                  </p>
+
+                  <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-stone-300">
+                    {msg.attendance}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex items-center justify-between">
+              {/* LEFT - Pagination UI */}
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white opacity-50 cursor-not-allowed"
+                >
+                  Prev
+                </button>
+
+                <button className="px-3 py-1 rounded-lg text-sm border bg-white text-stone-900 border-white">
+                  1
+                </button>
+
+                <button className="px-3 py-1 rounded-lg text-sm border bg-white/5 backdrop-blur-md text-white border-white/10">
+                  2
+                </button>
+
+                <button
+                  className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white"
+                >
+                  Next
+                </button>
+              </div>
+
+              {/* RIGHT - Info */}
+              <p className="text-sm text-stone-400 font-semibold">
+                Page 1 of 3
+              </p>
+            </div>
+          </div>
         </Section>
 
         {/* Hadiah */}
@@ -1256,7 +1368,8 @@ function InfoCard({
   place,
   extra,
   long,
-  lat
+  lat,
+  yt
 }: {
   title: string;
   time: string;
@@ -1264,6 +1377,7 @@ function InfoCard({
   extra?: string;
   long?: string;
   lat?: string;
+  yt?: string | null;
 }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 backdrop-blur-md transition">
@@ -1296,15 +1410,27 @@ function InfoCard({
         </div>
         {extra && <p>{extra}</p>}
 
-        <a
-          href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
-          target="_blank"
-          className="mt-2 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
-        >
-          <div className='flex items-center'>
-            <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
-          </div>
-        </a>
+        {
+          yt !== undefined ? (
+            yt !== null && <a
+              href={yt}
+              target="_blank"
+              className="mt-2 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
+            >
+              <div className='flex items-center'>
+                <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+              </div>
+            </a>
+          ) : <a
+            href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+            target="_blank"
+            className="mt-2 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-stone-900 hover:bg-stone-100 transition shadow-lg"
+          >
+            <div className='flex items-center'>
+              <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+            </div>
+          </a>
+        }
       </div>
     </div>
   );

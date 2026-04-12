@@ -105,6 +105,8 @@ export type EventInitProps = {
   music_url: string | null;
   schedule_note: string | null;
   wishlist_address: string | null;
+  youtube_url: string | null;
+
   gb_info: GroomBrideProps[];
   schedule_info: {
     type: ScheduleEnum;
@@ -117,6 +119,7 @@ export type EventInitProps = {
     longitude: string | null;
     notes: string[];
     ceremony_type: TradRecepType | null;
+    youtube_url: string | null;
   }[];
   event_galleries: {
     img_name: string | null;

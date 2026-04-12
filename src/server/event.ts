@@ -354,6 +354,7 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
         music_url: true,
         schedule_note: true,
         wishlist_address: true,
+        youtube_url: true,
         
         gb_info: {
           select: {
@@ -387,6 +388,7 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
             longitude: true,
             notes: true,
             ceremony_type: true,
+            youtube_url: true,
           },
           orderBy: {
             id: "asc"
