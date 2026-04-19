@@ -501,7 +501,6 @@ export default function WeddingInvitationPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            // Di proyek nyata, kirim ke API/Sheet.
             setRsvpSent(true);
             setTimeout(() => setRsvpSent(false), 3500);
           }}
@@ -582,6 +581,78 @@ export default function WeddingInvitationPage() {
             Terima kasih! RSVP Anda telah terekam.
           </div>
         </form>
+
+        <div className="mt-12">
+          <h3 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+            Ucapan & Doa
+          </h3>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                name: 'Dewi Lestari',
+                message: 'Semoga cinta kalian selalu tumbuh setiap hari 🤍',
+                date: '12 Feb 2026',
+                attend: 'Hadir',
+              },
+              {
+                name: 'Rizky Saputra',
+                message: 'Selamat menempuh hidup baru! Bahagia selalu ✨',
+                date: '13 Feb 2026',
+                attend: 'Berhalangan',
+              },
+              {
+                name: 'Anita Wijaya',
+                message: 'Doa terbaik untuk kalian berdua 🙏',
+                date: '14 Feb 2026',
+                attend: 'Hadir',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className={`flex flex-col rounded-2xl p-3 ${THEME.card} ${THEME.ring}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-slate-100">{item.name}</p>
+                    <p className="text-xs text-slate-300/70">{item.date}</p>
+                  </div>
+
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${item.attend === 'Hadir'
+                      ? 'bg-emerald-300/20 text-emerald-200'
+                      : 'bg-rose-300/20 text-rose-200'
+                      }`}
+                  >
+                    {item.attend}
+                  </span>
+                </div>
+
+                <p className="mt-3 text-sm leading-relaxed text-slate-200/90">
+                  {item.message}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p className="text-sm text-slate-300/70">Page 1 of 3</p>
+
+            <div className="flex items-center gap-2">
+              <button className="rounded-xl px-4 py-2 text-sm text-slate-300/70 ring-1 ring-white/10 hover:bg-white/5 transition">
+                Prev
+              </button>
+
+              <button className="rounded-xl bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 shadow">1</button>
+              <button className="rounded-xl px-4 py-2 text-sm text-slate-300/70 hover:bg-white/5 transition">2</button>
+              <button className="rounded-xl px-4 py-2 text-sm text-slate-300/70 hover:bg-white/5 transition">3</button>
+
+              <button className="rounded-xl px-4 py-2 text-sm text-slate-300/70 ring-1 ring-white/10 hover:bg-white/5 transition">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
       </Section>
 
       {/* ===== Hadiah ===== */}

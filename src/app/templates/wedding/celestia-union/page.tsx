@@ -583,7 +583,7 @@ export default function WeddingInvitationPage() {
       {/* Section: RSVP */}
       <section id="rsvp" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-4xl">
             <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Konfirmasi Kehadiran</h2>
             <p className="mt-2 text-white/80">Mohon isi formulir berikut untuk RSVP.</p>
 
@@ -631,6 +631,110 @@ export default function WeddingInvitationPage() {
                 Kirim RSVP
               </button>
             </form>
+
+            <div className="mt-12">
+              <h3 className={classNames(playfair.className, 'text-2xl text-white md:text-3xl')}>
+                Ucapan & Doa
+              </h3>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  {
+                    nama: 'Andi Pratama',
+                    pesan: 'Semoga menjadi keluarga yang sakinah, mawaddah, warahmah 🤍',
+                    tanggal: '12 Jan 2026',
+                    status: 'Hadir',
+                  },
+                  {
+                    nama: 'Siti Nurhaliza',
+                    pesan: 'Selamat menempuh hidup baru! Bahagia selalu ya 💐',
+                    tanggal: '13 Jan 2026',
+                    status: 'Mungkin',
+                  },
+                  {
+                    nama: 'Budi Santoso',
+                    pesan: 'Maaf tidak bisa hadir, tapi doa terbaik untuk kalian 🙏',
+                    tanggal: '14 Jan 2026',
+                    status: 'Tidak',
+                  },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className={classNames(
+                      'flex flex-col justify-between rounded-2xl border p-5',
+                      THEME.borderSoft,
+                      THEME.cardBg
+                    )}
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-white">{item.nama}</p>
+                        <p className="text-xs text-white/60">{item.tanggal}</p>
+                      </div>
+
+                      {/* Status Badge */}
+                      <span
+                        className={classNames(
+                          'rounded-full px-3 py-1 text-xs font-medium',
+                          item.status === 'Hadir' && 'bg-green-400/20 text-green-300',
+                          item.status === 'Mungkin' && 'bg-yellow-400/20 text-yellow-300',
+                          item.status === 'Tidak' && 'bg-red-400/20 text-red-300'
+                        )}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+
+                    {/* Message */}
+                    <p className="mt-4 text-sm leading-relaxed text-white/80">
+                      {item.pesan}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <p className="text-sm text-white/70">Page 1 of 3</p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    className={classNames(
+                      'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                      THEME.borderSoft
+                    )}
+                  >
+                    Prev
+                  </button>
+
+                  <button 
+                    className={classNames(
+                      'rounded-full px-4 py-2 text-sm font-semibold text-black',
+                      THEME.accentBg
+                    )}
+                  >
+                    1
+                  </button>
+
+                  <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
+                    2
+                  </button>
+
+                  <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
+                    3
+                  </button>
+
+                  <button
+                    className={classNames(
+                      'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                      THEME.borderSoft
+                    )}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

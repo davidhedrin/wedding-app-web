@@ -706,111 +706,212 @@ function RSVPForm() {
   };
 
   return (
-    <div className="grid md:grid-cols-5 gap-8">
-      <div className="md:col-span-3 rounded-3xl border bg-white p-6 md:p-8 border-white/60 shadow-xl/30 shadow-gray-200">
-        <h4 className="font-semibold text-lg">Konfirmasi Kehadiran</h4>
-        <p className="text-slate-600 text-sm mt-1">
-          Mohon isi formulir ini untuk membantu kami menyiapkan tempat terbaik.
-        </p>
-        <form onSubmit={submit} className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm text-slate-600">Nama Lengkap</label>
-            <input
-              required
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
-              placeholder="Nama Anda"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-slate-600">Kontak (HP/Email)</label>
-            <input
-              required
-              value={form.contact}
-              onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
-              placeholder="08xx / email"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-slate-600">Kehadiran</label>
-            <select
-              value={form.attendance}
-              onChange={(e) => setForm((f) => ({ ...f, attendance: e.target.value }))}
-              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
-            >
-              <option>Hadir</option>
-              <option>Tidak Hadir</option>
-              <option>Masih Ragu</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm text-slate-600">Jumlah Tamu</label>
-            <input
-              type="number"
-              min={1}
-              value={form.guests}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, guests: Math.max(1, Number(e.target.value)) }))
-              }
-              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="block text-sm text-slate-600">Ucapan</label>
-            <textarea
-              rows={4}
-              value={form.message}
-              onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-              className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
-              placeholder="Doa & ucapan..."
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-white bg-linear-to-r from-indigo-500 to-rose-500 hover:opacity-95 active:scale-[.99] transition disabled:opacity-60"
-            >
-              {loading ? (
-                <>
-                  <SpinnerIcon className="w-4 h-4 animate-spin" />
-                  Mengirim...
-                </>
-              ) : (
-                <>
-                  <SparkleIcon className="w-4 h-4" /> Kirim RSVP
-                </>
+    <div>
+      <div className="grid md:grid-cols-5 gap-8">
+        <div className="md:col-span-3 rounded-3xl border bg-white p-6 md:p-8 border-white/60 shadow-xl/30 shadow-gray-200">
+          <h4 className="font-semibold text-lg">Konfirmasi Kehadiran</h4>
+          <p className="text-slate-600 text-sm mt-1">
+            Mohon isi formulir ini untuk membantu kami menyiapkan tempat terbaik.
+          </p>
+          <form onSubmit={submit} className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-slate-600">Nama Lengkap</label>
+              <input
+                required
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+                placeholder="Nama Anda"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-slate-600">Kontak (HP/Email)</label>
+              <input
+                required
+                value={form.contact}
+                onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
+                className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+                placeholder="08xx / email"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-slate-600">Kehadiran</label>
+              <select
+                value={form.attendance}
+                onChange={(e) => setForm((f) => ({ ...f, attendance: e.target.value }))}
+                className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              >
+                <option>Hadir</option>
+                <option>Tidak Hadir</option>
+                <option>Masih Ragu</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm text-slate-600">Jumlah Tamu</label>
+              <input
+                type="number"
+                min={1}
+                value={form.guests}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, guests: Math.max(1, Number(e.target.value)) }))
+                }
+                className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm text-slate-600">Ucapan</label>
+              <textarea
+                rows={4}
+                value={form.message}
+                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                className="mt-1 w-full px-3 py-1.5 border rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-200"
+                placeholder="Doa & ucapan..."
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-white bg-linear-to-r from-indigo-500 to-rose-500 hover:opacity-95 active:scale-[.99] transition disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <SpinnerIcon className="w-4 h-4 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  <>
+                    <SparkleIcon className="w-4 h-4" /> Kirim RSVP
+                  </>
+                )}
+              </button>
+              {done && (
+                <p className="text-emerald-600 text-sm mt-3">
+                  Terima kasih! RSVP Anda telah kami terima.
+                </p>
               )}
-            </button>
-            {done && (
-              <p className="text-emerald-600 text-sm mt-3">
-                Terima kasih! RSVP Anda telah kami terima.
-              </p>
-            )}
-          </div>
-        </form>
-      </div>
+            </div>
+          </form>
+        </div>
 
-      {/* Info kontak & catatan */}
-      <div className="md:col-span-2 space-y-6">
-        <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
-          <h4 className="font-semibold text-lg">Kontak</h4>
-          <div className="mt-3 space-y-2 text-slate-600">
-            <div className="flex items-center gap-2">
-              <PhoneIcon className="w-4 h-4" /> 08xx-xxxx-xxxx (Aisyah)
+        {/* Info kontak & catatan */}
+        <div className="md:col-span-2 space-y-6">
+          <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
+            <h4 className="font-semibold text-lg">Kontak</h4>
+            <div className="mt-3 space-y-2 text-slate-600">
+              <div className="flex items-center gap-2">
+                <PhoneIcon className="w-4 h-4" /> 08xx-xxxx-xxxx (Aisyah)
+              </div>
+              <div className="flex items-center gap-2">
+                <PhoneIcon className="w-4 h-4" /> 08xx-xxxx-xxxx (Raka)
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <PhoneIcon className="w-4 h-4" /> 08xx-xxxx-xxxx (Raka)
-            </div>
+          </div>
+          <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
+            <h4 className="font-semibold text-lg">Catatan</h4>
+            <p className="text-slate-600 mt-2">
+              Mohon konfirmasi kehadiran paling lambat H-7. Terima kasih!
+            </p>
           </div>
         </div>
-        <div className="rounded-3xl border bg-white p-6 border-white/60 shadow-xl/30 shadow-gray-200">
-          <h4 className="font-semibold text-lg">Catatan</h4>
-          <p className="text-slate-600 mt-2">
-            Mohon konfirmasi kehadiran paling lambat H-7. Terima kasih!
+      </div>
+
+      <div className="mt-12">
+        <h3 className="text-lg font-semibold text-emerald-900 mb-6">
+          Ucapan & Doa Tamu
+        </h3>
+
+        <div className="space-y-5">
+          {[
+            {
+              name: "Rania Putri",
+              message:
+                "Semoga menjadi keluarga yang penuh cinta, keberkahan, dan selalu dalam lindungan Tuhan 🤍",
+              date: "10 Apr 2026",
+              status: "Hadir",
+            },
+            {
+              name: "Bima Pratama",
+              message:
+                "Selamat menempuh hidup baru! Semoga selalu bahagia sampai akhir hayat ✨",
+              date: "11 Apr 2026",
+              status: "Masih Ragu",
+            },
+            {
+              name: "Salsa Amelia",
+              message:
+                "Maaf tidak bisa hadir, tapi doa terbaik selalu menyertai kalian berdua 🙏",
+              date: "12 Apr 2026",
+              status: "Tidak Hadir",
+            },
+          ].map((item, i) => (
+            <div key={i} className="relative">
+
+              {/* soft divider line */}
+              <div className="absolute left-4 top-0 bottom-0 w-px bg-emerald-100" />
+
+              {/* card */}
+              <div className="ml-10 rounded-2xl border border-emerald-100 bg-white/70 backdrop-blur-md p-4 shadow-sm hover:shadow-md transition">
+
+                {/* header */}
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-emerald-900">
+                    {item.name}
+                  </p>
+
+                  <span
+                    className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : item.status === "Masih Ragu"
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : "bg-rose-50 text-rose-700 border-rose-200"
+                      }`}
+                  >
+                    {item.status}
+                  </span>
+                </div>
+
+                {/* message */}
+                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                  {item.message}
+                </p>
+
+                {/* footer */}
+                <div className="mt-3 text-xs text-slate-400">
+                  {item.date}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* PAGINATION */}
+        <div className="mt-10 flex flex-col items-center gap-3">
+          <p className="text-xs text-slate-500">
+            Page 1 of 3
           </p>
+
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1 text-xs rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition">
+              Prev
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-full bg-emerald-600 text-white font-medium">
+              1
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-full text-emerald-700 hover:bg-emerald-50 transition">
+              2
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-full text-emerald-700 hover:bg-emerald-50 transition">
+              3
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition">
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

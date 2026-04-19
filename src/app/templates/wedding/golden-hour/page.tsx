@@ -570,6 +570,101 @@ export default function WeddingInvitePage(): JSX.Element {
                 </div>
               </form>
             </div>
+
+            <div className="mt-16">
+              <h3
+                className="text-2xl font-serif mb-6 text-white"
+                style={{ fontFamily: "var(--ff-heading)" }}
+              >
+                Ucapan & Doa
+              </h3>
+
+              {/* Masonry style */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  {
+                    name: 'Nadia Putri',
+                    message:
+                      'Semoga pernikahan ini menjadi awal dari perjalanan indah yang penuh cinta 💛',
+                    date: '25 Mar 2026',
+                    status: 'Hadir',
+                  },
+                  {
+                    name: 'Arief Rahman',
+                    message:
+                      'Langgeng selalu dan penuh keberkahan untuk keluarga kecil kalian 🙏',
+                    date: '25 Mar 2026',
+                    status: 'Belum Pasti',
+                  },
+                  {
+                    name: 'Cindy Wijaya',
+                    message:
+                      'Maaf belum bisa hadir, tapi doa terbaik selalu untuk kalian ✨',
+                    date: '26 Mar 2026',
+                    status: 'Tidak Hadir',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="break-inside-avoid rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md hover:bg-white/10 transition"
+                  >
+                    {/* Message */}
+                    <p className="text-sm leading-relaxed text-slate-200 italic">
+                      “{item.message}”
+                    </p>
+
+                    {/* Divider */}
+                    <div className="my-4 h-px bg-white/10" />
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <div>
+                        <p className="font-medium text-slate-200">{item.name}</p>
+                        <p>{item.date}</p>
+                      </div>
+
+                      <span
+                        className={`px-2 py-1 rounded-full text-[10px] ${item.status === 'Hadir'
+                            ? 'bg-emerald-300/20 text-emerald-300'
+                            : item.status === 'Belum Pasti'
+                              ? 'bg-yellow-300/20 text-yellow-300'
+                              : 'bg-rose-300/20 text-rose-300'
+                          }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <div className="mt-10 flex flex-col items-center gap-3">
+                <p className="text-xs text-slate-400">Page 1 of 3</p>
+
+                <div className="flex items-center gap-2">
+                  <button className="px-3 py-1 text-xs border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition">
+                    Prev
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full bg-amber-300 text-[#0b1221] font-semibold">
+                    1
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full text-slate-300 hover:bg-white/10 transition">
+                    2
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full text-slate-300 hover:bg-white/10 transition">
+                    3
+                  </button>
+
+                  <button className="px-3 py-1 text-xs border border-white/10 rounded-full text-slate-300 hover:bg-white/10 transition">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Hadiah */}

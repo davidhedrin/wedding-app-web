@@ -703,7 +703,7 @@ function RSVP({
   return (
     <div className="relative py-16 sm:py-20">
       <SectionTitle title="RSVP" subtitle="Konfirmasi kehadiran Anda." />
-      <div className="mx-auto mt-8 max-w-3xl px-6">
+      <div className="mx-auto mt-8 max-w-4xl px-6">
         <form onSubmit={onSubmit} className="glass rounded-3xl p-6 sm:p-8 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Nama Lengkap">
@@ -775,6 +775,101 @@ function RSVP({
             </div>
           )}
         </form>
+
+        <div className="mt-16 px-6">
+          <h3 className="text-2xl font-semibold text-emerald-100">
+            Ucapan & Doa
+          </h3>
+
+          {/* Chat list */}
+          <div className="mt-6 space-y-4">
+            {[
+              {
+                name: 'Dimas Prakoso',
+                message: 'Semoga selalu diberkahi dan bahagia selalu 🤍',
+                date: '28 Mar 2026',
+                attendance: 'Hadir',
+              },
+              {
+                name: 'Melisa Tan',
+                message: 'Maaf belum bisa hadir, tapi doa terbaik untuk kalian ✨',
+                date: '29 Mar 2026',
+                attendance: 'Tidak Hadir',
+              },
+              {
+                name: 'Rafi Ahmad',
+                message: 'Selamat ya! Semoga jadi keluarga yang sakinah 🙏',
+                date: '30 Mar 2026',
+                attendance: 'Mungkin',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}
+              >
+                <div className="max-w-[85%] sm:max-w-[70%]">
+                  {/* Bubble */}
+                  <div
+                    className={`rounded-2xl px-4 py-3 text-sm leading-relaxed backdrop-blur-md border ${i % 2 === 0
+                        ? 'bg-white/10 border-white/10 text-emerald-100 rounded-bl-sm'
+                        : 'bg-amber-300/90 text-emerald-950 border-amber-200/40 rounded-br-sm'
+                      }`}
+                  >
+                    <p>{item.message}</p>
+                  </div>
+
+                  {/* Meta */}
+                  <div
+                    className={`mt-1 text-xs flex items-center gap-2 ${i % 2 === 0 ? 'text-emerald-100/60' : 'text-amber-200 justify-end'
+                      }`}
+                  >
+                    <span className="font-medium">{item.name}</span>
+                    <span>•</span>
+                    <span>{item.date}</span>
+                    <span>•</span>
+                    <span
+                      className={`${item.attendance === 'Hadir'
+                          ? 'text-emerald-300'
+                          : item.attendance === 'Mungkin'
+                            ? 'text-yellow-300'
+                            : 'text-rose-300'
+                        }`}
+                    >
+                      {item.attendance}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <p className="text-xs text-emerald-100/60">Page 1 of 3</p>
+
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1 text-xs rounded-full border border-white/10 text-emerald-100/70 hover:bg-white/10 transition">
+                Prev
+              </button>
+
+              <button className="px-3 py-1 text-xs rounded-full bg-amber-300 text-emerald-950 font-semibold">
+                1
+              </button>
+
+              <button className="px-3 py-1 text-xs rounded-full text-emerald-100/70 hover:bg-white/10 transition">
+                2
+              </button>
+
+              <button className="px-3 py-1 text-xs rounded-full text-emerald-100/70 hover:bg-white/10 transition">
+                3
+              </button>
+
+              <button className="px-3 py-1 text-xs rounded-full border border-white/10 text-emerald-100/70 hover:bg-white/10 transition">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <style jsx>{`

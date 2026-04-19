@@ -658,7 +658,7 @@ export default function Page() {
             onSubmit={onSubmitRSVP}
             className="mt-8 grid gap-4 rounded-3xl border border-emerald-300/20 bg-emerald-900/40 p-6 backdrop-blur-xl"
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <Field label="Nama Lengkap">
                 <input
                   required
@@ -709,6 +709,91 @@ export default function Page() {
               </button>
             </div>
           </form>
+
+          <div className="mt-14">
+            <h3 className="text-2xl font-semibold text-emerald-100 md:text-3xl">
+              Ucapan & Doa Tamu
+            </h3>
+
+            <div className="mt-8 space-y-4">
+              {[
+                {
+                  name: 'Ahmad Fauzi',
+                  message: 'Semoga pernikahan ini membawa keberkahan dan kebahagiaan 🌿',
+                  date: '10 Mar 2026',
+                  attendance: 'hadir',
+                },
+                {
+                  name: 'Clara Dewanti',
+                  message: 'Maaf tidak bisa hadir, tapi doa terbaik selalu untuk kalian 🤍',
+                  date: '11 Mar 2026',
+                  attendance: 'tidak',
+                },
+                {
+                  name: 'Rendy Kurniawan',
+                  message: 'Selamat menempuh hidup baru! Semoga langgeng selamanya ✨',
+                  date: '12 Mar 2026',
+                  attendance: 'hadir',
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="relative flex flex-col gap-4 rounded-2xl border border-emerald-300/20 bg-emerald-900/30 p-5 backdrop-blur-xl md:flex-row md:items-center md:justify-between"
+                >
+                  <div className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-emerald-300/40" />
+
+                  <div className="pl-3">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <p className="font-semibold text-emerald-100">{item.name}</p>
+
+                      <span
+                        className={`rounded-full border px-3 py-1 text-xs ${item.attendance === 'hadir'
+                            ? 'border-emerald-300/40 text-emerald-200'
+                            : 'border-rose-300/40 text-rose-200'
+                          }`}
+                      >
+                        {item.attendance === 'hadir' ? 'Hadir' : 'Tidak Hadir'}
+                      </span>
+                    </div>
+
+                    <p className="mt-2 text-sm text-emerald-100/80 leading-relaxed">
+                      {item.message}
+                    </p>
+                  </div>
+
+                  <div className="text-xs text-emerald-200/60 md:text-right">
+                    {item.date}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:justify-between">
+              <p className="text-sm text-emerald-200/70">Page 1 of 3</p>
+
+              <div className="flex items-center gap-2">
+                <button className="rounded-full border border-emerald-300/20 px-4 py-2 text-sm text-emerald-200/70 hover:bg-emerald-300/10 transition">
+                  Prev
+                </button>
+
+                <button className="rounded-full bg-emerald-300/80 px-4 py-2 text-sm font-semibold text-emerald-900 shadow">
+                  1
+                </button>
+
+                <button className="rounded-full px-4 py-2 text-sm text-emerald-200/70 hover:bg-emerald-300/10 transition">
+                  2
+                </button>
+
+                <button className="rounded-full px-4 py-2 text-sm text-emerald-200/70 hover:bg-emerald-300/10 transition">
+                  3
+                </button>
+
+                <button className="rounded-full border border-emerald-300/20 px-4 py-2 text-sm text-emerald-200/70 hover:bg-emerald-300/10 transition">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
         </Container>
       </section>
 

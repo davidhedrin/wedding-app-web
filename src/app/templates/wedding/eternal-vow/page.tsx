@@ -849,7 +849,7 @@ const RSVPSection: React.FC = () => {
         </p>
       </div>
 
-      <div className="max-w-xl mx-auto bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-10 shadow-xl">
+      <div className="max-w-xl mx-auto bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
         {submitted ? (
           <div className="text-center text-amber-300 tracking-widest animate-fadeIn">
             Thank you for your response
@@ -918,6 +918,98 @@ const RSVPSection: React.FC = () => {
             </button>
           </div>
         )}
+      </div>
+
+      <div className="mt-24 max-w-3xl mx-auto">
+        <h3 className="text-center font-serif text-3xl md:text-4xl text-amber-300">
+          Wishes for the Couple
+        </h3>
+        <p className="mt-2 text-center text-neutral-500 text-sm">
+          Messages from beloved guests
+        </p>
+
+        {/* List */}
+        <div className="mt-10 space-y-6">
+          {[
+            {
+              name: 'Michael Tan',
+              message: 'Wishing you a lifetime filled with love, laughter, and endless happiness.',
+              date: 'March 15, 2026',
+              attendance: 'yes',
+            },
+            {
+              name: 'Sofia Wijaya',
+              message: "Sorry I couldn't attend, but my prayers and love are always with you both.",
+              date: 'March 16, 2026',
+              attendance: 'no',
+            },
+            {
+              name: 'Daniel Hartono',
+              message: 'Congratulations on your beautiful journey together ✨',
+              date: 'March 17, 2026',
+              attendance: 'yes',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="relative rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-xl transition hover:border-amber-400/40"
+            >
+              {/* Glow effect */}
+              <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 hover:opacity-100 transition duration-500 bg-linear-to-r from-amber-400/10 via-transparent to-pink-500/10" />
+
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <p className="text-neutral-200 font-medium tracking-wide">
+                  {item.name}
+                </p>
+
+                <span
+                  className={`text-xs tracking-widest uppercase ${item.attendance === 'yes'
+                      ? 'text-amber-300'
+                      : 'text-neutral-500'
+                    }`}
+                >
+                  {item.attendance === 'yes'
+                    ? 'Attending'
+                    : 'Not Attending'}
+                </span>
+              </div>
+
+              {/* Message */}
+              <p className="mt-4 text-neutral-400 leading-relaxed text-sm">
+                {item.message}
+              </p>
+
+              {/* Footer */}
+              <div className="mt-6 text-xs text-neutral-600 tracking-widest">
+                {item.date}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-12 flex flex-col items-center gap-4">
+          <p className="text-xs tracking-widest text-neutral-600">
+            PAGE 1 OF 3
+          </p>
+
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 text-xs tracking-widest text-neutral-500 hover:text-amber-300 transition">
+              PREV
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-amber-300" />
+              <span className="h-2 w-2 rounded-full bg-neutral-700" />
+              <span className="h-2 w-2 rounded-full bg-neutral-700" />
+            </div>
+
+            <button className="px-4 py-2 text-xs tracking-widest text-neutral-500 hover:text-amber-300 transition">
+              NEXT
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -1072,15 +1164,7 @@ const GiftSection: React.FC = () => {
             {WISHLIST_ITEMS.map((item) => (
               <div
                 key={item.id}
-                className="
-                  bg-black/30
-                  border border-white/10
-                  rounded-2xl
-                  p-5
-                  transition
-                  hover:border-amber-400/40
-                  hover:shadow-[0_0_20px_rgba(255,191,0,0.2)]
-                "
+                className="bg-black/30 border border-white/10 rounded-2xl p-5 transition hover:border-amber-400/40 hover:shadow-[0_0_20px_rgba(255,191,0,0.2)]"
               >
                 <div className="flex flex-col gap-4">
                   <div>

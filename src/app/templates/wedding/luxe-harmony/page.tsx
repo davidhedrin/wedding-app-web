@@ -600,6 +600,105 @@ export default function InvitationPage() {
                 )}
               </div>
             </form>
+
+            <div className="mt-16">
+              <h3 className="text-2xl font-playfair font-semibold text-slate-800 text-center">
+                Ucapan & Doa
+              </h3>
+
+              <div className="mt-10 relative">
+                {/* Vertical line */}
+                <div className="absolute left-4 top-0 bottom-0 w-px bg-slate-300" />
+
+                <div className="space-y-8">
+                  {[
+                    {
+                      name: 'Putri Anindya',
+                      message: 'Semoga selalu diberikan kebahagiaan dan keberkahan 💛',
+                      date: '5 Apr 2026',
+                      attending: 'yes',
+                    },
+                    {
+                      name: 'Andika Saputra',
+                      message: 'Selamat! Semoga menjadi keluarga yang harmonis 🙏',
+                      date: '6 Apr 2026',
+                      attending: 'maybe',
+                    },
+                    {
+                      name: 'Claudia Wijaya',
+                      message: 'Maaf belum bisa hadir, tapi doa terbaik selalu ✨',
+                      date: '7 Apr 2026',
+                      attending: 'no',
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="relative pl-12">
+                      {/* Dot */}
+                      <div className="absolute left-1.5 top-1.5 h-4 w-4 rounded-full bg-amber-400 ring-4 ring-white" />
+
+                      {/* Card */}
+                      <div className="rounded-xl border border-slate-200 bg-white/70 backdrop-blur-sm p-4 shadow-sm hover:shadow-md transition">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-slate-800">{item.name}</p>
+
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${item.attending === 'yes'
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : item.attending === 'maybe'
+                                  ? 'bg-yellow-100 text-yellow-600'
+                                  : 'bg-rose-100 text-rose-600'
+                              }`}
+                          >
+                            {item.attending === 'yes'
+                              ? 'Hadir'
+                              : item.attending === 'maybe'
+                                ? 'Mungkin'
+                                : 'Tidak Hadir'}
+                          </span>
+                        </div>
+
+                        {/* Message */}
+                        <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                          {item.message}
+                        </p>
+
+                        {/* Date */}
+                        <div className="mt-3 text-xs text-slate-400">
+                          {item.date}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="mt-10 flex flex-col items-center gap-3">
+                <p className="text-xs text-slate-500">Page 1 of 3</p>
+
+                <div className="flex items-center gap-2">
+                  <button className="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition">
+                    Prev
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full bg-amber-400 text-white font-semibold">
+                    1
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full text-slate-600 hover:bg-slate-100 transition">
+                    2
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full text-slate-600 hover:bg-slate-100 transition">
+                    3
+                  </button>
+
+                  <button className="px-3 py-1 text-xs rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Hadiah */}

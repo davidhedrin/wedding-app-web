@@ -746,6 +746,97 @@ export default function WeddingInvitePage() {
                   </div>
                 )}
               </form>
+
+              {/* Guestbook - Stacked Cards */}
+              <div className="mt-16">
+                <h3 className="text-2xl font-semibold text-rose-100 text-center">
+                  Ucapan & Doa
+                </h3>
+
+                <div className="mt-10 space-y-6">
+                  {[
+                    {
+                      name: 'Aulia Rahma',
+                      message: 'Semoga pernikahan ini penuh cinta dan kebahagiaan 🌹',
+                      date: '2 Apr 2026',
+                      attendance: 'Hadir',
+                    },
+                    {
+                      name: 'Kevin Wijaya',
+                      message: 'Selamat! Semoga langgeng sampai tua ✨',
+                      date: '3 Apr 2026',
+                      attendance: 'Belum Pasti',
+                    },
+                    {
+                      name: 'Salsa Putri',
+                      message: 'Maaf belum bisa hadir, tapi doa terbaik selalu 🙏',
+                      date: '4 Apr 2026',
+                      attendance: 'Tidak Hadir',
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="relative">
+                      {/* Layer belakang */}
+                      <div className="absolute inset-0 translate-y-2 scale-[0.98] rounded-2xl bg-rose-900/20 blur-sm" />
+
+                      {/* Card utama */}
+                      <div className="relative rounded-2xl border border-rose-700/40 bg-rose-900/30 p-5 backdrop-blur-md shadow-lg">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-rose-100">{item.name}</p>
+
+                          <span
+                            className={`text-xs px-3 py-1 rounded-full ${item.attendance === 'Hadir'
+                                ? 'bg-emerald-300/20 text-emerald-200'
+                                : item.attendance === 'Belum Pasti'
+                                  ? 'bg-yellow-300/20 text-yellow-200'
+                                  : 'bg-rose-300/20 text-rose-200'
+                              }`}
+                          >
+                            {item.attendance}
+                          </span>
+                        </div>
+
+                        {/* Message */}
+                        <p className="mt-3 text-sm text-rose-100/90 leading-relaxed">
+                          {item.message}
+                        </p>
+
+                        {/* Footer */}
+                        <div className="mt-4 text-xs text-rose-200/60">
+                          {item.date}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="mt-10 flex flex-col items-center gap-3">
+                  <p className="text-xs text-rose-200/60">Page 1 of 3</p>
+
+                  <div className="flex items-center gap-2">
+                    <button className="px-3 py-1 text-xs rounded-full border border-rose-700/40 text-rose-200/70 hover:bg-rose-800/40 transition">
+                      Prev
+                    </button>
+
+                    <button className="px-3 py-1 text-xs rounded-full bg-linear-to-r from-rose-500 to-amber-400 text-slate-900 font-semibold">
+                      1
+                    </button>
+
+                    <button className="px-3 py-1 text-xs rounded-full text-rose-200/70 hover:bg-rose-800/40 transition">
+                      2
+                    </button>
+
+                    <button className="px-3 py-1 text-xs rounded-full text-rose-200/70 hover:bg-rose-800/40 transition">
+                      3
+                    </button>
+
+                    <button className="px-3 py-1 text-xs rounded-full border border-rose-700/40 text-rose-200/70 hover:bg-rose-800/40 transition">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 

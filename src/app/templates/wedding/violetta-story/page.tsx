@@ -850,6 +850,120 @@ export default function WeddingInvitationPage() {
               )}
             </div>
           </form>
+
+          <div className="mt-14">
+
+            <div className="text-center mb-8">
+              <h3 className="text-xl font-semibold text-white">
+                Guest Book
+              </h3>
+              <p className="text-sm text-white/60 mt-1">
+                Ucapan & doa dari para tamu
+              </p>
+            </div>
+
+            <div className="space-y-4">
+
+              {[
+                {
+                  name: "Kevin Pratama",
+                  message:
+                    "Selamat menempuh hidup baru, semoga langgeng sampai tua ✨",
+                  date: "15 Apr 2026",
+                  status: "Hadir",
+                },
+                {
+                  name: "Dinda Lestari",
+                  message:
+                    "Maaf belum bisa hadir, tapi doa terbaik selalu menyertai kalian 💜",
+                  date: "16 Apr 2026",
+                  status: "Tidak Hadir",
+                },
+                {
+                  name: "Rizky Aditya",
+                  message:
+                    "Semoga menjadi keluarga yang sakinah mawaddah warahmah 🔥",
+                  date: "17 Apr 2026",
+                  status: "Belum Pasti",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-5 hover:bg-white/10 transition"
+                >
+
+                  {/* glow line */}
+                  <div className="absolute left-0 top-4 bottom-4 w-0.5 bg-fuchsia-500/40 rounded-full" />
+
+                  <div className="pl-4">
+
+                    {/* header */}
+                    <div className="flex items-center justify-between">
+
+                      <p className="text-white font-medium">
+                        {item.name}
+                      </p>
+
+                      <span
+                        className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
+                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
+                            : item.status === "Belum Pasti"
+                              ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
+                              : "bg-rose-500/10 text-rose-300 border-rose-400/30"
+                          }`}
+                      >
+                        {item.status}
+                      </span>
+
+                    </div>
+
+                    {/* message */}
+                    <p className="mt-2 text-sm text-white/70 leading-relaxed">
+                      {item.message}
+                    </p>
+
+                    {/* date */}
+                    <p className="mt-3 text-xs text-white/40">
+                      {item.date}
+                    </p>
+
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* PAGINATION */}
+            <div className="mt-10 flex flex-col items-center gap-3">
+
+              <p className="text-xs text-white/50">
+                Page 1 of 3
+              </p>
+
+              <div className="flex items-center gap-2">
+
+                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                  Prev
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full bg-fuchsia-500 text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]">
+                  1
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                  2
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                  3
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                  Next
+                </button>
+
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

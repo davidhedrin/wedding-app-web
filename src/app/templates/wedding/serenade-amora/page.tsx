@@ -762,6 +762,109 @@ const WeddingInvitationPage: React.FC = () => {
               </div>
             )}
           </form>
+
+          <div className="mt-14">
+
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-serif text-neutral-800">
+                Ucapan & Doa Tamu
+              </h3>
+              <p className="text-sm text-neutral-500 mt-1">
+                Doa dan pesan dari para tamu undangan
+              </p>
+            </div>
+
+            <div className="space-y-5">
+
+              {[
+                {
+                  name: "Alya Rahma",
+                  message:
+                    "Semoga menjadi keluarga yang sakinah, mawaddah, warahmah 🤍",
+                  date: "12 Apr 2026",
+                  status: "Hadir",
+                },
+                {
+                  name: "Fajar Nugroho",
+                  message:
+                    "Selamat menempuh hidup baru, semoga langgeng sampai tua bersama ✨",
+                  date: "13 Apr 2026",
+                  status: "Berhalangan",
+                },
+                {
+                  name: "Nabila Sari",
+                  message:
+                    "Maaf belum bisa hadir, tapi doa terbaik selalu untuk kalian 🙏",
+                  date: "14 Apr 2026",
+                  status: "Berhalangan",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="relative rounded-2xl border bg-white p-5 md:p-6 shadow-sm hover:shadow-md transition"
+                >
+
+                  {/* STATUS BADGE FLOAT */}
+                  <div
+                    className={`absolute top-4 right-4 text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-rose-50 text-rose-700 border-rose-200"
+                      }`}
+                  >
+                    {item.status}
+                  </div>
+
+                  {/* NAME */}
+                  <p className="font-medium text-neutral-800">
+                    {item.name}
+                  </p>
+
+                  {/* MESSAGE */}
+                  <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
+                    {item.message}
+                  </p>
+
+                  {/* DATE */}
+                  <div className="mt-4 text-xs text-neutral-400">
+                    {item.date}
+                  </div>
+
+                </div>
+              ))}
+            </div>
+
+            {/* PAGINATION */}
+            <div className="mt-10 flex flex-col items-center gap-3">
+
+              <p className="text-xs text-neutral-500">
+                Page 1 of 3
+              </p>
+
+              <div className="flex items-center gap-2">
+
+                <button className="px-3 py-1 text-xs rounded-full border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition">
+                  Prev
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full bg-neutral-900 text-white">
+                  1
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition">
+                  2
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition">
+                  3
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-neutral-300 text-neutral-600 hover:bg-neutral-50 transition">
+                  Next
+                </button>
+
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

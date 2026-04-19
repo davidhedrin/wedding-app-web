@@ -564,7 +564,7 @@ export default function WeddingInvite() {
 
             {/* RSVP */}
             <section id="rsvp">
-              <div className="mx-auto max-w-2xl">
+              <div className="mx-auto max-w-4xl">
                 <h2 className="font-playfair text-3xl mb-6">RSVP</h2>
                 <form onSubmit={handleRsvpSubmit} className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 shadow">
                   <div className="grid gap-3">
@@ -626,6 +626,86 @@ export default function WeddingInvite() {
                     {rsvpSent && <div className="text-sm text-emerald-300">Terima kasih! Konfirmasi Anda telah diterima.</div>}
                   </div>
                 </form>
+
+                <div className="mt-14">
+                  <h3 className="text-xl font-semibold text-slate-100">
+                    Ucapan & Doa
+                  </h3>
+
+                  {/* List */}
+                  <div className="mt-6 divide-y divide-slate-700/60 rounded-2xl border border-slate-700 bg-slate-800/30">
+                    {[
+                      {
+                        name: 'Rina Putri',
+                        message: 'Semoga selalu bahagia dan langgeng ya 💕',
+                        date: '20 Mar 2026',
+                      },
+                      {
+                        name: 'Fajar Nugroho',
+                        message: 'Selamat menempuh hidup baru, semoga penuh berkah 🙏',
+                        date: '21 Mar 2026',
+                      },
+                      {
+                        name: 'Lina Wijaya',
+                        message: 'Turut berbahagia untuk kalian berdua ✨',
+                        date: '22 Mar 2026',
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-4 p-4 hover:bg-slate-700/20 transition"
+                      >
+                        {/* Avatar */}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-300/20 text-sm font-semibold text-amber-300">
+                          {item.name.charAt(0)}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-slate-100">
+                              {item.name}
+                            </p>
+                            <span className="text-xs text-slate-400">
+                              {item.date}
+                            </span>
+                          </div>
+
+                          <p className="mt-1 text-sm text-slate-300 leading-relaxed">
+                            {item.message}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  <div className="mt-6 flex items-center justify-between">
+                    <p className="text-xs text-slate-400">Page 1 of 3</p>
+
+                    <div className="flex items-center gap-1">
+                      <button className="px-3 py-1.5 text-xs rounded-md border border-slate-700 text-slate-300 hover:bg-slate-700/30">
+                        Prev
+                      </button>
+
+                      <button className="px-3 py-1.5 text-xs rounded-md bg-amber-300 text-slate-900 font-medium">
+                        1
+                      </button>
+
+                      <button className="px-3 py-1.5 text-xs rounded-md text-slate-300 hover:bg-slate-700/30">
+                        2
+                      </button>
+
+                      <button className="px-3 py-1.5 text-xs rounded-md text-slate-300 hover:bg-slate-700/30">
+                        3
+                      </button>
+
+                      <button className="px-3 py-1.5 text-xs rounded-md border border-slate-700 text-slate-300 hover:bg-slate-700/30">
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
 

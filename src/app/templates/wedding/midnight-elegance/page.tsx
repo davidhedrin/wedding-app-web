@@ -507,6 +507,95 @@ export default function Page() {
               Terima kasih! RSVP Anda sudah tercatat.
             </div>
           )}
+
+          <div className="mt-14">
+            <h3 className="text-xl font-semibold text-white/90">
+              Ucapan & Doa
+            </h3>
+
+            <div className="mt-6 space-y-4">
+              {[
+                {
+                  name: "Ayu Lestari",
+                  message: "Semoga menjadi keluarga yang sakinah, mawaddah, warahmah 🤍",
+                  date: "12 Apr 2026",
+                  status: "Hadir",
+                },
+                {
+                  name: "Rizky Pratama",
+                  message: "Selamat menempuh hidup baru! Semoga selalu bahagia ✨",
+                  date: "13 Apr 2026",
+                  status: "Mungkin",
+                },
+                {
+                  name: "Dewi Anggraini",
+                  message: "Maaf tidak bisa hadir, tapi doa terbaik selalu untuk kalian 🙏",
+                  date: "14 Apr 2026",
+                  status: "Tidak Hadir",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md hover:bg-white/10 transition"
+                >
+                  {/* HEADER */}
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium text-white">{item.name}</p>
+
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full ${item.status === "Hadir"
+                          ? "bg-emerald-300/20 text-emerald-300"
+                          : item.status === "Mungkin"
+                            ? "bg-amber-300/20 text-amber-300"
+                            : "bg-rose-300/20 text-rose-300"
+                        }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+
+                  {/* MESSAGE */}
+                  <p className="mt-3 text-sm text-white/70 leading-relaxed">
+                    {item.message}
+                  </p>
+
+                  {/* FOOTER */}
+                  <div className="mt-4 flex items-center justify-between text-xs text-white/40">
+                    <span>{item.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* PAGINATION */}
+            <div className="mt-10 flex flex-col items-center gap-4">
+              <p className="text-xs text-white/50">
+                Page 1 of 3
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-1 text-xs rounded-full border border-white/10 text-white/60 hover:bg-white/10 transition">
+                  Prev
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full bg-white text-black font-medium">
+                  1
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full text-white/60 hover:bg-white/10 transition">
+                  2
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full text-white/60 hover:bg-white/10 transition">
+                  3
+                </button>
+
+                <button className="px-3 py-1 text-xs rounded-full border border-white/10 text-white/60 hover:bg-white/10 transition">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

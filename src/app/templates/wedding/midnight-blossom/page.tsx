@@ -864,86 +864,199 @@ function RSVPForm() {
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="grid grid-cols-1 md:grid-cols-2 gap-6"
-    >
-      <Card>
-        <div className="grid grid-cols-1 gap-4">
-          <Input
-            label="Nama Lengkap"
-            value={form.name}
-            onChange={(v) => setForm((f) => ({ ...f, name: v }))}
-            required
-          />
-          <Input
-            label="No. HP/WA"
-            value={form.phone}
-            onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
-          />
-          <Select
-            label="Konfirmasi Kehadiran"
-            value={form.attendance}
-            onChange={(v) => setForm((f) => ({ ...f, attendance: v }))}
-            options={["Hadir", "Tidak Hadir", "Belum Pasti"]}
-          />
-          <NumberInput
-            label="Jumlah Tamu"
-            value={form.guests}
-            min={1}
-            max={10}
-            onChange={(v) => setForm((f) => ({ ...f, guests: v }))}
-          />
-          <Textarea
-            label="Pesan/Ucapan"
-            value={form.message}
-            onChange={(v) => setForm((f) => ({ ...f, message: v }))}
-            rows={4}
-          />
-          <button
-            type="submit"
-            disabled={sending}
-            className={classNames(
-              "mt-2 inline-flex items-center justify-center rounded-xl px-5 py-3",
-              "border border-rose-300/30 bg-rose-300/10 text-rose-100",
-              "hover:bg-rose-300/20 transition disabled:opacity-60"
+    <>
+      <form
+        onSubmit={onSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        <Card>
+          <div className="grid grid-cols-1 gap-4">
+            <Input
+              label="Nama Lengkap"
+              value={form.name}
+              onChange={(v) => setForm((f) => ({ ...f, name: v }))}
+              required
+            />
+            <Input
+              label="No. HP/WA"
+              value={form.phone}
+              onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
+            />
+            <Select
+              label="Konfirmasi Kehadiran"
+              value={form.attendance}
+              onChange={(v) => setForm((f) => ({ ...f, attendance: v }))}
+              options={["Hadir", "Tidak Hadir", "Belum Pasti"]}
+            />
+            <NumberInput
+              label="Jumlah Tamu"
+              value={form.guests}
+              min={1}
+              max={10}
+              onChange={(v) => setForm((f) => ({ ...f, guests: v }))}
+            />
+            <Textarea
+              label="Pesan/Ucapan"
+              value={form.message}
+              onChange={(v) => setForm((f) => ({ ...f, message: v }))}
+              rows={4}
+            />
+            <button
+              type="submit"
+              disabled={sending}
+              className={classNames(
+                "mt-2 inline-flex items-center justify-center rounded-xl px-5 py-3",
+                "border border-rose-300/30 bg-rose-300/10 text-rose-100",
+                "hover:bg-rose-300/20 transition disabled:opacity-60"
+              )}
+            >
+              {sending ? "Mengirim..." : "Kirim RSVP"}
+            </button>
+            {status === "ok" && (
+              <p className="text-emerald-300 text-sm mt-2">
+                Terima kasih! RSVP Anda telah kami terima.
+              </p>
             )}
-          >
-            {sending ? "Mengirim..." : "Kirim RSVP"}
-          </button>
-          {status === "ok" && (
-            <p className="text-emerald-300 text-sm mt-2">
-              Terima kasih! RSVP Anda telah kami terima.
-            </p>
-          )}
-          {status === "fail" && (
-            <p className="text-rose-300 text-sm mt-2">
-              Maaf, terjadi kesalahan. Coba lagi.
-            </p>
-          )}
-        </div>
-      </Card>
+            {status === "fail" && (
+              <p className="text-rose-300 text-sm mt-2">
+                Maaf, terjadi kesalahan. Coba lagi.
+              </p>
+            )}
+          </div>
+        </Card>
 
-      <div className="space-y-4">
-        <Card>
-          <h4 className="font-serif text-xl text-rose-100">
-            Informasi Tambahan
-          </h4>
-          <ul className="mt-2 list-disc pl-5 text-neutral-300 space-y-1">
-            <li>RSVP paling lambat 7 hari sebelum acara.</li>
-            <li>Mohon isi jumlah tamu dengan benar.</li>
-            <li>Untuk informasi lebih lanjut, hubungi CP: 08xx-xxxx-xxxx.</li>
-          </ul>
-        </Card>
-        <Card>
-          <h4 className="font-serif text-xl text-rose-100">Kursi Terbatas</h4>
-          <p className="text-neutral-300">
-            Kami menyiapkan tempat terbaik untuk Anda. Mohon konfirmasi
-            kehadiran agar kami dapat menyambut dengan hangat.
-          </p>
-        </Card>
+        <div className="space-y-4">
+          <Card>
+            <h4 className="font-serif text-xl text-rose-100">
+              Informasi Tambahan
+            </h4>
+            <ul className="mt-2 list-disc pl-5 text-neutral-300 space-y-1">
+              <li>RSVP paling lambat 7 hari sebelum acara.</li>
+              <li>Mohon isi jumlah tamu dengan benar.</li>
+              <li>Untuk informasi lebih lanjut, hubungi CP: 08xx-xxxx-xxxx.</li>
+            </ul>
+          </Card>
+          <Card>
+            <h4 className="font-serif text-xl text-rose-100">Kursi Terbatas</h4>
+            <p className="text-neutral-300">
+              Kami menyiapkan tempat terbaik untuk Anda. Mohon konfirmasi
+              kehadiran agar kami dapat menyambut dengan hangat.
+            </p>
+          </Card>
+        </div>
+      </form>
+
+      <div className="mt-16">
+        <h3 className="text-2xl font-serif text-rose-100 mb-6">
+          Ucapan & Kehadiran Tamu
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              title: 'Hadir',
+              color: 'emerald',
+              items: [
+                {
+                  name: 'Rina Kusuma',
+                  message: 'Tidak sabar datang ke hari bahagia kalian 💛',
+                  date: '10 Apr 2026',
+                },
+              ],
+            },
+            {
+              title: 'Belum Pasti',
+              color: 'yellow',
+              items: [
+                {
+                  name: 'Agus Setiawan',
+                  message: 'Semoga bisa hadir, doakan ya 🙏',
+                  date: '11 Apr 2026',
+                },
+              ],
+            },
+            {
+              title: 'Tidak Hadir',
+              color: 'rose',
+              items: [
+                {
+                  name: 'Clara Wijaya',
+                  message: 'Maaf tidak bisa hadir, doa terbaik selalu ✨',
+                  date: '12 Apr 2026',
+                },
+              ],
+            },
+          ].map((col, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
+            >
+              {/* Column Header */}
+              <div className="mb-4 flex items-center justify-between">
+                <h4 className="font-semibold text-rose-100">{col.title}</h4>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${col.color === 'emerald'
+                      ? 'bg-emerald-300/20 text-emerald-300'
+                      : col.color === 'yellow'
+                        ? 'bg-yellow-300/20 text-yellow-300'
+                        : 'bg-rose-300/20 text-rose-300'
+                    }`}
+                >
+                  {col.title}
+                </span>
+              </div>
+
+              {/* Cards */}
+              <div className="space-y-3">
+                {col.items.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-white/10 bg-black/30 p-3 hover:bg-white/10 transition"
+                  >
+                    <p className="text-sm font-medium text-rose-100">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-xs text-neutral-300 line-clamp-3">
+                      {item.message}
+                    </p>
+                    <p className="mt-2 text-[10px] text-neutral-500">
+                      {item.date}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-10 flex flex-col items-center gap-3">
+          <p className="text-xs text-neutral-400">Page 1 of 3</p>
+
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1 text-xs rounded-md border border-white/10 text-neutral-300 hover:bg-white/10">
+              Prev
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-md bg-rose-300 text-black font-semibold">
+              1
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-md text-neutral-300 hover:bg-white/10">
+              2
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-md text-neutral-300 hover:bg-white/10">
+              3
+            </button>
+
+            <button className="px-3 py-1 text-xs rounded-md border border-white/10 text-neutral-300 hover:bg-white/10">
+              Next
+            </button>
+          </div>
+        </div>
       </div>
-    </form>
+    </>
   );
 }
 
