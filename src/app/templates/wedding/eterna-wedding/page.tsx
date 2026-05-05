@@ -4,7 +4,7 @@ import useCountdown from "@/lib/countdown";
 import React, { useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
-import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, toast } from "@/lib/utils";
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
@@ -12,8 +12,8 @@ import { useLoading } from "@/components/loading/loading-context";
 import { GetSplashScreenEventData, UpadateRsvp } from "@/server/event";
 import LoadingUI from "@/components/loading/loading-ui";
 import { GenProfileDescWedding } from "../../utils";
-import { EventGifts, RsvpStatusEnum } from "@/generated/prisma";
-import { GetDataEventGifts } from "@/server/event-detail";
+import { EventGifts, EventRsvp, RsvpStatusEnum } from "@/generated/prisma";
+import { GetDataEventGifts, GetDataEventRsvp } from "@/server/event-detail";
 import FloatingActionButton from "@/app/templates/floating-action";
 import { ModalWishlist } from "../../modal-wishlist";
 import { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
@@ -106,9 +106,8 @@ export default function WeddingInvitationPage() {
   const [perPageWs, setPerPageWs] = useState(6);
   const [totalPageWs, setTotalPageWs] = useState(0);
   const [datasWs, setDatasWs] = useState<EventGifts[] | null>(null);
-
   const fatchWishlist = async (event_id: number, page: number = pageTableWs, countPage: number = perPageWs) => {
-    const getWishlistGift = await GetDataEventGifts(event_id, {
+    const result = await GetDataEventGifts(event_id, {
       curPage: page,
       perPage: countPage,
       where: {
@@ -127,14 +126,52 @@ export default function WeddingInvitationPage() {
       }
     });
 
-    setTotalPageWs(getWishlistGift.meta.totalPages);
-    setPageTableWs(getWishlistGift.meta.page);
-    setDatasWs(getWishlistGift.data);
+    setTotalPageWs(result.meta.totalPages);
+    setPageTableWs(result.meta.page);
+    setDatasWs(result.data);
   };
   const changePaginateWs = async (page: number) => {
     if (eventDatas) {
       setPageTableWs(page);
       await fatchWishlist(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [pageTableRsvp, setPageTableRsvp] = useState(1);
+  const [perPageRsvp, setPerPageRsvp] = useState(6);
+  const [totalPageRsvp, setTotalPageRsvp] = useState(0);
+  const [datasRsvp, setDatasRsvp] = useState<EventRsvp[] | null>(null);
+  const fatchRsvpMsg = async (event_id: number, page: number = pageTableRsvp, countPage: number = perPageRsvp) => {
+    const result = await GetDataEventRsvp(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        show_desc: true,
+        att_status: {
+          not: null
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        desc: true,
+        show_desc: true,
+        att_status: true,
+        createdAt: true
+      },
+      orderBy: {
+        createdAt: "asc"
+      }
+    });
+
+    setTotalPageRsvp(result.meta.totalPages);
+    setPageTableRsvp(result.meta.page);
+    setDatasRsvp(result.data);
+  };
+  const changePaginateRsvp = async (page: number) => {
+    if (eventDatas) {
+      setPageTableRsvp(page);
+      await fatchRsvpMsg(eventDatas.event_rsvp.event_id, page);
     }
   };
 
@@ -190,7 +227,8 @@ export default function WeddingInvitationPage() {
             const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
             if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
 
-            await fatchWishlist(findData.event_rsvp.event_id);
+            fatchWishlist(findData.event_rsvp.event_id);
+            fatchRsvpMsg(findData.event_rsvp.event_id);
           }
 
         } catch (error: any) {
@@ -922,67 +960,140 @@ export default function WeddingInvitationPage() {
             </div>
           </form>
 
-          <div className="mt-10">
-            <h3 className="font-serif text-2xl font-semibold text-white mb-4">
-              Ucapan & Doa
-            </h3>
+          {
+            datasRsvp !== null ? <div className="mt-10">
+              <h3 className="font-serif text-2xl font-semibold text-white mb-4">
+                Ucapan & Doa
+              </h3>
 
-            <div className="space-y-4 pr-2">
-              {dummyMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-white">
-                      {msg.name}
+              <div className="space-y-4 pr-2">
+                {datasRsvp.map((msg, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-medium text-white">
+                        {msg.name}
+                      </p>
+                      <span className="text-xs text-stone-400">
+                        {msg.createdAt ? msg.createdAt.toLocaleDateString("id-ID") : "-"}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-stone-300 mb-2">
+                      {msg.desc || "-"}
                     </p>
-                    <span className="text-xs text-stone-400">
-                      {new Date(msg.createdAt).toLocaleDateString("id-ID")}
+
+                    <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-stone-300">
+                      {msg.att_status ? rsvpLabels[msg.att_status] : "-"}
                     </span>
                   </div>
-
-                  <p className="text-sm text-stone-300 mb-2">
-                    {msg.message || "-"}
-                  </p>
-
-                  <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-stone-300">
-                    {msg.attendance}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 flex items-center justify-between">
-              {/* LEFT - Pagination UI */}
-              <div className="flex items-center gap-2">
-                <button
-                  className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white opacity-50 cursor-not-allowed"
-                >
-                  Prev
-                </button>
-
-                <button className="px-3 py-1 rounded-lg text-sm border bg-white text-stone-900 border-white">
-                  1
-                </button>
-
-                <button className="px-3 py-1 rounded-lg text-sm border bg-white/5 backdrop-blur-md text-white border-white/10">
-                  2
-                </button>
-
-                <button
-                  className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white"
-                >
-                  Next
-                </button>
+                ))}
               </div>
 
-              {/* RIGHT - Info */}
-              <p className="text-sm text-stone-400 font-semibold">
-                Page 1 of 3
-              </p>
+              <div className="mt-6 flex items-center justify-between">
+                {/* LEFT - Pagination UI */}
+                <div className="flex items-center gap-2">
+                  <button
+                      disabled={pageTableRsvp <= 1}
+                      onClick={() => {
+                        if (pageTableRsvp >= 1) changePaginateRsvp(pageTableRsvp - 1);
+                      }}
+                    className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white opacity-50 cursor-not-allowed"
+                  >
+                    Prev
+                  </button>
+
+                  {
+                    Array.from({ length: totalPageRsvp }, (x, i) => {
+                      const numberPage = i + 1;
+                      return <button key={i}
+                      onClick={() => changePaginateRsvp(numberPage)}
+                        className={`px-3 py-1 rounded-lg text-sm border ${pageTableRsvp === numberPage ? "bg-white text-stone-900 border-white" : "bg-white/5 backdrop-blur-md text-white border-white/10"}`}>
+                        {numberPage}
+                      </button>
+                    })
+                  }
+
+                  <button
+                      disabled={pageTableRsvp >= totalPageRsvp}
+                      onClick={() => {
+                        if (pageTableRsvp <= totalPageRsvp) changePaginateRsvp(pageTableRsvp + 1);
+                      }}
+                    className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white"
+                  >
+                    Next
+                  </button>
+                </div>
+
+                {/* RIGHT - Info */}
+                <p className="text-sm text-stone-400 font-semibold">
+                  Page {pageTableRsvp} of {totalPageRsvp}
+                </p>
+              </div>
+            </div> : <div className="mt-10">
+              <h3 className="font-serif text-2xl font-semibold text-white mb-4">
+                Ucapan & Doa
+              </h3>
+
+              <div className="space-y-4 pr-2">
+                {dummyMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-medium text-white">
+                        {msg.name}
+                      </p>
+                      <span className="text-xs text-stone-400">
+                        {new Date(msg.createdAt).toLocaleDateString("id-ID")}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-stone-300 mb-2">
+                      {msg.message || "-"}
+                    </p>
+
+                    <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-stone-300">
+                      {msg.attendance}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between">
+                {/* LEFT - Pagination UI */}
+                <div className="flex items-center gap-2">
+                  <button
+                    className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white opacity-50 cursor-not-allowed"
+                  >
+                    Prev
+                  </button>
+
+                  <button className="px-3 py-1 rounded-lg text-sm border bg-white text-stone-900 border-white">
+                    1
+                  </button>
+
+                  <button className="px-3 py-1 rounded-lg text-sm border bg-white/5 backdrop-blur-md text-white border-white/10">
+                    2
+                  </button>
+
+                  <button
+                    className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white"
+                  >
+                    Next
+                  </button>
+                </div>
+
+                {/* RIGHT - Info */}
+                <p className="text-sm text-stone-400 font-semibold">
+                  Page 1 of 3
+                </p>
+              </div>
             </div>
-          </div>
+          }
         </Section>
 
         {/* Hadiah */}

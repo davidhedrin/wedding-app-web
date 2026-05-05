@@ -2,7 +2,7 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { copyToClipboard, ExtractYtID, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, rsvpLabels, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { copyToClipboard, ExtractYtID, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
@@ -2911,6 +2911,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
     { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
     { name: "Attandance", key: "att_status", key_sort: "att_status", IsVisible: true },
   ]);
@@ -3027,7 +3028,6 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         },
         select: {
           id: true,
-          name: true,
           event_id: true,
           att_number: true,
           desc: true,
