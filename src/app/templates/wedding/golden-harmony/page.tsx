@@ -7,6 +7,7 @@ import useCountdown from "@/lib/countdown";
 import bgImage from './bg.jpg';
 import { formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -16,9 +17,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 */
 
 const HERO_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
 ];
 
 const WEDDING_DATE = new Date();
@@ -154,7 +155,7 @@ export default function WeddingInvite() {
               >
                 <div className="w-10 h-10 rounded-full border border-slate-200/20 overflow-hidden">
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                     alt="logo"
                     className="w-full h-full object-cover"
                   />
@@ -362,7 +363,7 @@ export default function WeddingInvite() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div className="flex flex-col items-center text-center bg-slate-800/40 p-6 rounded-2xl border border-slate-700 shadow">
                   <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-amber-300 mb-4">
-                    <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Mempelai 1" className="w-full h-full object-cover" />
+                    <img src={`${Configs.base_url}/assets/img/2149043983.jpg`} alt="Mempelai 1" className="w-full h-full object-cover" />
                   </div>
                   <div className="font-playfair text-xl">Nama Mempelai Pria</div>
                   <div className="text-slate-300 text-sm mt-2">Putra dari Bpk. ... & Ibu ...</div>
@@ -370,7 +371,7 @@ export default function WeddingInvite() {
 
                 <div className="flex flex-col items-center text-center bg-slate-800/40 p-6 rounded-2xl border border-slate-700 shadow">
                   <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-amber-300 mb-4">
-                    <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="Mempelai 2" className="w-full h-full object-cover" />
+                    <img src={`${Configs.base_url}/assets/img/2149043983.jpg`} alt="Mempelai 2" className="w-full h-full object-cover" />
                   </div>
                   <div className="font-playfair text-xl">Nama Mempelai Wanita</div>
                   <div className="text-slate-300 text-sm mt-2">Putri dari Bpk. ... & Ibu ...</div>
@@ -469,7 +470,7 @@ export default function WeddingInvite() {
                         <div key={i} className="w-full shrink-0 px-2">
                           <div className="h-72 sm:h-80 md:h-96 rounded-xl overflow-hidden border border-slate-700">
                             <img
-                              src="http://localhost:3005/assets/img/2149043983.jpg"
+                              src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                               alt={`galeri-${i}`}
                               className="w-full h-full object-cover"
                             />
@@ -502,7 +503,7 @@ export default function WeddingInvite() {
                           className={`w-12 h-8 rounded overflow-hidden border ${i === galleryIdx ? 'ring-2 ring-amber-300' : 'border-slate-700'}`}
                           onClick={() => setGalleryIdx(i)}
                         >
-                          <img src="http://localhost:3005/assets/img/2149043983.jpg" alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                          <img src={`${Configs.base_url}/assets/img/2149043983.jpg`} alt={`thumb-${i}`} className="w-full h-full object-cover" />
                         </button>
                       ))}
                     </div>
@@ -932,7 +933,7 @@ export default function WeddingInvite() {
                 <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full overflow-hidden border border-slate-700">
-                      <img src="http://localhost:3005/assets/img/2149043983.jpg" alt="footer" className="w-full h-full object-cover" />
+                      <img src={`${Configs.base_url}/assets/img/2149043983.jpg`} alt="footer" className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <div className="font-playfair">A & B</div>
@@ -949,7 +950,7 @@ export default function WeddingInvite() {
                   </div>
 
                   <div className="text-slate-400 text-xs">
-                    © {new Date().getFullYear()} Undangan Pernikahan — Dibuat dengan ❤️
+                    © {new Date().getFullYear()} A & B — Dibuat dengan <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a>
                   </div>
                 </div>
               </div>

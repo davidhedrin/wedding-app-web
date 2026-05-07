@@ -8,7 +8,6 @@ import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, Extrac
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
-import { useLoading } from "@/components/loading/loading-context";
 import { GetSplashScreenEventData, UpadateRsvp } from "@/server/event";
 import LoadingUI from "@/components/loading/loading-ui";
 import { GenProfileDescWedding } from "../../utils";
@@ -16,7 +15,7 @@ import { EventGifts, EventRsvp, RsvpStatusEnum } from "@/generated/prisma";
 import { GetDataEventGifts, GetDataEventRsvp } from "@/server/event-detail";
 import FloatingActionButton from "@/app/templates/floating-action";
 import { ModalWishlist } from "../../modal-wishlist";
-import { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
+import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -35,13 +34,13 @@ type SectionKey =
   | "faq";
 
 const IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
 ];
 
 const GALLERY = new Array(8).fill(
-  "http://localhost:3005/assets/img/2149043983.jpg"
+  `${Configs.base_url}/assets/img/2149043983.jpg`
 );
 
 const WEDDING_DATE = new Date();
@@ -996,10 +995,10 @@ export default function WeddingInvitationPage() {
                 {/* LEFT - Pagination UI */}
                 <div className="flex items-center gap-2">
                   <button
-                      disabled={pageTableRsvp <= 1}
-                      onClick={() => {
-                        if (pageTableRsvp >= 1) changePaginateRsvp(pageTableRsvp - 1);
-                      }}
+                    disabled={pageTableRsvp <= 1}
+                    onClick={() => {
+                      if (pageTableRsvp >= 1) changePaginateRsvp(pageTableRsvp - 1);
+                    }}
                     className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white opacity-50 cursor-not-allowed"
                   >
                     Prev
@@ -1009,7 +1008,7 @@ export default function WeddingInvitationPage() {
                     Array.from({ length: totalPageRsvp }, (x, i) => {
                       const numberPage = i + 1;
                       return <button key={i}
-                      onClick={() => changePaginateRsvp(numberPage)}
+                        onClick={() => changePaginateRsvp(numberPage)}
                         className={`px-3 py-1 rounded-lg text-sm border ${pageTableRsvp === numberPage ? "bg-white text-stone-900 border-white" : "bg-white/5 backdrop-blur-md text-white border-white/10"}`}>
                         {numberPage}
                       </button>
@@ -1017,10 +1016,10 @@ export default function WeddingInvitationPage() {
                   }
 
                   <button
-                      disabled={pageTableRsvp >= totalPageRsvp}
-                      onClick={() => {
-                        if (pageTableRsvp <= totalPageRsvp) changePaginateRsvp(pageTableRsvp + 1);
-                      }}
+                    disabled={pageTableRsvp >= totalPageRsvp}
+                    onClick={() => {
+                      if (pageTableRsvp <= totalPageRsvp) changePaginateRsvp(pageTableRsvp + 1);
+                    }}
                     className="px-3 py-1 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 text-sm text-white"
                   >
                     Next
@@ -1421,9 +1420,9 @@ export default function WeddingInvitationPage() {
         {/* Footer */}
         <footer className="py-12 text-center text-stone-400">
           <p className="text-sm">
-            Terima kasih atas doa & kehadiran Anda. Sampai jumpa di hari bahagia kami!
+            © {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} Aisyah & Bagas
           </p>
-          <p className="mt-2 text-xs">© {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} Aisyah & Bagas</p>
+          <div className="text-sm mt-1">Designed by <a href={Configs.base_url} target='_blank' className='text-white underline'>Wedlyvite</a></div>
         </footer>
       </div>
 

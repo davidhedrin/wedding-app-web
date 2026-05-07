@@ -6,6 +6,7 @@ import useCountdown from '@/lib/countdown';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import bgImage from './bg.jpeg';
+import Configs from '@/lib/config';
 
 const greatVibes = Great_Vibes({ subsets: ['latin'], weight: ['400'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'] });
@@ -28,10 +29,10 @@ const THEME = {
 };
 
 const IMAGES = [
-  'http://localhost:3005/assets/img/2149043983.jpg',
-  'http://localhost:3005/assets/img/2149043983.jpg',
-  'http://localhost:3005/assets/img/2149043983.jpg',
-  'http://localhost:3005/assets/img/2149043983.jpg',
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
 ];
 
 const NAV = [
@@ -1043,7 +1044,7 @@ export default function WeddingInvitationPage() {
               </div>
             </div>
             <div>
-              <div className="text-white">Bagikan</div>
+              <div className="text-white">Sosial Media</div>
               <div className="mt-3 flex gap-3">
                 {['Instagram', 'Facebook', 'X'].map((s, i) => (
                   <a key={i} href="#" className={classNames('inline-flex items-center justify-center rounded-full p-2 text-white/80 transition hover:text-white', 'border border-white/20')}>
@@ -1056,7 +1057,7 @@ export default function WeddingInvitationPage() {
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/60 md:flex-row">
             <div>© {new Date().getFullYear()} Alya & Rizky Wedding</div>
-            <div>Designed with ❤️ & Tailwind</div>
+            <div>Designed by <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a></div>
           </div>
         </div>
       </footer>

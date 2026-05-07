@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Playfair_Display, Lora, Great_Vibes } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -45,7 +46,7 @@ const COUPLE = {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d997.8231467925161!2d106.8317317!3d-6.169963699999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d67f2b7f1f%3A0xe9a0e6f3c0b02f!2sIstiqlal%20Mosque!5e0!3m2!1sen!2sid!4v1696755555555!5m2!1sen!2sid",
 };
 
-const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const PLACEHOLDER_IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 const HERO_IMAGES = [PLACEHOLDER_IMG, PLACEHOLDER_IMG, PLACEHOLDER_IMG]; // bisa diganti variasi
 const GALLERY_IMAGES = Array.from({ length: 10 }, () => PLACEHOLDER_IMG);
 
@@ -143,7 +144,7 @@ export default function WeddingInvitationPage() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -874,8 +875,7 @@ export default function WeddingInvitationPage() {
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-slate-400 sm:flex-row">
             <span>© {new Date().getFullYear()} Fajar & Anindya Wedding</span>
             <span>
-              Made with <span className="text-amber-300">♥</span> | Tema{" "}
-              <span className="text-amber-300">Royal Navy & Gold</span>
+              Made with <span className="text-amber-300">♥</span> | <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a>
             </span>
           </div>
         </div>

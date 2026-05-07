@@ -7,6 +7,7 @@
 
 'use client'
 
+import Configs from '@/lib/config';
 import React, {
   useEffect,
   useState,
@@ -17,7 +18,7 @@ import React, {
 /*                               GLOBAL CONFIG                                */
 /* -------------------------------------------------------------------------- */
 
-const IMAGE_URL = 'http://localhost:3005/assets/img/2149043983.jpg'
+const IMAGE_URL = `${Configs.base_url}/assets/img/2149043983.jpg`
 
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
@@ -965,8 +966,8 @@ const RSVPSection: React.FC = () => {
 
                 <span
                   className={`text-xs tracking-widest uppercase ${item.attendance === 'yes'
-                      ? 'text-amber-300'
-                      : 'text-neutral-500'
+                    ? 'text-amber-300'
+                    : 'text-neutral-500'
                     }`}
                 >
                   {item.attendance === 'yes'
@@ -1319,9 +1320,14 @@ const Footer: React.FC = () => {
           ))}
         </ul>
 
-        <p className="text-xs text-neutral-600 tracking-widest">
-          © 2026 Eternal Vow. All Rights Reserved.
-        </p>
+        <div>
+          <p className="text-xs text-neutral-600 tracking-widest">
+            © 2026 Alexander & Isabella. All Rights Reserved.
+          </p>
+          <div className="text-xs text-neutral-600 tracking-widest mt-1">
+            Made by <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a>.
+          </div>
+        </div>
       </div>
     </footer>
   )

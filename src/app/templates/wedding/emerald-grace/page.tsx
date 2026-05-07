@@ -4,6 +4,7 @@ import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -15,7 +16,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
-const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const PLACEHOLDER_IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 
 type Countdown = {
   days: number;
@@ -177,7 +178,7 @@ export default function Page() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -748,8 +749,8 @@ export default function Page() {
 
                       <span
                         className={`rounded-full border px-3 py-1 text-xs ${item.attendance === 'hadir'
-                            ? 'border-emerald-300/40 text-emerald-200'
-                            : 'border-rose-300/40 text-rose-200'
+                          ? 'border-emerald-300/40 text-emerald-200'
+                          : 'border-rose-300/40 text-rose-200'
                           }`}
                       >
                         {item.attendance === 'hadir' ? 'Hadir' : 'Tidak Hadir'}
@@ -1059,11 +1060,12 @@ export default function Page() {
 
           {/* Divider */}
           <div className="mt-10 border-t border-emerald-300/10 pt-6 text-center text-sm text-emerald-100/60">
-            © {new Date().getFullYear()} Aisyah & Brahma Wedding. All Rights Reserved.
-            <br />
-            <span className="text-emerald-100/50">
-              Made with ❤ using Next.js & Tailwind CSS
-            </span>
+            <div>
+              © {new Date().getFullYear()} Aisyah & Brahma Wedding. All Rights Reserved.
+            </div>
+            <div className="text-emerald-100/50 mt-2">
+              Made by <a href={Configs.base_url} target='_blank' className='underline'>Wedlyvite</a>
+            </div>
           </div>
         </div>
       </footer>

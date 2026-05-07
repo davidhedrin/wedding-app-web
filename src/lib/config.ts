@@ -5,7 +5,7 @@ import paymentMethod from "@/json/payment-method.json";
 
 const Configs = {
   app_name: "Wedlyvite",
-  base_url: "http://localhost:3005",
+  base_url: process.env.NEXT_PUBLIC_BASE_URL,
 
   resend_from: "no-replay@resend.dev",
   
