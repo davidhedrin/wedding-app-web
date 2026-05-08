@@ -703,7 +703,7 @@ export default function WeddingInvitationPage() {
               {/* Detail */}
               <div className={classNames('rounded-3xl border p-6', THEME.borderSoft, THEME.cardBg)}>
                 <div className="space-y-5">
-                  <div>
+                  <div className='space-y-2'>
                     <h3 className={classNames(playfair.className, 'text-xl text-white')}>Akad Nikah</h3>
                     <p className="text-white/70">Minggu, 21 Desember 2025 • 10.00 WIB</p>
                     <p className="text-white/70">
@@ -729,7 +729,7 @@ export default function WeddingInvitationPage() {
                       </a>
                     </div>
                   </div>
-                  <div>
+                  <div className='space-y-2'>
                     <h3 className={classNames(playfair.className, 'text-xl text-white')}>Resepsi</h3>
                     <p className="text-white/70">Minggu, 21 Desember 2025 • 12.00 - 15.00 WIB</p>
                     <p className="text-white/70">
@@ -775,7 +775,7 @@ export default function WeddingInvitationPage() {
                 </div>
 
                 {/* Overlay Button */}
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+                <div className="w-full flex justify-center absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
                   <a
                     href="https://maps.google.com/?q=Gedung%20Graha%20Cinta%20Jakarta"
                     target="_blank"
@@ -1382,9 +1382,9 @@ export default function WeddingInvitationPage() {
               }
             </div> : <div className="mt-8 grid gap-6 md:grid-cols-3">
               {[
-                { label: 'Transfer Bank', desc: 'BCA • 1234567890 • a.n. Alya Putri' },
-                { label: 'E-Wallet', desc: 'OVO • 0812-3456-7890' },
-                { label: 'E-Wallet', desc: 'Gopay • 0812-3456-7890' },
+                { icon: 'bca', desc: '1234567890', account: "Alya Putri" },
+                { icon: 'dana', desc: '0812-3456-7890', account: "Alya Putri" },
+                { icon: 'ovo', desc: '0812-3456-7890', account: "Alya Putri" },
               ].map((h, i) => (
                 <div
                   key={i}
@@ -1394,8 +1394,8 @@ export default function WeddingInvitationPage() {
                     THEME.cardBg
                   )}
                 >
-                  <div className="text-xs uppercase tracking-wider text-white/60">
-                    {h.label}
+                  <div className="flex items-center gap-3 text-white">
+                    <img className="h-5" src={allPaymentMethod.find(m => m.key === h.icon)?.icon} /> • <span className="text-sm">{h.account}</span>
                   </div>
 
                   <div className="mt-1 text-white leading-relaxed">
@@ -1405,7 +1405,7 @@ export default function WeddingInvitationPage() {
                   <button
                     onClick={() => navigator.clipboard?.writeText(h.desc)}
                     className={classNames(
-                      'mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
+                      'mt-2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
                       THEME.accentBg,
                       THEME.accentRing
                     )}
@@ -1812,8 +1812,8 @@ export default function WeddingInvitationPage() {
             <div className='col-span-12 md:col-span-3'>
               <div className="text-white">Kontak</div>
               <div className="mt-3 grid gap-2 text-white/70">
-                <span>Phone/WA: {eventDatas?.contact_phone ?? "-"}</span>
-                <span>Email: {eventDatas?.contact_email ?? "-"}</span>
+                <span>Phone/WA: {eventDatas ? eventDatas.contact_phone ?? "-" : "0812-3456-7890"}</span>
+                <span>Email: {eventDatas ? eventDatas.contact_email ?? "-" : "undangan@alya-rizky.id"}</span>
               </div>
             </div>
             <div className='col-span-12 md:col-span-3'>
