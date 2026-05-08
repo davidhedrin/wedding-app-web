@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -14,7 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 */
 
 /* ==================== CONFIG ==================== */
-const IMAGE_SRC = "http://localhost:3005/assets/img/2149043983.jpg";
+const IMAGE_SRC = `${Configs.base_url}/assets/img/2149043983.jpg`;
 // Example date (YYYY-MM-DDTHH:MM:SS); replace with actual wedding datetime in local timezone.
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
@@ -138,7 +139,7 @@ export default function WeddingInvite() {
             >
               <div className="absolute inset-0">
                 <img
-                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                   alt="cover"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -764,10 +765,10 @@ export default function WeddingInvite() {
 
                         <span
                           className={`text-[11px] px-3 py-1 rounded-full ${item.status === "Hadir"
-                              ? "bg-emerald-300/10 text-emerald-300 border border-emerald-300/20"
-                              : item.status === "Mungkin"
-                                ? "bg-amber-300/10 text-amber-300 border border-amber-300/20"
-                                : "bg-rose-300/10 text-rose-300 border border-rose-300/20"
+                            ? "bg-emerald-300/10 text-emerald-300 border border-emerald-300/20"
+                            : item.status === "Mungkin"
+                              ? "bg-amber-300/10 text-amber-300 border border-amber-300/20"
+                              : "bg-rose-300/10 text-rose-300 border border-rose-300/20"
                             }`}
                         >
                           {item.status}
@@ -1048,7 +1049,10 @@ export default function WeddingInvite() {
               </div>
 
               <div className="mt-6 text-xs text-white/60 text-center">
-                © {new Date().getFullYear()} Nadian &amp; Stephen — Dibuat dengan ❤
+                <div>
+                  © {new Date().getFullYear()} Nadian &amp; Stephen
+                </div>
+                <div className="mt-2">Designed by <a href={Configs.base_url} target='_blank' className="underline">Wedlyvite</a></div>
               </div>
             </div>
           </footer>

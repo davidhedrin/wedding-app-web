@@ -6,6 +6,7 @@ import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -19,9 +20,9 @@ const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 const HERO_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
 ]; // sementara gunakan yang diberikan
 
 /* ---------------------------- UTIL ---------------------------- */
@@ -143,7 +144,7 @@ export default function WeddingInvitePage(): JSX.Element {
             >
               <div className="absolute inset-0">
                 <img
-                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                   alt="cover"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -625,10 +626,10 @@ export default function WeddingInvitePage(): JSX.Element {
 
                       <span
                         className={`px-2 py-1 rounded-full text-[10px] ${item.status === 'Hadir'
-                            ? 'bg-emerald-300/20 text-emerald-300'
-                            : item.status === 'Belum Pasti'
-                              ? 'bg-yellow-300/20 text-yellow-300'
-                              : 'bg-rose-300/20 text-rose-300'
+                          ? 'bg-emerald-300/20 text-emerald-300'
+                          : item.status === 'Belum Pasti'
+                            ? 'bg-yellow-300/20 text-yellow-300'
+                            : 'bg-rose-300/20 text-rose-300'
                           }`}
                       >
                         {item.status}
@@ -913,7 +914,12 @@ export default function WeddingInvitePage(): JSX.Element {
                   ))}
                 </nav>
 
-                <div className="text-sm text-slate-400">© {new Date().getFullYear()} [Nama Keluarga]. All rights reserved.</div>
+                <div>
+                  <div className="text-sm text-slate-400">
+                    © {new Date().getFullYear()} Betrice & Jhonson.
+                  </div>
+                  <div className="text-sm text-slate-400">Designed by <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a></div>
+                </div>
               </div>
             </div>
           </footer>

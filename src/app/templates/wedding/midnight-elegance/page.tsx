@@ -3,6 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -20,7 +21,7 @@ const THEME = {
   soft: "text-[#B8C2D6]", // soft slate
   softBg: "bg-white/5",
 };
-const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const PLACEHOLDER_IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
@@ -135,7 +136,7 @@ export default function Page() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -808,11 +809,7 @@ export default function Page() {
           </div>
           <div className="mt-10 pt-6 border-t border-white/10 text-xs text-white/60 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>© {new Date().getFullYear()} Alya & Raka — All rights reserved.</div>
-            <div className="flex items-center gap-3">
-              <a href="#" className="opacity-75 hover:opacity-100">Kebijakan Privasi</a>
-              <span className="opacity-40">•</span>
-              <a href="#" className="opacity-75 hover:opacity-100">Syarat & Ketentuan</a>
-            </div>
+            <div>Designed by <a href={Configs.base_url} target='_blank' className='text-[#F2C265]'>Wedlyvite</a></div>
           </div>
         </div>
       </footer>

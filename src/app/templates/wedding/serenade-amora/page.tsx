@@ -3,6 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -14,7 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
-const PLACEHOLDER_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const PLACEHOLDER_IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 const HERO_IMAGES = [PLACEHOLDER_IMG, PLACEHOLDER_IMG, PLACEHOLDER_IMG]; // bisa ganti beragam foto
 const MAPS_EMBED_SRC =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.821823820262!2d106.827153!3d-6.162959!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5c5b6c8d3d7%3A0xf1e2b1d3c2a4!2sMonas%20-%20Jakarta!5e0!3m2!1sen!2sid!4v1680000000000!5m2!1sen!2sid";
@@ -183,7 +184,7 @@ const WeddingInvitationPage: React.FC = () => {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -807,8 +808,8 @@ const WeddingInvitationPage: React.FC = () => {
                   {/* STATUS BADGE FLOAT */}
                   <div
                     className={`absolute top-4 right-4 text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : "bg-rose-50 text-rose-700 border-rose-200"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : "bg-rose-50 text-rose-700 border-rose-200"
                       }`}
                   >
                     {item.status}
@@ -1051,7 +1052,10 @@ const WeddingInvitationPage: React.FC = () => {
           </div>
 
           <div className="mt-10 text-center text-sm text-neutral-500">
-            Dibuat dengan ❤️ — {new Date().getFullYear()}
+            <div>
+              © {new Date().getFullYear()} A & B Wedding
+            </div>
+            <div className="mt-1">Designed by <a href={Configs.base_url} target='_blank' className='underline'>Wedlyvite</a></div>
           </div>
         </div>
       </section>

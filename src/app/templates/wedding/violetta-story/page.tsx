@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import bgImage from './bg.jpg';
 import { formatDate } from "@/lib/utils";
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -48,7 +49,7 @@ const THEME = {
 };
 
 const IMAGES = Array.from({ length: 8 }).map(
-  () => "http://localhost:3005/assets/img/2149043983.jpg"
+  () => `${Configs.base_url}/assets/img/2149043983.jpg`
 );
 
 type RSVPForm = {
@@ -906,10 +907,10 @@ export default function WeddingInvitationPage() {
 
                       <span
                         className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
-                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
-                            : item.status === "Belum Pasti"
-                              ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
-                              : "bg-rose-500/10 text-rose-300 border-rose-400/30"
+                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
+                          : item.status === "Belum Pasti"
+                            ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
+                            : "bg-rose-500/10 text-rose-300 border-rose-400/30"
                           }`}
                       >
                         {item.status}
@@ -1228,7 +1229,10 @@ export default function WeddingInvitationPage() {
           </div>
 
           <div className="mt-10 border-t border-white/10 pt-6 text-center text-white/70 text-sm">
-            © {new Date().getFullYear()} Aisyah & Zidan — All rights reserved.
+            <div>
+              © {new Date().getFullYear()} Aisyah & Zidan — All rights reserved.
+            </div>
+            <div className="mt-1">Designed by <a href={Configs.base_url} target='_blank' className='text-purple-400 underline'>Wedlyvite</a></div>
           </div>
         </div>
       </footer>

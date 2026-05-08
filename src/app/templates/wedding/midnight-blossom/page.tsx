@@ -4,6 +4,7 @@ import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -20,7 +21,7 @@ type NavItem = {
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
-const IMAGE_URL = "http://localhost:3005/assets/img/2149043983.jpg";
+const IMAGE_URL = `${Configs.base_url}/assets/img/2149043983.jpg`;
 
 const navItems: NavItem[] = [
   { id: "mempelai", label: "Mempelai" },
@@ -148,7 +149,7 @@ export default function UndanganPage() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -766,6 +767,7 @@ export default function UndanganPage() {
           <p className="text-sm mt-2">
             © {new Date().getFullYear()} Aisyah & Raka — All rights reserved.
           </p>
+          <div className="text-sm mt-2">Designed by <a href={Configs.base_url} target='_blank' className='text-rose-300'>Wedlyvite</a></div>
         </div>
       </footer>
     </main>
@@ -996,10 +998,10 @@ function RSVPForm() {
                 <h4 className="font-semibold text-rose-100">{col.title}</h4>
                 <span
                   className={`text-xs px-2 py-1 rounded-full ${col.color === 'emerald'
-                      ? 'bg-emerald-300/20 text-emerald-300'
-                      : col.color === 'yellow'
-                        ? 'bg-yellow-300/20 text-yellow-300'
-                        : 'bg-rose-300/20 text-rose-300'
+                    ? 'bg-emerald-300/20 text-emerald-300'
+                    : col.color === 'yellow'
+                      ? 'bg-yellow-300/20 text-yellow-300'
+                      : 'bg-rose-300/20 text-rose-300'
                     }`}
                 >
                   {col.title}

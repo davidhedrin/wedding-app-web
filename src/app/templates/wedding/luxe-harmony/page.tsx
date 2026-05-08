@@ -6,6 +6,7 @@ import Head from "next/head";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -22,7 +23,7 @@ type RSVPForm = {
   message?: string;
 };
 
-const IMAGE = "http://localhost:3005/assets/img/2149043983.jpg";
+const IMAGE = `${Configs.base_url}/assets/img/2149043983.jpg`;
 
 /**
  * Ubah TARGET_DATE di sini (ISO string). Contoh: "2025-12-31T09:00:00+07:00"
@@ -120,7 +121,7 @@ export default function InvitationPage() {
             >
               <div className="absolute inset-0">
                 <img
-                  src='http://localhost:3005/assets/img/2149043983.jpg'
+                  src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                   alt="cover"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -643,10 +644,10 @@ export default function InvitationPage() {
 
                           <span
                             className={`text-xs px-2 py-1 rounded-full ${item.attending === 'yes'
-                                ? 'bg-emerald-100 text-emerald-600'
-                                : item.attending === 'maybe'
-                                  ? 'bg-yellow-100 text-yellow-600'
-                                  : 'bg-rose-100 text-rose-600'
+                              ? 'bg-emerald-100 text-emerald-600'
+                              : item.attending === 'maybe'
+                                ? 'bg-yellow-100 text-yellow-600'
+                                : 'bg-rose-100 text-rose-600'
                               }`}
                           >
                             {item.attending === 'yes'
@@ -927,8 +928,8 @@ export default function InvitationPage() {
                 ))}
               </div>
             </div>
-
-            <p className="text-center text-xs text-slate-500 mt-4">Designed with ❤️ • Digital Invitation Template</p>
+            
+            <div className="text-center text-xs text-slate-500 mt-4">Designed by <a href={Configs.base_url} target='_blank' className='text-amber-500 underline'>Wedlyvite</a></div>
           </div>
         </footer>
 

@@ -8,6 +8,7 @@ import useCountdown from "@/lib/countdown";
 import bgImage from './bg.jpg';
 import { formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -20,9 +21,9 @@ const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
 const HERO_IMAGES = [
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
-  "http://localhost:3005/assets/img/2149043983.jpg",
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
+  `${Configs.base_url}/assets/img/2149043983.jpg`,
 ];
 
 const MAP_LAT = -6.200000; // contoh: Jakarta
@@ -358,7 +359,7 @@ export default function WeddingInvitePage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <img
-                          src="http://localhost:3005/assets/img/2149043983.jpg"
+                          src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                           alt="Mempelai 1"
                           className="w-full h-44 object-cover rounded-lg border border-rose-700/30 shadow-inner"
                         />
@@ -369,7 +370,7 @@ export default function WeddingInvitePage() {
                       </div>
                       <div className="space-y-3">
                         <img
-                          src="http://localhost:3005/assets/img/2149043983.jpg"
+                          src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                           alt="Mempelai 2"
                           className="w-full h-44 object-cover rounded-lg border border-rose-700/30 shadow-inner"
                         />
@@ -408,7 +409,7 @@ export default function WeddingInvitePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="flex flex-col items-center text-center space-y-4">
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                     alt="Mempelai 1"
                     className="w-64 h-64 object-cover rounded-full border-4 border-rose-700 shadow-lg"
                   />
@@ -420,7 +421,7 @@ export default function WeddingInvitePage() {
 
                 <div className="flex flex-col items-center text-center space-y-4">
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                     alt="Mempelai 2"
                     className="w-64 h-64 object-cover rounded-full border-4 border-rose-700 shadow-lg"
                   />
@@ -646,12 +647,12 @@ export default function WeddingInvitePage() {
 
                 <div className="mt-8 flex gap-4 justify-center">
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                     alt="cerita"
                     className="w-48 h-32 object-cover rounded-lg border border-rose-700/30 shadow"
                   />
                   <img
-                    src="http://localhost:3005/assets/img/2149043983.jpg"
+                    src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                     alt="cerita2"
                     className="w-48 h-32 object-cover rounded-lg border border-rose-700/30 shadow"
                   />
@@ -1077,7 +1078,7 @@ export default function WeddingInvitePage() {
                   <a className="text-sm text-rose-200/80 hover:text-amber-300" href="#faq">FAQ</a>
                 </nav>
 
-                <div className="text-sm text-rose-200/70">Made with ❤️ — Terima kasih atas doa dan kehadirannya.</div>
+                <div className="text-sm text-rose-200/70">Made by <a href={Configs.base_url} target='_blank' className='text-rose-400'>Wedlyvite</a></div>
               </div>
             </div>
           </footer>

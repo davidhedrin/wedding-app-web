@@ -5,6 +5,7 @@ import { Playfair_Display, Great_Vibes, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 import { formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -22,7 +23,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
 
-const THEME_IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const THEME_IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 const GALLERY_IMAGES = Array.from({ length: 10 }, () => THEME_IMG);
 const COUPLE = {
   bride: {
@@ -175,7 +176,7 @@ export default function WeddingInvitationPage() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -811,8 +812,8 @@ function RSVP({
                   {/* Bubble */}
                   <div
                     className={`rounded-2xl px-4 py-3 text-sm leading-relaxed backdrop-blur-md border ${i % 2 === 0
-                        ? 'bg-white/10 border-white/10 text-emerald-100 rounded-bl-sm'
-                        : 'bg-amber-300/90 text-emerald-950 border-amber-200/40 rounded-br-sm'
+                      ? 'bg-white/10 border-white/10 text-emerald-100 rounded-bl-sm'
+                      : 'bg-amber-300/90 text-emerald-950 border-amber-200/40 rounded-br-sm'
                       }`}
                   >
                     <p>{item.message}</p>
@@ -829,10 +830,10 @@ function RSVP({
                     <span>•</span>
                     <span
                       className={`${item.attendance === 'Hadir'
-                          ? 'text-emerald-300'
-                          : item.attendance === 'Mungkin'
-                            ? 'text-yellow-300'
-                            : 'text-rose-300'
+                        ? 'text-emerald-300'
+                        : item.attendance === 'Mungkin'
+                          ? 'text-yellow-300'
+                          : 'text-rose-300'
                         }`}
                     >
                       {item.attendance}
@@ -1160,9 +1161,7 @@ function Footer() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-emerald-800/50 pt-6 text-xs text-emerald-100/70 sm:flex-row">
           <p>© {new Date().getFullYear()} Rama & Aisyah — All rights reserved.</p>
-          <p className="text-center">
-            Dibuat dengan ❤️ menggunakan Next.js & Tailwind.
-          </p>
+          <div className="text-center">Designed by <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a></div>
         </div>
       </div>
     </footer>

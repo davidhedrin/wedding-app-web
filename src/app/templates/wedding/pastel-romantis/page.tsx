@@ -3,6 +3,7 @@
 import useCountdown from "@/lib/countdown";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import Configs from "@/lib/config";
 
 /**
  * Invitation Type: Wedding
@@ -11,7 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
  * Create By: David
 */
 
-const IMG = "http://localhost:3005/assets/img/2149043983.jpg";
+const IMG = `${Configs.base_url}/assets/img/2149043983.jpg`;
 const weddingDate = new Date();
 weddingDate.setDate(weddingDate.getDate() + 12);
 
@@ -101,7 +102,7 @@ export default function WeddingInvitationPage() {
           >
             <div className="absolute inset-0">
               <img
-                src='http://localhost:3005/assets/img/2149043983.jpg'
+                src={`${Configs.base_url}/assets/img/2149043983.jpg`}
                 alt="cover"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -443,9 +444,11 @@ export default function WeddingInvitationPage() {
           Terima kasih atas doa & kehadiran Anda.
           <div className="mt-2">
             <span className="inline-flex items-center gap-1">
-              <HeartLineIcon className="w-4 h-4" /> Aisyah & Raka
+              © {new Date().getFullYear()} <HeartLineIcon className="w-4 h-4" /> Aisyah & Raka
             </span>
           </div>
+
+          <div className="mt-1">Designed by <a href={Configs.base_url} target='_blank' className='bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-rose-600'>Wedlyvite</a></div>
         </div>
       </footer>
     </div>
@@ -861,10 +864,10 @@ function RSVPForm() {
 
                   <span
                     className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : item.status === "Masih Ragu"
-                          ? "bg-amber-50 text-amber-700 border-amber-200"
-                          : "bg-rose-50 text-rose-700 border-rose-200"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      : item.status === "Masih Ragu"
+                        ? "bg-amber-50 text-amber-700 border-amber-200"
+                        : "bg-rose-50 text-rose-700 border-rose-200"
                       }`}
                   >
                     {item.status}
