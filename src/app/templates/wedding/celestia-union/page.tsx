@@ -4,9 +4,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Great_Vibes, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import useCountdown from '@/lib/countdown';
 import { AnimatePresence, motion } from 'framer-motion';
-
 import bgImage from './bg.jpeg';
-import Configs from '@/lib/config';
+
+import Configs, { MusicThemeKeys, PaymentMethodKeys } from '@/lib/config';
+import { useSearchParams } from 'next/navigation';
+import { EventInitProps, GroomBrideProps, InvitationParams } from '@/lib/model-types';
+import { EventGifts, EventRsvp, RsvpStatusEnum } from '@/generated/prisma';
+import { GetDataEventGifts, GetDataEventRsvp } from '@/server/event-detail';
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from '@/lib/utils';
+import { GetSplashScreenEventData, UpadateRsvp } from '@/server/event';
+import { GenProfileDescWedding } from '../../utils';
+import LoadingUI from '@/components/loading/loading-ui';
+import FloatingActionButton from '../../floating-action';
+import { ModalWishlist } from '../../modal-wishlist';
 
 const greatVibes = Great_Vibes({ subsets: ['latin'], weight: ['400'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'] });
@@ -68,6 +78,174 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 export default function WeddingInvitationPage() {
+  const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
+  const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
+
+  const [isLoading, setIsloading] = useState(true);
+  const searchParams = useSearchParams();
+  const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
+  const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
+
+  const [groom, setGroom] = useState<GroomBrideProps | null>(null);
+  const [bride, setBride] = useState<GroomBrideProps | null>(null);
+  const [groomProfile, setGroomProfile] = useState<string>();
+  const [brideProfile, setBrideProfile] = useState<string>();
+  const [longlatLoc, setLonglatLoc] = useState<string>();
+
+  const [rsvpName, setRsvpName] = useState<string>("");
+  const [rsvpHp, setRsvpHp] = useState<string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
+  const [rsvpDesc, setRsvpDesc] = useState<string>("");
+
+  const [pageTableWs, setPageTableWs] = useState(1);
+  const [perPageWs, setPerPageWs] = useState(6);
+  const [totalPageWs, setTotalPageWs] = useState(0);
+  const [datasWs, setDatasWs] = useState<EventGifts[] | null>(null);
+  const fatchWishlist = async (event_id: number, page: number = pageTableWs, countPage: number = perPageWs) => {
+    const result = await GetDataEventGifts(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        type: "Wishlist"
+      },
+      select: {
+        id: true,
+        name: true,
+        product_price: true,
+        qty: true,
+        product_url: true,
+        reserve_qty: true,
+      },
+      orderBy: {
+        id: "asc"
+      }
+    });
+
+    setTotalPageWs(result.meta.totalPages);
+    setPageTableWs(result.meta.page);
+    setDatasWs(result.data);
+  };
+  const changePaginateWs = async (page: number) => {
+    if (eventDatas) {
+      setPageTableWs(page);
+      await fatchWishlist(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [pageTableRsvp, setPageTableRsvp] = useState(1);
+  const [perPageRsvp, setPerPageRsvp] = useState(6);
+  const [totalPageRsvp, setTotalPageRsvp] = useState(0);
+  const [datasRsvp, setDatasRsvp] = useState<EventRsvp[] | null>(null);
+  const fatchRsvpMsg = async (event_id: number, page: number = pageTableRsvp, countPage: number = perPageRsvp) => {
+    const result = await GetDataEventRsvp(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        show_desc: true,
+        att_status: {
+          not: null
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        desc: true,
+        show_desc: true,
+        att_status: true,
+        createdAt: true
+      },
+      orderBy: {
+        createdAt: "asc"
+      }
+    });
+
+    setTotalPageRsvp(result.meta.totalPages);
+    setPageTableRsvp(result.meta.page);
+    setDatasRsvp(result.data);
+  };
+  const changePaginateRsvp = async (page: number) => {
+    if (eventDatas) {
+      setPageTableRsvp(page);
+      await fatchRsvpMsg(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [isMusic, setIsMusic] = useState(false);
+  const [openedModalWs, setOpenedModalWs] = useState(false);
+  const [wishlistActiveId, setWishlistActiveId] = useState<number>(0);
+  const openModalWislist = (wislist_id: number) => {
+    setWishlistActiveId(wislist_id);
+    setOpenedModalWs(true);
+  }
+
+  useEffect(() => {
+    const delayMs = 2000;
+    const fatchData = async () => {
+      if (invtParams.code !== undefined && invtParams.code.trim() !== "") {
+        try {
+          const findData = await ExecuteMinimumDelay(
+            GetSplashScreenEventData(invtParams.code),
+            delayMs
+          );
+
+          if (findData) {
+            setEventDatas(findData);
+            setRsvpName(findData.event_rsvp.name);
+            setRsvpHp(findData.event_rsvp.phone ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
+            setRsvpDesc(findData.event_rsvp.desc ?? "");
+
+            const groomData = findData.gb_info.find(x => x.type === "Groom");
+            const brideData = findData.gb_info.find(x => x.type === "Bride");
+            setGroom(groomData ?? null);
+            setBride(brideData ?? null);
+
+            if (groomData) setGroomProfile(GenProfileDescWedding({
+              type: groomData.type,
+              birth_order: groomData.birth_order,
+              father_name: groomData.father_name,
+              mother_name: groomData.mother_name,
+              place_origin: groomData.place_origin,
+              occupation: groomData.occupation,
+            }));
+
+            if (brideData) setBrideProfile(GenProfileDescWedding({
+              type: brideData.type,
+              birth_order: brideData.birth_order,
+              father_name: brideData.father_name,
+              mother_name: brideData.mother_name,
+              place_origin: brideData.place_origin,
+              occupation: brideData.occupation,
+            }));
+
+            const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
+            if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+
+            fatchWishlist(findData.event_rsvp.event_id);
+            fatchRsvpMsg(findData.event_rsvp.event_id);
+          }
+
+        } catch (error: any) {
+          await delay(delayMs);
+          toast({
+            type: "warning",
+            title: "Unknown Invitation",
+            message: error?.message ?? "We are sorry, your invitation was not recognized!"
+          });
+        }
+      } else {
+        await delay(delayMs);
+      }
+
+      setIsloading(false);
+    };
+
+    fatchData();
+  }, []);
+  //--------------------------------------------------------------------
+
   const [opened, setOpened] = useState(false)
   useLockBodyScroll(!opened)
   // Atur tanggal pernikahan di sini (format ISO agar aman):
@@ -76,7 +254,7 @@ export default function WeddingInvitationPage() {
   const [navOpen, setNavOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(TARGET_DATE);
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(eventDatas?.event_time ?? TARGET_DATE);
 
   // Hero background carousel
   const [slide, setSlide] = useState(0);
@@ -131,6 +309,38 @@ export default function WeddingInvitationPage() {
   // FAQ
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  // RSVP form (dummy handler)
+  const [sending, setSending] = useState(false);
+  const onSubmitRSVP = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (invtParams.code !== undefined && eventDatas !== null) {
+      e.preventDefault();
+      const form = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(form.entries());
+      setSending(true);
+
+      await ExecuteMinimumDelay(
+        UpadateRsvp(invtParams.code, {
+          rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
+          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
+          rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
+        }),
+        2000
+      );
+
+      setSending(false);
+      (e.target as HTMLFormElement).reset();
+    }
+
+    toast({
+      type: "success",
+      title: "Submit successfully",
+      message: "Your submission has been successfully completed"
+    });
+  };
+
+  if (isLoading) return <LoadingUI className="bg-linear-to-br from-indigo-900 via-indigo-950 to-black" activeTitle={false} />
+
   return (
     <main className={classNames('min-h-screen scroll-smooth', jakarta.className)}>
       {/* Background global */}
@@ -161,13 +371,20 @@ export default function WeddingInvitationPage() {
               className="relative z-10"
             >
               <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
-              <span className={classNames(greatVibes.className, 'text-5xl leading-none md:text-7xl', THEME.accent)}>Alya & Rizky</span>
-              <p className="mt-4 text-lg"><span className={THEME.accent}>21 Desember 2025</span></p>
+              <span className={classNames(greatVibes.className, 'text-5xl leading-none md:text-7xl', THEME.accent)}>
+                {groom?.shortname ?? "Alya"} & {bride?.shortname ?? "Rizky"}
+              </span>
+              <p className="mt-4 text-lg"><span className={THEME.accent}>{formatDate(eventDatas?.event_time ?? TARGET_DATE, "full")}</span></p>
               <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+              <p className="font-semibold text-xl mt-1 text-white">{eventDatas?.event_rsvp.name ?? "Nama Tamu"}</p>
 
               <button
-                onClick={() => setOpened(true)}
+                onClick={() => {
+                  if (eventDatas && eventDatas.music_url) playMusic(eventDatas.music_url);
+                  else playMusic(musicThemeWedding?.items[0].url ?? "");
+                  setIsMusic(prev => !prev);
+                  setOpened(prev => !prev);
+                }}
                 className={classNames(
                   'group mt-8 inline-flex items-center gap-3 rounded-full px-6 py-3 text-black transition focus:outline-none focus:ring-4',
                   THEME.accentBg, THEME.accentRing
@@ -187,7 +404,7 @@ export default function WeddingInvitationPage() {
       <header ref={headerRef} className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className={classNames(greatVibes.className, 'text-2xl md:text-3xl', THEME.accent)}>A & R</span>
+            <span className={classNames(greatVibes.className, 'text-2xl md:text-3xl', THEME.accent)}>{groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "R"}</span>
             <span className={classNames(playfair.className, 'hidden text-sm uppercase tracking-widest text-white/70 sm:block')}>Undangan Pernikahan</span>
           </div>
           <nav className="hidden items-center gap-2 md:flex">
@@ -258,10 +475,10 @@ export default function WeddingInvitationPage() {
 
           {/* Konten hero */}
           <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center text-white">
-            <span className={classNames(greatVibes.className, 'text-5xl leading-none md:text-7xl', THEME.accent)}>Alya & Rizky</span>
+            <span className={classNames(greatVibes.className, 'text-5xl leading-none md:text-7xl', THEME.accent)}>{groom?.shortname ?? "Alya"} & {bride?.shortname ?? "Rizky"}</span>
             <h1 className={classNames(playfair.className, 'mt-3 text-2xl font-semibold md:text-4xl')}>Dengan Penuh Cinta, Kami Mengundang</h1>
             <p className="mt-2 max-w-2xl text-white/80 md:text-lg">
-              Mohon doa restu atas pernikahan kami pada <span className={THEME.accent}>21 Desember 2025</span>, pukul <span className={THEME.accent}>10.00 WIB</span>.
+              Mohon doa restu atas pernikahan kami pada <span className={THEME.accent}>{formatDate(eventDatas?.event_time ?? TARGET_DATE, "full")}</span>, pukul <span className={THEME.accent}>{formatDate(eventDatas?.event_time ?? TARGET_DATE, undefined, "short")} WIB</span>.
             </p>
 
             {/* Countdown */}
@@ -315,47 +532,86 @@ export default function WeddingInvitationPage() {
           <div className="mx-auto max-w-3xl text-center">
             <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Kata Sambutan</h2>
             <p className="mt-3 text-white/80">
-              Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
+              {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}
             </p>
           </div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {[
-              { name: 'Alya Putri', desc: 'Putri dari Bpk. Ahmad & Ibu Sari' },
-              { name: 'Rizky Pratama', desc: 'Putra dari Bpk. Budi & Ibu Rina' },
-            ].map((p, idx) => (
-              <div
-                key={idx}
-                className={classNames(
-                  'group relative overflow-hidden rounded-3xl border p-5 md:p-6',
-                  THEME.borderSoft,
-                  THEME.cardBg,
-                  'min-h-87.5'
-                )}
-              >
-                <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
-                  <img
-                    src={IMAGES[0]}
-                    alt={p.name}
-                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                    style={{
-                      objectPosition: 'center',
-                    }}
-                  />
-                </div>
+            {
+              eventDatas ? eventDatas.gb_info.map((x, i) => (
+                <div
+                  key={i}
+                  className={classNames(
+                    'group relative overflow-hidden rounded-3xl border p-5 md:p-6',
+                    THEME.borderSoft,
+                    THEME.cardBg,
+                    'min-h-87.5'
+                  )}
+                >
+                  <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
+                    <img
+                      src={x.img_path ?? ""}
+                      alt={x.shortname}
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      style={{
+                        objectPosition: 'center',
+                      }}
+                    />
+                  </div>
 
-                <div className="mt-4 z-10 relative">
-                  <h3 className={classNames(playfair.className, 'text-2xl text-white')}>
-                    {p.name}
-                  </h3>
-                  <p className="text-white/70">{p.desc}</p>
-                </div>
+                  <div className="mt-4 z-10 relative">
+                    <h3 className={classNames(playfair.className, 'text-2xl text-white')}>
+                      {x.fullname}
+                    </h3>
+                    <p className="text-white/70">
+                      {x.type === "Groom" ? groomProfile : brideProfile}
+                    </p>
+                    {
+                      x.personal_msg && <p className="text-white/70 italic">{`“${x.personal_msg}”`}</p>
+                    }
+                  </div>
 
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
-                  <div className="absolute inset-0 bg-linear-to-t from-amber-300/10 via-transparent to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-linear-to-t from-amber-300/10 via-transparent to-transparent" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              )) : [
+                { name: 'Alya Putri', desc: 'Putri dari Bpk. Ahmad & Ibu Sari' },
+                { name: 'Rizky Pratama', desc: 'Putra dari Bpk. Budi & Ibu Rina' },
+              ].map((p, idx) => (
+                <div
+                  key={idx}
+                  className={classNames(
+                    'group relative overflow-hidden rounded-3xl border p-5 md:p-6',
+                    THEME.borderSoft,
+                    THEME.cardBg,
+                    'min-h-87.5'
+                  )}
+                >
+                  <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
+                    <img
+                      src={IMAGES[0]}
+                      alt={p.name}
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      style={{
+                        objectPosition: 'center',
+                      }}
+                    />
+                  </div>
+
+                  <div className="mt-4 z-10 relative">
+                    <h3 className={classNames(playfair.className, 'text-2xl text-white')}>
+                      {p.name}
+                    </h3>
+                    <p className="text-white/70">{p.desc}</p>
+                  </div>
+
+                  <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-linear-to-t from-amber-300/10 via-transparent to-transparent" />
+                  </div>
+                </div>
+              ))
+            }
           </div>
         </div>
       </section>
@@ -366,78 +622,174 @@ export default function WeddingInvitationPage() {
           <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Rangkaian Acara</h2>
           <p className="mt-2 text-white/80">Berikut informasi waktu & tempat pelaksanaan.</p>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {/* Detail */}
-            <div className={classNames('rounded-3xl border p-6', THEME.borderSoft, THEME.cardBg)}>
-              <div className="space-y-5">
-                <div>
-                  <h3 className={classNames(playfair.className, 'text-xl text-white')}>Akad Nikah</h3>
-                  <p className="text-white/70">Minggu, 21 Desember 2025 • 10.00 WIB</p>
-                  <p className="text-white/70">Masjid Al-Falah, Jl. Damai No. 21, Jakarta</p>
-                  <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
-                  <div>
-                    <a
-                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
-                      target="_blank"
-                      className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
-                    >
-                      <div className='flex items-center'>
-                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+          {
+            eventDatas ? <div className="mt-8 grid gap-6 md:grid-cols-2">
+              <div className={classNames('rounded-3xl border p-6', THEME.borderSoft, THEME.cardBg)}>
+                <div className="space-y-5">
+                  {
+                    eventDatas.schedule_info.map((x, i) => {
+                      let title = "";
+                      if (x.type === "WED_MB") title = "Akad Nikah";
+                      else if (x.type === "WED_TOR") {
+                        if (x.ceremony_type === "Reception") title = "Resepsi";
+                        else if (x.ceremony_type === "Traditional") title = "Tradisional / Adat";
+                      }
+
+                      return <div key={i} className='space-y-2'>
+                        <h3 className={classNames(playfair.className, 'text-xl text-white')}>{title}</h3>
+                        <p className="text-white/70">{`${formatDate(CombineDateAndTime(x.date, x.start_time), "full", "short")} - ${x.end_time}`}</p>
+                        <div className="text-white/70">
+                          {`${x.location} · ${x.address}`}. <a
+                            href={`https://www.google.com/maps?q=${x.latitude},${x.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-amber-500 underline"
+                          >
+                            Lihat Lokasi
+                          </a>
+                        </div>
+                        {x.notes.length > 0 && <p className="text-white/70 mb-2">Catatan: {x.notes.join(", ")}.</p>}
+
+                        {
+                          x.youtube_url && <div>
+                            <a
+                              href={x.youtube_url}
+                              target="_blank"
+                              className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                            >
+                              <div className='flex items-center'>
+                                <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                              </div>
+                            </a>
+                          </div>
+                        }
                       </div>
-                    </a>
-                  </div>
+                    })
+                  }
+                  {
+                    eventDatas.schedule_note !== null && <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
+                      <div className="text-sm">Catatan</div>
+                      <div className="text-white">{(eventDatas.schedule_note)}</div>
+                    </div>
+                  }
                 </div>
-                <div>
-                  <h3 className={classNames(playfair.className, 'text-xl text-white')}>Resepsi</h3>
-                  <p className="text-white/70">Minggu, 21 Desember 2025 • 12.00 - 15.00 WIB</p>
-                  <p className="text-white/70">Gedung Graha Cinta, Jl. Bahagia No. 5, Jakarta</p>
-                  <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
-                  <div>
-                    <a
-                      href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
-                      target="_blank"
-                      className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
-                    >
-                      <div className='flex items-center'>
-                        <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
-                      </div>
-                    </a>
-                  </div>
+              </div>
+
+              <div className={classNames('overflow-hidden rounded-3xl border relative', THEME.borderSoft, THEME.cardBg)}>
+                <div className="h-full w-full">
+                  <iframe
+                    title="Lokasi Acara"
+                    className="h-125 md:h-full w-full"
+                    loading="lazy"
+                    src={`https://www.google.com/maps?q=${longlatLoc}&z=14&output=embed`}
+                  />
                 </div>
 
-                <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
-                  <div className="text-sm">Catatan</div>
-                  <div className="text-white">Mohon hadir tepat waktu & menjaga ketertiban.</div>
+                {/* Overlay Button */}
+                <div className="w-full flex justify-center absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+                  <a
+                    href={`https://www.google.com/maps?q=${longlatLoc}`}
+                    target="_blank"
+                    className={classNames(
+                      'inline-block rounded-full px-5 py-2 text-sm font-semibold text-black shadow-lg transition',
+                      THEME.accentBg
+                    )}
+                  >
+                    Buka di Google Maps
+                  </a>
+                </div>
+              </div>
+            </div> : <div className="mt-8 grid gap-6 md:grid-cols-2">
+              {/* Detail */}
+              <div className={classNames('rounded-3xl border p-6', THEME.borderSoft, THEME.cardBg)}>
+                <div className="space-y-5">
+                  <div>
+                    <h3 className={classNames(playfair.className, 'text-xl text-white')}>Akad Nikah</h3>
+                    <p className="text-white/70">Minggu, 21 Desember 2025 • 10.00 WIB</p>
+                    <p className="text-white/70">
+                      Masjid Al-Falah, Jl. Damai No. 21, Jakarta. <a
+                        href={`https://www.google.com/maps?q=1234,2345`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-500 underline"
+                      >
+                        Lihat Lokasi
+                      </a>
+                    </p>
+                    <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
+                    <div>
+                      <a
+                        href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                        target="_blank"
+                        className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className={classNames(playfair.className, 'text-xl text-white')}>Resepsi</h3>
+                    <p className="text-white/70">Minggu, 21 Desember 2025 • 12.00 - 15.00 WIB</p>
+                    <p className="text-white/70">
+                      Gedung Graha Cinta, Jl. Bahagia No. 5, Jakarta. <a
+                        href={`https://www.google.com/maps?q=1234,2345`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-500 underline"
+                      >
+                        Lihat Lokasi
+                      </a>
+                    </p>
+                    <p className="text-white/70 mb-2">Catatan: Nuansa Navy/Gold.</p>
+                    <div>
+                      <a
+                        href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
+                        target="_blank"
+                        className={classNames('inline-block rounded-full px-5 py-2 text-sm font-semibold text-black transition', THEME.accentBg)}
+                      >
+                        <div className='flex items-center'>
+                          <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border p-4 text-white/80 backdrop-blur-sm">
+                    <div className="text-sm">Catatan</div>
+                    <div className="text-white">Mohon hadir tepat waktu & menjaga ketertiban.</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Maps */}
+              <div className={classNames('overflow-hidden rounded-3xl border relative', THEME.borderSoft, THEME.cardBg)}>
+                <div className="h-full w-full">
+                  <iframe
+                    title="Lokasi Acara"
+                    className="h-125 md:h-full w-full"
+                    loading="lazy"
+                    src="https://www.google.com/maps?q=-6.200000,106.816666&z=14&output=embed"
+                  />
+                </div>
+
+                {/* Overlay Button */}
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+                  <a
+                    href="https://maps.google.com/?q=Gedung%20Graha%20Cinta%20Jakarta"
+                    target="_blank"
+                    className={classNames(
+                      'inline-block rounded-full px-5 py-2 text-sm font-semibold text-black shadow-lg transition',
+                      THEME.accentBg
+                    )}
+                  >
+                    Buka di Google Maps
+                  </a>
                 </div>
               </div>
             </div>
-
-            {/* Maps */}
-            <div className={classNames('overflow-hidden rounded-3xl border relative', THEME.borderSoft, THEME.cardBg)}>
-              <div className="h-full w-full">
-                <iframe
-                  title="Lokasi Acara"
-                  className="h-full w-full"
-                  loading="lazy"
-                  src="https://www.google.com/maps?q=-6.200000,106.816666&z=14&output=embed"
-                />
-              </div>
-
-              {/* Overlay Button */}
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
-                <a
-                  href="https://maps.google.com/?q=Gedung%20Graha%20Cinta%20Jakarta"
-                  target="_blank"
-                  className={classNames(
-                    'inline-block rounded-full px-5 py-2 text-sm font-semibold text-black shadow-lg transition',
-                    THEME.accentBg
-                  )}
-                >
-                  Buka di Google Maps
-                </a>
-              </div>
-            </div>
-          </div>
+          }
         </div>
       </section>
 
@@ -451,96 +803,194 @@ export default function WeddingInvitationPage() {
             <p className="mt-2 text-white/80">Potret kebahagiaan kami.</p>
           </div>
 
-          <div className="relative mt-10">
-            {/* Tombol panah kiri */}
-            <button
-              onClick={() => scrollGallery('left')}
-              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-            >
-              <svg viewBox="0 0 24 24" className="h-6 w-6">
-                <path fill="currentColor" d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
+          {
+            eventDatas ? <div className="relative mt-10">
+              {/* Tombol panah kiri */}
+              <button
+                onClick={() => scrollGallery('left')}
+                className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
+              >
+                <svg viewBox="0 0 24 24" className="h-6 w-6">
+                  <path fill="currentColor" d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
 
-            {/* Tombol panah kanan */}
-            <button
-              onClick={() => scrollGallery('right')}
-              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-            >
-              <svg viewBox="0 0 24 24" className="h-6 w-6">
-                <path fill="currentColor" d="M9 6l6 6-6 6" />
-              </svg>
-            </button>
+              {/* Tombol panah kanan */}
+              <button
+                onClick={() => scrollGallery('right')}
+                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
+              >
+                <svg viewBox="0 0 24 24" className="h-6 w-6">
+                  <path fill="currentColor" d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
 
-            {/* Container galeri */}
-            <div
-              ref={galleryRef}
-              className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
-            >
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="snap-center shrink-0">
+              {/* Container galeri */}
+              <div
+                ref={galleryRef}
+                className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              >
+                {eventDatas.event_galleries.map((x, i) => (
+                  <div key={i} className="snap-center shrink-0">
+                    <div
+                      className={classNames(
+                        'group relative h-72 w-52 md:h-96 md:w-72 overflow-hidden rounded-2xl border shadow-lg transition-transform hover:scale-[1.02]',
+                        THEME.borderSoft,
+                        THEME.cardBg
+                      )}
+                    >
+                      <img
+                        src={x.img_path ?? ""}
+                        alt={`Foto ${i + 1}`}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      {/* Overlay hover */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
+                        <svg
+                          className="h-10 w-10 text-amber-300 drop-shadow-md"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div> : <div className="relative mt-10">
+              {/* Tombol panah kiri */}
+              <button
+                onClick={() => scrollGallery('left')}
+                className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
+              >
+                <svg viewBox="0 0 24 24" className="h-6 w-6">
+                  <path fill="currentColor" d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              {/* Tombol panah kanan */}
+              <button
+                onClick={() => scrollGallery('right')}
+                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
+              >
+                <svg viewBox="0 0 24 24" className="h-6 w-6">
+                  <path fill="currentColor" d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
+
+              {/* Container galeri */}
+              <div
+                ref={galleryRef}
+                className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
+              >
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="snap-center shrink-0">
+                    <div
+                      className={classNames(
+                        'group relative h-72 w-52 md:h-96 md:w-72 overflow-hidden rounded-2xl border shadow-lg transition-transform hover:scale-[1.02]',
+                        THEME.borderSoft,
+                        THEME.cardBg
+                      )}
+                    >
+                      <img
+                        src={IMAGES[0]}
+                        alt={`Foto ${i + 1}`}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      {/* Overlay hover */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
+                        <svg
+                          className="h-10 w-10 text-amber-300 drop-shadow-md"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
+
+          {
+            eventDatas ? (
+              eventDatas.youtube_url !== null &&
+              <>
+                <div className="text-center mt-12">
+                  <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>
+                    Video
+                  </h2>
+                  <p className="mt-2 text-white/80">Cuplikan momen spesial yang kami abadikan.</p>
+                </div>
+                <div className="snap-center shrink-0 mt-10">
                   <div
                     className={classNames(
-                      'group relative h-72 w-52 md:h-96 md:w-72 overflow-hidden rounded-2xl border shadow-lg transition-transform hover:scale-[1.02]',
+                      'group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg',
                       THEME.borderSoft,
                       THEME.cardBg
                     )}
                   >
-                    <img
-                      src={IMAGES[0]}
-                      alt={`Foto ${i + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    <iframe
+                      className="h-full w-full"
+                      src={`https://www.youtube.com/embed/${ExtractYtID(eventDatas.youtube_url)}`}
+                      title="YouTube video"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
                     />
-                    {/* Overlay hover */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
+
+                    {/* Overlay play */}
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
                       <svg
-                        className="h-10 w-10 text-amber-300 drop-shadow-md"
+                        className="h-12 w-12 text-white drop-shadow-lg"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
+                        <path d="M8 5v14l11-7z" />
                       </svg>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>
-              Video
-            </h2>
-            <p className="mt-2 text-white/80">Cuplikan momen spesial yang kami abadikan.</p>
-          </div>
-          <div className="snap-center shrink-0 mt-10">
-            <div
-              className={classNames(
-                'group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg',
-                THEME.borderSoft,
-                THEME.cardBg
-              )}
-            >
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/vtIGvGigw4g"
-                title="YouTube video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-
-              {/* Overlay play */}
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
-                <svg
-                  className="h-12 w-12 text-white drop-shadow-lg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+              </>
+            ) : <>
+              <div className="text-center mt-12">
+                <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>
+                  Video
+                </h2>
+                <p className="mt-2 text-white/80">Cuplikan momen spesial yang kami abadikan.</p>
               </div>
-            </div>
-          </div>
+              <div className="snap-center shrink-0 mt-10">
+                <div
+                  className={classNames(
+                    'group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg',
+                    THEME.borderSoft,
+                    THEME.cardBg
+                  )}
+                >
+                  <iframe
+                    className="h-full w-full"
+                    src="https://www.youtube.com/embed/vtIGvGigw4g"
+                    title="YouTube video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+
+                  {/* Overlay play */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                    <svg
+                      className="h-12 w-12 text-white drop-shadow-lg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </>
+          }
         </div>
       </section>
 
@@ -552,31 +1002,66 @@ export default function WeddingInvitationPage() {
 
           <div className="relative mx-auto mt-8 max-w-3xl">
             <div className="absolute left-4 top-0 h-full w-0.5 bg-white/10 md:left-1/2 md:-translate-x-1/2" />
-            {[
-              { t: '2018', title: 'Pertama Bertemu', desc: 'Bersua di kampus dan memulai pertemanan.' },
-              { t: '2020', title: 'Perjalanan Bersama', desc: 'Belajar saling memahami dalam suka & duka.' },
-              { t: '2024', title: 'Lamaran', desc: 'Mengikat janji untuk melangkah lebih serius.' },
-              { t: '2025', title: 'Menuju Akad', desc: 'Menyiapkan hari H dengan penuh harap.' },
-            ].map((item, idx) => {
-              const isRight = idx % 2 === 1;
-              return (
-                <div key={idx} className={classNames('relative mb-8 md:flex md:items-center',)}>
-                  <div className={classNames(
-                    'relative z-10 w-full rounded-2xl border p-5 backdrop-blur',
-                    THEME.borderSoft, THEME.cardBg,
-                    'md:max-w-[46%]',
-                    isRight ? 'md:ml-auto' : 'md:mr-auto'
-                  )}>
-                    <div className="flex items-center gap-3">
-                      <div className={classNames('rounded-full px-3 py-1 text-xs font-semibold text-black', THEME.accentBg)}>{item.t}</div>
-                      <h3 className={classNames(playfair.className, 'text-xl text-white')}>{item.title}</h3>
+            {
+              eventDatas ? eventDatas.event_histories.map((ev, i) => {
+                const isRight = i % 2 === 1;
+                return (
+                  <div key={i} className={classNames('relative mb-8 md:flex md:items-center',)}>
+                    <div className={classNames(
+                      'relative z-10 w-full rounded-2xl border p-5 backdrop-blur',
+                      THEME.borderSoft, THEME.cardBg,
+                      'md:max-w-[46%]',
+                      isRight ? 'md:ml-auto' : 'md:mr-auto'
+                    )}>
+                      <div className="flex items-center gap-3">
+                        <div className={classNames('rounded-full px-3 py-1 text-xs font-semibold text-black', THEME.accentBg)}>{getMonthName(ev.month)} - {ev.year}</div>
+                        <h3 className={classNames(playfair.className, 'text-xl text-white')}>{ev.name}</h3>
+                      </div>
+                      <p className="mt-2 text-white/80">{ev.desc}</p>
+
+                      {ev.gallery?.img_path && (
+                        <div className="col-span-12 md:col-span-6 mt-2">
+                          <div className="overflow-hidden rounded-xl border border-white/10">
+                            <div className="aspect-4/3 w-full md:aspect-3/2">
+                              <img
+                                src={ev.gallery.img_path}
+                                alt={ev.name}
+                                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <p className="mt-2 text-white/80">{item.desc}</p>
+                    <div className={classNames('absolute left-4 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full ring-4 ring-black/40 md:left-1/2 md:-translate-x-1/2', THEME.accentBg)} />
                   </div>
-                  <div className={classNames('absolute left-4 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full ring-4 ring-black/40 md:left-1/2 md:-translate-x-1/2', THEME.accentBg)} />
-                </div>
-              );
-            })}
+                );
+              }) : [
+                { t: '2018', title: 'Pertama Bertemu', desc: 'Bersua di kampus dan memulai pertemanan.' },
+                { t: '2020', title: 'Perjalanan Bersama', desc: 'Belajar saling memahami dalam suka & duka.' },
+                { t: '2024', title: 'Lamaran', desc: 'Mengikat janji untuk melangkah lebih serius.' },
+                { t: '2025', title: 'Menuju Akad', desc: 'Menyiapkan hari H dengan penuh harap.' },
+              ].map((item, idx) => {
+                const isRight = idx % 2 === 1;
+                return (
+                  <div key={idx} className={classNames('relative mb-8 md:flex md:items-center',)}>
+                    <div className={classNames(
+                      'relative z-10 w-full rounded-2xl border p-5 backdrop-blur',
+                      THEME.borderSoft, THEME.cardBg,
+                      'md:max-w-[46%]',
+                      isRight ? 'md:ml-auto' : 'md:mr-auto'
+                    )}>
+                      <div className="flex items-center gap-3">
+                        <div className={classNames('rounded-full px-3 py-1 text-xs font-semibold text-black', THEME.accentBg)}>{item.t}</div>
+                        <h3 className={classNames(playfair.className, 'text-xl text-white')}>{item.title}</h3>
+                      </div>
+                      <p className="mt-2 text-white/80">{item.desc}</p>
+                    </div>
+                    <div className={classNames('absolute left-4 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full ring-4 ring-black/40 md:left-1/2 md:-translate-x-1/2', THEME.accentBg)} />
+                  </div>
+                );
+              })
+            }
           </div>
         </div>
       </section>
@@ -589,43 +1074,45 @@ export default function WeddingInvitationPage() {
             <p className="mt-2 text-white/80">Mohon isi formulir berikut untuk RSVP.</p>
 
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const data = new FormData(e.currentTarget);
-                alert(`Terima kasih, ${data.get('nama') || 'Tamu'}! RSVP Anda telah kami terima.`);
-                (e.currentTarget as HTMLFormElement).reset();
-              }}
+              onSubmit={onSubmitRSVP}
               className={classNames('mt-6 grid gap-4 rounded-3xl border p-6', THEME.borderSoft, THEME.cardBg)}
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-white/80">Nama Lengkap</label>
-                  <input name="nama" required placeholder="Nama Anda" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
+                  <input disabled={eventDatas !== null} value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} name="nama" required placeholder="Nama Anda" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-white/80">No. WhatsApp</label>
-                  <input name="wa" type="tel" placeholder="08xxxxxxxxxx" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
+                  <input value={rsvpHp} onChange={(e) => setRsvpHp(e.target.value)} name="wa" type="tel" placeholder="08xxxxxxxxxx" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-white/80">Jumlah Tamu</label>
-                  <input name="jumlah" type="number" min={1} defaultValue={1} className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
+                  <input value={rsvpAttNumber} onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      setRsvpAttNumber(1);
+                      return;
+                    }
+                    setRsvpAttNumber(parseInt(value));
+                  }} name="jumlah" type="number" min={1} className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-white/80">Kehadiran</label>
-                  <select name="status" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)}>
-                    <option value="Hadir">Hadir</option>
-                    <option value="Mungkin">Mungkin</option>
-                    <option value="Tidak">Tidak</option>
+                  <select value={rsvpAtt} onChange={(e) => setRsvpAtt(e.target.value as RsvpStatusEnum)} name="status" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)}>
+                    <option value={RsvpStatusEnum.PRESENCE}>Hadir</option>
+                    <option value={RsvpStatusEnum.ABSENCE}>Tidak hadir</option>
+                    <option value={RsvpStatusEnum.UNKNOWN}>Belum pasti</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="mb-1 block text-sm text-white/80">Ucapan / Doa</label>
-                <textarea name="ucapan" rows={4} placeholder="Titipkan doa terbaik untuk kami..." className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
+                <textarea value={rsvpDesc} onChange={(e) => setRsvpDesc(e.target.value)} name="ucapan" rows={4} placeholder="Titipkan doa terbaik untuk kami..." className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
               </div>
 
               <button type="submit" className={classNames('mt-2 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-black transition hover:brightness-95 focus:outline-none focus:ring-4', THEME.accentBg, THEME.accentRing)}>
@@ -633,109 +1120,196 @@ export default function WeddingInvitationPage() {
               </button>
             </form>
 
-            <div className="mt-12">
-              <h3 className={classNames(playfair.className, 'text-2xl text-white md:text-3xl')}>
-                Ucapan & Doa
-              </h3>
+            {
+              datasRsvp !== null ? <div className="mt-12">
+                <h3 className={classNames(playfair.className, 'text-2xl text-white md:text-3xl')}>
+                  Ucapan & Doa
+                </h3>
 
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  {
-                    nama: 'Andi Pratama',
-                    pesan: 'Semoga menjadi keluarga yang sakinah, mawaddah, warahmah 🤍',
-                    tanggal: '12 Jan 2026',
-                    status: 'Hadir',
-                  },
-                  {
-                    nama: 'Siti Nurhaliza',
-                    pesan: 'Selamat menempuh hidup baru! Bahagia selalu ya 💐',
-                    tanggal: '13 Jan 2026',
-                    status: 'Mungkin',
-                  },
-                  {
-                    nama: 'Budi Santoso',
-                    pesan: 'Maaf tidak bisa hadir, tapi doa terbaik untuk kalian 🙏',
-                    tanggal: '14 Jan 2026',
-                    status: 'Tidak',
-                  },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={classNames(
-                      'flex flex-col justify-between rounded-2xl border p-5',
-                      THEME.borderSoft,
-                      THEME.cardBg
-                    )}
-                  >
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-white">{item.nama}</p>
-                        <p className="text-xs text-white/60">{item.tanggal}</p>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {datasRsvp.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={classNames(
+                        'flex flex-col rounded-2xl border p-5',
+                        THEME.borderSoft,
+                        THEME.cardBg
+                      )}
+                    >
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-white">{msg.name}</p>
+                          <p className="text-xs text-white/60">{msg.createdAt ? msg.createdAt.toLocaleDateString("id-ID") : "-"}</p>
+                        </div>
+
+                        {/* Status Badge */}
+                        <span
+                          className={classNames(
+                            'rounded-full px-3 py-1 text-xs font-medium',
+                            msg.att_status === 'PRESENCE' && 'bg-green-400/20 text-green-300',
+                            msg.att_status === 'UNKNOWN' && 'bg-yellow-400/20 text-yellow-300',
+                            msg.att_status === 'ABSENCE' && 'bg-red-400/20 text-red-300'
+                          )}
+                        >
+                          {msg.att_status ? rsvpLabels[msg.att_status] : "-"}
+                        </span>
                       </div>
 
-                      {/* Status Badge */}
-                      <span
-                        className={classNames(
-                          'rounded-full px-3 py-1 text-xs font-medium',
-                          item.status === 'Hadir' && 'bg-green-400/20 text-green-300',
-                          item.status === 'Mungkin' && 'bg-yellow-400/20 text-yellow-300',
-                          item.status === 'Tidak' && 'bg-red-400/20 text-red-300'
-                        )}
-                      >
-                        {item.status}
-                      </span>
+                      {/* Message */}
+                      <p className="mt-4 text-sm leading-relaxed text-white/80">
+                        {msg.desc || "-"}
+                      </p>
                     </div>
+                  ))}
+                </div>
 
-                    {/* Message */}
-                    <p className="mt-4 text-sm leading-relaxed text-white/80">
-                      {item.pesan}
-                    </p>
+                <div className="mt-5 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <p className="text-sm text-white/70">Page 1 of 3</p>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={pageTableRsvp <= 1}
+                      onClick={() => {
+                        if (pageTableRsvp >= 1) changePaginateRsvp(pageTableRsvp - 1);
+                      }}
+                      className={classNames(
+                        'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                        THEME.borderSoft
+                      )}
+                    >
+                      Prev
+                    </button>
+
+                    {
+                      Array.from({ length: totalPageRsvp }, (x, i) => {
+                        const numberPage = i + 1;
+                        return <button key={i}
+                          onClick={() => changePaginateRsvp(numberPage)}
+                          className={`rounded-full px-4 py-2 text-sm ${pageTableRsvp === numberPage ? "font-semibold text-black " + THEME.accentBg : "text-white/70 hover:bg-white/10"}`}>
+                          {numberPage}
+                        </button>
+                      })
+                    }
+
+                    <button
+                      disabled={pageTableRsvp >= totalPageRsvp}
+                      onClick={() => {
+                        if (pageTableRsvp <= totalPageRsvp) changePaginateRsvp(pageTableRsvp + 1);
+                      }}
+                      className={classNames(
+                        'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                        THEME.borderSoft
+                      )}
+                    >
+                      Next
+                    </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              </div> : <div className="mt-12">
+                <h3 className={classNames(playfair.className, 'text-2xl text-white md:text-3xl')}>
+                  Ucapan & Doa
+                </h3>
 
-              <div className="mt-5 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                <p className="text-sm text-white/70">Page 1 of 3</p>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    {
+                      nama: 'Andi Pratama',
+                      pesan: 'Semoga menjadi keluarga yang sakinah, mawaddah, warahmah 🤍',
+                      tanggal: '12 Jan 2026',
+                      status: 'Hadir',
+                    },
+                    {
+                      nama: 'Siti Nurhaliza',
+                      pesan: 'Selamat menempuh hidup baru! Bahagia selalu ya 💐',
+                      tanggal: '13 Jan 2026',
+                      status: 'Mungkin',
+                    },
+                    {
+                      nama: 'Budi Santoso',
+                      pesan: 'Maaf tidak bisa hadir, tapi doa terbaik untuk kalian 🙏',
+                      tanggal: '14 Jan 2026',
+                      status: 'Tidak',
+                    },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={classNames(
+                        'flex flex-col justify-between rounded-2xl border p-5',
+                        THEME.borderSoft,
+                        THEME.cardBg
+                      )}
+                    >
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-white">{item.nama}</p>
+                          <p className="text-xs text-white/60">{item.tanggal}</p>
+                        </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    className={classNames(
-                      'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
-                      THEME.borderSoft
-                    )}
-                  >
-                    Prev
-                  </button>
+                        {/* Status Badge */}
+                        <span
+                          className={classNames(
+                            'rounded-full px-3 py-1 text-xs font-medium',
+                            item.status === 'Hadir' && 'bg-green-400/20 text-green-300',
+                            item.status === 'Mungkin' && 'bg-yellow-400/20 text-yellow-300',
+                            item.status === 'Tidak' && 'bg-red-400/20 text-red-300'
+                          )}
+                        >
+                          {item.status}
+                        </span>
+                      </div>
 
-                  <button 
-                    className={classNames(
-                      'rounded-full px-4 py-2 text-sm font-semibold text-black',
-                      THEME.accentBg
-                    )}
-                  >
-                    1
-                  </button>
+                      {/* Message */}
+                      <p className="mt-4 text-sm leading-relaxed text-white/80">
+                        {item.pesan}
+                      </p>
+                    </div>
+                  ))}
+                </div>
 
-                  <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
-                    2
-                  </button>
+                <div className="mt-5 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <p className="text-sm text-white/70">Page 1 of 3</p>
 
-                  <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
-                    3
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className={classNames(
+                        'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                        THEME.borderSoft
+                      )}
+                    >
+                      Prev
+                    </button>
 
-                  <button
-                    className={classNames(
-                      'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
-                      THEME.borderSoft
-                    )}
-                  >
-                    Next
-                  </button>
+                    <button
+                      className={classNames(
+                        'rounded-full px-4 py-2 text-sm font-semibold text-black',
+                        THEME.accentBg
+                      )}
+                    >
+                      1
+                    </button>
+
+                    <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
+                      2
+                    </button>
+
+                    <button className="rounded-full px-4 py-2 text-sm text-white/70 hover:bg-white/10">
+                      3
+                    </button>
+
+                    <button
+                      className={classNames(
+                        'rounded-full border px-4 py-2 text-sm text-white/70 transition hover:bg-white/10',
+                        THEME.borderSoft
+                      )}
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            }
           </div>
         </div>
       </section>
@@ -760,47 +1334,94 @@ export default function WeddingInvitationPage() {
           {/* ====================================================== */}
           {/* PRIMARY GIFT OPTIONS                                  */}
           {/* ====================================================== */}
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {[
-              { label: 'Transfer Bank', desc: 'BCA • 1234567890 • a.n. Alya Putri' },
-              { label: 'E-Wallet', desc: 'OVO / Gopay / DANA • 0812-3456-7890' },
-              { label: 'Kirim Kado', desc: 'Jl. Mawar No. 10, Jakarta' },
-            ].map((h, i) => (
-              <div
-                key={i}
-                className={classNames(
-                  'rounded-3xl border p-6 backdrop-blur',
-                  THEME.borderSoft,
-                  THEME.cardBg
-                )}
-              >
-                <div className="text-xs uppercase tracking-wider text-white/60">
-                  {h.label}
-                </div>
+          {
+            eventDatas ? <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {
+                eventDatas.event_gifts.map((x, i) => (
+                  <div
+                    key={i}
+                    className={classNames(
+                      'rounded-3xl border p-6 backdrop-blur',
+                      THEME.borderSoft,
+                      THEME.cardBg
+                    )}
+                  >
+                    <div className="flex items-center gap-3 text-white">
+                      <img className="h-5" src={allPaymentMethod.find(m => m.key === x.name)?.icon} /> • <span className="text-sm">{x.account}</span>
+                    </div>
 
-                <div className="mt-1 text-white leading-relaxed">
-                  {h.desc}
-                </div>
+                    <div className="mt-1 text-white leading-relaxed">
+                      {x.no_rek}
+                    </div>
 
-                <button
-                  onClick={() => navigator.clipboard?.writeText(h.desc)}
+                    <button
+                      onClick={() => {
+                        copyToClipboard(x.no_rek ?? "");
+                        toast({
+                          type: "success",
+                          title: "Copy to Clipboard",
+                          message: "Well done, Text copied to clipboard.",
+                        });
+                      }}
+                      className={classNames(
+                        'mt-2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
+                        THEME.accentBg,
+                        THEME.accentRing
+                      )}
+                    >
+                      Salin
+                      <svg viewBox="0 0 24 24" className="h-4 w-4">
+                        <path
+                          fill="currentColor"
+                          d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              }
+            </div> : <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {[
+                { label: 'Transfer Bank', desc: 'BCA • 1234567890 • a.n. Alya Putri' },
+                { label: 'E-Wallet', desc: 'OVO • 0812-3456-7890' },
+                { label: 'E-Wallet', desc: 'Gopay • 0812-3456-7890' },
+              ].map((h, i) => (
+                <div
+                  key={i}
                   className={classNames(
-                    'mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
-                    THEME.accentBg,
-                    THEME.accentRing
+                    'rounded-3xl border p-6 backdrop-blur',
+                    THEME.borderSoft,
+                    THEME.cardBg
                   )}
                 >
-                  Salin
-                  <svg viewBox="0 0 24 24" className="h-4 w-4">
-                    <path
-                      fill="currentColor"
-                      d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
+                  <div className="text-xs uppercase tracking-wider text-white/60">
+                    {h.label}
+                  </div>
+
+                  <div className="mt-1 text-white leading-relaxed">
+                    {h.desc}
+                  </div>
+
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(h.desc)}
+                    className={classNames(
+                      'mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-black',
+                      THEME.accentBg,
+                      THEME.accentRing
+                    )}
+                  >
+                    Salin
+                    <svg viewBox="0 0 24 24" className="h-4 w-4">
+                      <path
+                        fill="currentColor"
+                        d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          }
 
           {/* ====================================================== */}
           {/* WISHLIST SECTION                                      */}
@@ -840,27 +1461,59 @@ export default function WeddingInvitationPage() {
                     Alamat Lengkap
                   </div>
                   <div className="mt-1 text-white leading-relaxed">
-                    Jl. Mawar No. 10 Kel. Melati Indah Jakarta Selatan DKI Jakarta 12345 Indonesia
+                    {
+                      eventDatas ?
+                        (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
+                        : "Jl. Mawar No. 10 Kel. Melati Indah Jakarta Selatan DKI Jakarta 12345 Indonesia"
+                    }
                   </div>
                 </div>
 
-                <div>
-                  <button
-                    className={classNames(
-                      'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
-                      THEME.accentBg,
-                      THEME.accentRing
-                    )}
-                  >
-                    Salin Alamat
-                    <svg viewBox="0 0 24 24" className="h-4 w-4">
-                      <path
-                        fill="currentColor"
-                        d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                {
+                  eventDatas ? (
+                    eventDatas.wishlist_address && <div>
+                      <button
+                        onClick={() => {
+                          copyToClipboard(eventDatas.wishlist_address ?? "");
+                          toast({
+                            type: "success",
+                            title: "Copy to Clipboard",
+                            message: "Well done, Text copied to clipboard.",
+                          });
+                        }}
+                        className={classNames(
+                          'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
+                          THEME.accentBg,
+                          THEME.accentRing
+                        )}
+                      >
+                        Salin Alamat
+                        <svg viewBox="0 0 24 24" className="h-4 w-4">
+                          <path
+                            fill="currentColor"
+                            d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : <div>
+                    <button
+                      className={classNames(
+                        'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
+                        THEME.accentBg,
+                        THEME.accentRing
+                      )}
+                    >
+                      Salin Alamat
+                      <svg viewBox="0 0 24 24" className="h-4 w-4">
+                        <path
+                          fill="currentColor"
+                          d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                }
               </div>
             </div>
 
@@ -872,116 +1525,214 @@ export default function WeddingInvitationPage() {
 
             {/* Wishlist Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  name: 'Set Peralatan Makan Keramik',
-                  price: 'Rp 1.500.000',
-                  qty: 1,
-                  url: '#',
-                },
-                {
-                  name: 'Sprei Premium King Size',
-                  price: 'Rp 2.200.000',
-                  qty: 1,
-                  url: '#',
-                },
-                {
-                  name: 'Vas Kaca Dekoratif',
-                  price: 'Rp 750.000',
-                  qty: 2,
-                  url: '#',
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className={classNames(
-                    'rounded-3xl border p-5 backdrop-blur transition',
-                    THEME.borderSoft,
-                    THEME.cardBg
-                  )}
-                >
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <div className="text-white font-medium leading-snug">
-                        {item.name}
-                      </div>
-
-                      <div className="mt-2 text-sm text-white/70 space-y-1">
-                        <div>
-                          <span className="text-white/80">Perkiraan Harga:</span>{' '}
-                          {item.price}
+              {
+                datasWs !== null ? datasWs.map((x, i) => (
+                  <div
+                    key={i}
+                    className={classNames(
+                      'rounded-3xl border p-5 backdrop-blur transition',
+                      THEME.borderSoft,
+                      THEME.cardBg
+                    )}
+                  >
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <div className="text-white font-medium leading-snug">
+                          {x.name}{x.qty === x.reserve_qty && " (FULL)"}
                         </div>
-                        <div>
-                          <span className="text-white/80">Jumlah:</span>{' '}
-                          {item.qty} Unit • Direservasi: 1 Unit
+
+                        <div className="mt-2 text-sm text-white/70 space-y-1">
+                          <div>
+                            <span className="text-white/80">Perkiraan Harga:</span>{' '}
+                            {x.product_price}
+                          </div>
+                          <div>
+                            <span className="text-white/80">Jumlah:</span>{' '}
+                            {x.qty} Unit • Direservasi: {x.reserve_qty} Unit
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className='flex justify-between items-center gap-3'>
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={classNames(
-                          'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
-                          'border border-amber-300 text-amber-300',
-                          'flex-1'
-                        )}
-                      >
-                        Lihat
-                      </a>
-                      <button
-                        className={classNames(
-                          'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
-                          THEME.accentBg,
-                          THEME.accentRing,
-                          'text-black',
-                        )}
-                      >
-                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
-                      </button>
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href={x.product_url ?? ""}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={classNames(
+                            'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                            'border border-amber-300 text-amber-300',
+                            'flex-1'
+                          )}
+                        >
+                          Lihat
+                        </a>
+                        <button
+                          onClick={() => openModalWislist(x.id)}
+                          className={classNames(
+                            'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                            THEME.accentBg,
+                            THEME.accentRing,
+                            'text-black',
+                          )}
+                        >
+                          Reservasi <i className='bx bx-gift text-base ml-1'></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )) : [
+                  {
+                    name: 'Set Peralatan Makan Keramik',
+                    price: 'Rp 1.500.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Sprei Premium King Size',
+                    price: 'Rp 2.200.000',
+                    qty: 1,
+                    url: '#',
+                  },
+                  {
+                    name: 'Vas Kaca Dekoratif',
+                    price: 'Rp 750.000',
+                    qty: 2,
+                    url: '#',
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className={classNames(
+                      'rounded-3xl border p-5 backdrop-blur transition',
+                      THEME.borderSoft,
+                      THEME.cardBg
+                    )}
+                  >
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <div className="text-white font-medium leading-snug">
+                          {item.name}
+                        </div>
+
+                        <div className="mt-2 text-sm text-white/70 space-y-1">
+                          <div>
+                            <span className="text-white/80">Perkiraan Harga:</span>{' '}
+                            {item.price}
+                          </div>
+                          <div>
+                            <span className="text-white/80">Jumlah:</span>{' '}
+                            {item.qty} Unit • Direservasi: 1 Unit
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={classNames(
+                            'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                            'border border-amber-300 text-amber-300',
+                            'flex-1'
+                          )}
+                        >
+                          Lihat
+                        </a>
+                        <button
+                          className={classNames(
+                            'inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-xs font-semibold transition',
+                            THEME.accentBg,
+                            THEME.accentRing,
+                            'text-black',
+                          )}
+                        >
+                          Reservasi <i className='bx bx-gift text-base ml-1'></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
             </div>
 
             {/* ====================================================== */}
             {/* PAGINATION UI (UI ONLY)                                */}
             {/* ====================================================== */}
-            <div className="mt-10 flex flex-col items-center gap-4">
-              <div className="flex flex-wrap justify-center gap-2">
-                <button
-                  className={classNames(
-                    'h-10 w-10 rounded-full text-xs font-semibold text-black',
-                    THEME.accentBg
-                  )}
-                >
-                  1
-                </button>
-                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
-                  2
-                </button>
-                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
-                  3
-                </button>
-                <span className="px-2 text-white/50 text-xs self-center">…</span>
-                <button className="h-10 w-10 rounded-full border text-xs text-white/70">
-                  8
-                </button>
-              </div>
+            {
+              datasWs !== null ? <div className="mt-10 flex flex-col items-center gap-4">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {
+                    Array.from({ length: totalPageWs }, (x, i) => {
+                      const numberPage = i + 1;
+                      return <button key={i}
+                        onClick={() => changePaginateWs(numberPage)}
+                        className={`h-10 w-10 rounded-full text-xs ${pageTableWs === numberPage ? "font-semibold text-black " + THEME.accentBg : "border text-white/70"}`}>
+                        {numberPage}
+                      </button>
+                    })
+                  }
+                </div>
 
-              <div className="flex w-full max-w-xs gap-4">
-                <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
-                  Prev
-                </button>
-                <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
-                  Next
-                </button>
+                <div className="flex w-full max-w-xs gap-4">
+                  <button
+                    disabled={pageTableWs <= 1}
+                    onClick={() => {
+                      if (pageTableWs >= 1) changePaginateWs(pageTableWs - 1);
+                    }}
+                    className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                    Prev
+                  </button>
+                  <button
+                    disabled={pageTableWs >= totalPageWs}
+                    onClick={() => {
+                      if (pageTableWs <= totalPageWs) changePaginateWs(pageTableWs + 1);
+                    }}
+                    className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                    Next
+                  </button>
+                </div>
+              </div> : <div className="mt-10 flex flex-col items-center gap-4">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button
+                    className={classNames(
+                      'h-10 w-10 rounded-full text-xs font-semibold text-black',
+                      THEME.accentBg
+                    )}
+                  >
+                    1
+                  </button>
+                  <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                    2
+                  </button>
+                  <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                    3
+                  </button>
+                  <span className="px-2 text-white/50 text-xs self-center">…</span>
+                  <button className="h-10 w-10 rounded-full border text-xs text-white/70">
+                    8
+                  </button>
+                </div>
+
+                <div className="flex w-full max-w-xs gap-4">
+                  <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                    Prev
+                  </button>
+                  <button className="flex-1 rounded-full border px-4 py-3 text-xs text-white/70">
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            }
           </div>
+
+          <ModalWishlist
+            open={openedModalWs}
+            setOpen={setOpenedModalWs}
+            wishlist_id={wishlistActiveId}
+            barcode={invtParams.code ?? ""}
+            fatchWishlist={fatchWishlist}
+          />
         </div>
       </section>
 
@@ -990,30 +1741,50 @@ export default function WeddingInvitationPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <h2 className={classNames(playfair.className, 'text-3xl text-white md:text-4xl')}>Pertanyaan Umum</h2>
           <div className="mt-6 divide-y divide-white/10 rounded-3xl border backdrop-blur md:mt-8">
-            {[
-              { q: 'Apakah boleh membawa anak?', a: 'Tentu, kami dengan senang hati menyambut keluarga Anda.' },
-              { q: 'Apakah tersedia parkir?', a: 'Tersedia lahan parkir cukup luas di area gedung.' },
-              { q: 'Kapan waktu terbaik untuk hadir?', a: 'Mohon hadir 15–30 menit sebelum jadwal agar lebih nyaman.' },
-              { q: 'Apakah ada protokol kesehatan?', a: 'Silakan gunakan masker jika diperlukan dan jaga kebersihan tangan.' },
-            ].map((item, i) => {
-              const open = openFaq === i;
-              return (
-                <div key={i} className={classNames('overflow-hidden transition', open ? 'bg-white/5' : '')}>
-                  <button
-                    onClick={() => setOpenFaq(open ? null : i)}
-                    className="flex w-full items-center justify-between px-5 py-4 text-left text-white/90"
-                  >
-                    <span className="font-medium">{item.q}</span>
-                    <span className={classNames('transition-transform', open ? 'rotate-180' : '')}>
-                      <svg viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M7 10l5 5 5-5z" /></svg>
-                    </span>
-                  </button>
-                  <div className={classNames('px-5 pb-5 text-white/70', open ? 'block' : 'hidden')}>
-                    {item.a}
+            {
+              eventDatas ? eventDatas.event_faq.map((x, i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={i} className={classNames('overflow-hidden transition', open ? 'bg-white/5' : '')}>
+                    <button
+                      onClick={() => setOpenFaq(open ? null : i)}
+                      className="flex w-full items-center justify-between px-5 py-4 text-left text-white/90"
+                    >
+                      <span className="font-medium">{x.question}</span>
+                      <span className={classNames('transition-transform', open ? 'rotate-180' : '')}>
+                        <svg viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M7 10l5 5 5-5z" /></svg>
+                      </span>
+                    </button>
+                    <div className={classNames('px-5 pb-5 text-white/70', open ? 'block' : 'hidden')}>
+                      {x.answer}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              }) : [
+                { q: 'Apakah boleh membawa anak?', a: 'Tentu, kami dengan senang hati menyambut keluarga Anda.' },
+                { q: 'Apakah tersedia parkir?', a: 'Tersedia lahan parkir cukup luas di area gedung.' },
+                { q: 'Kapan waktu terbaik untuk hadir?', a: 'Mohon hadir 15–30 menit sebelum jadwal agar lebih nyaman.' },
+                { q: 'Apakah ada protokol kesehatan?', a: 'Silakan gunakan masker jika diperlukan dan jaga kebersihan tangan.' },
+              ].map((item, i) => {
+                const open = openFaq === i;
+                return (
+                  <div key={i} className={classNames('overflow-hidden transition', open ? 'bg-white/5' : '')}>
+                    <button
+                      onClick={() => setOpenFaq(open ? null : i)}
+                      className="flex w-full items-center justify-between px-5 py-4 text-left text-white/90"
+                    >
+                      <span className="font-medium">{item.q}</span>
+                      <span className={classNames('transition-transform', open ? 'rotate-180' : '')}>
+                        <svg viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M7 10l5 5 5-5z" /></svg>
+                      </span>
+                    </button>
+                    <div className={classNames('px-5 pb-5 text-white/70', open ? 'block' : 'hidden')}>
+                      {item.a}
+                    </div>
+                  </div>
+                );
+              })
+            }
           </div>
         </div>
       </section>
@@ -1021,12 +1792,14 @@ export default function WeddingInvitationPage() {
       {/* Footer */}
       <footer className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-12">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
-              <div className={classNames(greatVibes.className, 'text-3xl', THEME.accent)}>A & R</div>
-              <p className="mt-2 text-white/70">Terima kasih telah menjadi bagian dari momen istimewa kami.</p>
+          <div className="grid gap-8 grid-cols-12">
+            <div className='col-span-12 md:col-span-4'>
+              <div className={classNames(greatVibes.className, 'text-3xl', THEME.accent)}>{groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "R"}</div>
+              <p className="mt-2 text-white/70">
+                {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}
+              </p>
             </div>
-            <div>
+            <div className='col-span-12 md:col-span-2'>
               <div className="text-white">Navigasi</div>
               <div className="mt-3 grid gap-2 text-white/70">
                 {NAV.map((n) => (
@@ -1036,14 +1809,14 @@ export default function WeddingInvitationPage() {
                 ))}
               </div>
             </div>
-            <div>
+            <div className='col-span-12 md:col-span-3'>
               <div className="text-white">Kontak</div>
               <div className="mt-3 grid gap-2 text-white/70">
-                <span>WA: 0812-3456-7890</span>
-                <span>Email: undangan@alya-rizky.id</span>
+                <span>Phone/WA: {eventDatas?.contact_phone ?? "-"}</span>
+                <span>Email: {eventDatas?.contact_email ?? "-"}</span>
               </div>
             </div>
-            <div>
+            <div className='col-span-12 md:col-span-3'>
               <div className="text-white">Sosial Media</div>
               <div className="mt-3 flex gap-3">
                 {['Instagram', 'Facebook', 'X'].map((s, i) => (
@@ -1056,14 +1829,22 @@ export default function WeddingInvitationPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/60 md:flex-row">
-            <div>© {new Date().getFullYear()} Alya & Rizky Wedding</div>
+            <div>© {new Date().getFullYear()} • {groom?.shortname ?? "Alya"} & {bride?.shortname ?? "Rizky"} Wedding</div>
             <div>Designed by <a href={Configs.base_url} target='_blank' className='text-amber-300'>Wedlyvite</a></div>
           </div>
         </div>
       </footer>
 
       {/* Tombol back-to-top */}
-      <BackToTop />
+      {/* <BackToTop /> */}
+      <FloatingActionButton
+        isMusic={isMusic}
+        setIsMusic={setIsMusic}
+        musicUrl={eventDatas ? eventDatas.music_url ?? (musicThemeWedding?.items[0].url ?? "") : (musicThemeWedding?.items[0].url ?? "")}
+        qrValue={invtParams.code ?? "Wedlyvite"}
+        guestName={eventDatas?.event_rsvp.name ?? "Thomas Edison"}
+        eventDate={formatDate(eventDatas?.event_time ?? TARGET_DATE, "full")}
+      />
     </main>
   );
 }

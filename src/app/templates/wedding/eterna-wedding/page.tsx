@@ -529,7 +529,6 @@ export default function WeddingInvitationPage() {
                   </div>
                 })
               }
-
             </div> : <div className="grid md:grid-cols-2 gap-6 md:gap-10">
               {[
                 {
@@ -896,7 +895,15 @@ export default function WeddingInvitationPage() {
             onSubmit={onSubmitRSVP}
             className="grid md:grid-cols-2 gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
           >
-            <Field disabled={eventDatas !== null} value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} label="Nama" id="nama" placeholder="Nama lengkap" required />
+            <Field
+              disabled={eventDatas !== null}
+              value={rsvpName}
+              onChange={(e) => setRsvpName(e.target.value)}
+              label="Nama"
+              id="nama"
+              placeholder="Nama lengkap"
+              required
+            />
             <Field
               value={rsvpHp} onChange={(e) => setRsvpHp(e.target.value)}
               label="No. HP/WA"
@@ -1211,19 +1218,37 @@ export default function WeddingInvitationPage() {
                   Alamat Pengiriman
                 </p>
                 <p className="my-3 text-sm text-stone-200 leading-relaxed">
-                  Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia
+                  {
+                    eventDatas ?
+                      (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
+                      : "Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia"
+                  }
                 </p>
-                <button
-                  onClick={() => {
-                    copyToClipboard("Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia");
-                    toast({
-                      type: "success",
-                      title: "Copy to Clipboard",
-                      message: "Well done, Text copied to clipboard.",
-                    });
-                  }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
-                  Salin
-                </button>
+                {
+                  eventDatas ? (
+                    eventDatas.wishlist_address && <button
+                      onClick={() => {
+                        copyToClipboard(eventDatas.wishlist_address ?? "");
+                        toast({
+                          type: "success",
+                          title: "Copy to Clipboard",
+                          message: "Well done, Text copied to clipboard.",
+                        });
+                      }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
+                      Salin
+                    </button>
+                  ) : <button
+                    onClick={() => {
+                      copyToClipboard("Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia");
+                      toast({
+                        type: "success",
+                        title: "Copy to Clipboard",
+                        message: "Well done, Text copied to clipboard.",
+                      });
+                    }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
+                    Salin
+                  </button>
+                }
               </div>
 
               <p className="my-2 text-sm text-stone-300 leading-relaxed">
@@ -1420,7 +1445,7 @@ export default function WeddingInvitationPage() {
         {/* Footer */}
         <footer className="py-12 text-center text-stone-400">
           <p className="text-sm">
-            © {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} Aisyah & Bagas
+            © {eventDatas ? (eventDatas.event_time?.getFullYear() ?? new Date().getFullYear()) : new Date().getFullYear()} {groom?.shortname ?? "Aisyah"} & {bride?.shortname ?? "Bagas"}
           </p>
           <div className="text-sm mt-1">Designed by <a href={Configs.base_url} target='_blank' className='text-white underline'>Wedlyvite</a></div>
         </footer>

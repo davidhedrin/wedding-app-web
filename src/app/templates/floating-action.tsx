@@ -42,6 +42,13 @@ export default function FloatingActionButton({
     };
   }, [open]);
 
+  const [showBtnToTp, setShowBtnToTp] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowBtnToTp(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
       <div ref={fabRef} className="fixed bottom-5 right-5 flex flex-col items-center gap-3 z-50">
@@ -87,10 +94,21 @@ export default function FloatingActionButton({
         {/* Main FAB */}
         <button
           onClick={() => setOpen(!open)}
-          className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xl hover:bg-blue-700 transition"
+          className="w-11 h-11 rounded-full flex items-center justify-center border border-white/30 bg-black/60 p-2.5 text-white/80 backdrop-blur transition hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50"
         >
-          <i className={`bx text-2xl transition-transform duration-300 ${open ? "bx-x rotate-90" : "bx-plus"}`}></i>
+          <i className={`bx text-xl transition-transform duration-300 ${open ? "bx-x rotate-90" : "bx-plus"}`}></i>
         </button>
+
+        {/* To Top */}
+        {
+          showBtnToTp && <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="rounded-full border border-white/30 bg-black/60 p-2.5 text-white/80 backdrop-blur transition hover:text-white"
+            aria-label="Kembali ke atas"
+          >
+            <svg viewBox="0 0 24 24" className="h-6 w-6"><path fill="currentColor" d="M7 14l5-5l5 5H7z" /></svg>
+          </button>
+        }
       </div>
 
       {/* ================= MODAL QR ================= */}
