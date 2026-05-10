@@ -339,7 +339,18 @@ export default function WeddingInvitationPage() {
     });
   };
 
-  if (isLoading) return <LoadingUI className="bg-linear-to-br from-indigo-900 via-indigo-950 to-black" activeTitle={false} />
+  if (isLoading) return <div>
+    <div className="absolute inset-0">
+      <img
+        src={bgImage.src}
+        alt="cover"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+    </div>
+    
+    <LoadingUI activeTitle={false} />
+  </div>
 
   return (
     <main className={classNames('min-h-screen scroll-smooth', jakarta.className)}>
@@ -454,24 +465,26 @@ export default function WeddingInvitationPage() {
       <section id="hero" className="relative">
         {/* Background carousel */}
         <div className="relative h-[82vh] w-full overflow-hidden md:h-[88vh]">
-          {IMAGES.map((src, idx) => (
+          <div className="absolute inset-0">
+            {/* Background image */}
+            <img
+              src={eventDatas ? eventDatas.couple_img_path ?? IMAGES[0] : IMAGES[0]}
+              alt="Background"
+              className="h-full w-full object-cover"
+            />
+
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/40 to-black/70" />
+
+            {/* Extra effect */}
             <div
-              key={idx}
-              className={classNames(
-                'absolute inset-0 transition-opacity duration-1200 ease-out',
-                slide === idx ? 'opacity-100' : 'opacity-0'
-              )}
-            >
-              {/* pakai Image untuk optimasi, fallback dengan style bg */}
-              <img
-                src={src}
-                alt="Background"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/40 to-black/70" />
-              <div className="absolute inset-0 mix-blend-overlay opacity-30" style={{ backgroundImage: 'radial-gradient(circle at 20% 10%, rgba(255,255,255,0.15), transparent 35%)' }} />
-            </div>
-          ))}
+              className="absolute inset-0 mix-blend-overlay opacity-30"
+              style={{
+                backgroundImage:
+                  'radial-gradient(circle at 20% 10%, rgba(255,255,255,0.15), transparent 35%)',
+              }}
+            />
+          </div>
 
           {/* Konten hero */}
           <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center text-white">
@@ -1791,15 +1804,15 @@ export default function WeddingInvitationPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-12">
+        <div className="mx-auto max-w-5xl px-4 py-12">
           <div className="grid gap-8 grid-cols-12">
-            <div className='col-span-12 md:col-span-4'>
+            <div className='col-span-12 md:col-span-5'>
               <div className={classNames(greatVibes.className, 'text-3xl', THEME.accent)}>{groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "R"}</div>
               <p className="mt-2 text-white/70">
                 {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}
               </p>
             </div>
-            <div className='col-span-12 md:col-span-2'>
+            <div className='col-span-12 md:col-span-3'>
               <div className="text-white">Navigasi</div>
               <div className="mt-3 grid gap-2 text-white/70">
                 {NAV.map((n) => (
@@ -1809,22 +1822,11 @@ export default function WeddingInvitationPage() {
                 ))}
               </div>
             </div>
-            <div className='col-span-12 md:col-span-3'>
+            <div className='col-span-12 md:col-span-4'>
               <div className="text-white">Kontak</div>
               <div className="mt-3 grid gap-2 text-white/70">
                 <span>Phone/WA: {eventDatas ? eventDatas.contact_phone ?? "-" : "0812-3456-7890"}</span>
                 <span>Email: {eventDatas ? eventDatas.contact_email ?? "-" : "undangan@alya-rizky.id"}</span>
-              </div>
-            </div>
-            <div className='col-span-12 md:col-span-3'>
-              <div className="text-white">Sosial Media</div>
-              <div className="mt-3 flex gap-3">
-                {['Instagram', 'Facebook', 'X'].map((s, i) => (
-                  <a key={i} href="#" className={classNames('inline-flex items-center justify-center rounded-full p-2 text-white/80 transition hover:text-white', 'border border-white/20')}>
-                    <svg viewBox="0 0 24 24" className="h-5 w-5"><circle cx="12" cy="12" r="10" fill="currentColor" className="opacity-30" /><path d="M7 12h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                    <span className="sr-only">{s}</span>
-                  </a>
-                ))}
               </div>
             </div>
           </div>

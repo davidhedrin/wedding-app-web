@@ -8,17 +8,18 @@ import ContentComponent from "../comp-content";
 import { useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
 import TableTopToolbar from "@/components/table-top-toolbar";
-import { FormState, RsvpStatsParams, TableShortList, TableThModel } from "@/lib/model-types";
+import { FormState, RsvpStatsParams, RsvpUploadExcelProps, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
 import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
-import z from "zod";
+import z, { any } from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
 import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 import { GetDataEventWithSelect } from "@/server/event";
+import * as XLSX from "xlsx";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -2900,6 +2901,8 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const { activeIdxTab } = useTabEventDetail();
   const modalAddEdit = "modal-add-edit-rsvp-wedding";
   const btnCloseModal = "btn-close-modal-rsvp-wedding";
+  const modalUploadRsvp = "modal-upload-rsvp";
+  const btnCloseModalRsvp = "btn-close-modal-upload-rsvp";
 
   const [inputPage, setInputPage] = useState("1");
   const [pageTable, setPageTable] = useState(1);
@@ -3116,6 +3119,178 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     setLoading(false);
   };
 
+  const [showGuidelineRsvpData, setShowGuidelineRsvpData] = useState(true);
+  const [tempUploadRsvpData, setTempUploadRsvpData] = useState<RsvpUploadExcelProps[] | null>(null);
+  const REQUIRED_HEADERS_RSVP = [
+    "Phone Number",
+    "Name*",
+  ];
+  const inputRefRsvpExcel = useRef<HTMLInputElement>(null);
+  const resetUploadExcelRsvp = () => {
+    setTempUploadRsvpData(null);
+    setShowGuidelineRsvpData(true);
+
+    if (inputRefRsvpExcel.current) {
+      inputRefRsvpExcel.current.value = "";
+    }
+  };
+  const handleFileUploadExcelChange = async (e: { target: { files: FileList | null } }) => {
+    try {
+      const allowedTypes = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+        "application/vnd.ms-excel", // .xls
+      ];
+
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          type: "warning",
+          title: "Invalid File",
+          message: "Only Excel files (.xlsx, .xls) are allowed."
+        });
+        if (inputRefRsvpExcel.current) {
+          if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
+          inputRefRsvpExcel.current.value = "";
+        }
+        return;
+      };
+
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      const workbook = XLSX.read(uint8Array, {
+        type: "array",
+      });
+
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      const rows = XLSX.utils.sheet_to_json<(string | number)[]>(
+        worksheet,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+      const excelHeaders = (rows[0] || []).map((item) =>
+        String(item)
+      );
+
+      // for (const header of REQUIRED_HEADERS_RSVP) {
+      //   if (!excelHeaders.includes(header)) {
+      //     toast({
+      //       type: "warning",
+      //       title: "Invalid File",
+      //       message: `Colomn "${header}" is missing! Please do not change the header name`
+      //     });
+      //     return;
+      //   }
+      // }
+
+      const isHeaderMatch = JSON.stringify(excelHeaders) === JSON.stringify(REQUIRED_HEADERS_RSVP);
+      if (!isHeaderMatch) {
+        toast({
+          type: "warning",
+          title: "Invalid File",
+          message: `Column format is invalid! Please not change the header format or position`
+        });
+        if (inputRefRsvpExcel.current) {
+          if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
+          inputRefRsvpExcel.current.value = "";
+        }
+        return;
+      }
+
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+        defval: "",
+      });
+
+
+      setTempUploadRsvpData(
+        jsonData.filter((x: any) => x["Name*"]?.trim()).map((x: any) => ({
+          name: x["Name*"].trim(),
+          phone: x["Phone Number"]?.trim() || null,
+        }))
+      );
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again"
+      });
+      if (inputRefRsvpExcel.current) {
+        if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
+        inputRefRsvpExcel.current.value = "";
+      }
+    }
+  };
+
+  const handleDragOverUploadExcel = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.add('bg-gray-100', 'rounded-xl');
+  };
+  const handleDragLeaveUploadExcel = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
+  };
+  const handleDropUploadExcel = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('bg-gray-100', 'rounded-xl');
+
+    const files = e.dataTransfer.files;
+    handleFileUploadExcelChange({ target: { files } });
+  };
+
+  const handleSubmitUploadRsvp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      if (!(tempUploadRsvpData !== null && tempUploadRsvpData.length > 0)) return;
+
+      modalAction(btnCloseModalRsvp);
+      const confirmed = await showConfirm({
+        title: 'Submit Confirmation?',
+        message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
+        confirmText: 'Yes, Submit',
+        cancelText: 'No, Go Back',
+        icon: 'bx bx-error bx-tada text-blue-500'
+      });
+      if (!confirmed) {
+        modalAction(`btn-${modalUploadRsvp}`);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        // await StoreUpdateEventRSVP(event_id, createDtoData());
+        await fatchDatas();
+        toast({
+          type: "success",
+          title: "Submit successfully",
+          message: "Your submission has been successfully completed"
+        });
+      } catch (error: any) {
+        toast({
+          type: "warning",
+          title: "Request Failed",
+          message: error.message
+        });
+        modalAction(`btn-${modalUploadRsvp}`);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      toast({
+        type: "warning",
+        title: "Something's gone wrong",
+        message: "We can't proccess your request, Please try again."
+      });
+    }
+  };
+
   useEffect(() => {
     if (isFirstRender) return;
     if (tblSortList.length === 0) fatchDatas();
@@ -3260,18 +3435,28 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
 
       <div className="bg-white border border-gray-200 rounded-xl p-3">
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="pb-4">
-            <TableTopToolbar
-              inputSearch={inputSearch}
-              tblSortList={tblSortList}
-              thColomn={tblThColomns}
-              setTblThColomns={setTblThColomns}
-              setTblSortList={setTblSortList}
-              setInputSearch={setInputSearch}
-              fatchData={() => fatchDatas(pageTable)}
+          <div className="flex flex-col sm:flex-row gap-2 pb-4">
+            <button type="button"
+              id={`btn-${modalUploadRsvp}`}
+              // onClick={resetUploadExcelRsvp}
+              aria-haspopup="dialog" aria-expanded="false" aria-controls={modalUploadRsvp} data-hs-overlay={`#${modalUploadRsvp}`}
+              className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <i className='bx bx-spreadsheet text-lg me-1'></i> Upload
+            </button>
+            <div className="flex-1">
+              <TableTopToolbar
+                inputSearch={inputSearch}
+                tblSortList={tblSortList}
+                thColomn={tblThColomns}
+                setTblThColomns={setTblThColomns}
+                setTblSortList={setTblSortList}
+                setInputSearch={setInputSearch}
+                fatchData={() => fatchDatas(pageTable)}
 
-              openModal={openModalAddEdit}
-            />
+                openModal={openModalAddEdit}
+              />
+            </div>
           </div>
 
           <TablePagination
@@ -3457,6 +3642,215 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                     Close
                   </button>
                   <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </UiPortal>
+
+      <UiPortal>
+        <div id={modalUploadRsvp} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+          <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <form onSubmit={handleSubmitUploadRsvp} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm">
+                    <i className='bx bx-spreadsheet text-lg'></i> Upload RSVP
+                  </div>
+                </div>
+                <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalUploadRsvp}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                <div className="rounded-2xl border border-slate-200 bg-slate-100/80 p-4 mb-4">
+                  <div className="w-full flex items-start justify-between gap-3 text-left">
+                    <div className="flex items-start gap-2">
+                      {/* Icon */}
+                      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                        <i className="bx bx-info-circle text-lg"></i>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1">
+                        <div className="text-sm font-semibold text-slate-800">
+                          Upload Guideline!
+                        </div>
+
+                        <p className="text-sm text-slate-500">
+                          Review the instructions before uploading.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Toggle Icon */}
+                    <button type="button" onClick={() => setShowGuidelineRsvpData(!showGuidelineRsvpData)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg hover:bg-slate-200 transition">
+                      <i
+                        className={`bx text-2xl text-slate-500 transition-transform duration-200 ${showGuidelineRsvpData
+                          ? "bx-chevron-up"
+                          : "bx-chevron-down"
+                          }`}
+                      ></i>
+                    </button>
+                  </div>
+
+                  {
+                    showGuidelineRsvpData && <div className="mt-3 space-y-3">
+                      {
+                        [
+                          {
+                            numberBg: "bg-amber-100 text-amber-600",
+                            description: <>
+                              Get file template and follow the provided format to ensure successful import.
+                              <div className="mt-1">
+                                <a href="/RSVP_Template.xlsx" className="inline-flex items-center justify-center gap-x-1 text-sm font-medium text-blue-500">
+                                  <i className='bx bx-download text-lg'></i> <span className=" hover:underline">Download Template (.xlsx)</span>
+                                </a>
+                              </div>
+                            </>,
+                          },
+                          {
+                            numberBg: "bg-red-100 text-red-600",
+                            description: (
+                              <>
+                                Fields marked with{" "}
+                                <span className="font-semibold text-red-500">*</span> are required and
+                                must be filled in.
+                              </>
+                            ),
+                          },
+                          {
+                            numberBg: "bg-blue-100 text-blue-600",
+                            description: "Do not rename or modify the column. Do not move, delete, or add additional headers in the template file.",
+                          },
+                          {
+                            numberBg: "bg-emerald-100 text-emerald-600",
+                            description: <>
+                              Use string/text format for the <span className="font-semibold">Phone Number</span> column or leave empty if doesn't exist.
+                              <p>Example: 0812xxxxxxxx</p>
+                            </>,
+                          },
+                        ].map((x, i) => (
+                          <div key={i} className="flex items-start gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2">
+                            <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${x.numberBg}`}>
+                              {i + 1}
+                            </div>
+
+                            <div className="text-sm leading-6 text-slate-600">
+                              {x.description}
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  }
+                </div>
+
+                {
+                  tempUploadRsvpData === null ? <div onDragOver={handleDragOverUploadExcel} onDrop={handleDropUploadExcel} onDragLeave={handleDragLeaveUploadExcel} className="hover:bg-gray-100 rounded-xl">
+                    <label htmlFor="file-upload-rsvp-excel" className="cursor-pointer px-6 h-40 flex justify-center items-center bg-transparent border-2 border-dashed border-gray-300 rounded-xl">
+                      <div className="text-center">
+                        <span className="inline-flex justify-center items-center">
+                          <svg className="shrink-0 w-11 h-auto" width="71" height="51" viewBox="0 0 71 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.55172 8.74547L17.7131 6.88524V40.7377L12.8018 41.7717C9.51306 42.464 6.29705 40.3203 5.67081 37.0184L1.64319 15.7818C1.01599 12.4748 3.23148 9.29884 6.55172 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-emerald-600"></path>
+                            <path d="M64.4483 8.74547L53.2869 6.88524V40.7377L58.1982 41.7717C61.4869 42.464 64.703 40.3203 65.3292 37.0184L69.3568 15.7818C69.984 12.4748 67.7685 9.29884 64.4483 8.74547Z" stroke="currentColor" strokeWidth="2" className="stroke-emerald-600"></path>
+                            <rect x="17.5656" y="1" width="35.8689" height="42.7541" rx="5" stroke="currentColor" strokeWidth="2" className="fill-white stroke-emerald-600"></rect>
+                            <rect x="17.5656" y="1" width="35.8689" height="8.5" rx="5" className="fill-emerald-600"></rect>
+                            <path d="M26 14V38" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M35.5 14V38" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M45 14V38" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M22 20H49" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M22 27H49" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M22 34H49" stroke="currentColor" strokeWidth="1.8" className="stroke-emerald-500"></path>
+                            <path d="M24 15L31 24" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="stroke-emerald-700"></path>
+                            <path d="M31 15L24 24" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="stroke-emerald-700"></path>
+                          </svg>
+                        </span>
+
+                        <div className="flex flex-wrap justify-center text-sm/6 text-gray-600 mt-2">
+                          <span className="pe-1 font-medium text-gray-800">
+                            Drop file here or click to
+                          </span>
+                          <span className="font-semibold text-blue-600 hover:underline">
+                            browse
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-gray-400 mt-0">
+                          Allowed formats only .XLSX
+                        </p>
+
+                        <input
+                          ref={inputRefRsvpExcel}
+                          type="file"
+                          onChange={handleFileUploadExcelChange}
+                          id="file-upload-rsvp-excel"
+                          className="hidden"
+                          accept=".xlsx,.xls"
+                        />
+                      </div>
+                    </label>
+                  </div> : <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-6 h-6 text-emerald-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+
+                        <div>
+                          <div className="text-sm font-semibold text-gray-800">
+                            Uploaded Successfully
+                          </div>
+
+                          <p className="text-sm text-gray-500">
+                            Total data:
+                            <span className="font-semibold text-emerald-600 ms-1">
+                              {tempUploadRsvpData.length}
+                            </span> {tempUploadRsvpData.length > 1 ? "Rows" : "Row"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={resetUploadExcelRsvp}
+                        className="px-3 py-1.5 text-sm font-medium rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50 transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModalRsvp} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalUploadRsvp}`}>
+                    Close
+                  </button>
+                  <button disabled={!(tempUploadRsvpData !== null && tempUploadRsvpData.length > 0)} type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                     Submit
                   </button>
                 </div>

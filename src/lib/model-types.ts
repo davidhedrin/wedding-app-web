@@ -165,3 +165,8 @@ export type RsvpStatsParams = {
   no_response: number;
   present_persons: number;
 };
+
+export type RsvpUploadExcelProps = {
+  name: string;
+  phone: string | null;
+}

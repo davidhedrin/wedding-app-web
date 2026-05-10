@@ -74,7 +74,7 @@ Spesifikasi:
 - RSVP (form dengan validasi sederhana)
 - Hadiah
 - FAQ (accordion interaktif)
-- Footer dengan 3 colomn kata ucapan dari mempelai, navigasi lengkap, dan informasi kontak
+- Footer dengan 3 colomn kata ucapan dari mempelai, navigasi lengkap, dan informasi kontak (Phone/WA dan Email)
 6. Gunakan gambar ini untuk SEMUA gambar: http://localhost:3005/assets/img/2149043983.jpg
 7. Tambahkan banyak detail kecil:
 - Hover glow
