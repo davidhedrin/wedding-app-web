@@ -4,7 +4,7 @@ import { CommonParams, PaginateResult, RsvpStatsParams, UploadFileRespons } from
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
@@ -700,6 +700,20 @@ export async function DeleteDataEventRsvp(id: number) {
     throw error;
   }
 };
+
+export async function StoreUploadExcelRsvp(datas: DtoUploadRsvp[]) {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+    
+    await db.eventRsvp.createMany({
+      data: datas
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
 
 export async function ChangeDataEventPosting(id: number, status: boolean) {
   try {

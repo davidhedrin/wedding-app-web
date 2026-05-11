@@ -201,6 +201,14 @@ export type DtoEventRsvp = {
   phone: string | null;
 };
 
+export type DtoUploadRsvp = {
+  event_id: number;
+  barcode: string;
+  name: string;
+  phone: string;
+  createdBy: string | null;
+};
+
 export type DtoAttendanceRsvp = {
   rsvp_hp: string | null;
   rsvp_att: RsvpStatusEnum | null;
