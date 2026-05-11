@@ -2,21 +2,21 @@ import DatePicker from "@/components/ui/date-picker";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
-import { copyToClipboard, ExtractYtID, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, toast, toOrdinal } from "@/lib/utils";
+import { copyToClipboard, ExtractYtID, getMonthName, inputFormatPriceIdr, modalAction, normalizeSelectObj, parseFromIDR, playMusic, showConfirm, sortListToOrderBy, stopMusic, stringWithTimestamp, toast, toOrdinal } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import ContentComponent from "../comp-content";
-import { useTabEventDetail } from "@/lib/zustand";
+import { userLoginData, useTabEventDetail } from "@/lib/zustand";
 import dynamic from "next/dynamic";
 import TableTopToolbar from "@/components/table-top-toolbar";
-import { FormState, RsvpStatsParams, RsvpUploadExcelProps, TableShortList, TableThModel } from "@/lib/model-types";
+import { FormState, RsvpStatsParams, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
 import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
-import z, { any } from "zod";
+import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, UpdateShippingAddress } from "@/server/event-detail";
+import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, StoreUploadExcelRsvp, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 import { GetDataEventWithSelect } from "@/server/event";
 import * as XLSX from "xlsx";
@@ -2904,6 +2904,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const modalUploadRsvp = "modal-upload-rsvp";
   const btnCloseModalRsvp = "btn-close-modal-upload-rsvp";
 
+  const { userData } = userLoginData();
   const [inputPage, setInputPage] = useState("1");
   const [pageTable, setPageTable] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -3120,7 +3121,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   };
 
   const [showGuidelineRsvpData, setShowGuidelineRsvpData] = useState(true);
-  const [tempUploadRsvpData, setTempUploadRsvpData] = useState<RsvpUploadExcelProps[] | null>(null);
+  const [tempUploadRsvpData, setTempUploadRsvpData] = useState<DtoUploadRsvp[] | null>(null);
   const REQUIRED_HEADERS_RSVP = [
     "Phone Number",
     "Name*",
@@ -3134,6 +3135,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
       inputRefRsvpExcel.current.value = "";
     }
   };
+
   const handleFileUploadExcelChange = async (e: { target: { files: FileList | null } }) => {
     try {
       const allowedTypes = [
@@ -3207,11 +3209,13 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         defval: "",
       });
 
-
       setTempUploadRsvpData(
         jsonData.filter((x: any) => x["Name*"]?.trim()).map((x: any) => ({
+          event_id: event_id,
+          barcode: `${event_id}${stringWithTimestamp.v2(10)}`,
           name: x["Name*"].trim(),
           phone: x["Phone Number"]?.trim() || null,
+          createdBy: userData?.user?.email ?? null
         }))
       );
     } catch (error: any) {
@@ -3220,10 +3224,11 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         title: "Something's gone wrong",
         message: "We can't proccess your request, Please try again"
       });
-      if (inputRefRsvpExcel.current) {
-        if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
-        inputRefRsvpExcel.current.value = "";
-      }
+    }
+
+    if (inputRefRsvpExcel.current) {
+      if (e.target && 'value' in e.target) (e.target as HTMLInputElement).value = "";
+      inputRefRsvpExcel.current.value = "";
     }
   };
 
@@ -3251,7 +3256,6 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     try {
       if (!(tempUploadRsvpData !== null && tempUploadRsvpData.length > 0)) return;
 
-      modalAction(btnCloseModalRsvp);
       const confirmed = await showConfirm({
         title: 'Submit Confirmation?',
         message: 'Are you sure you want to submit this form? Please double-check before proceeding!',
@@ -3259,14 +3263,11 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
         cancelText: 'No, Go Back',
         icon: 'bx bx-error bx-tada text-blue-500'
       });
-      if (!confirmed) {
-        modalAction(`btn-${modalUploadRsvp}`);
-        return;
-      }
+      if (!confirmed) return;
 
       setLoading(true);
       try {
-        // await StoreUpdateEventRSVP(event_id, createDtoData());
+        await StoreUploadExcelRsvp(tempUploadRsvpData);
         await fatchDatas();
         toast({
           type: "success",
@@ -3279,8 +3280,9 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
           title: "Request Failed",
           message: error.message
         });
-        modalAction(`btn-${modalUploadRsvp}`);
       }
+      modalAction(btnCloseModalRsvp);
+      resetUploadExcelRsvp();
       setLoading(false);
     } catch (error: any) {
       toast({
@@ -3438,7 +3440,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
           <div className="flex flex-col sm:flex-row gap-2 pb-4">
             <button type="button"
               id={`btn-${modalUploadRsvp}`}
-              // onClick={resetUploadExcelRsvp}
+              onClick={resetUploadExcelRsvp}
               aria-haspopup="dialog" aria-expanded="false" aria-controls={modalUploadRsvp} data-hs-overlay={`#${modalUploadRsvp}`}
               className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
             >
