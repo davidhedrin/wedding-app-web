@@ -9,7 +9,7 @@ import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/serve
 import { Events, Templates, Tr, Vouchers } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
@@ -24,7 +24,7 @@ declare global {
   }
 };
 
-export default function Page() {
+function Inner() {
   const router = useRouter();
   const smartLink = useSmartLink();
   const listBr: BreadcrumbType[] = [
@@ -629,4 +629,12 @@ export default function Page() {
       </div >
     </>
   )
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
+  );
 }

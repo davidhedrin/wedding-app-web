@@ -9,10 +9,10 @@ import { useSmartLink } from "@/lib/smart-link";
 import { toast } from "@/lib/utils";
 import { checkTokenResetPass, resetPassword } from "@/server/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import z from "zod";
 
-export default function Page() {
+function Inner() {
   const smartLink = useSmartLink();
   const { setLoading } = useLoading();
   const { push } = useRouter();
@@ -101,7 +101,7 @@ export default function Page() {
     setLoadingSubmit(true);
     setTimeout(async () => {
       try {
-        await resetPassword({token,password});
+        await resetPassword({ token, password });
 
         toast({
           type: "success",
@@ -183,4 +183,12 @@ export default function Page() {
       </div>
     </div>
   )
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
+  );
 }

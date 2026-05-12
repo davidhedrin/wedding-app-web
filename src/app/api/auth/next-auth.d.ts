@@ -5,13 +5,13 @@ import { RolesEnum } from '@/generated/prisma';
 declare module "next-auth" {
   interface User {
     role?: RolesEnum;
-    email_verified: boolean;
+    email_verified?: Date | null;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     role?: RolesEnum;
-    email_verified: boolean;
+    email_verified?: Date | null;
   }
 }

@@ -28,6 +28,7 @@
     "bcryptjs": "^3.0.2",
     "boxicons": "^2.1.4",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
     "jquery": "^3.7.1",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",

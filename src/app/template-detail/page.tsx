@@ -12,9 +12,9 @@ import { GetDataTemplatesBySlug } from '@/server/systems/catalog';
 import { TemplateCaptures, Templates } from '@/generated/prisma';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
-export default function page() {
+function Inner() {
   const { push } = useRouter();
   const smartLink = useSmartLink();
   const { setLoading } = useLoading();
@@ -155,7 +155,7 @@ export default function page() {
               <BreadcrumbList className='my-3' listBr={listBr} textColor='text-gray-800' />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Carousel */}
-                <div className="relative w-full md:h-[460px] h-[300px] overflow-hidden rounded-xl shadow-lg">
+                <div className="relative w-full md:h-115 h-75 overflow-hidden rounded-xl shadow-lg">
                   {captureImage.map((x, idx) => (
                     <img
                       key={idx}
@@ -372,6 +372,14 @@ export default function page() {
       }
     </div>
   )
+}
+
+export default function page() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
+  );
 }
 
 function ShapeBackground({ templateColor }: { templateColor: Color[] }) {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Great_Vibes, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import useCountdown from '@/lib/countdown';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -77,7 +77,7 @@ function useLockBodyScroll(isLocked: boolean) {
 const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
-export default function WeddingInvitationPage() {
+function Inner() {
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
@@ -348,7 +348,7 @@ export default function WeddingInvitationPage() {
       />
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
     </div>
-    
+
     <LoadingUI activeTitle={false} />
   </div>
 
@@ -1848,6 +1848,14 @@ export default function WeddingInvitationPage() {
         eventDate={formatDate(eventDatas?.event_time ?? TARGET_DATE, "full")}
       />
     </main>
+  );
+};
+
+export default function WeddingInvitationPage() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
   );
 }
 

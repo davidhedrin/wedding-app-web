@@ -47,6 +47,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           return {
             ...finduser,
+            id: String(finduser.id),
             name: finduser.fullname
           };
         } catch (err: any) {
@@ -65,7 +66,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email_verified: true
         }
       });
-      if(!exisUser?.email_verified) {
+
+      if (!exisUser) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
+      if(!exisUser.email_verified) {
         const findToken = await db.verificationToken.findUnique({
           where: { userId: exisUser?.id},
           select: { token: true }
@@ -84,7 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.name = user.name;
         token.role = user.role;
-        token.email_verified = user.email_verified !== null ? true : false;
+        token.email_verified = user.email_verified;
       };
       return token;
     },

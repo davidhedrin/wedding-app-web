@@ -1,7 +1,7 @@
 "use client";
 
 import useCountdown from "@/lib/countdown";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 
 import bgImage from './bg.jpg';
 import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from "@/lib/utils";
@@ -80,7 +80,7 @@ const dummyMessages = [
   },
 ];
 
-export default function WeddingInvitationPage() {
+function Inner() {
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
@@ -1460,6 +1460,14 @@ export default function WeddingInvitationPage() {
         eventDate={formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}
       />
     </main>
+  );
+}
+
+export default function WeddingInvitationPage() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
   );
 }
 
