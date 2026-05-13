@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { RolesEnum } from "@/generated/prisma";
 
 export async function proxy(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
@@ -9,7 +8,7 @@ export async function proxy(request: NextRequest) {
   if (!token && !pathname.startsWith("/auth")) return redirectTo(request, "/auth");
   if (token && pathname.startsWith("/auth")) return redirectTo(request, "/");
   
-  if (pathname.startsWith("/client/systems") && token?.role != RolesEnum.Admin) return redirectTo(request, "/");
+  if (pathname.startsWith("/client/systems") && token?.role != "Admin") return redirectTo(request, "/");
 
   return NextResponse.next();
 }

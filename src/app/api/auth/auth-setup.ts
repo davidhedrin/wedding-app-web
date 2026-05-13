@@ -58,23 +58,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account }) {
-      if(account?.provider !== "credentials") return false;
-      const exisUser = await getUserById({
-        id: user.id ? parseInt(user.id) : 0,
-        select: {
-          id: true,
-          email_verified: true
-        }
-      });
-
-      if (!exisUser) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
-      if(!exisUser.email_verified) {
-        const findToken = await db.verificationToken.findUnique({
-          where: { userId: exisUser?.id},
-          select: { token: true }
+      // if(account?.provider !== "credentials") return false;
+      if(account?.provider === "credentials") {
+        const exisUser = await getUserById({
+          id: user.id ? parseInt(user.id) : 0,
+          select: {
+            id: true,
+            email_verified: true
+          }
         });
-        if(!findToken) throw new CustomError("Token Not Found", "Please confirm your email address verification!");
-        throw new CustomError("Email Not Verify", findToken.token);
+  
+        if (!exisUser) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
+        if(!exisUser.email_verified) {
+          const findToken = await db.verificationToken.findUnique({
+            where: { userId: exisUser?.id},
+            select: { token: true }
+          });
+          if(!findToken) throw new CustomError("Token Not Found", "Please confirm your email address verification!");
+          throw new CustomError("Email Not Verify", findToken.token);
+        }
       }
       return true;
     },
