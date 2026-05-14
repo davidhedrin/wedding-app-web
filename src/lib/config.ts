@@ -7,7 +7,7 @@ const Configs = {
   app_name: "Wedlyvite",
   base_url: process.env.NEXT_PUBLIC_BASE_URL,
 
-  resend_from: "no-replay@resend.dev",
+  resend_from: "no-replay@wedlyvite.my.id",
   
   valid_reset_pass: 5, // Minute
   valid_email_verify: 5, // Minute
