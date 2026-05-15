@@ -281,7 +281,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "eternal-vow",
         name: "Eternal Vow",
-        price: 179000,
+        price: 159000,
         disc_price: null,
         short_desc: "A timeless luxury wedding invitation with dark elegance and golden vows.",
         desc: `<h1 style="text-align: center;">Eternal Vow: A Promise Without End</h1>

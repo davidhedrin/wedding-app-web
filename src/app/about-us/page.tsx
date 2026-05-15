@@ -14,14 +14,14 @@ export default function AboutUsPage() {
   return (
     <div className="pb-16">
       <div className='relative w-full h-[50vh] flex items-end justify-center text-center pb-14'>
-        <div className="absolute -z-30 inset-0 bg-gradient-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
+        <div className="absolute -z-30 inset-0 bg-linear-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
 
         <div className="absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-          w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] lg:w-[650px] lg:h-[650px]
-          bg-gradient-to-t from-red-500/40 to-pink-400/60 blur-3xl rounded-md mix-blend-multiply
+          w-100 h-100 sm:w-125 sm:h-125 lg:w-162.5 lg:h-162.5
+          bg-linear-to-t from-red-500/40 to-pink-400/60 blur-3xl rounded-md mix-blend-multiply
           animate-floating"
         />
-        <div className="absolute -z-30 top-20 left-20 w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] lg:w-[300px] lg:h-[300px]
+        <div className="absolute -z-30 top-20 left-20 w-50 h-50 sm:w-62.5 sm:h-62.5 lg:w-75 lg:h-75
         bg-pink-400 blur-3xl rounded-md mix-blend-multiply animate-floating"
         />
         <div className="absolute -z-30 top-40 right-10 w-60 h-60 md:w-96 md:h-96 rounded-full bg-indigo-400/70 blur-3xl" />
@@ -64,19 +64,19 @@ export default function AboutUsPage() {
               <div className="flex items-center space-x-2">
                 <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full font-medium bg-blue-100 text-blue-800">
                   <i className='bx bx-check-circle text-lg'></i>
-                  <span className="font-medium text-sm">Template Premium</span>
+                  <span className="font-medium text-sm">Premium Templates</span>
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full font-medium bg-blue-100 text-blue-800">
                   <i className='bx bx-check-circle text-lg'></i>
-                  <span className="font-medium text-sm">Mudah Digunakan</span>
+                  <span className="font-medium text-sm">Easy to use</span>
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full font-medium bg-blue-100 text-blue-800">
                   <i className='bx bx-check-circle text-lg'></i>
-                  <span className="font-medium text-sm">Support 24/7</span>
+                  <span className="font-medium text-sm">24/7 Support</span>
                 </span>
               </div>
             </div>
