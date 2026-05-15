@@ -111,7 +111,7 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
             {stateForm.errors?.password && <ZodErrors err={stateForm.errors?.password} />}
           </div>
           <div
-            className="absolute right-2 top-[34px] text-muted-foreground hover:text-foreground cursor-pointer"
+            className="absolute right-2 top-8.5 text-muted-foreground hover:text-foreground cursor-pointer"
             onClick={() => setTogglePass((prev) => !prev)}
             tabIndex={-1}
           >
@@ -124,7 +124,7 @@ export default function SignUp({ setSigninSignup }: { setSigninSignup: React.Dis
             {stateForm.errors?.co_password && <ZodErrors err={stateForm.errors?.co_password} />}
           </div>
           <div
-            className="absolute right-2 top-[34px] text-muted-foreground hover:text-foreground cursor-pointer"
+            className="absolute right-2 top-8.5 text-muted-foreground hover:text-foreground cursor-pointer"
             onClick={() => setToggleCoPass((prev) => !prev)}
             tabIndex={-1}
           >

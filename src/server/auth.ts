@@ -53,6 +53,9 @@ export async function signUpAction(formData: DtoSignUp) {
     const hashPass = await hashPassword(password, 15);
   
     await db.$transaction(async (tx) => {
+      const existingUser = await tx.user.findUnique({ where: { email } });
+      if (existingUser) throw new Error("Email is already exist in Wedlyvite!");
+
       const user = await tx.user.create({
         data: {
           fullname,
@@ -147,7 +150,7 @@ export async function resendEmailVerify(token: string) {
     if(!findToken) throw new Error("The token or OTP may be incorrect or no longer valid.");
     if (findToken.createAt) {
       const timeDifference = new Date().getTime() - new Date(findToken.createAt).getTime();
-      if (timeDifference < 1000 * 60 * Configs.valid_email_verify) throw new Error("An email has already been sent. Please wait a minutes before requesting again.");
+      if (timeDifference < 1000 * 60 * Configs.valid_email_verify) throw new Error("An email has already been sent. Please wait a minutes to resend OTP.");
     };
 
     const findUser = await db.user.findUnique({
