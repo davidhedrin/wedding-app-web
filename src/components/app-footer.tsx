@@ -10,7 +10,7 @@ export default function AppFooter() {
             <div className="flex items-center space-x-2">
               <img src="/assets/img/logo/wedlyvite-landscape.png" className="h-8 w-auto" />
             </div>
-            <p className="text-muted text-sm leading-relaxed text-justify">
+            <p className="text-muted md:text-base leading-relaxed text-justify">
               A modern platform for creating elegant and personalized digital invitations for weddings, birthdays, parties and other events.
             </p>
           </div>
@@ -20,23 +20,28 @@ export default function AppFooter() {
             <h3 className="font-semibold text-foreground mb-4">Fast Link</h3>
             <ul className="space-y-2">
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Home
                 </div>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
-                  Catalog
-                </div>
-              </li>
-              <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   About Us
                 </div>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                  Services
+                </div>
+              </li>
+              <li>
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   FAQ
+                </div>
+              </li>
+              <li>
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                  Catalog
                 </div>
               </li>
             </ul>
@@ -47,22 +52,22 @@ export default function AppFooter() {
             <h3 className="font-semibold text-foreground mb-4">Supports</h3>
             <ul className="space-y-2">
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Usage Guide
                 </div>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Contact Us
                 </div>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Term & Condition
                 </div>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth text-sm">
+                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Privacy Policy
                 </div>
               </li>

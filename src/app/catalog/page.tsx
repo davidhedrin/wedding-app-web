@@ -173,11 +173,11 @@ export default function CatalogPage() {
 
   return (
     <div className="pb-16">
-      <div className='relative w-full h-[50vh] flex items-end justify-center text-center pb-14'>
+      <div className='relative w-full h-[60vh] flex items-end justify-center text-center pb-14'>
         <div className="absolute -z-30 inset-0 bg-linear-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
         <div className="
           absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-          w-[280px] h-[280px] sm:w-[300px] sm:h-[300px] lg:w-[650px] lg:h-[650px]
+          w-70 h-70 sm:w-75 sm:h-75 lg:w-162.5 lg:h-162.5
           bg-pink-400/40 blur-3xl rounded-full mix-blend-multiply
           [clip-path:polygon(50%_0%,80%_20%,100%_50%,80%_80%,50%_100%,20%_80%,0%_50%,20%_20%)]
         " />
@@ -226,7 +226,7 @@ export default function CatalogPage() {
         {/* Search + Sort */}
         <div className="flex items-center gap-4">
           {/* Search */}
-          <div className="flex-1 min-w-[140px]">
+          <div className="flex-1 min-w-35">
             <Input
               type="search"
               placeholder="Search template here..."
@@ -240,7 +240,7 @@ export default function CatalogPage() {
           <div className="relative" ref={dropdownSortRef}>
             <button
               onClick={() => setOpenSort((prev) => !prev)}
-              className="relative flex items-center justify-center border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-[120px]"
+              className="relative flex items-center justify-center border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-30"
             >
               <i className="bx bx-sort mr-2"></i>
               <span className="relative">

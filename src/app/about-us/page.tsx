@@ -2,9 +2,11 @@
 
 import { useLoading } from "@/components/loading/loading-context";
 import Configs from "@/lib/config";
+import { useSmartLink } from "@/lib/smart-link";
 import { useEffect } from "react";
 
 export default function AboutUsPage() {
+  const smartLink = useSmartLink();
   const { setLoading } = useLoading();
 
   useEffect(() => {
@@ -13,7 +15,7 @@ export default function AboutUsPage() {
 
   return (
     <div className="pb-16">
-      <div className='relative w-full h-[50vh] flex items-end justify-center text-center pb-14'>
+      <div className='relative w-full h-[60vh] flex items-end justify-center text-center pb-14'>
         <div className="absolute -z-30 inset-0 bg-linear-to-b from-gray-800/25 to-gray-100 backdrop-blur-xs pointer-events-none" />
 
         <div className="absolute -z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
@@ -84,7 +86,7 @@ export default function AboutUsPage() {
 
           <div className="col-span-12 md:col-span-4">
             <div className="relative flex justify-center items-center">
-              <div className="rounded-xl p-7 shadow-lg relative z-10 border-t-4 border-t-blue-400">
+              <div className="rounded-xl p-7 shadow-lg relative z-10 border-t-4 border-t-[#e9a5a0]">
                 <div className="bg-gray-100/50 rounded-lg p-4 shadow-xl">
                   <div className="text-center">
                     <i className='bx bx-heart text-4xl mx-auto mb-4 text-color-app'></i>
@@ -190,13 +192,9 @@ export default function AboutUsPage() {
           </div>
 
           <div className="flex gap-4 justify-center">
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm md:text-base font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+            <a href="/catalog" onClick={() => smartLink("/catalog")} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm md:text-base font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
               Create Invitation Now
-            </button>
-
-            <button type="button" className="py-2 px-3 inline-flex items-center gap-x-1 text-sm md:text-base font-medium rounded-lg border border-blue-600 text-blue-600 hover:border-blue-500 hover:text-blue-500 focus:outline-hidden focus:border-blue-500 focus:text-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:border-blue-400">
-              Learn More
-            </button>
+            </a>
           </div>
         </div>
       </div>
