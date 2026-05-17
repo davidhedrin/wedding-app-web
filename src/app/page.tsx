@@ -187,9 +187,155 @@ export default function Page() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="bg-gray-200 py-16">
+        <div className='max-w-5xl px-4 xl:px-0 mx-auto'>
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div className="relative">
+              <img
+                src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1200&auto=format&fit=crop"
+                alt="Wedding"
+                className="rounded-4xl shadow-2xl"
+              />
+
+              <div className="absolute -bottom-8 -right-8 bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50">
+                <h3 className="text-4xl font-bold text-cyan-600">10K+</h3>
+                <p className="text-gray-600 mt-2">Invitations Created</p>
+              </div>
+            </div>
+
+            <div>
+              <span className="text-violet-600 font-semibold uppercase tracking-widest">
+                Why Choose Us
+              </span>
+
+              <h2 className="mt-5 text-2xl md:text-4xl font-bold leading-tight">
+                Designed To Make
+                <br />
+                Your Wedding More Special
+              </h2>
+
+              <p className="mt-8 text-muted md:text-base leading-relaxed">
+                We combine elegant design, modern technology, and user-friendly
+                experiences to create digital invitations that leave lasting
+                impressions on your guests.
+              </p>
+
+              <div className="mt-10 space-y-6">
+                {[
+                  "Elegant & modern invitation designs",
+                  "Fast and easy customization process",
+                  "Responsive on all devices",
+                  "Interactive premium features",
+                  "Affordable pricing for everyone",
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="w-7 h-7 rounded-full bg-linear-to-r from-cyan-500 to-blue-600 text-white flex items-center justify-center text-sm">
+                      ✓
+                    </div>
+
+                    <p className="text-gray-700 md:text-base">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl px-4 xl:px-0 mx-auto py-16">
+        <div className="mb-20">
+          {/* Heading */}
+          <div className="text-center mb-14">
+            <div className="text-xl md:text-2xl font-bold mb-2">
+              Frequently Asked <span className="text-color-app">Questions</span>
+            </div>
+
+            <p className="md:text-base text-muted max-w-2xl mx-auto">
+              Everything you need to know about creating and sharing digital invitations with Wedlyvite.
+            </p>
+          </div>
+
+          {/* FAQ List */}
+          <div className="space-y-4">
+            {[
+              {
+                question: "How do I create a digital invitation?",
+                answer:
+                  "Simply choose your favorite template, customize your event details, upload photos, and publish your invitation instantly."
+              },
+              {
+                question: "Can I personalize my invitation content?",
+                answer:
+                  "Yes, you can easily fill in your own event details through the dashboard, including names, event schedules, locations, photo galleries, background music, RSVP settings, and other personal information."
+              },
+              {
+                question: "Does Wedlyvite support RSVP features?",
+                answer:
+                  "Absolutely. Guests can confirm attendance directly through your invitation page and all responses are automatically recorded."
+              },
+              {
+                question: "Can invitations be opened on mobile devices?",
+                answer:
+                  "Yes. All invitation templates are fully responsive and optimized for smartphones, tablets, and desktop devices."
+              },
+              {
+                question: "How long does it take to publish an invitation?",
+                answer:
+                  "Only a few minutes. After completing the customization process, your invitation can immediately be shared with guests."
+              },
+              {
+                question: "Do you provide customer support?",
+                answer:
+                  "Yes, our support team is available every day to help you with technical issues, customization, and other questions."
+              }
+            ].map((item, index) => (
+              <details
+                key={index}
+                className="group overflow-hidden rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(59,130,246,0.10)] hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <summary className="list-none cursor-pointer">
+                  <div className="flex items-center justify-between gap-4 px-5 py-4">
+
+                    {/* Left */}
+                    <div className="flex items-center gap-4">
+                      <div className="min-w-11 w-11 h-11 rounded-2xl bg-linear-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i className='bx bx-help-circle text-white text-2xl'></i>
+                      </div>
+
+                      <div>
+                        <div className="font-semibold text-base md:text-lg text-slate-800 leading-relaxed">
+                          {item.question}
+                        </div>
+
+                        <div className="text-sm text-muted">
+                          Click to view answer
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Icon */}
+                    <div
+                      className="min-w-10 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-open:rotate-180 group-open:bg-blue-500 group-open:text-white transition-all duration-300">
+                      <i className='bx bx-chevron-down text-2xl'></i>
+                    </div>
+
+                  </div>
+                </summary>
+
+                {/* Content */}
+                <div
+                  className="border-t border-slate-100 px-6 pb-6 pt-4 text-muted leading-relaxed bg-linear-to-b from-transparent to-slate-50/60">
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
 
         {/* Ready to Create Your Dream Invitation */}
-        <div className="text-center mt-24 space-y-8">
+        <div className="text-center space-y-8">
           <div className="flex justify-center mb-6">
             <img src="/assets/img/logo/wedlyvite-logo.png" className="h-14 w-auto" />
           </div>

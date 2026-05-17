@@ -106,7 +106,6 @@ export default function AppHeader() {
             <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/about-us" onClick={() => smartLink("/about-us")}>About Us</a>
             <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/services" onClick={() => smartLink("/services")}>Services</a>
             <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/contact" onClick={() => smartLink("/contact")}>Contact</a>
-            <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="#">FAQ</a>
             <a className="px-3 md:py-3 text-sm font-medium hover:text-neutral-600 focus:outline-hidden" href="/catalog" onClick={() => smartLink("/catalog")}>Catalog</a>
             {/* <div className="hs-dropdown [--strategy:static] md:[--strategy:absolute] [--adaptive:none] md:[--trigger:hover] [--auto-close:inside] md:inline-block">
               <button id="hs-pro-anpd" type="button" className="gap-0.5 hs-dropdown-toggle px-3 md:py-3 w-full md:w-auto flex items-center text-sm font-medium hover:text-neutral-600 focus:outline-hidden" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">

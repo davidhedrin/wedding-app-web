@@ -253,12 +253,12 @@ export default function ServicesPage() {
               Your Dream Invitation?
             </h2>
 
-            <p className="mt-6 md:text-base text-gray-300 leading-relaxed">
+            <p className="my-6 md:text-base text-gray-300 leading-relaxed">
               Start creating beautiful online invitations today and make your
               special moment unforgettable for everyone.
             </p>
 
-            <a href="/catalog" onClick={() => smartLink("/catalog")} className="mt-10 py-2 px-4 md:text-base rounded-lg bg-white text-slate-900 font-medium hover:scale-105 transition shadow-xl">
+            <a href="/catalog" onClick={() => smartLink("/catalog")} className="py-2 px-4 md:text-base rounded-lg bg-white text-slate-900 font-medium hover:scale-105 transition shadow-xl">
               Create Invitation Now
             </a>
           </div>

@@ -1,6 +1,9 @@
 import Configs from "@/lib/config";
+import { useSmartLink } from "@/lib/smart-link";
 
 export default function AppFooter() {
+  const smartLink = useSmartLink();
+
   return (
     <footer className="bg-soft-background border-t border-gray-300">
       <div className="max-w-5xl px-4 xl:px-0 mx-auto py-16">
@@ -20,29 +23,29 @@ export default function AppFooter() {
             <h3 className="font-semibold text-foreground mb-4">Fast Link</h3>
             <ul className="space-y-2">
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                <a href="/" onClick={() => smartLink("/")} aria-current="page" className="text-muted hover:text-accent-primary transition-smooth md:text-base hover:underline">
                   Home
-                </div>
+                </a>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                <a href="/about-us" onClick={() => smartLink("/about-us")} className="text-muted hover:text-accent-primary transition-smooth md:text-base hover:underline">
                   About Us
-                </div>
+                </a>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                <a href="/services" onClick={() => smartLink("/services")} className="text-muted hover:text-accent-primary transition-smooth md:text-base hover:underline">
                   Services
-                </div>
+                </a>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
-                  FAQ
-                </div>
+                <a href="/contact" onClick={() => smartLink("/contact")} className="text-muted hover:text-accent-primary transition-smooth md:text-base hover:underline">
+                  Contact Us
+                </a>
               </li>
               <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
+                <a href="/catalog" onClick={() => smartLink("/catalog")} className="text-muted hover:text-accent-primary transition-smooth md:text-base hover:underline">
                   Catalog
-                </div>
+                </a>
               </li>
             </ul>
           </div>
@@ -54,11 +57,6 @@ export default function AppFooter() {
               <li>
                 <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
                   Usage Guide
-                </div>
-              </li>
-              <li>
-                <div className="text-muted hover:text-accent-primary transition-smooth md:text-base">
-                  Contact Us
                 </div>
               </li>
               <li>
