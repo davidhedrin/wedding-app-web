@@ -206,7 +206,7 @@ export default function ServicesPage() {
               <h2 className="mt-5 text-2xl md:text-4xl font-bold leading-tight">
                 Designed To Make
                 <br />
-                Your Wedding More Special
+                Your Event More Special
               </h2>
 
               <p className="mt-8 text-muted md:text-base leading-relaxed">

@@ -99,14 +99,14 @@ export type MidtransSnapResponse = {
 
 export type DtoVouchers = {
   id: number | null;
-  code: string,
-  disc_type: DiscTypeEnum,
-  disc_amount: number,
-  valid_from: string,
-  valid_to: string,
-  total_qty: number,
-  is_one_use: boolean,
-  desc: string | null,
+  code: string;
+  disc_type: DiscTypeEnum;
+  disc_amount: number;
+  valid_from: string;
+  valid_to: string;
+  total_qty: number;
+  is_one_use: boolean;
+  desc: string | null;
   is_active: boolean | null;
 };
 
@@ -119,32 +119,33 @@ export type DtoTr = {
 
 export type DtoMainInfoWedding = {
   event_id: number | null;
-  greeting_msg: string | null,
-  couple_img_name: string | null,
-  couple_img_url: string | null,
+  greeting_msg: string | null;
+  couple_img_name: string | null;
+  couple_img_url: string | null;
   couple_file_img: File | null;
-  contact_email: string | null,
-  contact_phone: string | null,
-  music_url: string | null,
-  youtube_url: string | null,
+  contact_email: string | null;
+  contact_phone: string | null;
+  music_url: string | null;
+  music_file: File | null;
+  youtube_url: string | null;
   groom_bride: DtoGroomBride[];
 };
 
 export type DtoGroomBride = {
   id: number | null;
-  type: GroomBrideEnum,
-  fullname: string,
-  shortname: string,
-  birth_place: string,
-  birth_date: Date,
-  birth_order: number,
-  father_name: string | null,
-  mother_name: string | null,
-  place_origin: string | null,
-  occupation: string | null,
-  personal_msg: string | null,
-  img_name: string | null,
-  img_url: string | null,
+  type: GroomBrideEnum;
+  fullname: string;
+  shortname: string;
+  birth_place: string;
+  birth_date: Date;
+  birth_order: number;
+  father_name: string | null;
+  mother_name: string | null;
+  place_origin: string | null;
+  occupation: string | null;
+  personal_msg: string | null;
+  img_name: string | null;
+  img_url: string | null;
   file_img: File | null;
 };
 
@@ -158,15 +159,15 @@ export type DtoScheduler = {
   loc_address: string;
   langLat: [number, number] | null;
   notes: string[];
-  youtube_url: string | null,
+  youtube_url: string | null;
   
   ceremon_type?: TradRecepType;
 };
 
 export type DtoEventGallery = {
   id: number | null;
-  img_name: string,
-  img_url: string,
+  img_name: string;
+  img_url: string;
   file?: File;
 };
 
@@ -191,8 +192,8 @@ export type DtoEventGift = {
 
 export type DtoEventFAQ = {
   id: number | null;
-  question: string,
-  answer: string,
+  question: string;
+  answer: string;
 };
 
 export type DtoEventRsvp = {

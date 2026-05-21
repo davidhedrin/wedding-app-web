@@ -21,8 +21,6 @@ import { auth } from "./app/api/auth/auth-setup";
 // }
 
 export default auth((req) => {
-  console.log("AUTH", req.auth);
-
   const pathname = req.nextUrl.pathname;
   const isLoggedIn = !!req.auth;
 

@@ -13,6 +13,7 @@ const Configs = {
   valid_email_verify: 5, // Minute
 
   maxSizePictureInMB: 5,
+  maxSizeAudioInMB: 6,
   nameBtnSubmit: "submitType",
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
@@ -21,7 +22,7 @@ const Configs = {
   tryDays: 3,
   toastDuration: 4000, // In second
 
-  s3_bucket: "wedlyvite",
+  s3_bucket: process.env.NEXT_PUBLIC_CLOUDFLARE_BUCKET,
   p_limit: 25
 };
 export default Configs;

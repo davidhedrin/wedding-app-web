@@ -54,17 +54,19 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     const data_id = formData.id ?? 0;
     const findCategory = CategoryKeys.find(x => x.key === formData.ctg_key);
 
-    await Promise.all(
-      formData.captures.map(async (x) => {
-        if (x.file !== null) {
-          var upFile = await CloudflareUploadFile(x.file, "webp", Configs.s3_bucket, "template");
-          if (upFile?.status) {
-            x.file_name = upFile.filename;
-            x.file_path = upFile.path;
+    if(Configs.s3_bucket !== undefined) {
+      await Promise.all(
+        formData.captures.map(async (x) => {
+          if (Configs.s3_bucket !== undefined && x.file !== null) {
+            var upFile = await CloudflareUploadFile(x.file, "webp", Configs.s3_bucket, "template");
+            if (upFile?.status) {
+              x.file_name = upFile.filename;
+              x.file_path = upFile.path;
+            }
           }
-        }
-      })
-    );
+        })
+      );
+    }
 
     const fatchDbCapture = await db.templateCaptures.findMany({
       where: { tmp_id: data_id }
@@ -72,10 +74,12 @@ export async function StoreUpdateDataTemplates(formData: DtoTemplates) {
     const deletedCaptures = fatchDbCapture.filter((old: any) => !formData.captures.some((cur) =>
       old.id != null && cur.id === old.id ? true : old.file_name && cur.file_name === old.file_name
     ));
-    await Promise.all(deletedCaptures.map(async (x: any) => {
-      if (x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
-      await db.templateCaptures.delete({ where: { id: x.id } });
-    }));
+    if(Configs.s3_bucket !== undefined) {
+      await Promise.all(deletedCaptures.map(async (x: any) => {
+        if (Configs.s3_bucket !== undefined && x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
+        await db.templateCaptures.delete({ where: { id: x.id } });
+      }));
+    }
 
     await db.$transaction(async (tx) => {
       const templateData = await tx.templates.upsert({
@@ -155,9 +159,11 @@ export async function DeleteDataTemplates(id: number) {
       where: { tmp_id: id }
     });
     
-    getAllCaptureTemp.forEach((x: any) => {
-      if (x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
-    });
+    if(Configs.s3_bucket !== undefined) {
+      getAllCaptureTemp.forEach((x: any) => {
+        if (Configs.s3_bucket !== undefined && x.file_name) CloudflareDeleteFile(Configs.s3_bucket, x.file_name).catch(err => {});
+      });
+    }
     
     await db.templates.update({
       where: { id },

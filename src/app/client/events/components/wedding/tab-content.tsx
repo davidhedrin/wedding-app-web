@@ -67,6 +67,9 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   const [ytVideoStory, setYtVideoStory] = useState<string>(dataEvent.youtube_url ?? "");
   const [imageFileCouple, setImageFileCouple] = useState<File | null>(null);
   const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(dataEvent.couple_img_path);
+  const [fileMusicTheme, setFileMusicTheme] = useState<File | null>(null);
+  const [fileMusicThemeUrl, setFileMusicThemeUrl] = useState<string | null>(null);
+  const [playStopMusicTheme, setPlayStopMusicTheme] = useState(false);
 
   // Groom Info
   const [groomId, setGroomId] = useState<number | null>(null);
@@ -127,7 +130,6 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     setImageFileCouple(file);
     setPreviewUrlCouple(URL.createObjectURL(file));
   };
-
   const handleDragOverCapture = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -195,6 +197,41 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     }
   };
 
+  const handleFileCustomMusicTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const maxSizeInMB = Configs.maxSizeAudioInMB;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+      if (file.type !== "audio/mpeg") {
+        toast({
+          type: "warning",
+          title: "Invalid File Type",
+          message: "Only MP3 files are allowed."
+        });
+        e.target.value = "";
+        return;
+      }
+
+      if (file.size > maxSizeInBytes) {
+        toast({
+          type: "warning",
+          title: "File Too Large",
+          message: `The file size must be less than ${maxSizeInMB}MB.`
+        });
+        e.target.value = "";
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      setFileMusicTheme(file);
+      setFileMusicThemeUrl(objectUrl);
+      e.target.value = "";
+    }
+  };
+
   const createDtoData = (): DtoMainInfoWedding => {
     const shortNameGroom = groomFullname?.trim().match(/^\S+/)?.[0] ?? "";
     const shortNameBride = brideFullname?.trim().match(/^\S+/)?.[0] ?? "";
@@ -205,6 +242,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
       music_url: musicTheme.trim() != "" ? musicTheme : null,
+      music_file: fileMusicTheme,
       youtube_url: ytVideoStory.trim() != "" ? ytVideoStory : null,
       groom_bride: [
         {
@@ -597,7 +635,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
           <div className="col-span-12">
             <label className="block text-sm font-medium mb-1 dark:text-white" htmlFor="youtube_video_url">
               Youtube Video Story
-              <p className='text-sm text-muted'>After upload your history love video on Youtube, you can paste the URL here. The embed video will be display on your gallery tab invitaion.</p>
+              <p className='text-sm text-muted'>From your Youtube video, Klik share, copy link, and paste the URL here. The embed video will be display on your gallery tab invitaion.</p>
             </label>
             <Input
               value={ytVideoStory}
@@ -695,18 +733,69 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                 const url = e.target.value;
                 if (!url) {
                   setMusicTheme("");
+                  stopMusic();
                   return;
                 }
                 setMusicTheme(e.target.value);
                 playMusic(url);
+
+                setFileMusicTheme(null);
+                setFileMusicThemeUrl(null);
+                setPlayStopMusicTheme(false);
               }}
               onBlur={() => {
                 stopMusic();
               }}
               id='music_theme' label='Music Theme' placeholder='Select music theme'
-              options={musicThemeWedding?.items.map(x => ({ value: x.url, label: x.name })) || []}
+              options={[
+                ...(musicThemeWedding?.items.map(x => ({
+                  value: x.url,
+                  label: x.name
+                })) || []),
+                { value: "custom_upload", label: "Custom Upload..." }
+              ]}
             />
           </div>
+          {
+            musicTheme === "custom_upload" && <div className="col-span-12">
+              <label className="block text-sm font-medium mb-1 dark:text-white" htmlFor="custom_theme_music">
+                Upload Music Theme<span className="text-red-500">*</span>
+                <p className='text-sm text-muted'>Choose an MP3 file to upload your custom event music theme. Max size: {Configs.maxSizeAudioInMB} MB.</p>
+              </label>
+              <div className="w-full">
+                {/* <label htmlFor="custom_theme_music" className="sr-only bg-gray-200">Choose file</label> */}
+                <input
+                  type="file"
+                  onChange={handleFileCustomMusicTheme}
+                  name="custom_theme_music"
+                  id="custom_theme_music"
+                  accept=".mp3,audio/mpeg"
+                  className="block w-full bg-layer border border-gray-300 border-layer-line rounded-lg text-sm text-foreground placeholder:text-muted-foreground-1 focus:z-10 focus:outline-hidden focus:border-primary-focus focus:ring-1 focus:ring-primary-focus disabled:opacity-50 disabled:pointer-events-none file:bg-surface file:border-0 file:me-4 file:py-2 file:px-3"
+                />
+              </div>
+              {
+                fileMusicTheme && <div className="flex items-center pt-2">
+                  <div className="text-sm">File Selected:</div>
+                  <div className="text-sm text-muted underline ps-2">{fileMusicTheme.name}</div>
+                  <div onClick={() => {
+                    if (playStopMusicTheme) {
+                      stopMusic();
+                    } else {
+                      if (fileMusicThemeUrl) playMusic(fileMusicThemeUrl);
+                    }
+
+                    setPlayStopMusicTheme(prev => !prev);
+                  }}
+                    className="text-sm text-blue-500 ps-2 flex items-center cursor-pointer"
+                  >
+                    {
+                      playStopMusicTheme ? <>Pause <i className='bx bx-pause text-lg'></i></> : <>Play<i className='bx bx-play text-lg'></i></>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
         </div>
 
         <div className="text-xs text-gray-500 sm:order-1 order-1 italic mt-3 mb-2">

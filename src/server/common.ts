@@ -199,7 +199,7 @@ export async function CloudflareUploadFile(
       ContentType: `image/${ext}`,
     });
     
-    const res = await cloudflare_s3.send(putObjectCmd);
+    await cloudflare_s3.send(putObjectCmd);
     const fileUrl = `${process.env.NEXT_PUBLIC_CLOUDFLARE_ENDPOINT}/${fileName}`;
     return {
       status: true,

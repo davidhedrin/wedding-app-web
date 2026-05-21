@@ -63,16 +63,18 @@ export async function UpdateDataUser(formData: DtoUser) {
     //   };
     // };
 
-    if(findUserData && findUserData.image && formData.img_url === null) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
-    if(formData.file_img !== null) {
-      if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
-
-      var upFile = await CloudflareUploadFile(formData.file_img, "webp", Configs.s3_bucket, "user-profile");
-      if(upFile != null && upFile.status == true) {
-        formData.img_name = upFile.filename;
-        formData.img_url = upFile.path;
+    if(Configs.s3_bucket !== undefined) {
+      if(findUserData && findUserData.image && formData.img_url === null) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+      if(formData.file_img !== null) {
+        if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+  
+        var upFile = await CloudflareUploadFile(formData.file_img, "webp", Configs.s3_bucket, "user-profile");
+        if(upFile != null && upFile.status == true) {
+          formData.img_name = upFile.filename;
+          formData.img_url = upFile.path;
+        };
       };
-    };
+    }
     
     await db.user.update({
       where: { id: data_id },
@@ -110,7 +112,7 @@ export async function DeleteDataUser(id: number) {
     const findUserData = await db.user.findUnique({
       where: { id }
     });
-    if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+    if(Configs.s3_bucket !== undefined && findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
 
     await db.user.update({
       where: { id },

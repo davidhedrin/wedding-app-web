@@ -49,7 +49,7 @@ export default function AppHeader() {
                   </div>
                 </div>
               </div>
-            </div> : <a href="/auth" onClick={() => smartLink("/auth")} className="ps-3 group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
+            </div> : <a href="/auth" onClick={() => smartLink("/auth")} className="md:ms-2 group inline-flex items-center gap-x-1 py-2 px-3 btn-color-app font-medium text-sm text-nowrap text-neutral-800 rounded-lg focus:outline-hidden">
               Start Here! <i className='bx bx-log-in text-lg'></i>
             </a>
           }

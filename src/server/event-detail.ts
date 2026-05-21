@@ -30,16 +30,18 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
     const findEventData = await db.events.findUnique({
       where: { id: event_id }
     });
-    if(findEventData && findEventData.couple_img_name && formData.couple_file_img === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
-    if(formData.couple_file_img !== null) {
-      if(findEventData && findEventData.couple_img_name) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
-
-      var upFile = await CloudflareUploadFile(formData.couple_file_img, "webp", Configs.s3_bucket, "wedding-couple");
-      if(upFile != null && upFile.status == true) {
-        formData.couple_img_name = upFile.filename;
-        formData.couple_img_url = upFile.path;
+    if(Configs.s3_bucket !== undefined){
+      if(findEventData && findEventData.couple_img_name && formData.couple_file_img === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
+      if(formData.couple_file_img !== null) {
+        if(findEventData && findEventData.couple_img_name) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
+  
+        var upFile = await CloudflareUploadFile(formData.couple_file_img, "webp", Configs.s3_bucket, "wedding-couple");
+        if(upFile != null && upFile.status == true) {
+          formData.couple_img_name = upFile.filename;
+          formData.couple_img_url = upFile.path;
+        };
       };
-    };
+    }
 
     await db.$transaction(async (tr) => {
       await tr.events.update({
@@ -91,17 +93,19 @@ async function upsertGroomBride({
 
     if (!existing) return;
 
-    // Hapus gambar lama jika img dihapus dari form
-    if (existing.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
-    // Upload gambar baru
-    if (data.file_img) {
-      if (existing.img_name) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
-      const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${data.id}`);
-      if (upFile?.status) {
-        data.img_name = upFile.filename;
-        data.img_url = upFile.path;
+    if(Configs.s3_bucket !== undefined){
+      // Hapus gambar lama jika img dihapus dari form
+      if (existing.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+      // Upload gambar baru
+      if (data.file_img) {
+        if (existing.img_name) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+        const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${data.id}`);
+        if (upFile?.status) {
+          data.img_name = upFile.filename;
+          data.img_url = upFile.path;
+        };
       };
-    };
+    }
 
     await tr.groomBrideInfo.update({
       where: { id: dataId },
@@ -142,7 +146,7 @@ async function upsertGroomBride({
       }
     });
 
-    if (data.file_img) {
+    if (Configs.s3_bucket !== undefined && data.file_img) {
       const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${typeGroomBride}-${created.id}`);
       if (upFile?.status) {
         await tr.groomBrideInfo.update({
@@ -249,18 +253,20 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
     const limit = pLimit(Configs.p_limit);
     let uploadPromises: Promise<UploadFileRespons>[] = [];
     
-    formData.forEach(x => {
-      if (x.file !== undefined) {
-        const file: File = x.file;
-        const setLimit = limit(() => CloudflareUploadFile(
-          file,
-          "webp",
-          Configs.s3_bucket,
-          `event-gallery-${event_id}`
-        ));
-        uploadPromises.push(setLimit);
-      }
-    });
+    if(Configs.s3_bucket !== undefined){
+      formData.forEach(x => {
+        if (x.file !== undefined) {
+          const file: File = x.file;
+          const setLimit = limit(() => CloudflareUploadFile(
+            file,
+            "webp",
+            Configs.s3_bucket ?? "",
+            `event-gallery-${event_id}`
+          ));
+          uploadPromises.push(setLimit);
+        }
+      });
+    }
 
     if(uploadPromises.length === 0) return;
     const results = await Promise.all(uploadPromises);
@@ -319,7 +325,7 @@ export async function DeleteEventGalleryById(event_id: number, gallery_id: numbe
     });
     if(!findGallery) throw new Error("Gallery photo not Found!");
 
-    if (findGallery.img_name) CloudflareDeleteFile(Configs.s3_bucket, findGallery.img_name).catch(err => {});
+    if (Configs.s3_bucket !== undefined && findGallery.img_name) CloudflareDeleteFile(Configs.s3_bucket, findGallery.img_name).catch(err => {});
     await db.eventGalleries.delete({
       where: { id: gallery_id, event_id }
     });
