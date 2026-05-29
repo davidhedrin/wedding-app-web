@@ -332,8 +332,20 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     formData.append("groom_birth_date", groomBirthDate ? groomBirthDate.toString() : "");
     formData.append("bride_birth_date", brideBirthDate ? brideBirthDate.toString() : "");
 
+    let formSchame = FormSchemaMainInfo;
+
+    if (musicTheme === "custom_upload") { // Continue here
+      formData.append("custom_theme_music", "");
+      if (fileMusicThemeUrl) formData.append("custom_theme_music", fileMusicThemeUrl);
+
+      const newFormSchame = FormSchemaMainInfo.extend({
+        custom_theme_music: z.string().min(1, { message: "Custom music theme is required field." }).trim()
+      });
+      formSchame = newFormSchame;
+    };
+
     const data = Object.fromEntries(formData);
-    const valResult = FormSchemaMainInfo.safeParse(data);
+    const valResult = formSchame.safeParse(data);
     if (!valResult.success) {
       setStateFormMainInfo({
         success: false,
@@ -794,6 +806,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                   </div>
                 </div>
               }
+              {stateFormMainInfo.errors?.custom_theme_music && <ZodErrors err={stateFormMainInfo.errors?.custom_theme_music} />}
             </div>
           }
         </div>

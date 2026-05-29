@@ -186,13 +186,14 @@ model Events {
   tmp_ctg     String
   tmp_ctg_key String
 
-  greeting_msg    String?
-  couple_img_name String?
-  couple_img_path String?
-  contact_email   String?
-  contact_phone   String?
-  music_url       String?
-  youtube_url     String?
+  greeting_msg     String?
+  couple_img_name  String?
+  couple_img_path  String?
+  contact_email    String?
+  contact_phone    String?
+  music_url        String?
+  custom_music_url String?
+  youtube_url      String?
 
   schedule_note    String?
   wishlist_address String?
