@@ -103,6 +103,9 @@ export type EventInitProps = {
   contact_email: string | null;
   contact_phone: string | null;
   music_url: string | null;
+  custom_music_url: string | null;
+  custom_music_r2: string | null;
+  custom_music_name: string | null;
   schedule_note: string | null;
   wishlist_address: string | null;
   youtube_url: string | null;

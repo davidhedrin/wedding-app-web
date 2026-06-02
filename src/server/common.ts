@@ -7,6 +7,7 @@ import { writeFile } from 'fs/promises';
 import path from "path";
 import sharp from 'sharp';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import mime from 'mime';
 
 function getExtSharp(format: keyof sharp.FormatEnum | sharp.AvailableFormatInfo): string {
   if (typeof format === "string") return format.toLowerCase();
@@ -164,8 +165,8 @@ const cloudflare_s3 = new S3Client({
   region: "auto",
   endpoint: process.env.NEXT_PUBLIC_CLOUDFLARE_URL_S3,
   credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_CLOUDFLARE_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.NEXT_PUBLIC_CLOUDFLARE_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY!,
   },
 });
 export async function CloudflareUploadFile(
@@ -181,7 +182,7 @@ export async function CloudflareUploadFile(
     const sizeKb = fileBuffer.length / 1024;
     let { quality, effort } = getCompressionParams(sizeKb);
 
-    const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
+    const compressedBuffer = await sharp(fileBuffer).rotate().toFormat(to_format, {
       quality,
       effort,
       chromaSubsampling: "4:2:0",
@@ -240,4 +241,47 @@ export async function CloudflareDeleteFile(bucket: string, filename: string): Pr
       path: null
     };
   }
-}
+};
+
+export async function CloudflareUploadAnyFile(
+  file: File,
+  bucket: string,
+  prefix?: string,
+): Promise<UploadFileRespons> {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const originalName = file.name;
+    const ext = path.extname(originalName).replace(".", "");
+
+    const randomName = stringWithTimestamp(5, true);
+
+    const fileName = `${prefix ? prefix + "-" : ""}${randomName}${ext ? "." + ext : ""}`;
+    const contentType = mime.getType(ext ?? "") || "application/octet-stream";
+
+    const putObjectCmd = new PutObjectCommand({
+      Bucket: bucket,
+      Key: fileName,
+      Body: buffer,
+      ContentType: contentType,
+    });
+    await cloudflare_s3.send(putObjectCmd);
+
+    const fileUrl = `${process.env.NEXT_PUBLIC_CLOUDFLARE_ENDPOINT}/${fileName}`;
+    
+    return {
+      status: true,
+      message: "File upload successfully",
+      filename: fileName,
+      path: fileUrl,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.message,
+      filename: null,
+      path: null,
+    };
+  }
+};

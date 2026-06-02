@@ -67,8 +67,11 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
   const [ytVideoStory, setYtVideoStory] = useState<string>(dataEvent.youtube_url ?? "");
   const [imageFileCouple, setImageFileCouple] = useState<File | null>(null);
   const [previewUrlCouple, setPreviewUrlCouple] = useState<string | null>(dataEvent.couple_img_path);
+
+  // Custom music theme
   const [fileMusicTheme, setFileMusicTheme] = useState<File | null>(null);
-  const [fileMusicThemeUrl, setFileMusicThemeUrl] = useState<string | null>(null);
+  const [fileMusicThemeUrl, setFileMusicThemeUrl] = useState<string | null>(dataEvent.music_url ? (dataEvent.music_url == Configs.keyCustomMusic ? dataEvent.custom_music_url : null) : null);
+  const [fileMusicThemeName, setFileMusicThemeName] = useState<string | null>(dataEvent.music_url ? (dataEvent.music_url == Configs.keyCustomMusic ? dataEvent.custom_music_name : null) : null);
   const [playStopMusicTheme, setPlayStopMusicTheme] = useState(false);
 
   // Groom Info
@@ -197,6 +200,20 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
     }
   };
 
+  const onChangeMusicTheme = (url: string) => {
+    if (!url) {
+      setMusicTheme("");
+      stopMusic();
+      return;
+    }
+    setMusicTheme(url);
+    playMusic(url);
+
+    setFileMusicTheme(null);
+    setFileMusicThemeUrl(null);
+    setFileMusicThemeName(null);
+    setPlayStopMusicTheme(false);
+  };
   const handleFileCustomMusicTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const file = e.target.files[0];
@@ -228,6 +245,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       const objectUrl = URL.createObjectURL(file);
       setFileMusicTheme(file);
       setFileMusicThemeUrl(objectUrl);
+      setFileMusicThemeName(file.name);
       e.target.value = "";
     }
   };
@@ -242,7 +260,6 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       contact_email: contactEmail.trim() != "" ? contactEmail : null,
       contact_phone: contactPhone.trim() != "" ? contactPhone : null,
       music_url: musicTheme.trim() != "" ? musicTheme : null,
-      music_file: fileMusicTheme,
       youtube_url: ytVideoStory.trim() != "" ? ytVideoStory : null,
       groom_bride: [
         {
@@ -284,6 +301,11 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
       couple_img_name: null,
       couple_img_url: previewUrlCouple ?? null,
       couple_file_img: imageFileCouple,
+
+      custom_music_r2: null,
+      custom_music_url: fileMusicThemeUrl,
+      custom_music_name: fileMusicThemeName,
+      custom_music_file: fileMusicTheme,
     };
 
     return newData;
@@ -334,7 +356,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
 
     let formSchame = FormSchemaMainInfo;
 
-    if (musicTheme === "custom_upload") { // Continue here
+    if (musicTheme === Configs.keyCustomMusic) { // Continue here
       formData.append("custom_theme_music", "");
       if (fileMusicThemeUrl) formData.append("custom_theme_music", fileMusicThemeUrl);
 
@@ -373,6 +395,11 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
         title: "Submit successfully",
         message: "Your submission has been successfully completed"
       });
+
+      setImageFileCouple(null);
+      setFileMusicTheme(null);
+      setImageFileGroom(null);
+      setImageFileBride(null);
     } catch (error: any) {
       toast({
         type: "warning",
@@ -741,20 +768,7 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
           </div>
           <div className="col-span-12 md:col-span-4">
             <Select value={musicTheme}
-              onChange={(e) => {
-                const url = e.target.value;
-                if (!url) {
-                  setMusicTheme("");
-                  stopMusic();
-                  return;
-                }
-                setMusicTheme(e.target.value);
-                playMusic(url);
-
-                setFileMusicTheme(null);
-                setFileMusicThemeUrl(null);
-                setPlayStopMusicTheme(false);
-              }}
+              onChange={(e) => onChangeMusicTheme(e.target.value)}
               onBlur={() => {
                 stopMusic();
               }}
@@ -764,12 +778,12 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                   value: x.url,
                   label: x.name
                 })) || []),
-                { value: "custom_upload", label: "Custom Upload..." }
+                { value: Configs.keyCustomMusic, label: "Custom Upload..." }
               ]}
             />
           </div>
           {
-            musicTheme === "custom_upload" && <div className="col-span-12">
+            musicTheme === Configs.keyCustomMusic && <div className="col-span-12">
               <label className="block text-sm font-medium mb-1 dark:text-white" htmlFor="custom_theme_music">
                 Upload Music Theme<span className="text-red-500">*</span>
                 <p className='text-sm text-muted'>Choose an MP3 file to upload your custom event music theme. Max size: {Configs.maxSizeAudioInMB} MB.</p>
@@ -786,9 +800,9 @@ function MainTabContent({ dataEvent }: { dataEvent: Events }) {
                 />
               </div>
               {
-                fileMusicTheme && <div className="flex items-center pt-2">
+                fileMusicThemeUrl && <div className="flex items-center pt-2">
                   <div className="text-sm">File Selected:</div>
-                  <div className="text-sm text-muted underline ps-2">{fileMusicTheme.name}</div>
+                  <div className="text-sm text-muted underline ps-2">{fileMusicThemeName ?? "Name Not Indetified"}</div>
                   <div onClick={() => {
                     if (playStopMusicTheme) {
                       stopMusic();
@@ -1492,6 +1506,14 @@ function GalleryTabContent(event_id: number) {
   const handleFileCaptureChange = async (e: { target: { files: FileList | null } }) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    if (files.length > 4) {
+      toast({
+        type: "info",
+        title: "Limit upload",
+        message: "Only allowed to select 4 files per upload. Please try again!",
+      });
+      return;
+    }
 
     if ((files.length + images.length) > Configs.p_limit) {
       toast({
@@ -1684,13 +1706,16 @@ function GalleryTabContent(event_id: number) {
               <span className="pe-1 font-medium text-gray-800">
                 Drop file here or click to
               </span>
-              <span className="font-semibold text-blue-600 hover:underline">
+              <span className="pe-1 font-semibold text-blue-600 hover:underline">
                 browse
+              </span>
+              <span className="pe-1 font-medium text-gray-800">
+                (Max 4 files)
               </span>
             </div>
 
             <p className="text-xs text-gray-400 mt-0">
-              Allowed formats JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB
+              JPG, JPEG, PNG up to {Configs.maxSizePictureInMB}MB, with maximum 4 files per upload
             </p>
 
             <input
@@ -1714,11 +1739,11 @@ function GalleryTabContent(event_id: number) {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              A maximum of 25 files can be uploaded.
+              A maximum of {Configs.p_limit} files can be uploaded.
               {/* Here your photo gallery list for guests to view and enjoy. */}
             </p>
             <p className="text-sm text-gray-500">
-              Files: {images.length}/25
+              Files: {images.length}/{Configs.p_limit}
             </p>
           </div>
           <hr className="my-2 text-gray-300" />

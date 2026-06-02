@@ -23,7 +23,8 @@ const Configs = {
   toastDuration: 4000, // In second
 
   s3_bucket: process.env.NEXT_PUBLIC_CLOUDFLARE_BUCKET,
-  p_limit: 25
+  p_limit: 20,
+  keyCustomMusic: "custom_upload",
 };
 export default Configs;
 

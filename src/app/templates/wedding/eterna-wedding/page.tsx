@@ -88,7 +88,8 @@ function Inner() {
   const searchParams = useSearchParams();
   const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
   const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
-
+  
+  const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [groom, setGroom] = useState<GroomBrideProps | null>(null);
   const [bride, setBride] = useState<GroomBrideProps | null>(null);
   const [groomProfile, setGroomProfile] = useState<string>();
@@ -199,6 +200,7 @@ function Inner() {
             setRsvpAtt(findData.event_rsvp.att_status ?? "");
             setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
             setRsvpDesc(findData.event_rsvp.desc ?? "");
+            setMusicUrl(findData.music_url === Configs.keyCustomMusic ? findData.custom_music_url : findData.music_url);
 
             const groomData = findData.gb_info.find(x => x.type === "Groom");
             const brideData = findData.gb_info.find(x => x.type === "Bride");
@@ -386,7 +388,7 @@ function Inner() {
 
                 <button
                   onClick={() => {
-                    if (eventDatas && eventDatas.music_url) playMusic(eventDatas.music_url);
+                    if (musicUrl) playMusic(musicUrl);
                     else playMusic(musicThemeWedding?.items[0].url ?? "");
                     setIsMusic(prev => !prev);
                     setOpened(prev => !prev);
@@ -1454,7 +1456,7 @@ function Inner() {
       <FloatingActionButton
         isMusic={isMusic}
         setIsMusic={setIsMusic}
-        musicUrl={eventDatas ? eventDatas.music_url ?? (musicThemeWedding?.items[0].url ?? "") : (musicThemeWedding?.items[0].url ?? "")}
+        musicUrl={musicUrl ?? (musicThemeWedding?.items[0].url ?? "")}
         qrValue={invtParams.code ?? "Wedlyvite"}
         guestName={eventDatas?.event_rsvp.name ?? "Thomas Edison"}
         eventDate={formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}

@@ -126,9 +126,13 @@ export type DtoMainInfoWedding = {
   contact_email: string | null;
   contact_phone: string | null;
   music_url: string | null;
-  music_file: File | null;
   youtube_url: string | null;
   groom_bride: DtoGroomBride[];
+  
+  custom_music_url: string | null;
+  custom_music_r2: string | null;
+  custom_music_name: string | null;
+  custom_music_file: File | null;
 };
 
 export type DtoGroomBride = {

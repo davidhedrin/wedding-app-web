@@ -5,7 +5,7 @@ import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
-import { CloudflareDeleteFile, CloudflareUploadFile } from "./common";
+import { CloudflareDeleteFile, CloudflareUploadAnyFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
 import { User } from "next-auth";
@@ -31,7 +31,7 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
       where: { id: event_id }
     });
     if(Configs.s3_bucket !== undefined){
-      if(findEventData && findEventData.couple_img_name && formData.couple_file_img === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
+      // if(findEventData && findEventData.couple_img_name && formData.couple_file_img === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
       if(formData.couple_file_img !== null) {
         if(findEventData && findEventData.couple_img_name) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
   
@@ -41,6 +41,21 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
           formData.couple_img_url = upFile.path;
         };
       };
+
+      if(formData.music_url == Configs.keyCustomMusic) {
+        if(findEventData && findEventData.custom_music_r2 && formData.custom_music_file === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.custom_music_r2).catch(err => {});
+        if(formData.custom_music_file !== null) {
+          if(findEventData && findEventData.custom_music_r2) CloudflareDeleteFile(Configs.s3_bucket, findEventData.custom_music_r2).catch(err => {});
+
+          var upFileMusic = await CloudflareUploadAnyFile(formData.custom_music_file, Configs.s3_bucket, "custom-music");
+          if(upFileMusic != null && upFileMusic.status == true) {
+            formData.custom_music_r2 = upFileMusic.filename;
+            formData.custom_music_url = upFileMusic.path;
+          }
+        }
+      } else {
+        if(findEventData && findEventData.custom_music_r2) CloudflareDeleteFile(Configs.s3_bucket, findEventData.custom_music_r2).catch(err => {});
+      }
     }
 
     await db.$transaction(async (tr) => {
@@ -52,8 +67,11 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
           contact_phone: formData.contact_phone,
           couple_img_name: formData.couple_img_name,
           couple_img_path: formData.couple_img_url,
-          music_url: formData.music_url,
           youtube_url: formData.youtube_url,
+          music_url: formData.music_url,
+          custom_music_url: formData.custom_music_url,
+          custom_music_name: formData.custom_music_name,
+          custom_music_r2: formData.custom_music_r2,
           updatedBy: user?.email
         }
       });
@@ -95,7 +113,7 @@ async function upsertGroomBride({
 
     if(Configs.s3_bucket !== undefined){
       // Hapus gambar lama jika img dihapus dari form
-      if (existing.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+      // if (existing.img_name && data.img_name === null) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
       // Upload gambar baru
       if (data.file_img) {
         if (existing.img_name) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
