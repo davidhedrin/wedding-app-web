@@ -24,14 +24,6 @@ enum DiscTypeEnum {
   Percent
 }
 
-enum AuthProviderEnum {
-  Credential
-  Google
-  Facebook
-
-  @@map("AuthProviderEnum")
-}
-
 enum EventStatusEnum {
   PENDING
   NOT_PAID
@@ -68,21 +60,20 @@ enum RsvpStatusEnum {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
-  password       String
-  email_verified DateTime?
-  role           RolesEnum
-  fullname       String?
-  image          String?
-  image_path     String?
-  no_phone       String?
-  gender         String?
-  birth_date     DateTime?
-  birth_place    String?
-  point          Int?             @default(0)
-  is_active      Boolean?         @default(true)
-  provider       AuthProviderEnum
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  role          RolesEnum @default(Client)
+  name          String?
+  no_phone      String?
+  gender        String?
+  birth_date    DateTime?
+  birth_place   String?
+  point         Int?      @default(0)
+  image         String?
+  image_name    String?
+  is_active     Boolean?  @default(true)
 
   createdBy String?
   updatedBy String?
@@ -93,6 +84,20 @@ model User {
 
   events  Events[]
   user_tr Tr[]
+  account Account?
+}
+
+model Account {
+  id                Int    @id @default(autoincrement())
+  userId            Int    @unique
+  type              String
+  provider          String
+  providerAccountId String
+  expires_at        Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model VerificationToken {
@@ -193,7 +198,7 @@ model Events {
   contact_phone     String?
   music_url         String?
   custom_music_url  String?
-  custom_music_r2  String?
+  custom_music_r2   String?
   custom_music_name String?
   youtube_url       String?
 

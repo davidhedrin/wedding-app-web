@@ -22,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      allowDangerousEmailAccountLinking: true
     }),
     Credentials({
       credentials: {
@@ -38,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           });
 
-          if (!finduser) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
+          if (!finduser || finduser.password === null) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
           if(finduser.is_active == false) throw new CustomError("Account Blocked!", "Please contact administrator if this is a mistake.");
           // if(finduser.email_verified == null) throw new CustomError("Email Not Verify", "Please confirm your email address verification!");
           
@@ -48,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return {
             ...finduser,
             id: String(finduser.id),
-            name: finduser.fullname
+            name: finduser.name
           };
         } catch (err: any) {
           throw new CustomError(err.name, err.message);
@@ -56,20 +57,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     }),
   ],
+  events: {
+    async createUser({ user }) {
+      // Just for Google
+      try{
+        await db.user.update({
+          where: {
+            id: Number(user.id)
+          },
+          data: {
+            fullname: user.name,
+            email_verified: new Date()
+          }
+        });
+      } catch (err: any) {
+        throw new CustomError(err.name, err.message);
+      }
+    },
+  },
   callbacks: {
     async signIn({ user, account }) {
-      // if(account?.provider !== "credentials") return false;
       if(account?.provider === "credentials") {
         const exisUser = await getUserById({
           id: user.id ? parseInt(user.id) : 0,
           select: {
             id: true,
-            email_verified: true
+            emailVerified: true
           }
         });
   
         if (!exisUser) throw new CustomError("Account Not Found", "We couldn't find an account with that email or username!");
-        if(!exisUser.email_verified) {
+        if(!exisUser.emailVerified) {
           const findToken = await db.verificationToken.findUnique({
             where: { userId: exisUser?.id},
             select: { token: true }

@@ -35,7 +35,7 @@ export default function Page() {
   const [inputSearch, setInputSearch] = useState("");
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
-    { name: "Name", key: "fullname", key_sort: "fullname", IsVisible: true },
+    { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "Email", key: "email", key_sort: "email", IsVisible: true },
     { name: "Role", key: "role", key_sort: "role", IsVisible: true },
     { name: "No Phone", key: "no_phone", key_sort: "no_phone", IsVisible: true },
@@ -52,7 +52,7 @@ export default function Page() {
         perPage: countPage,
         where: {
           OR: [
-            { fullname: { contains: inputSearch.trim(), mode: "insensitive" } },
+            { name: { contains: inputSearch.trim(), mode: "insensitive" } },
             { email: { contains: inputSearch.trim(), mode: "insensitive" } },
           ]
         },
@@ -166,7 +166,7 @@ export default function Page() {
     const newData: DtoUser = {
       id: addEditId,
       email: txtEmail,
-      fullname: txtName,
+      name: txtName,
       role: txtRole as RolesEnum,
       no_phone: txtPhone,
       gender: txtGender,
@@ -189,13 +189,13 @@ export default function Page() {
         setAddEditId(data.id);
         setIsActive(data.is_active != null ? data.is_active.toString() : "");
         setTxtEmail(data.email || "");
-        setTxtName(data.fullname || "");
+        setTxtName(data.name || "");
         setTxtRole(data.role);
         setTxtPhone(data.no_phone || "");
         setTxtGender(data.gender || "");
         setBirthDate(data.birth_date);
         setTxtBirthPlace(data.birth_place || "");
-        setUrlPrevPP(data.image_path || undefined);
+        setUrlPrevPP(data.image || undefined);
         setFilePP(null);
       }
       setLoading(false);
@@ -358,7 +358,7 @@ export default function Page() {
                             <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
                               <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
 
-                              {'fullname' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.fullname}</td>}
+                              {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
                               {'email' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.email}</td>}
                               {'role' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.role}</td>}
                               {'no_phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.no_phone || "-"}</td>}
@@ -415,7 +415,7 @@ export default function Page() {
         <i className='bx bx-plus-circle text-lg'></i> New
       </button>
       <UiPortal>
-        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 start-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
+        <div id={modalAddEdit} className="hs-overlay hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog">
           <div className="sm:max-w-lg hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
             <form onSubmit={handleSubmitForm} className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">

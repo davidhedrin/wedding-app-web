@@ -25,7 +25,7 @@ export type DtoUser = {
   id: number | null;
   email: string;
   role: RolesEnum;
-  fullname: string;
+  name: string;
   is_active: boolean;
   no_phone: string | null;
   gender: string | null;

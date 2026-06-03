@@ -1,6 +1,6 @@
 "use server";
 
-import { AuthProviderEnum, Prisma, RolesEnum, User } from "@/generated/prisma";
+import { Prisma, RolesEnum, User } from "@/generated/prisma";
 import { db } from "../../prisma/db-init";
 import { signIn, signOut } from "@/app/api/auth/auth-setup";
 import { generateOtp, hashPassword } from "@/lib/utils";
@@ -41,6 +41,18 @@ export async function signInCredential(formData: DtoSignIn) {
   }
 };
 
+export async function signInGoogle() {
+  try {
+    await signIn('google', {
+      redirectTo: "/client/dasboard"
+    }).then((res) => {
+      console.log(res);
+    });
+  } catch (err: any) {
+    throw err;
+  }
+}
+
 export async function signOutAuth() {
   await signOut({redirect: true, redirectTo: "/auth"});
 };
@@ -58,13 +70,12 @@ export async function signUpAction(formData: DtoSignUp) {
 
       const user = await tx.user.create({
         data: {
-          fullname,
+          name: fullname,
           email,
           password: hashPass,
           is_active: true,
           createdBy: email,
-          provider: AuthProviderEnum.Credential,
-          role: RolesEnum.Client
+          role: RolesEnum.Client,
         }
       });
       

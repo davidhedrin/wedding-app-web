@@ -64,9 +64,9 @@ export async function UpdateDataUser(formData: DtoUser) {
     // };
 
     if(Configs.s3_bucket !== undefined) {
-      if(findUserData && findUserData.image && formData.img_url === null) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+      if(findUserData && findUserData.image_name && formData.img_url === null) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image_name).catch(err => {});
       if(formData.file_img !== null) {
-        if(findUserData && findUserData.image) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image).catch(err => {});
+        if(findUserData && findUserData.image_name) CloudflareDeleteFile(Configs.s3_bucket, findUserData.image_name).catch(err => {});
   
         var upFile = await CloudflareUploadFile(formData.file_img, "webp", Configs.s3_bucket, "user-profile");
         if(upFile != null && upFile.status == true) {
@@ -79,14 +79,14 @@ export async function UpdateDataUser(formData: DtoUser) {
     await db.user.update({
       where: { id: data_id },
       data: {
-        fullname: formData.fullname,
+        name: formData.name,
         role: formData.role,
         no_phone: formData.no_phone,
         gender: formData.gender,
         birth_date: formData.birth_date,
         birth_place: formData.birth_place,
-        image: formData.img_name,
-        image_path: formData.img_url,
+        image: formData.img_url,
+        image_name: formData.img_name,
         is_active: formData.is_active,
         updatedBy: user?.email
       }

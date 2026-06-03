@@ -6,7 +6,6 @@ import { ZodErrors } from "@/components/zod-errors";
 import { FormState } from "@/lib/model-types";
 import { toast } from "@/lib/utils";
 import { signUpAction } from "@/server/auth";
-import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
