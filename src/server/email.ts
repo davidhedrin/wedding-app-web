@@ -48,7 +48,7 @@ export async function EmailForgotPassword(email: string) {
       where: {
         email: email,
         is_active: true,
-        email_verified: {
+        emailVerified: {
           not: null
         }
       }

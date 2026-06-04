@@ -5,7 +5,7 @@ import useCountdown from "@/lib/countdown";
 import { AnimatePresence, motion } from 'framer-motion';
 import bgImage from './bg.jpg';
 
-import { CombineDateAndTime, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from "@/lib/utils";
+import { CombineDateAndTime, copyToClipboard, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from "@/lib/utils";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
 import { useSearchParams } from "next/navigation";
 import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
@@ -669,7 +669,7 @@ function Inner() {
               }}
             >
               <img
-                src={eventDatas ? (eventDatas.event_galleries[0].img_path ?? "") : IMAGES[0]}
+                src={eventDatas ? (eventDatas.couple_img_path ?? "") : IMAGES[0]}
                 alt="Foto prewedding"
                 className="h-80 sm:h-96 w-full object-cover"
               />
@@ -1518,38 +1518,71 @@ function Inner() {
                 Transfer Bank
               </h4>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {[
+              {
+                eventDatas ? <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {
-                    bank: "Bank BCA",
-                    no: "1234567890",
-                    name: "Aisyah Rahma",
-                  },
-                  {
-                    bank: "Bank BRI",
-                    no: "9876543210",
-                    name: "Zidan Arya",
-                  },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between gap-4 rounded-xl bg-black/30 border border-white/10 p-4"
-                  >
-                    <div className="text-sm">
-                      <p className="font-medium">{item.bank}</p>
-                      <p className="text-white/70">No. Rek: {item.no}</p>
-                      <p className="text-white/50">a.n. {item.name}</p>
-                    </div>
+                    eventDatas.event_gifts.map((x, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between gap-4 rounded-xl bg-black/30 border border-white/10 p-4"
+                      >
+                        <div className="text-sm">
+                          <div className="flex items-center gap-3 text-white mb-2">
+                            <img className="h-5" src={allPaymentMethod.find(m => m.key === x.name)?.icon} />
+                          </div>
+                          <p className="text-white/70">No. Rek: {x.no_rek}</p>
+                          <p className="text-white/50">a.n. {x.name}</p>
+                        </div>
 
-                    <button
-                      className="btn bg-white/10 text-sm px-4 py-2 rounded-full"
-                      onClick={() => navigator.clipboard.writeText(item.no)}
+                        <button
+                          className="btn bg-white/10 text-sm px-4 py-2 rounded-full"
+                          onClick={() => navigator.clipboard.writeText(x.no_rek ?? "")}
+                        >
+                          Salin
+                        </button>
+                      </div>
+                    ))
+                  }
+                </div> : <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {[
+                    {
+                      icon: "bca",
+                      no: "1234567890",
+                      name: "Aisyah Rahma",
+                    },
+                    {
+                      icon: "dana",
+                      no: "0812-3456-7890",
+                      name: "Zidan Arya",
+                    },
+                    {
+                      icon: "ovo",
+                      no: "0812-3456-7890",
+                      name: "Zidan Arya",
+                    },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between gap-4 rounded-xl bg-black/30 border border-white/10 p-4"
                     >
-                      Salin
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      <div className="text-sm">
+                        <div className="flex items-center gap-3 text-white mb-2">
+                          <img className="h-5" src={allPaymentMethod.find(m => m.key === item.icon)?.icon} />
+                        </div>
+                        <p className="text-white/70">No. Rek: {item.no}</p>
+                        <p className="text-white/50">a.n. {item.name}</p>
+                      </div>
+
+                      <button
+                        className="btn bg-white/10 text-sm px-4 py-2 rounded-full"
+                        onClick={() => navigator.clipboard.writeText(item.no)}
+                      >
+                        Salin
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              }
             </div>
           </div>
 
@@ -1568,19 +1601,37 @@ function Inner() {
                   Alamat Pengiriman
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-white/70">
-                  Aisyah Rahma Jl. Melati No. 10 Bandung 40123 Indonesia
+                  {
+                    eventDatas ? (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.") : "Aisyah Rahma Jl. Melati No. 10 Bandung 40123 Indonesia"
+                  }
                 </p>
 
-                <button
-                  className="btn bg-white/10 text-sm px-4 py-2 rounded-full mt-3"
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      "Aisyah Rahma, Jl. Melati No. 10, Bandung 40123, Indonesia"
-                    )
-                  }
-                >
-                  Salin Alamat
-                </button>
+                {
+                  eventDatas ? (
+                    eventDatas.wishlist_address && <button
+                      className="btn bg-white/10 text-sm px-4 py-2 rounded-full mt-3"
+                      onClick={() => {
+                        copyToClipboard(eventDatas.wishlist_address ?? "");
+                        toast({
+                          type: "success",
+                          title: "Copy to Clipboard",
+                          message: "Well done, Text copied to clipboard.",
+                        });
+                      }}
+                    >
+                      Salin Alamat
+                    </button>
+                  ) : <button
+                    className="btn bg-white/10 text-sm px-4 py-2 rounded-full mt-3"
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        "Aisyah Rahma, Jl. Melati No. 10, Bandung 40123, Indonesia"
+                      )
+                    }
+                  >
+                    Salin Alamat
+                  </button>
+                }
               </div>
 
               <p className="mt-3 text-sm text-white/70">
@@ -1589,69 +1640,147 @@ function Inner() {
               </p>
 
               <div className="mt-6 grid md:grid-cols-3 gap-5">
-                {[
-                  { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
-                  { name: "Sprei Premium King Size", price: "Rp 2.200.000", qty: 1 },
-                  { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl bg-black/30 border border-white/10 p-4 flex flex-col justify-between"
-                  >
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-white/60 mt-1">
-                        Estimasi: {item.price}
-                      </p>
-                      <p className="text-sm text-white/60 mt-1">
-                        Jumlah: {item.qty} Unit • Direservasi: 1 Unit
-                      </p>
-                    </div>
+                {
+                  datasWs !== null ? datasWs.map((x, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl bg-black/30 border border-white/10 p-4 flex flex-col justify-between"
+                    >
+                      <div>
+                        <p className="font-medium">{x.name}{x.qty === x.reserve_qty && " (FULL)"}</p>
+                        <p className="text-sm text-white/60 mt-1">
+                          Estimasi: {x.product_price}
+                        </p>
+                        <p className="text-sm text-white/60 mt-1">
+                          Jumlah: {x.qty} Unit • Direservasi: {x.reserve_qty} Unit
+                        </p>
+                      </div>
 
-                    <div className='flex justify-between items-center gap-3'>
-                      <a
-                        href="#"
-                        className="mt-3 text-center text-sm rounded-full border border-white/20 py-2 px-3 hover:bg-white/10 transition"
-                      >
-                        Lihat
-                      </a>
-                      <button
-                        className="flex-1 mt-3 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
-                      >
-                        Reservasi <i className='bx bx-gift text-base ml-1'></i>
-                      </button>
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href={x.product_url ?? ""}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 text-center text-sm rounded-full border border-white/20 py-2 px-3 hover:bg-white/10 transition"
+                        >
+                          Lihat
+                        </a>
+                        <button
+                          onClick={() => openModalWislist(x.id)}
+                          className="flex-1 mt-3 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
+                        >
+                          Reservasi <i className='bx bx-gift text-base ml-1'></i>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )) : [
+                    { name: "Set Peralatan Makan", price: "Rp 1.500.000", qty: 1 },
+                    { name: "Sprei Premium King Size", price: "Rp 2.200.000", qty: 1 },
+                    { name: "Lampu Meja Minimalis", price: "Rp 850.000", qty: 1 },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl bg-black/30 border border-white/10 p-4 flex flex-col justify-between"
+                    >
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-white/60 mt-1">
+                          Estimasi: {item.price}
+                        </p>
+                        <p className="text-sm text-white/60 mt-1">
+                          Jumlah: {item.qty} Unit • Direservasi: 1 Unit
+                        </p>
+                      </div>
+
+                      <div className='flex justify-between items-center gap-3'>
+                        <a
+                          href="#"
+                          className="mt-3 text-center text-sm rounded-full border border-white/20 py-2 px-3 hover:bg-white/10 transition"
+                        >
+                          Lihat
+                        </a>
+                        <button
+                          className="flex-1 mt-3 text-center text-sm rounded-full border border-white/20 py-2 hover:bg-white/10 transition"
+                        >
+                          Reservasi <i className='bx bx-gift text-base ml-1'></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                }
               </div>
 
               {/* ================= PAGINATION (UI ONLY) ================= */}
-              <div className="mt-8 flex flex-col items-center gap-4">
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full bg-white text-black text-xs font-semibold">
-                    1
-                  </button>
-                  <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
-                    2
-                  </button>
-                  <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
-                    3
-                  </button>
-                </div>
+              {
+                datasWs !== null ? <div className="mt-8 flex flex-col items-center gap-4">
+                  <div className="flex gap-2">
+                    {
+                      Array.from({ length: totalPageWs }, (x, i) => {
+                        const numberPage = i + 1;
+                        return <button key={i}
+                          onClick={() => changePaginateWs(numberPage)}
+                          className={`w-8 h-8 rounded-full ${pageTableWs === numberPage ? "bg-white text-black text-xs font-semibold" : "border border-white/30 text-xs text-white/70"}`}>
+                          {numberPage}
+                        </button>
+                      })
+                    }
+                  </div>
 
-                <div className="flex gap-3">
-                  <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
-                    Prev
-                  </button>
-                  <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
-                    Next
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      disabled={pageTableWs <= 1}
+                      onClick={() => {
+                        if (pageTableWs >= 1) changePaginateWs(pageTableWs - 1);
+                      }}
+                      className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition"
+                    >
+                      Prev
+                    </button>
+                    <button
+                      disabled={pageTableWs >= totalPageWs}
+                      onClick={() => {
+                        if (pageTableWs <= totalPageWs) changePaginateWs(pageTableWs + 1);
+                      }}
+                      className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div> : <div className="mt-8 flex flex-col items-center gap-4">
+                  <div className="flex gap-2">
+                    <button className="w-8 h-8 rounded-full bg-white text-black text-xs font-semibold">
+                      1
+                    </button>
+                    <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
+                      2
+                    </button>
+                    <button className="w-8 h-8 rounded-full border border-white/30 text-xs text-white/70">
+                      3
+                    </button>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
+                      Prev
+                    </button>
+                    <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10 transition">
+                      Next
+                    </button>
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
       </section>
+
+      <ModalWishlist
+        open={openedModalWs}
+        setOpen={setOpenedModalWs}
+        wishlist_id={wishlistActiveId}
+        barcode={invtParams.code ?? ""}
+        fatchWishlist={fatchWishlist}
+      />
 
       {/* FAQ */}
       <section id="faq" className="relative">
@@ -1661,41 +1790,60 @@ function Inner() {
           <div className="reveal space-y-3" ref={(el) => {
             if (el) revealRef.current["faq"] = el
           }}>
-            {[
-              {
-                q: "Apakah anak-anak diperbolehkan?",
-                a: "Tentu, kami senang menyambut seluruh keluarga.",
-              },
-              {
-                q: "Apakah ada dress code?",
-                a: "Menggunakan warna ungu/netral akan sangat serasi dengan tema.",
-              },
-              {
-                q: "Kapan sebaiknya datang?",
-                a: "Mohon hadir 15-30 menit sebelum acara dimulai.",
-              },
-              {
-                q: "Apakah tersedia parkir?",
-                a: "Ya, area parkir luas dan terkoordinir.",
-              },
-            ].map((f, idx) => {
-              const isOpen = openFAQ === idx;
-              return (
-                <div key={idx} className="rounded-2xl border border-white/10 overflow-hidden">
-                  <button
-                    onClick={() => setOpenFAQ(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between px-4 py-4 bg-white/5 hover:bg-white/10 transition"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="text-left font-medium">{f.q}</span>
-                    <span className="text-xl">{isOpen ? "−" : "+"}</span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 py-3 bg-black/30 text-white/85">{f.a}</div>
-                  )}
-                </div>
-              );
-            })}
+            {
+              eventDatas ? eventDatas.event_faq.map((x, idx) => {
+                const isOpen = openFAQ === idx;
+                return (
+                  <div key={idx} className="rounded-2xl border border-white/10 overflow-hidden">
+                    <button
+                      onClick={() => setOpenFAQ(isOpen ? null : idx)}
+                      className="w-full flex items-center justify-between px-4 py-4 bg-white/5 hover:bg-white/10 transition"
+                      aria-expanded={isOpen}
+                    >
+                      <span className="text-left font-medium">{x.question}</span>
+                      <span className="text-xl">{isOpen ? "−" : "+"}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="px-4 py-3 bg-black/30 text-white/85">{x.answer}</div>
+                    )}
+                  </div>
+                );
+              }) : [
+                {
+                  q: "Apakah anak-anak diperbolehkan?",
+                  a: "Tentu, kami senang menyambut seluruh keluarga.",
+                },
+                {
+                  q: "Apakah ada dress code?",
+                  a: "Menggunakan warna ungu/netral akan sangat serasi dengan tema.",
+                },
+                {
+                  q: "Kapan sebaiknya datang?",
+                  a: "Mohon hadir 15-30 menit sebelum acara dimulai.",
+                },
+                {
+                  q: "Apakah tersedia parkir?",
+                  a: "Ya, area parkir luas dan terkoordinir.",
+                },
+              ].map((f, idx) => {
+                const isOpen = openFAQ === idx;
+                return (
+                  <div key={idx} className="rounded-2xl border border-white/10 overflow-hidden">
+                    <button
+                      onClick={() => setOpenFAQ(isOpen ? null : idx)}
+                      className="w-full flex items-center justify-between px-4 py-4 bg-white/5 hover:bg-white/10 transition"
+                      aria-expanded={isOpen}
+                    >
+                      <span className="text-left font-medium">{f.q}</span>
+                      <span className="text-xl">{isOpen ? "−" : "+"}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="px-4 py-3 bg-black/30 text-white/85">{f.a}</div>
+                    )}
+                  </div>
+                );
+              })
+            }
           </div>
         </div>
       </section>
@@ -1766,6 +1914,15 @@ function Inner() {
           </div>
         </div>
       </footer>
+
+      <FloatingActionButton
+        isMusic={isMusic}
+        setIsMusic={setIsMusic}
+        musicUrl={musicUrl ?? (musicThemeWedding?.items[0].url ?? "")}
+        qrValue={invtParams.code ?? "Wedlyvite"}
+        guestName={eventDatas?.event_rsvp.name ?? "Thomas Edison"}
+        eventDate={formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")}
+      />
     </main>
   );
 }

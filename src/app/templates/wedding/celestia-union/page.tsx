@@ -1464,15 +1464,6 @@ function Inner() {
               <div className="flex flex-col gap-4">
                 <div>
                   <div className="text-xs uppercase tracking-wider text-white/60">
-                    Penerima
-                  </div>
-                  <div className="mt-1 text-white font-medium">
-                    Alya Putri
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-white/60">
                     Alamat Lengkap
                   </div>
                   <div className="mt-1 text-white leading-relaxed">

@@ -136,7 +136,7 @@ export async function emailVerify(formData: DtoOtpVerify) {
           id: findToken.userId
         },
         data: {
-          email_verified: new Date()
+          emailVerified: new Date()
         }
       });
 
