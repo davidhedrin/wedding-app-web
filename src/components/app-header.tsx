@@ -21,7 +21,11 @@ export default function AppHeader() {
           {
             userData && statusLogin === "authenticated" ? <div className="hidden md:inline-flex hs-dropdown [--strategy:absolute] [--auto-close:inside] [--placement:bottom-right] relative text-start">
               <button id="hs-profile-app" type="button" className="cursor-pointer p-0.5 inline-flex shrink-0 items-center gap-x-3 text-start rounded-full hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                <img className="shrink-0 size-8 rounded-full" src="https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80" alt="Avatar" />
+                <img
+                  className="shrink-0 size-8 rounded-full"
+                  src={userData.user?.image ?? "https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80"}
+                  alt="Avatar"
+                />
               </button>
 
               <div className="hs-dropdown-menu hs-dropdown-open:opacity-100 w-60 transition-[opacity,margin] duration opacity-0 hidden z-20 bg-white border border-gray-200 rounded-xl shadow-xl" role="menu" aria-orientation="vertical" aria-labelledby="hs-profile-app">

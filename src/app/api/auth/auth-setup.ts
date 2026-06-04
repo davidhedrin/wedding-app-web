@@ -66,8 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: Number(user.id)
           },
           data: {
-            fullname: user.name,
-            email_verified: new Date()
+            emailVerified: new Date()
           }
         });
       } catch (err: any) {

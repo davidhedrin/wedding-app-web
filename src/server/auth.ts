@@ -44,7 +44,7 @@ export async function signInCredential(formData: DtoSignIn) {
 export async function signInGoogle() {
   try {
     await signIn('google', {
-      redirectTo: "/client/dasboard"
+      redirectTo: "/client/dashboard"
     }).then((res) => {
       console.log(res);
     });
