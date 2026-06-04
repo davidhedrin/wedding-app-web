@@ -1180,7 +1180,7 @@ function Inner() {
                 </div>
 
                 <div className="mt-5 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                  <p className="text-sm text-white/70">Page 1 of 3</p>
+                  <p className="text-sm text-white/70">Page {pageTableRsvp} of {totalPageRsvp}</p>
 
                   <div className="flex items-center gap-2">
                     <button

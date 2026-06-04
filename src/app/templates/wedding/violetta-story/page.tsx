@@ -1,12 +1,21 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Playfair_Display, Cormorant_Garamond, Inter } from "next/font/google";
 import useCountdown from "@/lib/countdown";
 import { AnimatePresence, motion } from 'framer-motion';
-
 import bgImage from './bg.jpg';
-import { formatDate } from "@/lib/utils";
-import Configs from "@/lib/config";
+
+import { CombineDateAndTime, delay, ExecuteMinimumDelay, ExtractYtID, formatDate, getMonthName, playMusic, rsvpLabels, toast } from "@/lib/utils";
+import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
+import { useSearchParams } from "next/navigation";
+import { EventInitProps, GroomBrideProps, InvitationParams } from "@/lib/model-types";
+import { EventGifts, EventRsvp, RsvpStatusEnum } from "@/generated/prisma";
+import { GetDataEventGifts, GetDataEventRsvp } from "@/server/event-detail";
+import { GetSplashScreenEventData, UpadateRsvp } from "@/server/event";
+import { GenProfileDescWedding } from "../../utils";
+import LoadingUI from '@/components/loading/loading-ui';
+import FloatingActionButton from '../../floating-action';
+import { ModalWishlist } from '../../modal-wishlist';
 
 /**
  * Invitation Type: Wedding
@@ -52,14 +61,6 @@ const IMAGES = Array.from({ length: 8 }).map(
   () => `${Configs.base_url}/assets/img/2149043983.jpg`
 );
 
-type RSVPForm = {
-  name: string;
-  phone: string;
-  attendance: "Hadir" | "Tidak Hadir" | "Belum Pasti";
-  guests: number;
-  message: string;
-};
-
 // === KOMPONEN KECIL ===
 const SectionTitle: React.FC<{ title: string; subtitle?: string }> = ({
   title,
@@ -99,7 +100,177 @@ function useLockBodyScroll(isLocked: boolean) {
 };
 
 // === HALAMAN ===
-export default function WeddingInvitationPage() {
+function Inner() {
+  const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
+  const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
+
+  const [isLoading, setIsloading] = useState(true);
+  const searchParams = useSearchParams();
+  const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
+  const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
+
+  const [musicUrl, setMusicUrl] = useState<string | null>(null);
+  const [groom, setGroom] = useState<GroomBrideProps | null>(null);
+  const [bride, setBride] = useState<GroomBrideProps | null>(null);
+  const [groomProfile, setGroomProfile] = useState<string>();
+  const [brideProfile, setBrideProfile] = useState<string>();
+  const [longlatLoc, setLonglatLoc] = useState<string>();
+
+  const [rsvpName, setRsvpName] = useState<string>("");
+  const [rsvpHp, setRsvpHp] = useState<string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
+  const [rsvpDesc, setRsvpDesc] = useState<string>("");
+
+  const [pageTableWs, setPageTableWs] = useState(1);
+  const [perPageWs, setPerPageWs] = useState(6);
+  const [totalPageWs, setTotalPageWs] = useState(0);
+  const [datasWs, setDatasWs] = useState<EventGifts[] | null>(null);
+  const fatchWishlist = async (event_id: number, page: number = pageTableWs, countPage: number = perPageWs) => {
+    const result = await GetDataEventGifts(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        type: "Wishlist"
+      },
+      select: {
+        id: true,
+        name: true,
+        product_price: true,
+        qty: true,
+        product_url: true,
+        reserve_qty: true,
+      },
+      orderBy: {
+        id: "asc"
+      }
+    });
+
+    setTotalPageWs(result.meta.totalPages);
+    setPageTableWs(result.meta.page);
+    setDatasWs(result.data);
+  };
+  const changePaginateWs = async (page: number) => {
+    if (eventDatas) {
+      setPageTableWs(page);
+      await fatchWishlist(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [pageTableRsvp, setPageTableRsvp] = useState(1);
+  const [perPageRsvp, setPerPageRsvp] = useState(6);
+  const [totalPageRsvp, setTotalPageRsvp] = useState(0);
+  const [datasRsvp, setDatasRsvp] = useState<EventRsvp[] | null>(null);
+  const fatchRsvpMsg = async (event_id: number, page: number = pageTableRsvp, countPage: number = perPageRsvp) => {
+    const result = await GetDataEventRsvp(event_id, {
+      curPage: page,
+      perPage: countPage,
+      where: {
+        show_desc: true,
+        att_status: {
+          not: null
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        desc: true,
+        show_desc: true,
+        att_status: true,
+        createdAt: true
+      },
+      orderBy: {
+        createdAt: "asc"
+      }
+    });
+
+    setTotalPageRsvp(result.meta.totalPages);
+    setPageTableRsvp(result.meta.page);
+    setDatasRsvp(result.data);
+  };
+  const changePaginateRsvp = async (page: number) => {
+    if (eventDatas) {
+      setPageTableRsvp(page);
+      await fatchRsvpMsg(eventDatas.event_rsvp.event_id, page);
+    }
+  };
+
+  const [isMusic, setIsMusic] = useState(false);
+  const [openedModalWs, setOpenedModalWs] = useState(false);
+  const [wishlistActiveId, setWishlistActiveId] = useState<number>(0);
+  const openModalWislist = (wislist_id: number) => {
+    setWishlistActiveId(wislist_id);
+    setOpenedModalWs(true);
+  }
+
+  useEffect(() => {
+    const delayMs = 2000;
+    const fatchData = async () => {
+      if (invtParams.code !== undefined && invtParams.code.trim() !== "") {
+        try {
+          const findData = await ExecuteMinimumDelay(
+            GetSplashScreenEventData(invtParams.code),
+            delayMs
+          );
+
+          if (findData) {
+            setEventDatas(findData);
+            setRsvpName(findData.event_rsvp.name);
+            setRsvpHp(findData.event_rsvp.phone ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
+            setRsvpDesc(findData.event_rsvp.desc ?? "");
+            setMusicUrl(findData.music_url === Configs.keyCustomMusic ? findData.custom_music_url : findData.music_url);
+
+            const groomData = findData.gb_info.find(x => x.type === "Groom");
+            const brideData = findData.gb_info.find(x => x.type === "Bride");
+            setGroom(groomData ?? null);
+            setBride(brideData ?? null);
+
+            if (groomData) setGroomProfile(GenProfileDescWedding({
+              type: groomData.type,
+              birth_order: groomData.birth_order,
+              father_name: groomData.father_name,
+              mother_name: groomData.mother_name,
+              place_origin: groomData.place_origin,
+              occupation: groomData.occupation,
+            }));
+
+            if (brideData) setBrideProfile(GenProfileDescWedding({
+              type: brideData.type,
+              birth_order: brideData.birth_order,
+              father_name: brideData.father_name,
+              mother_name: brideData.mother_name,
+              place_origin: brideData.place_origin,
+              occupation: brideData.occupation,
+            }));
+
+            const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
+            if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+
+            fatchWishlist(findData.event_rsvp.event_id);
+            fatchRsvpMsg(findData.event_rsvp.event_id);
+          }
+
+        } catch (error: any) {
+          await delay(delayMs);
+          toast({
+            type: "warning",
+            title: "Unknown Invitation",
+            message: error?.message ?? "We are sorry, your invitation was not recognized!"
+          });
+        }
+      } else {
+        await delay(delayMs);
+      }
+
+      setIsloading(false);
+    };
+
+    fatchData();
+  }, []);
+  //--------------------------------------------------------------------
+
   const [opened, setOpened] = useState(false)
   useLockBodyScroll(!opened)
 
@@ -120,7 +291,7 @@ export default function WeddingInvitationPage() {
   }, []);
 
   // Countdown
-  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(WEDDING_DATE);
+  const { days, hours, minutes, seconds, isToday, isExpired } = useCountdown(eventDatas?.event_time ?? WEDDING_DATE);
 
   const goToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -132,19 +303,33 @@ export default function WeddingInvitationPage() {
   const galPrev = () => setGalIdx((i) => (i - 1 + IMAGES.length) % IMAGES.length);
 
   // RSVP
-  const [form, setForm] = useState<RSVPForm>({
-    name: "",
-    phone: "",
-    attendance: "Hadir",
-    guests: 1,
-    message: "",
-  });
-  const [sent, setSent] = useState(false);
-  const submitRSVP = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Integrasikan ke API/Sheet/Email sesuai kebutuhan
-    console.log("RSVP:", form);
-    setSent(true);
+  const [sending, setSending] = useState(false);
+  const submitRSVP = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (invtParams.code !== undefined && eventDatas !== null) {
+      e.preventDefault();
+      const form = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(form.entries());
+      setSending(true);
+
+      await ExecuteMinimumDelay(
+        UpadateRsvp(invtParams.code, {
+          rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
+          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
+          rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
+        }),
+        2000
+      );
+
+      setSending(false);
+      (e.target as HTMLFormElement).reset();
+    }
+
+    toast({
+      type: "success",
+      title: "Submit successfully",
+      message: "Your submission has been successfully completed"
+    });
   };
 
   // FAQ
@@ -238,13 +423,9 @@ export default function WeddingInvitationPage() {
         }
       `}</style>
 
-      <AnimatePresence>
-        {!opened && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-98 flex items-center justify-center text-center px-6"
-          >
+      <AnimatePresence mode="wait">
+        {
+          isLoading ? <div className="fixed inset-0 z-98">
             <div className="absolute inset-0">
               <img
                 src={bgImage.src}
@@ -254,33 +435,55 @@ export default function WeddingInvitationPage() {
               <div className="absolute inset-0 bg-linear-to-b from-purple-900/30 via-fuchsia-900/50 to-purple-800/80 backdrop-blur-sm" />
             </div>
 
+            <LoadingUI activeTitle={false} />
+          </div> : !opened && (
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1 }}
-              className="relative z-10 space-y-4"
+              key="intro"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-98 flex items-center justify-center text-center px-6"
             >
-              <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
-              <h1
-                className={`mt-4 text-4xl sm:text-5xl lg:text-6xl leading-tight ${playfair.className}`}
-              >
-                <span className={THEME.accent}>Aisyah</span> &{" "}
-                <span className={THEME.accent}>Zidan</span>
-              </h1>
-              <p className="mt-4 text-lg"><strong className={THEME.accent}>Tanggal:</strong> {formatDate(WEDDING_DATE, "long")}</p>
-              <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-              <p className="font-semibold text-xl mt-1 text-white">Nama Tamu</p>
+              <div className="absolute inset-0">
+                <img
+                  src={bgImage.src}
+                  alt="cover"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-linear-to-b from-purple-900/30 via-fuchsia-900/50 to-purple-800/80 backdrop-blur-sm" />
+              </div>
 
-              <button
-                onClick={() => setOpened(true)}
-                className={`btn ${THEME.btn}`}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="relative z-10 space-y-4"
               >
-                Buka Undangan
-                <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
-              </button>
+                <p className="tracking-widest uppercase text-sm mb-4 text-white">Wedding Invitation</p>
+                <h1
+                  className={`mt-4 text-4xl sm:text-5xl lg:text-6xl leading-tight ${playfair.className}`}
+                >
+                  <span className={THEME.accent}>{groom?.shortname ?? "Aisyah"}</span> &{" "}
+                  <span className={THEME.accent}>{bride?.shortname ?? "Zidan"}</span>
+                </h1>
+                <p className="mt-4 text-lg"><strong className={THEME.accent}>Tanggal:</strong> {formatDate(eventDatas?.event_time ?? WEDDING_DATE, "long")}</p>
+                <p className="mt-2 italic text-white">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <p className="font-semibold text-xl mt-1 text-white">{eventDatas?.event_rsvp.name ?? "Nama Tamu"}</p>
+
+                <button
+                  onClick={() => {
+                    if (musicUrl) playMusic(musicUrl);
+                    else playMusic(musicThemeWedding?.items[0].url ?? "");
+                    setIsMusic(prev => !prev);
+                    setOpened(prev => !prev);
+                  }}
+                  className={`btn ${THEME.btn}`}
+                >
+                  Buka Undangan
+                  <span className="inline-block translate-x-0 group-hover:translate-x-0.5 transition">↗</span>
+                </button>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
       </AnimatePresence>
 
       {/* NAVIGATION */}
@@ -295,7 +498,7 @@ export default function WeddingInvitationPage() {
               onClick={() => goToSection("hero")}
               aria-label="Kembali ke atas"
             >
-              <span className={`${THEME.accent}`}>A&Z</span> Wedding
+              <span className={`${THEME.accent}`}>{groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "Z"}</span> Wedding
             </button>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -363,13 +566,11 @@ export default function WeddingInvitationPage() {
               <h1
                 className={`mt-4 text-4xl sm:text-5xl lg:text-6xl leading-tight ${playfair.className}`}
               >
-                <span className={THEME.accent}>Aisyah</span> &{" "}
-                <span className={THEME.accent}>Zidan</span>
+                <span className={THEME.accent}>{groom?.shortname ?? "Aisyah"}</span> &{" "}
+                <span className={THEME.accent}>{bride?.shortname ?? "Zidan"}</span>
               </h1>
               <p className={`mt-4 text-white/80 ${cormorant.className} text-lg`}>
-                Dengan memohon rahmat Tuhan Yang Maha Esa, kami bermaksud
-                menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan
-                bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
+                Dengan memohon rahmat Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
               </p>
 
               {/* COUNTDOWN */}
@@ -468,16 +669,16 @@ export default function WeddingInvitationPage() {
               }}
             >
               <img
-                src={IMAGES[0]}
+                src={eventDatas ? (eventDatas.event_galleries[0].img_path ?? "") : IMAGES[0]}
                 alt="Foto prewedding"
                 className="h-80 sm:h-96 w-full object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex items-center gap-2">
-                  <span className={`text-sm ${THEME.accent}`}>#AisyahZidan</span>
+                  <span className={`text-sm ${THEME.accent}`}>#{groom?.shortname ?? "Aisyah"}{bride?.shortname ?? "Zidan"}</span>
                   <span className="text-white/60 text-sm">•</span>
-                  <span className="text-white/80 text-sm">12.20.2025</span>
+                  <span className="text-white/80 text-sm">{formatDate(eventDatas?.event_time ?? WEDDING_DATE, "long")}</span>
                 </div>
               </div>
             </div>
@@ -493,44 +694,70 @@ export default function WeddingInvitationPage() {
             subtitle="Bersama dalam cinta dan harapan"
           />
           <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { name: "Aisyah Rahma", desc: "Putri dari Bapak X & Ibu Y" },
-              { name: "Zidan Arya", desc: "Putra dari Bapak A & Ibu B" },
-            ].map((p, idx) => (
-              <div
-                key={p.name}
-                className="reveal rounded-3xl overflow-hidden card"
-                ref={(el) => {
-                  if (el) revealRef.current[`m-${idx}`] = el
-                }}
-              >
-                <div className="relative">
-                  <img
-                    src={IMAGES[idx]}
-                    alt={p.name}
-                    className="h-72 w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+            {
+              eventDatas ? eventDatas.gb_info.map((x, idx) => (
+                <div
+                  key={idx}
+                  className="reveal rounded-3xl overflow-hidden card"
+                  ref={(el) => {
+                    if (el) revealRef.current[`m-${idx}`] = el
+                  }}
+                >
+                  <div className="relative">
+                    <img
+                      src={IMAGES[idx]}
+                      alt={x.shortname}
+                      className="h-72 w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className={`text-2xl ${playfair.className}`}>{x.fullname}</h3>
+                    <p className={`text-white/80 mt-1 ${inter.className}`}>
+                      {x.type === "Groom" ? groomProfile : brideProfile}
+                    </p>
+                    <p className={`mt-4 text-white/80 ${cormorant.className}`}>
+                      “{x.personal_msg}”
+                    </p>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className={`text-2xl ${playfair.className}`}>{p.name}</h3>
-                  <p className={`text-white/80 mt-1 ${inter.className}`}>{p.desc}</p>
-                  <p className={`mt-4 text-white/80 ${cormorant.className}`}>
-                    “Semoga Allah menghimpun yang terserak dari keduanya,
-                    memberkahi keduanya, dan menuntun keduanya pada kebaikan.”
-                  </p>
+              )) : [
+                { name: "Aisyah Rahma", desc: "Putri dari Bapak X & Ibu Y" },
+                { name: "Zidan Arya", desc: "Putra dari Bapak A & Ibu B" },
+              ].map((p, idx) => (
+                <div
+                  key={p.name}
+                  className="reveal rounded-3xl overflow-hidden card"
+                  ref={(el) => {
+                    if (el) revealRef.current[`m-${idx}`] = el
+                  }}
+                >
+                  <div className="relative">
+                    <img
+                      src={IMAGES[idx]}
+                      alt={p.name}
+                      className="h-72 w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className={`text-2xl ${playfair.className}`}>{p.name}</h3>
+                    <p className={`text-white/80 mt-1 ${inter.className}`}>{p.desc}</p>
+                    <p className={`mt-4 text-white/80 ${cormorant.className}`}>
+                      “Semoga Allah menghimpun yang terserak dari keduanya,
+                      memberkahi keduanya, dan menuntun keduanya pada kebaikan.”
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            }
           </div>
 
           <div className="reveal mt-8 text-center" ref={(el) => {
             if (el) revealRef.current["m-sapaan"] = el
           }}>
             <p className={`${cormorant.className} text-white/85 text-lg`}>
-              Dengan penuh sukacita, kami mengundang Bapak/Ibu/Saudara/i untuk
-              menghadiri hari bahagia kami. Doa restu Anda adalah hadiah
-              terindah bagi kami.
+              {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Dengan penuh sukacita, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia kami. Doa restu Anda adalah hadiah terindah bagi kami."}
             </p>
           </div>
         </div>
@@ -538,87 +765,205 @@ export default function WeddingInvitationPage() {
 
       {/* ACARA */}
       <section id="acara" className="relative">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-18 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-18 md:py-20">
           <SectionTitle
             title="Acara"
             subtitle="Waktu & Tempat Penyelenggaraan"
           />
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="reveal card rounded-2xl p-6" ref={(el) => {
-              if (el) revealRef.current["ac-1"] = el
-            }}>
-              <h4 className={`text-xl ${playfair.className}`}>Akad Nikah</h4>
-              <ul className="mt-3 space-y-2 text-white/85">
-                <li>Sabtu, 20 Desember 2025</li>
-                <li>10:00 WIB</li>
-                <li>Masjid Agung Contoh</li>
-              </ul>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Pill>Formal</Pill>
-                <Pill>Masker Opsional</Pill>
-              </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* LEFT */}
+            <div className="space-y-6">
 
-              <a
-                href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
-                target="_blank"
-                className={`inline-flex mt-4 btn ${THEME.btn}`}
-              >
-                <div className='flex items-center'>
-                  <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
+              {
+                eventDatas ? eventDatas.schedule_info.map((x, i) => {
+                  let title = "";
+                  if (x.type === "WED_MB") title = "Akad Nikah";
+                  else if (x.type === "WED_TOR") {
+                    if (x.ceremony_type === "Reception") title = "Resepsi";
+                    else if (x.ceremony_type === "Traditional") title = "Tradisional / Adat";
+                  }
+
+                  return <div
+                    key={i}
+                    className="reveal card rounded-2xl p-6"
+                    ref={(el) => {
+                      if (el) revealRef.current[`ac-${i}`] = el;
+                    }}
+                  >
+                    <h4 className={`text-xl ${playfair.className}`}>
+                      {title}
+                    </h4>
+
+                    <ul className="mt-3 space-y-2 text-white/85">
+                      <li>{`${formatDate(CombineDateAndTime(x.date, x.start_time), "full", "short")} - ${x.end_time}`}</li>
+                      <li>
+                        {`${x.location} · ${x.address}`}. <a
+                          href={`https://www.google.com/maps?q=${x.latitude},${x.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-amber-500 underline"
+                        >
+                          Lihat Lokasi
+                        </a>
+                      </li>
+                    </ul>
+
+                    {x.notes.length > 0 && <div className="mt-4 flex flex-wrap gap-2">
+                      {x.notes.map((tag, tagIndex) => (
+                        <Pill key={tagIndex}>{tag}</Pill>
+                      ))}
+                    </div>
+                    }
+
+                    {
+                      x.youtube_url && <a
+                        href={x.youtube_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex mt-4 btn ${THEME.btn}`}
+                      >
+                        <div className="flex items-center">
+                          <span className="me-1">
+                            Live Youtube
+                          </span>
+                          <i className="bx bxl-youtube text-2xl"></i>
+                        </div>
+                      </a>
+                    }
+                  </div>
+                }) : [
+                  {
+                    title: "Akad Nikah",
+                    date: "Sabtu, 20 Desember 2025 | 10:00 WIB",
+                    location: "Masjid Agung Contoh",
+                    tags: ["Formal", "Masker Opsional"],
+                    livestream: "https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo",
+                  },
+                  {
+                    title: "Resepsi",
+                    date: "Sabtu, 20 Desember 2025 | 19:00 — 21:00 WIB",
+                    location: "Gedung Serbaguna Contoh",
+                    tags: ["Dress Code: Ungu / Netral", "Parkir Luas"],
+                    livestream: "https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo",
+                  },
+                ].map((event, index) => (
+                  <div
+                    key={index}
+                    className="reveal card rounded-2xl p-6"
+                    ref={(el) => {
+                      if (el) revealRef.current[`ac-${index}`] = el;
+                    }}
+                  >
+                    <h4 className={`text-xl ${playfair.className}`}>
+                      {event.title}
+                    </h4>
+
+                    <ul className="mt-3 space-y-2 text-white/85">
+                      <li>{event.date}</li>
+                      <li>{event.location}</li>
+                    </ul>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {event.tags.map((tag, tagIndex) => (
+                        <Pill key={tagIndex}>{tag}</Pill>
+                      ))}
+                    </div>
+
+                    {event.livestream && (
+                      <a
+                        href={event.livestream}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex mt-4 btn ${THEME.btn}`}
+                      >
+                        <div className="flex items-center">
+                          <span className="me-1">
+                            Live Youtube
+                          </span>
+                          <i className="bx bxl-youtube text-2xl"></i>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                ))}
+
+              {/* CATATAN */}
+              {
+                eventDatas ? eventDatas.schedule_note !== null && <div
+                  className="reveal card rounded-2xl p-6"
+                  ref={(el) => {
+                    if (el) revealRef.current["ac-note"] = el;
+                  }}
+                >
+                  <h4 className={`text-xl ${playfair.className}`}>
+                    Catatan
+                  </h4>
+
+                  <p className="mt-3 text-white/85">
+                    {eventDatas.schedule_note}
+                  </p>
+
+                  <button
+                    onClick={() => goToSection("rsvp")}
+                    className={`mt-4 btn ${THEME.btn}`}
+                  >
+                    Isi RSVP
+                  </button>
+                </div> : <div
+                  className="reveal card rounded-2xl p-6"
+                  ref={(el) => {
+                    if (el) revealRef.current["ac-note"] = el;
+                  }}
+                >
+                  <h4 className={`text-xl ${playfair.className}`}>
+                    Catatan
+                  </h4>
+
+                  <p className="mt-3 text-white/85">
+                    Mohon konfirmasi kehadiran melalui form RSVP.
+                    Datang tepat waktu ya! Tersedia photobooth
+                    dan live music.
+                  </p>
+
+                  <button
+                    onClick={() => goToSection("rsvp")}
+                    className={`mt-4 btn ${THEME.btn}`}
+                  >
+                    Isi RSVP
+                  </button>
                 </div>
-              </a>
+              }
             </div>
 
-            <div className="reveal card rounded-2xl p-6" ref={(el) => {
-              if (el) revealRef.current["ac-2"] = el
-            }}>
-              <h4 className={`text-xl ${playfair.className}`}>Resepsi</h4>
-              <ul className="mt-3 space-y-2 text-white/85">
-                <li>Sabtu, 20 Desember 2025</li>
-                <li>19:00 — 21:00 WIB</li>
-                <li>Gedung Serbaguna Contoh</li>
-              </ul>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Pill>Dress Code: Ungu / Netral</Pill>
-                <Pill>Parkir Luas</Pill>
-              </div>
-
-              <a
-                href="https://youtu.be/17aqk4WUhIA?si=KDgGKd2wTs1FpVTo"
-                target="_blank"
-                className={`inline-flex mt-4 btn ${THEME.btn}`}
+            {/* RIGHT */}
+            {
+              eventDatas ? <div
+                className="reveal card rounded-2xl overflow-hidden border border-white/10 min-h-150"
+                ref={(el) => {
+                  if (el) revealRef.current["ac-map"] = el;
+                }}
               >
-                <div className='flex items-center'>
-                  <div className='me-1 leading-none'>Live Youtube</div><i className='bx bxl-youtube text-2xl'></i>
-                </div>
-              </a>
-            </div>
-
-            <div className="reveal card rounded-2xl p-6" ref={(el) => {
-              if (el) revealRef.current["ac-3"] = el
-            }}>
-              <h4 className={`text-xl ${playfair.className}`}>Catatan</h4>
-              <p className="mt-3 text-white/85">
-                Mohon konfirmasi kehadiran melalui form RSVP. Datang tepat waktu
-                ya! Tersedia photobooth dan live music.
-              </p>
-              <button onClick={() => goToSection("rsvp")} className={`mt-4 btn w-full ${THEME.btn}`}>
-                Isi RSVP
-              </button>
-            </div>
-          </div>
-
-          <div className="reveal mt-8 rounded-2xl overflow-hidden border border-white/10" ref={(el) => {
-            if (el) revealRef.current["ac-map"] = el
-          }}>
-            {/* Google Maps Iframe (contoh tempat) */}
-            <iframe
-              title="Lokasi Acara"
-              src="https://www.google.com/maps?q=Monas%20Jakarta&output=embed"
-              className="w-full h-80 md:h-105"
-              loading="lazy"
-            />
+                <iframe
+                  title="Lokasi Acara"
+                  src={`https://www.google.com/maps?q=${longlatLoc}&z=14&output=embed`}
+                  className="w-full h-full min-h-150"
+                  loading="lazy"
+                />
+              </div> : <div
+                className="reveal card rounded-2xl overflow-hidden border border-white/10 min-h-150"
+                ref={(el) => {
+                  if (el) revealRef.current["ac-map"] = el;
+                }}
+              >
+                <iframe
+                  title="Lokasi Acara"
+                  src="https://www.google.com/maps?q=Monas%20Jakarta&output=embed"
+                  className="w-full h-full min-h-150"
+                  loading="lazy"
+                />
+              </div>
+            }
           </div>
         </div>
       </section>
@@ -634,73 +979,138 @@ export default function WeddingInvitationPage() {
           <div className="reveal relative rounded-3xl overflow-hidden border border-white/10" ref={(el) => {
             if (el) revealRef.current["gal"] = el
           }}>
-            <div className="relative h-72 sm:h-96">
-              {IMAGES.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`Galeri ${i + 1}`}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIdx ? "opacity-100" : "opacity-0"
-                    }`}
-                />
-              ))}
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-
-              {/* Controls */}
-              <button
-                aria-label="Sebelumnya"
-                onClick={galPrev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-              >
-                ‹
-              </button>
-              <button
-                aria-label="Berikutnya"
-                onClick={galNext}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-              >
-                ›
-              </button>
-
-              {/* Dots */}
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-                {IMAGES.map((_, i) => (
-                  <button
+            {
+              eventDatas ? <div className="relative h-72 sm:h-96">
+                {eventDatas.event_galleries.map((src, i) => (
+                  <img
                     key={i}
-                    aria-label={`Slide ${i + 1}`}
-                    className={`h-2 w-2 rounded-full transition ${i === galIdx ? "bg-white" : "bg-white/50 hover:bg-white/70"
-                      }`}
-                    onClick={() => setGalIdx(i)}
+                    src={src.img_path ?? ""}
+                    alt={`Galeri ${i + 1}`}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIdx ? "opacity-100" : "opacity-0"}`}
                   />
                 ))}
-              </div>
-            </div>
-          </div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
 
-          <div className="snap-center shrink-0 mt-16">
-            <div
-              className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
-            >
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/vtIGvGigw4g"
-                title="YouTube video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-
-              {/* Overlay play */}
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
-                <svg
-                  className="h-12 w-12 text-white drop-shadow-lg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
+                {/* Controls */}
+                <button
+                  aria-label="Sebelumnya"
+                  onClick={galPrev}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
                 >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+                  ‹
+                </button>
+                <button
+                  aria-label="Berikutnya"
+                  onClick={galNext}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
+                >
+                  ›
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                  {eventDatas.event_galleries.map((_, i) => (
+                    <button
+                      key={i}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2 w-2 rounded-full transition ${i === galIdx ? "bg-white" : "bg-white/50 hover:bg-white/70"}`}
+                      onClick={() => setGalIdx(i)}
+                    />
+                  ))}
+                </div>
+              </div> : <div className="relative h-72 sm:h-96">
+                {IMAGES.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`Galeri ${i + 1}`}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIdx ? "opacity-100" : "opacity-0"
+                      }`}
+                  />
+                ))}
+                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
+
+                {/* Controls */}
+                <button
+                  aria-label="Sebelumnya"
+                  onClick={galPrev}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
+                >
+                  ‹
+                </button>
+                <button
+                  aria-label="Berikutnya"
+                  onClick={galNext}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
+                >
+                  ›
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                  {IMAGES.map((_, i) => (
+                    <button
+                      key={i}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2 w-2 rounded-full transition ${i === galIdx ? "bg-white" : "bg-white/50 hover:bg-white/70"
+                        }`}
+                      onClick={() => setGalIdx(i)}
+                    />
+                  ))}
+                </div>
+              </div>
+            }
+          </div>
+
+          {
+            eventDatas ? eventDatas.youtube_url !== null && <div className="snap-center shrink-0 mt-16">
+              <div
+                className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+              >
+                <iframe
+                  className="h-full w-full"
+                  src={`https://www.youtube.com/embed/${ExtractYtID(eventDatas.youtube_url)}`}
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            </div> : <div className="snap-center shrink-0 mt-16">
+              <div
+                className="bg-black/40 backdrop-blur-md group relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg"
+              >
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/vtIGvGigw4g"
+                  title="YouTube video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+
+                {/* Overlay play */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 text-white drop-shadow-lg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
       </section>
 
@@ -709,61 +1119,90 @@ export default function WeddingInvitationPage() {
         <div className="mx-auto max-w-5xl px-4 py-14 sm:py-18 md:py-20">
           <SectionTitle title="Cerita Kami" subtitle="Jejak perjalanan cinta" />
           <ol className="relative border-l border-white/20 ml-2">
-            {[
-              {
-                t: "2018",
-                title: "Pertemuan Pertama",
-                body:
-                  "Kami bertemu di kampus, sebuah awal sederhana yang bermakna.",
-              },
-              {
-                t: "2020",
-                title: "Komitmen",
-                body:
-                  "Di tengah banyak hal, kami semakin yakin melangkah bersama.",
-              },
-              {
-                t: "2024",
-                title: "Lamaran",
-                body:
-                  "Momen khidmat bersama keluarga yang mengikat janji kami.",
-              },
-              {
-                t: "2025",
-                title: "Menuju Pelaminan",
-                body:
-                  "Dengan doa restu, kami siap memasuki babak baru kehidupan.",
-              },
-            ].map((item, i) => (
-              <li
-                key={i}
-                className="mb-10 ml-4 reveal"
-                ref={(el) => {
-                  if (el) revealRef.current[`story-${i}`] = el
-                }}
-              >
-                <div className="flex flex-col md:flex-row items-start">
-                  {/* Teks bagian kiri */}
-                  <div className="md:w-2/3 md:pr-4">
-                    <div className="absolute w-3 h-3 bg-amber-300 rounded-full -left-1.5 top-1.5 border border-white/30" />
-                    <time className="text-sm text-white/70 ps-2.5">{item.t}</time>
-                    <h3 className={`text-xl mt-1 ${playfair.className}`}>
-                      {item.title}
-                    </h3>
-                    <p className="text-white/85 mt-1">{item.body}</p>
-                  </div>
+            {
+              eventDatas ? eventDatas.event_histories.map((ev, i) => {
+                return <li
+                  key={i}
+                  className="mb-10 ml-4 reveal"
+                  ref={(el) => {
+                    if (el) revealRef.current[`story-${i}`] = el
+                  }}
+                >
+                  <div className="flex flex-col md:flex-row items-start">
+                    {/* Teks bagian kiri */}
+                    <div className="md:w-2/3 md:pr-4">
+                      <div className="absolute w-3 h-3 bg-amber-300 rounded-full -left-1.5 top-1.5 border border-white/30" />
+                      <time className="text-sm text-white/70 ps-2.5">{getMonthName(ev.month)} - {ev.year}</time>
+                      <h3 className={`text-xl mt-1 ${playfair.className}`}>
+                        {ev.name}
+                      </h3>
+                      <p className="text-white/85 mt-1">{ev.desc}</p>
+                    </div>
 
-                  {/* Gambar bagian kanan */}
-                  <div className="md:w-1/3 mt-3 md:mt-0">
-                    <img
-                      src={IMAGES[i % IMAGES.length]}
-                      alt={item.title}
-                      className="h-44 w-full object-cover rounded-xl border border-white/10"
-                    />
+                    {/* Gambar bagian kanan */}
+                    {ev.gallery?.img_path && (
+                      <div className="md:w-1/3 mt-3 md:mt-0">
+                        <img
+                          src={ev.gallery.img_path}
+                          alt={ev.name}
+                          className="h-44 w-full object-cover rounded-xl border border-white/10"
+                        />
+                      </div>
+                    )}
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              }) : [
+                {
+                  t: "Jan - 2018",
+                  title: "Pertemuan Pertama",
+                  body: "Kami bertemu di kampus, sebuah awal sederhana yang bermakna.",
+                },
+                {
+                  t: "Feb - 2020",
+                  title: "Komitmen",
+                  body: "Di tengah banyak hal, kami semakin yakin melangkah bersama.",
+                },
+                {
+                  t: "Mar - 2024",
+                  title: "Lamaran",
+                  body: "Momen khidmat bersama keluarga yang mengikat janji kami.",
+                },
+                {
+                  t: "Apr - 2025",
+                  title: "Menuju Pelaminan",
+                  body: "Dengan doa restu, kami siap memasuki babak baru kehidupan.",
+                },
+              ].map((item, i) => (
+                <li
+                  key={i}
+                  className="mb-10 ml-4 reveal"
+                  ref={(el) => {
+                    if (el) revealRef.current[`story-${i}`] = el
+                  }}
+                >
+                  <div className="flex flex-col md:flex-row items-start">
+                    {/* Teks bagian kiri */}
+                    <div className="md:w-2/3 md:pr-4">
+                      <div className="absolute w-3 h-3 bg-amber-300 rounded-full -left-1.5 top-1.5 border border-white/30" />
+                      <time className="text-sm text-white/70 ps-2.5">{item.t}</time>
+                      <h3 className={`text-xl mt-1 ${playfair.className}`}>
+                        {item.title}
+                      </h3>
+                      <p className="text-white/85 mt-1">{item.body}</p>
+                    </div>
+
+                    {/* Gambar bagian kanan */}
+                    <div className="md:w-1/3 mt-3 md:mt-0">
+                      <img
+                        src={IMAGES[i % IMAGES.length]}
+                        alt={item.title}
+                        className="h-44 w-full object-cover rounded-xl border border-white/10"
+                      />
+                    </div>
+                  </div>
+                </li>
+              ))
+            }
           </ol>
         </div>
       </section>
@@ -784,8 +1223,7 @@ export default function WeddingInvitationPage() {
               <label className="text-sm text-white/80">Nama Lengkap</label>
               <input
                 required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                disabled={eventDatas !== null} value={rsvpName} onChange={(e) => setRsvpName(e.target.value)}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
                 placeholder="Nama Anda"
               />
@@ -794,8 +1232,7 @@ export default function WeddingInvitationPage() {
               <label className="text-sm text-white/80">No. WhatsApp</label>
               <input
                 required
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                value={rsvpHp} onChange={(e) => setRsvpHp(e.target.value)}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
                 placeholder="08xxxxxxxxxx"
               />
@@ -804,15 +1241,12 @@ export default function WeddingInvitationPage() {
             <div>
               <label className="text-sm text-white/80">Kehadiran</label>
               <select
-                value={form.attendance}
-                onChange={(e) =>
-                  setForm({ ...form, attendance: e.target.value as RSVPForm["attendance"] })
-                }
+                value={rsvpAtt} onChange={(e) => setRsvpAtt(e.target.value as RsvpStatusEnum)}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
               >
-                <option>Hadir</option>
-                <option>Tidak Hadir</option>
-                <option>Belum Pasti</option>
+                <option value={RsvpStatusEnum.PRESENCE}>Hadir</option>
+                <option value={RsvpStatusEnum.ABSENCE}>Tidak hadir</option>
+                <option value={RsvpStatusEnum.UNKNOWN}>Belum pasti</option>
               </select>
             </div>
 
@@ -820,11 +1254,15 @@ export default function WeddingInvitationPage() {
               <label className="text-sm text-white/80">Jumlah Tamu</label>
               <input
                 type="number"
-                min={1}
-                value={form.guests}
-                onChange={(e) =>
-                  setForm({ ...form, guests: Number(e.target.value) })
-                }
+                value={rsvpAttNumber}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "") {
+                    setRsvpAttNumber(1);
+                    return;
+                  }
+                  setRsvpAttNumber(parseInt(value));
+                }}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
               />
             </div>
@@ -833,8 +1271,7 @@ export default function WeddingInvitationPage() {
               <label className="text-sm text-white/80">Pesan / Doa</label>
               <textarea
                 rows={4}
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                value={rsvpDesc} onChange={(e) => setRsvpDesc(e.target.value)}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
                 placeholder="Tulis pesan terbaik Anda..."
               />
@@ -844,127 +1281,220 @@ export default function WeddingInvitationPage() {
               <button type="submit" className={`btn ${THEME.btn} w-full sm:w-auto`}>
                 Kirim Konfirmasi
               </button>
-              {sent && (
-                <span className="text-sm text-emerald-300">
-                  Terima kasih! RSVP Anda sudah kami terima.
-                </span>
-              )}
             </div>
           </form>
 
-          <div className="mt-14">
+          {
+            datasRsvp !== null ? <div className="mt-14">
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-semibold text-white">
+                  Guest Book
+                </h3>
+                <p className="text-sm text-white/60 mt-1">
+                  Ucapan & doa dari para tamu
+                </p>
+              </div>
 
-            <div className="text-center mb-8">
-              <h3 className="text-xl font-semibold text-white">
-                Guest Book
-              </h3>
-              <p className="text-sm text-white/60 mt-1">
-                Ucapan & doa dari para tamu
-              </p>
-            </div>
+              <div className="space-y-4">
+                {datasRsvp.map((msg, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-5 hover:bg-white/10 transition"
+                  >
 
-            <div className="space-y-4">
+                    {/* glow line */}
+                    <div className="absolute left-0 top-4 bottom-4 w-0.5 bg-fuchsia-500/40 rounded-full" />
 
-              {[
-                {
-                  name: "Kevin Pratama",
-                  message:
-                    "Selamat menempuh hidup baru, semoga langgeng sampai tua ✨",
-                  date: "15 Apr 2026",
-                  status: "Hadir",
-                },
-                {
-                  name: "Dinda Lestari",
-                  message:
-                    "Maaf belum bisa hadir, tapi doa terbaik selalu menyertai kalian 💜",
-                  date: "16 Apr 2026",
-                  status: "Tidak Hadir",
-                },
-                {
-                  name: "Rizky Aditya",
-                  message:
-                    "Semoga menjadi keluarga yang sakinah mawaddah warahmah 🔥",
-                  date: "17 Apr 2026",
-                  status: "Belum Pasti",
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-5 hover:bg-white/10 transition"
-                >
+                    <div className="pl-4">
 
-                  {/* glow line */}
-                  <div className="absolute left-0 top-4 bottom-4 w-0.5 bg-fuchsia-500/40 rounded-full" />
+                      {/* header */}
+                      <div className="flex items-center justify-between">
 
-                  <div className="pl-4">
+                        <p className="text-white font-medium">
+                          {msg.name}
+                        </p>
 
-                    {/* header */}
-                    <div className="flex items-center justify-between">
+                        <span
+                          className={`text-[11px] px-3 py-1 rounded-full border ${msg.att_status === 'PRESENCE'
+                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
+                            : msg.att_status === 'UNKNOWN'
+                              ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
+                              : "bg-rose-500/10 text-rose-300 border-rose-400/30"
+                            }`}
+                        >
+                          {msg.att_status ? rsvpLabels[msg.att_status] : "-"}
+                        </span>
 
-                      <p className="text-white font-medium">
-                        {item.name}
+                      </div>
+
+                      {/* message */}
+                      <p className="mt-2 text-sm text-white/70 leading-relaxed">
+                        {msg.desc || "-"}
                       </p>
 
-                      <span
-                        className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
-                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
-                          : item.status === "Belum Pasti"
-                            ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
-                            : "bg-rose-500/10 text-rose-300 border-rose-400/30"
-                          }`}
-                      >
-                        {item.status}
-                      </span>
+                      {/* date */}
+                      <p className="mt-3 text-xs text-white/40">
+                        {msg.createdAt ? msg.createdAt.toLocaleDateString("id-ID") : "-"}
+                      </p>
 
                     </div>
-
-                    {/* message */}
-                    <p className="mt-2 text-sm text-white/70 leading-relaxed">
-                      {item.message}
-                    </p>
-
-                    {/* date */}
-                    <p className="mt-3 text-xs text-white/40">
-                      {item.date}
-                    </p>
-
                   </div>
+                ))}
+              </div>
+
+              {/* PAGINATION */}
+              <div className="mt-10 flex flex-col items-center gap-3">
+                <p className="text-xs text-white/50">
+                  Page {pageTableRsvp} of {totalPageRsvp}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={pageTableRsvp <= 1}
+                    onClick={() => {
+                      if (pageTableRsvp >= 1) changePaginateRsvp(pageTableRsvp - 1);
+                    }}
+                    className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition"
+                  >
+                    Prev
+                  </button>
+
+                  {
+                    Array.from({ length: totalPageRsvp }, (x, i) => {
+                      const numberPage = i + 1;
+                      return <button key={i}
+                        onClick={() => changePaginateRsvp(numberPage)}
+                        className={`px-3 py-1 text-sm rounded-full ${pageTableRsvp === numberPage ? "bg-fuchsia-500 text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]" : "border border-white/20 text-white/70 hover:bg-white/10 transition"}`}>
+                        {numberPage}
+                      </button>
+                    })
+                  }
+
+                  <button
+                    disabled={pageTableRsvp >= totalPageRsvp}
+                    onClick={() => {
+                      if (pageTableRsvp <= totalPageRsvp) changePaginateRsvp(pageTableRsvp + 1);
+                    }}
+                    className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition"
+                  >
+                    Next
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            </div> : <div className="mt-14">
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-semibold text-white">
+                  Guest Book
+                </h3>
+                <p className="text-sm text-white/60 mt-1">
+                  Ucapan & doa dari para tamu
+                </p>
+              </div>
 
-            {/* PAGINATION */}
-            <div className="mt-10 flex flex-col items-center gap-3">
+              <div className="space-y-4">
 
-              <p className="text-xs text-white/50">
-                Page 1 of 3
-              </p>
+                {[
+                  {
+                    name: "Kevin Pratama",
+                    message:
+                      "Selamat menempuh hidup baru, semoga langgeng sampai tua ✨",
+                    date: "15 Apr 2026",
+                    status: "Hadir",
+                  },
+                  {
+                    name: "Dinda Lestari",
+                    message:
+                      "Maaf belum bisa hadir, tapi doa terbaik selalu menyertai kalian 💜",
+                    date: "16 Apr 2026",
+                    status: "Tidak Hadir",
+                  },
+                  {
+                    name: "Rizky Aditya",
+                    message:
+                      "Semoga menjadi keluarga yang sakinah mawaddah warahmah 🔥",
+                    date: "17 Apr 2026",
+                    status: "Belum Pasti",
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-5 hover:bg-white/10 transition"
+                  >
 
-              <div className="flex items-center gap-2">
+                    {/* glow line */}
+                    <div className="absolute left-0 top-4 bottom-4 w-0.5 bg-fuchsia-500/40 rounded-full" />
 
-                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
-                  Prev
-                </button>
+                    <div className="pl-4">
 
-                <button className="px-3 py-1 text-xs rounded-full bg-fuchsia-500 text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]">
-                  1
-                </button>
+                      {/* header */}
+                      <div className="flex items-center justify-between">
 
-                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
-                  2
-                </button>
+                        <p className="text-white font-medium">
+                          {item.name}
+                        </p>
 
-                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
-                  3
-                </button>
+                        <span
+                          className={`text-[11px] px-3 py-1 rounded-full border ${item.status === "Hadir"
+                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
+                            : item.status === "Belum Pasti"
+                              ? "bg-yellow-500/10 text-yellow-300 border-yellow-400/30"
+                              : "bg-rose-500/10 text-rose-300 border-rose-400/30"
+                            }`}
+                        >
+                          {item.status}
+                        </span>
 
-                <button className="px-3 py-1 text-xs rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
-                  Next
-                </button>
+                      </div>
 
+                      {/* message */}
+                      <p className="mt-2 text-sm text-white/70 leading-relaxed">
+                        {item.message}
+                      </p>
+
+                      {/* date */}
+                      <p className="mt-3 text-xs text-white/40">
+                        {item.date}
+                      </p>
+
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* PAGINATION */}
+              <div className="mt-10 flex flex-col items-center gap-3">
+
+                <p className="text-sm text-white/50">
+                  Page 1 of 3
+                </p>
+
+                <div className="flex items-center gap-2">
+
+                  <button className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                    Prev
+                  </button>
+
+                  <button className="px-3 py-1 text-sm rounded-full bg-fuchsia-500 text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]">
+                    1
+                  </button>
+
+                  <button className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                    2
+                  </button>
+
+                  <button className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                    3
+                  </button>
+
+                  <button className="px-3 py-1 text-sm rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
+                    Next
+                  </button>
+
+                </div>
               </div>
             </div>
-          </div>
+          }
+
         </div>
       </section>
 
@@ -1237,5 +1767,13 @@ export default function WeddingInvitationPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function WeddingInvitationPage() {
+  return (
+    <Suspense>
+      <Inner />
+    </Suspense>
   );
 }

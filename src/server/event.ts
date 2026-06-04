@@ -8,7 +8,7 @@ import { CartCheckoutProps, CombineDateAndTime, stringWithTimestamp } from "@/li
 import { ulid } from "ulid";
 import midtrans from "@/lib/midtrans-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
-import { Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
+import { EventRsvp, Events, EventStatusEnum, Prisma, TemplateCaptures, Templates, Tr, User, Vouchers } from "@/generated/prisma";
 import { CheckVoucherById } from "./systems/voucher";
 
 // const statusMidTr = await midtrans.core.transaction.status(findIsTr.tr_id);
@@ -47,6 +47,25 @@ export async function GetDataEvents(params: GetDataEventsParams): Promise<Pagina
     }
   };
 };
+
+export async function GetFirstRsvpPreview(eventId: number): Promise<EventRsvp> {
+  try{
+    const session = await auth();
+    if(!session) throw new Error("Authentication credential not Found!");
+    const { user } = session;
+
+    const getRow = await db.eventRsvp.findFirst({
+      where: {
+        event_id: eventId
+      }
+    });
+
+    if (!getRow) throw new Error("To preview your event, please add guests on the RSVP tab first.");
+    return getRow;
+  } catch (error: any) {
+    throw error;
+  }
+}
 
 export async function StoreUpdateDataEvents(formData: DtoEvents): Promise<string | null> {
   try {
@@ -133,7 +152,7 @@ function ParamSnapMidtrans({ orderId, amount, event }: { orderId: string, amount
       gross_amount: amount
     },
     customer_details: {
-      first_name: event.user.fullname,
+      first_name: event.user.name,
       email: event.user.email,
       phone: event.user.no_phone
     },

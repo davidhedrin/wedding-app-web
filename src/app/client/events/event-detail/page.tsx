@@ -5,7 +5,7 @@ import { useLoading } from "@/components/loading/loading-context";
 import { BreadcrumbType, Color } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
 import { CartCheckoutProps, eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
-import { CancelOrderEvent, GetDataEventByCode, StoreSnapMidtrans } from "@/server/event";
+import { CancelOrderEvent, GetDataEventByCode, GetFirstRsvpPreview, StoreSnapMidtrans } from "@/server/event";
 import { Events, Templates, Tr, Vouchers } from "@/generated/prisma";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
@@ -265,7 +265,20 @@ function Inner() {
     }
   };
 
-  const [activeTab, setActiveTab] = useState("main-info");
+  const handlePreview = async (eventId: number, url: string | null) => {
+    if(!url) return;
+
+    try {
+      const getRow = await GetFirstRsvpPreview(eventId);
+      window.open(`/${url}?code=${getRow.barcode}`, "_blank");
+    } catch (error: any) {
+      toast({
+        type: "info",
+        title: "Preview Failed!",
+        message: error.message
+      });
+    }
+  };
 
   return (
     <>
@@ -515,9 +528,9 @@ function Inner() {
 
                     {/* Preview Button */}
                     <div>
-                      <a href={`/${dataEvent.template.url}`} target='_blank' className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                      <button onClick={() => handlePreview(dataEvent.id, dataEvent.template?.url ?? null)} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
                         Preview
-                      </a>
+                      </button>
                     </div>
                   </div>
 
