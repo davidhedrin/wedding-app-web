@@ -3,7 +3,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ConfirmProps, ToastProps, useConfirmStore, useToastStore, userLoginData } from "./zustand";
 import { signOutAuth } from "@/server/auth";
-import { StatusType, TableShortList, TableThModel } from "./model-types";
+import { DurationProps, StatusType, TableShortList, TableThModel } from "./model-types";
 import { DiscTypeEnum, EventStatusEnum, RsvpStatusEnum, Vouchers } from "@/generated/prisma";
 import Configs from "./config";
 
@@ -269,18 +269,14 @@ export function toDatetimeLocalString(date: Date): string {
 
 export function CartCheckoutProps({
   subTotal,
-  addOns,
-  voucher
+  voucher,
+  duration
 } : {
   subTotal: number;
-  addOns: boolean | null;
   voucher: Vouchers | null;
+  duration: DurationProps;
 }) {
-  let priceAddOn = 0;
   let dicAmountResult = 0;
-
-  if (addOns) priceAddOn = Configs.priceAddOn1;
-  else priceAddOn = 0;
 
   if (voucher !== null) {
     if (voucher.disc_type === DiscTypeEnum.Amount) dicAmountResult = Number(voucher.disc_amount);
@@ -291,7 +287,7 @@ export function CartCheckoutProps({
     dicAmountResult = Math.min(dicAmountResult, subTotal);
   };
 
-  const grandTotalAmount = (subTotal + priceAddOn) - dicAmountResult;
+  const grandTotalAmount = (subTotal + duration.value) - dicAmountResult;
   return {
     dicAmountResult,
     totalAmount: grandTotalAmount

@@ -200,23 +200,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
     let dataPriceInit = 0;
     if(getDataEvent.template) dataPriceInit = getDataEvent.template.disc_price ? getDataEvent.template.price - getDataEvent.template.disc_price : getDataEvent.template.price;
     
-    // let priceAddOn = 0;
-    // let dicAmountResult = 0;
-    
-    // if (formData.extra_history) priceAddOn = Configs.priceAddOn;
-    // else priceAddOn = 0;
-
-    // if (checkVoucher !== null) {
-    //   if (checkVoucher.disc_type === DiscTypeEnum.AMOUNT) dicAmountResult = Number(checkVoucher.disc_amount);
-    //   if (checkVoucher.disc_type === DiscTypeEnum.PERCENT) {
-    //     const dicsPerAmount = Math.ceil(dataPriceInit * (checkVoucher.disc_amount / 100));
-    //     dicAmountResult = dicsPerAmount;
-    //   };
-    //   dicAmountResult = Math.min(dicAmountResult, dataPriceInit);
-    // };
-    // const grandTotalAmount = (dataPriceInit + priceAddOn) - dicAmountResult;
-    
-    const allPropsCheckout = CartCheckoutProps({subTotal: dataPriceInit, addOns: formData.add_ons1, voucher: checkVoucher});
+    const allPropsCheckout = CartCheckoutProps({subTotal: dataPriceInit, voucher: checkVoucher, duration: formData.duration});
 
     if(findIsTr && findIsTr.pay_token && findIsTr.pay_redirect_url){
       if(nowDate > findIsTr.pay_expiry_time){
@@ -276,8 +260,7 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
           voucher_slug: checkVoucher && checkVoucher.slug,
           voucher_type: checkVoucher && checkVoucher.disc_type,
           voucher_amount: checkVoucher && checkVoucher.disc_amount,
-          add_ons1: formData.add_ons1,
-          add_ons1_amount: formData.add_ons1 ? formData.add_ons1_amount : null,
+          duration_amount: formData.duration.value,
           total_amount: allPropsCheckout.totalAmount
         }
       });
@@ -290,13 +273,17 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
         })
       );
 
-      const expiredPay = new Date(nowDate.getTime() + 86400000); 
+      const expiredPay = new Date(nowDate.getTime() + 86400000);
+      const curDur = new Date();
+      curDur.setMonth(curDur.getMonth() + formData.duration.month);
       
       await Promise.all([
         tx.events.update({
           where: { id: formData.event_id },
           data: {
             tmp_status: EventStatusEnum.NOT_PAID,
+            duration: formData.duration.month,
+            duration_date: curDur,
           }
         }),
         tx.tr.update({

@@ -8,6 +8,9 @@ import { StoreUpdateDataEvents } from "@/server/event";
 import { TemplateCaptures, Templates } from "@/generated/prisma";
 import { useRouter } from "next/navigation";
 import { useLoading } from "./loading/loading-context";
+import { useState } from "react";
+import { DurationProps } from "@/lib/model-types";
+import Configs, { DurationList } from "@/lib/config";
 
 type TemplateCatalogProp = {
   template: Templates & {
@@ -20,6 +23,7 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
   const { setLoading } = useLoading();
   const smartLink = useSmartLink();
   const { statusLogin } = userLoginData();
+  const [selectDuration, setSelectDuration] = useState<DurationProps>(DurationList.find(x => x.month == Configs.defaultDuration) ?? DurationList[0]);
 
   const addTemplate = async () => {
     const confirmed = await showConfirm({
@@ -122,15 +126,15 @@ export default function TemplateCatalog({ template }: TemplateCatalogProp) {
             {template.disc_price && template.disc_price > 0 ? (
               <div>
                 <p className="text-gray-400 line-through text-sm">
-                  Rp {template.price.toLocaleString("id-ID")}
+                  Rp {(template.price + selectDuration.value).toLocaleString("id-ID")}
                 </p>
                 <p className="text-color-app font-bold text-base">
-                  Rp {(template.price - template.disc_price).toLocaleString("id-ID")}
+                  Rp {((template.price + selectDuration.value) - template.disc_price).toLocaleString("id-ID")}
                 </p>
               </div>
             ) : (
               <p className="text-color-app font-bold text-base">
-                Rp {template.price.toLocaleString("id-ID")}
+                Rp {(template.price + selectDuration.value).toLocaleString("id-ID")}
               </p>
             )}
           </div>

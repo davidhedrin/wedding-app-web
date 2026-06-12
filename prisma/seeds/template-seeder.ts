@@ -11,7 +11,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "celestia-union",
         name: "Celestia Union",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Celebrate your love with celestial charm and timeless elegance.",
         desc: "<h1 style=\"text-align: center;\">Celestia Union: A Love Written in the Stars</h1><p style=\"text-align: left;\">The <strong>Celestia Union</strong> wedding template brings a celestial charm that feels timeless and enchanting. Inspired by the beauty of the cosmos, its design combines starlit details, dreamy gradients, and a romantic atmosphere. Perfect for couples who believe their love is destined in the stars, this template exudes elegance with a touch of magic.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Elegant celestial-inspired graphics and motifs</li><li>Responsive design for flawless viewing on all devices</li><li>Customizable sections for love stories, gallery, and RSVP</li><li>Refined typography with a dreamy glow effect</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who adore cosmic or celestial themes</li><li>Romantic weddings under the night sky</li><li>Those who want a mystical yet elegant vibe</li></ol><p style=\"text-align: center;\"><em>“Celestia Union made our invitation feel like a love story written among the stars.”</em> — <strong>Luna &amp; Elias</strong></p>",
@@ -29,7 +29,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "dark-aurora",
         name: "Dark Aurora",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Bring mystery and radiance to your wedding with aurora-inspired elegance.",
         desc: "<h1 style=\"text-align: center;\">Dark Aurora: Mystique in Radiant Lights</h1><p style=\"text-align: left;\">The <strong>Dark Aurora</strong> wedding template offers a bold and mesmerizing atmosphere inspired by the natural wonder of the aurora borealis. With its deep tones contrasted by radiant color flows, this design creates an ambience of passion, mystery, and elegance. It’s the ideal choice for couples who want their celebration to shine with a dramatic flair.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Unique aurora-inspired color transitions</li><li>Fully responsive across devices</li><li>Customizable layouts for story, gallery, and RSVP</li><li>Modern fonts with luminous contrast</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love dramatic and bold aesthetics</li><li>Evening weddings with glamorous settings</li><li>Those seeking a mysterious yet refined theme</li></ol><p style=\"text-align: center;\"><em>“Our guests were captivated by the beauty of Dark Aurora — it felt magical.”</em> — <strong>Aria &amp; Daven</strong></p>",
@@ -47,7 +47,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "emerald-grace",
         name: "Emerald Grace",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Elegant and timeless, inspired by the beauty of emerald green.",
         desc: "<h1 style=\"text-align: center;\">Emerald Grace: Elegance in Green</h1><p style=\"text-align: left;\">The <strong>Emerald Grace</strong> wedding template celebrates sophistication with the timeless beauty of emerald green. Its luxurious tones and refined details bring out the natural charm of love and harmony. Combining minimalism with elegance, this template feels both refreshing and regal, making every detail shine in grace.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Luxurious emerald-inspired color palette</li><li>Clean, responsive, and versatile design</li><li>Sections for story, gallery, RSVP, and details</li><li>Typography that emphasizes elegance and class</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love timeless and classic styles</li><li>Garden or ballroom weddings</li><li>Those who want a balance of minimalism and luxury</li></ol><p style=\"text-align: center;\"><em>“Emerald Grace gave our wedding an aura of pure elegance.”</em> — <strong>Clara &amp; James</strong></p>",
@@ -65,7 +65,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "eterna-wedding",
         name: "Eterna Wedding",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "A timeless design that symbolizes eternal love and devotion.",
         desc: "<h1 style=\"text-align: center;\">Eterna Wedding: Timeless Romance</h1><p style=\"text-align: left;\">The <strong>Eterna Wedding</strong> template embodies everlasting love with a design that feels both timeless and graceful. Its clean lines, harmonious palette, and balanced layouts create an atmosphere of pure devotion. Designed for couples who want elegance without excess, this template highlights what truly matters — your eternal bond.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Classic and timeless layout</li><li>Responsive design for every screen</li><li>Customizable sections for story, RSVP, and more</li><li>Elegant fonts for a refined finish</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who value simplicity and grace</li><li>Weddings with traditional or modern vibes</li><li>Those who want to emphasize everlasting love</li></ol><p style=\"text-align: center;\"><em>“Eterna Wedding made our day feel truly timeless.”</em> — <strong>Olivia &amp; Noah</strong></p>",
@@ -83,7 +83,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "golden-harmony",
         name: "Golden Harmony",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Shine with golden elegance and harmonious design.",
         desc: "<h1 style=\"text-align: center;\">Golden Harmony: Radiance in Unity</h1><p style=\"text-align: left;\">The <strong>Golden Harmony</strong> template reflects the brilliance of love with a golden touch that symbolizes warmth, unity, and prosperity. Its elegant patterns and shimmering highlights create a luxurious vibe while maintaining a refined balance. This design is made for couples who wish their wedding to glow with richness and sophistication.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Luxurious golden tones with subtle contrasts</li><li>Responsive and easy-to-customize sections</li><li>Layouts for story, RSVP, and gallery</li><li>Premium typography for a sophisticated look</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love luxury themes</li><li>Indoor ballroom or classic weddings</li><li>Those seeking a golden, radiant atmosphere</li></ol><p style=\"text-align: center;\"><em>“Golden Harmony made our wedding glow with elegance.”</em> — <strong>Sophia &amp; Daniel</strong></p>",
@@ -101,7 +101,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "golden-hour-promise",
         name: "Golden Hour Promise",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Capture the magic of love in the warm glow of the golden hour.",
         desc: "<h1 style=\"text-align: center;\">Golden Hour Promise: Love in Warm Light</h1><p style=\"text-align: left;\">The <strong>Golden Hour Promise</strong> wedding template embraces the romantic charm of sunset’s golden glow. With its soft tones, dreamy layouts, and radiant highlights, it creates a serene and intimate atmosphere. Perfect for couples who want their love to shine in warm light, this design turns every detail into a golden memory.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Warm golden-hour inspired palette</li><li>Responsive layouts for story, gallery, and RSVP</li><li>Soft typography that enhances romantic vibes</li><li>Easy customization for personal touches</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love sunset or outdoor weddings</li><li>Romantic themes with natural elegance</li><li>Those who want a warm and intimate design</li></ol><p style=\"text-align: center;\"><em>“Golden Hour Promise made our wedding feel as magical as the sunset.”</em> — <strong>Emma &amp; Lucas</strong></p>",
@@ -119,7 +119,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "luminara-elegance",
         name: "Luminara Elegance",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Shimmering lights and refined elegance for your big day.",
         desc: "<h1 style=\"text-align: center;\">Luminara Elegance: A Celebration of Light</h1><p style=\"text-align: left;\">The <strong>Luminara Elegance</strong> wedding template is designed to illuminate your love story with dazzling refinement. Inspired by glowing lanterns and gentle lights, it combines sophistication with a festive charm. Its polished layouts and subtle animations create an atmosphere that feels both radiant and graceful.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Light-inspired design with elegant accents</li><li>Responsive on all screen sizes</li><li>Customizable gallery, RSVP, and story sections</li><li>Stylish fonts for a polished finish</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who want a glowing, festive theme</li><li>Indoor or outdoor weddings with lights decor</li><li>Those who love refined and radiant styles</li></ol><p style=\"text-align: center;\"><em>“Luminara Elegance added a magical glow to our celebration.”</em> — <strong>Hannah &amp; Felix</strong></p>",
@@ -137,7 +137,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "luminous-bond",
         name: "Luminous Bond",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Celebrate a radiant love that shines brightly in unity.",
         desc: "<h1 style=\"text-align: center;\">Luminous Bond: Shining Together</h1><p style=\"text-align: left;\">The <strong>Luminous Bond</strong> template symbolizes the radiant connection between two hearts. With its glowing motifs, clean layouts, and refined balance of brightness and elegance, it highlights the beauty of unity. Every detail is crafted to emphasize the bond that shines forever.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Bright, glowing-inspired visual elements</li><li>Responsive design across devices</li><li>Sections for couple story, RSVP, and photo gallery</li><li>Elegant fonts to enrich readability</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who want a glowing and heartfelt vibe</li><li>Weddings with light-inspired or modern themes</li><li>Those seeking a radiant yet elegant design</li></ol><p style=\"text-align: center;\"><em>“Luminous Bond perfectly captured the brightness of our love.”</em> — <strong>Maya &amp; Aaron</strong></p>",
@@ -155,7 +155,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "luxe-harmony",
         name: "Luxe Harmony",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Luxury and harmony combined in an elegant wedding design.",
         desc: "<h1 style=\"text-align: center;\">Luxe Harmony: Where Luxury Meets Love</h1><p style=\"text-align: left;\">The <strong>Luxe Harmony</strong> template is created for couples who want a touch of grandeur without losing intimacy. Its luxurious details, rich color palette, and balanced layouts create an exquisite yet warm ambience. Perfect for weddings where elegance and sophistication are celebrated in harmony.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Luxurious motifs and refined details</li><li>Responsive design for easy access</li><li>Customizable story, RSVP, and gallery sections</li><li>Premium typography that exudes class</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who dream of a luxury wedding</li><li>Classic ballroom or modern elegant settings</li><li>Those who want a sophisticated touch</li></ol><p style=\"text-align: center;\"><em>“Luxe Harmony gave our celebration a luxurious, unforgettable feel.”</em> — <strong>Charlotte &amp; Ethan</strong></p>",
@@ -173,7 +173,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "midnight-blossom",
         name: "Midnight Blossom",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Blooming elegance under the charm of midnight skies.",
         desc: "<h1 style=\"text-align: center;\">Midnight Blossom: Romance After Dark</h1><p style=\"text-align: left;\">The <strong>Midnight Blossom</strong> template combines the mystery of night with the beauty of blossoms. Featuring dark tones with floral highlights, it creates a romantic and enchanting atmosphere. This design is ideal for couples who want elegance with a hint of drama and natural beauty.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Dark floral-inspired theme</li><li>Responsive and customizable sections</li><li>Gallery, RSVP, and story layouts included</li><li>Stylish typography with romantic flair</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love floral elegance</li><li>Nighttime or garden weddings</li><li>Those who want a dramatic yet romantic vibe</li></ol><p style=\"text-align: center;\"><em>“Midnight Blossom gave our wedding an enchanting charm.”</em> — <strong>Iris &amp; Nathan</strong></p>",
@@ -191,7 +191,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "midnight-elegance",
         name: "Midnight Elegance",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Sophisticated and refined beauty under the starlit night.",
         desc: "<h1 style=\"text-align: center;\">Midnight Elegance: Refined Under the Stars</h1><p style=\"text-align: left;\">The <strong>Midnight Elegance</strong> wedding template brings sophistication to life with a theme inspired by the serenity of midnight skies. Its deep shades, polished layouts, and refined accents offer a luxurious yet graceful design. This template is perfect for couples who want a classy and timeless wedding look.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Elegant dark palette with refined accents</li><li>Responsive design across all devices</li><li>Customizable sections for love story, RSVP, and gallery</li><li>High-quality typography for sophistication</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love classic elegance</li><li>Evening or indoor ballroom weddings</li><li>Those who want a refined and timeless look</li></ol><p style=\"text-align: center;\"><em>“Midnight Elegance gave our day the timeless touch we dreamed of.”</em> — <strong>Grace &amp; William</strong></p>",
@@ -209,7 +209,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "pastel-romantis",
         name: "Pastel Romantis",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Soft pastel colors for a sweet and romantic wedding theme.",
         desc: "<h1 style=\"text-align: center;\">Pastel Romantis: Sweet Elegance</h1><p style=\"text-align: left;\">The <strong>Pastel Romantis</strong> template captures the sweetness of love with its soft color palette and charming layouts. With gentle tones and a lighthearted touch, it creates an atmosphere of romance and joy. Perfect for couples who want their wedding invitation to feel tender, dreamy, and full of love.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Beautiful pastel-inspired palette</li><li>Responsive design suitable for all screens</li><li>Customizable story, gallery, and RSVP sections</li><li>Light and elegant typography</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love sweet, soft tones</li><li>Outdoor garden or daytime weddings</li><li>Those seeking a romantic yet playful feel</li></ol><p style=\"text-align: center;\"><em>“Pastel Romantis made our wedding theme so soft and memorable.”</em> — <strong>Aisha &amp; Rafi</strong></p>",
@@ -227,7 +227,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "secrad-union",
         name: "Sacred Union",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Honor love with a design that feels sacred and eternal.",
         desc: "<h1 style=\"text-align: center;\">Sacred Union: Eternal Devotion</h1><p style=\"text-align: left;\">The <strong>Sacred Union</strong> template symbolizes the spiritual and emotional depth of marriage. With its solemn tones, graceful layouts, and timeless details, it reflects love as a sacred bond. Ideal for couples who value tradition, devotion, and the true meaning of union.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Sacred-inspired elegant palette</li><li>Responsive and customizable sections</li><li>Layouts for story, RSVP, and gallery</li><li>Refined fonts to enhance solemn beauty</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who value meaningful traditions</li><li>Classic or religious wedding ceremonies</li><li>Those seeking a design with emotional depth</li></ol><p style=\"text-align: center;\"><em>“Sacred Union reflected the depth of our devotion beautifully.”</em> — <strong>Elena &amp; Marco</strong></p>",
@@ -245,7 +245,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "serenade-amora",
         name: "Serenade Amora",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "A romantic serenade of love in elegant tones and layouts.",
         desc: "<h1 style=\"text-align: center;\">Serenade Amora: A Symphony of Love</h1><p style=\"text-align: left;\">The <strong>Serenade Amora</strong> template captures the poetry of romance in every detail. With its elegant color scheme, musical flow in layouts, and sophisticated finishes, it feels like a serenade dedicated to love itself. Perfect for couples who want their wedding to feel romantic, harmonious, and unforgettable.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Romantic tones with harmonious flow</li><li>Responsive design for all screens</li><li>Story, RSVP, and gallery layouts customizable</li><li>Typography that feels poetic and refined</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love music and poetry</li><li>Romantic and elegant weddings</li><li>Those who want a serenade-like design</li></ol><p style=\"text-align: center;\"><em>“Serenade Amora made our wedding feel like a love song.”</em> — <strong>Sienna &amp; Adrian</strong></p>",
@@ -263,7 +263,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "violetta-story",
         name: "Violetta Story",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "Tell your love story in graceful violet hues.",
         desc: "<h1 style=\"text-align: center;\">Violetta Story: Romance in Violet</h1><p style=\"text-align: left;\">The <strong>Violetta Story</strong> template brings charm and elegance with its violet-inspired tones. Symbolizing devotion and romance, its design combines floral accents, graceful layouts, and a touch of sophistication. It’s perfect for couples who want to tell their love story in a unique and heartfelt way.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Violet-inspired elegant palette</li><li>Responsive and customizable sections</li><li>Layouts for story, RSVP, and gallery</li><li>Stylish fonts for a graceful finish</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Couples who love violet or floral themes</li><li>Romantic garden or ballroom weddings</li><li>Those who want to tell a graceful love story</li></ol><p style=\"text-align: center;\"><em>“Violetta Story told our love beautifully in every detail.”</em> — <strong>Lilian &amp; Victor</strong></p>",
@@ -281,7 +281,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "eternal-vow",
         name: "Eternal Vow",
-        price: 159000,
+        price: 65000,
         disc_price: null,
         short_desc: "A timeless luxury wedding invitation with dark elegance and golden vows.",
         desc: `<h1 style="text-align: center;">Eternal Vow: A Promise Without End</h1>
@@ -309,7 +309,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "aurora-celebration",
         name: "Aurora Celebration",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "A dazzling celebration inspired by the magical lights of the aurora.",
         desc: "<h1 style=\"text-align: center;\">Aurora Celebration: A Party of Lights</h1><p style=\"text-align: left;\">The <strong>Aurora Celebration</strong> birthday template captures the vibrant magic of the northern lights. With radiant color transitions and festive layouts, it creates a lively yet enchanting atmosphere. Perfect for birthdays that want to shine with color and joy, this design makes every detail glow like the aurora itself.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Aurora-inspired vibrant color palette</li><li>Responsive design across devices</li><li>Customizable sections for greetings, photos, and RSVP</li><li>Dynamic typography with a festive touch</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Birthday parties with colorful themes</li><li>Evening celebrations with lights and glamour</li><li>Those who love bold and enchanting designs</li></ol><p style=\"text-align: center;\"><em>“Aurora Celebration made my birthday truly magical and unforgettable.”</em> — <strong>Camila</strong></p>",
@@ -327,7 +327,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "eternal-birthday-moments",
         name: "Eternal Birthday Moments",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Capture birthday memories that last forever with timeless design.",
         desc: "<h1 style=\"text-align: center;\">Eternal Birthday Moments: Memories Forever</h1><p style=\"text-align: left;\">The <strong>Eternal Birthday Moments</strong> template is all about celebrating with elegance and creating memories that stand the test of time. Its refined layouts, soft colors, and timeless details make it perfect for birthdays that want to balance joy and sophistication. Every section is designed to highlight precious moments in style.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Timeless and elegant design</li><li>Responsive across devices</li><li>Customizable story, gallery, and RSVP sections</li><li>Classic typography for a refined touch</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Milestone birthdays</li><li>Elegant celebrations with family and friends</li><li>Those who want a timeless theme</li></ol><p style=\"text-align: center;\"><em>“Eternal Birthday Moments made my milestone birthday feel truly unforgettable.”</em> — <strong>Eliana</strong></p>",
@@ -345,7 +345,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "golden-age",
         name: "Golden Age",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Shine with golden elegance in a birthday celebration full of joy.",
         desc: "<h1 style=\"text-align: center;\">Golden Age: Celebrate in Radiant Style</h1><p style=\"text-align: left;\">The <strong>Golden Age</strong> template is designed for birthdays that want to shine with richness and joy. With a golden palette, luxurious details, and festive layouts, it creates an atmosphere of elegance and celebration. Ideal for milestone birthdays or anyone who wants to glow in golden sophistication.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Luxurious golden-themed visuals</li><li>Responsive design for all devices</li><li>Customizable photo gallery, greetings, and RSVP</li><li>Premium fonts for classy impact</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Milestone birthdays</li><li>Luxury or ballroom-themed parties</li><li>Those who love golden elegance</li></ol><p style=\"text-align: center;\"><em>“Golden Age made my celebration shine brighter than ever.”</em> — <strong>Michael</strong></p>",
@@ -363,7 +363,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "midnight-glow",
         name: "Midnight Glow",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "A glowing birthday celebration inspired by the beauty of midnight.",
         desc: "<h1 style=\"text-align: center;\">Midnight Glow: Shine Through the Night</h1><p style=\"text-align: left;\">The <strong>Midnight Glow</strong> template brings together the elegance of midnight with the sparkle of celebration. Its dark tones illuminated by glowing highlights create a stunning atmosphere for unforgettable birthdays. It’s the perfect design for those who love night parties filled with style and brilliance.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Dark yet glowing color contrasts</li><li>Responsive design for all devices</li><li>Customizable photo and RSVP sections</li><li>Modern typography with luminous touch</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Night-themed birthday parties</li><li>Indoor or outdoor celebrations with lights</li><li>Those who want an elegant and radiant vibe</li></ol><p style=\"text-align: center;\"><em>“Midnight Glow made my birthday sparkle all night long.”</em> — <strong>Sophia</strong></p>",
@@ -381,7 +381,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "radiant-party",
         name: "Radiant Party",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Bright, fun, and vibrant — a perfect party full of radiance.",
         desc: "<h1 style=\"text-align: center;\">Radiant Party: Shine with Joy</h1><p style=\"text-align: left;\">The <strong>Radiant Party</strong> template is all about color, joy, and fun. With its lively palette, festive accents, and modern layouts, it brings out the brightness of your special day. It’s ideal for birthdays that want to radiate happiness and excitement in every detail.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Bright and vibrant color scheme</li><li>Responsive design across devices</li><li>Customizable greetings, photos, and RSVP</li><li>Playful yet elegant fonts</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Fun and vibrant birthday celebrations</li><li>Outdoor or indoor festive themes</li><li>Those who love colorful, cheerful designs</li></ol><p style=\"text-align: center;\"><em>“Radiant Party brought so much joy and color to my birthday.”</em> — <strong>Diego</strong></p>",
@@ -399,7 +399,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "shimmering-gold",
         name: "Shimmering Gold",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Golden shimmer for a luxurious and unforgettable birthday.",
         desc: "<h1 style=\"text-align: center;\">Shimmering Gold: Celebrate in Luxury</h1><p style=\"text-align: left;\">The <strong>Shimmering Gold</strong> template is designed for birthdays that deserve sparkle and grandeur. With shimmering golden details, elegant layouts, and a luxurious palette, it creates a celebration that feels glamorous and unforgettable. Perfect for those who love to party in golden style.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Golden shimmering visuals</li><li>Responsive layouts for all screens</li><li>Sections for photos, greetings, and RSVP</li><li>Elegant fonts to highlight luxury</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Luxury-themed birthdays</li><li>Milestone celebrations</li><li>Those who want a glamorous party design</li></ol><p style=\"text-align: center;\"><em>“Shimmering Gold made my birthday feel like pure luxury.”</em> — <strong>Valentina</strong></p>",
@@ -417,7 +417,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "celebration-countdown",
         name: "Celebration Countdown",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Elegant midnight tones with golden and blush accents for a modern birthday celebration.",
         desc: "<h1 style=\"text-align: center;\">Midnight Elegance: A Celebration in Style</h1><p style=\"text-align: left;\">The <strong>Midnight Elegance</strong> template combines deep midnight blue tones with radiant golden and blush highlights. Designed for those who want a birthday invitation that feels modern, stylish, and premium, it creates a magical atmosphere that stands out on every screen. With smooth animations, elegant typography, and responsive layouts, this template captures both warmth and sophistication.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Midnight-inspired background with gradient golden and blush accents</li><li>Interactive countdown and smooth scroll navigation</li><li>Dedicated sections for greetings, event details, gallery, and RSVP</li><li>Playful yet elegant typography combinations</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Modern & stylish birthday parties</li><li>Celebrations with elegant evening themes</li><li>Anyone who loves a premium, classy digital invitation</li></ol><p style=\"text-align: center;\"><em>“Midnight Elegance turned my birthday into a stylish and unforgettable memory.”</em> — <strong>Aurelia</strong></p>",
@@ -435,7 +435,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "timless-elegance",
         name: "Timeless Birthday Elegance",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Modern digital invitation with playful yet elegant tones, countdown, and interactive sections for a premium experience.",
         desc: "<h1 style=\"text-align: center;\">Timeless Birthday Elegance Birthday Celebration</h1><p style=\"text-align: left;\">The <strong>Premium Birthday Invite</strong> template brings together cheerful pastel gradients, smooth scroll navigation, and a beautifully styled countdown to create a warm, modern digital invitation. With responsive layouts, elegant typography, and interactive sections, it ensures every guest feels welcomed and informed in style.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Pastel gradient background with playful decorative shapes</li><li>Interactive countdown timer with day-of adjustments</li><li>Smooth navigation across welcome, event details, gallery, and RSVP</li><li>Elegant typography mix with script for names and clean sans-serif for content</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Birthday parties with a modern aesthetic</li><li>Digital-first invitations with responsive design</li><li>Hosts who want both elegance and interactivity in their invite</li></ol><p style=\"text-align: center;\"><em>“This template made Alya’s celebration feel truly special and premium.”</em> — <strong>Guest Feedback</strong></p>",
@@ -453,7 +453,7 @@ export default async (prisma: PrismaClient<Prisma.PrismaClientOptions, never, De
       {
         slug: "cozy-elegance",
         name: "Cozy Elegance",
-        price: 149000,
+        price: 49000,
         disc_price: null,
         short_desc: "Warm and stylish digital invitation with cozy gradients, elegant details, countdown, and interactive sections for a memorable experience.",
         desc: "<h1 style=\"text-align: center;\">Cozy Elegance Birthday Celebration</h1><p style=\"text-align: left;\">The <strong>Cozy Elegance</strong> template blends soft gradient tones, refined layouts, and interactive features to create an inviting digital birthday invitation. With a balance of warmth and sophistication, it ensures every guest feels both welcomed and impressed from the very first glance.</p><h2 style=\"text-align: left;\">Highlights:</h2><ul><li>Subtle cozy gradients with modern decorative accents</li><li>Interactive countdown timer with dynamic day-of messages</li><li>Smooth scroll navigation across welcome, event details, gallery, and RSVP</li><li>Elegant font pairing — stylish script for highlights and clean sans-serif for readability</li></ul><h3 style=\"text-align: left;\">Perfect For:</h3><ol><li>Birthday parties with a cozy yet premium aesthetic</li><li>Hosts who want a balance of warmth, elegance, and interactivity</li><li>Digital-first celebrations with responsive and modern design</li></ol><p style=\"text-align: center;\"><em>“Cozy Elegance made our celebration feel warm, stylish, and unforgettable.”</em> — <strong>Guest Feedback</strong></p>",

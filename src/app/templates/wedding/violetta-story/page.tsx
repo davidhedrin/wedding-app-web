@@ -122,6 +122,9 @@ function Inner() {
   const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
+  const [timeWedMb, setTimeWedMb] = useState<{ title: string, time: string, loc: string | null } | null>(null);
+  const [timeWedTor, setTimeWedTor] = useState<{ title: string, time: string, loc: string | null } | null>(null);
+
   const [pageTableWs, setPageTableWs] = useState(1);
   const [perPageWs, setPerPageWs] = useState(6);
   const [totalPageWs, setTotalPageWs] = useState(0);
@@ -245,8 +248,19 @@ function Inner() {
               occupation: brideData.occupation,
             }));
 
-            const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
-            if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+            findData.schedule_info.map((x, i) => {
+              const time = `${formatDate(CombineDateAndTime(x.date, x.start_time), "full", "short")} - ${x.end_time}`
+              if (x.type === "WED_MB") {
+                setTimeWedMb({ title: "Akad", time, loc: x.location });
+                setLonglatLoc(`${x.latitude},${x.longitude}`);
+              } else if (x.type === "WED_TOR") {
+                let title = "";
+                if (x.ceremony_type === "Reception") title = "Resepsi";
+                else if (x.ceremony_type === "Traditional") title = "Tradisional";
+
+                setTimeWedTor({ title: title, time, loc: x.location });
+              }
+            });
 
             fatchWishlist(findData.event_rsvp.event_id);
             fatchRsvpMsg(findData.event_rsvp.event_id);
@@ -1851,21 +1865,21 @@ function Inner() {
       {/* FOOTER */}
       <footer className="relative">
         <div className="mx-auto max-w-7xl px-4 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
+          <div className="grid md:grid-cols-12 gap-8">
+            <div className="md:col-span-4">
               <h4 className={`text-xl ${playfair.className}`}>
                 <span className={THEME.accent}>A&Z</span> Wedding
               </h4>
               <p className="text-white/80 mt-2">
-                Terima kasih telah menjadi bagian dari kisah kami.
+                {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}
               </p>
               <div className="mt-4 flex gap-2">
-                <span className="chip px-3 py-1 rounded-full">#AisyahZidan</span>
-                <span className="chip px-3 py-1 rounded-full">#20Des2025</span>
+                <span className="chip px-3 py-1 rounded-full">#{groom?.shortname ?? "Aisyah"}{bride?.shortname ?? "Zidan"}</span>
+                <span className="chip px-3 py-1 rounded-full">#{formatDate(eventDatas?.event_time ?? WEDDING_DATE, "medium").replace(/\s+/g, "")}</span>
               </div>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <h5 className="font-semibold mb-3">Navigasi</h5>
               <ul className="space-y-2">
                 {nav.map((n) => (
@@ -1881,21 +1895,34 @@ function Inner() {
               </ul>
             </div>
 
-            <div>
+            <div className="md:col-span-3">
               <h5 className="font-semibold mb-3">Informasi</h5>
               <ul className="space-y-2 text-white/85">
-                <li>Akad: 20 Des 2025, 10:00 WIB</li>
-                <li>Resepsi: 20 Des 2025, 19:00 WIB</li>
-                <li>Lokasi: Jakarta</li>
+                {
+                  eventDatas ? <>
+                    {
+                      timeWedMb && <li>{`${timeWedMb.title}: ${timeWedMb.time}`}</li>
+                    }
+                    {
+                      timeWedTor && <li>{`${timeWedTor.title}: ${timeWedTor.time}`}</li>
+                    }
+                    {
+                      timeWedMb && <li>Lokasi: {timeWedMb.loc}</li>
+                    }
+                  </> : <>
+                    <li>Akad: 20 Des 2025, 10:00 WIB</li>
+                    <li>Resepsi: 20 Des 2025, 19:00 WIB</li>
+                    <li>Lokasi: Jakarta</li>
+                  </>
+                }
               </ul>
             </div>
 
-            <div>
+            <div className="md:col-span-3">
               <h5 className="font-semibold mb-3">Kontak</h5>
               <ul className="space-y-2 text-white/85">
-                <li>WA Aisyah: 08xxxxxxxxxx</li>
-                <li>WA Zidan: 08xxxxxxxxxx</li>
-                <li>Email: hello@wedding.com</li>
+                <li>Phone/WA: {eventDatas ? eventDatas.contact_phone ?? "-" : "0812-3456-7890"}</li>
+                <li>Email: {eventDatas ? eventDatas.contact_email ?? "-" : "undangan@aisyah-zidan.id"}</li>
               </ul>
               <button
                 onClick={() => goToSection("rsvp")}
@@ -1908,7 +1935,7 @@ function Inner() {
 
           <div className="mt-10 border-t border-white/10 pt-6 text-center text-white/70 text-sm">
             <div>
-              © {new Date().getFullYear()} Aisyah & Zidan — All rights reserved.
+              © {new Date().getFullYear()} {groom?.shortname ?? "Aisyah"} & {bride?.shortname ?? "Zidan"} — All rights reserved.
             </div>
             <div className="mt-1">Designed by <a href={Configs.base_url} target='_blank' className='text-purple-400 underline'>Wedlyvite</a></div>
           </div>

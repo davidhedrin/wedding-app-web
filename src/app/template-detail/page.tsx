@@ -3,7 +3,7 @@
 import BreadcrumbList from '@/components/breadcrumb-list';
 import { useLoading } from '@/components/loading/loading-context';
 import { DtoEvents } from '@/lib/dto';
-import { Color } from '@/lib/model-types';
+import { Color, DurationProps } from '@/lib/model-types';
 import { useSmartLink } from '@/lib/smart-link';
 import { calculateRateProduct, toast } from '@/lib/utils';
 import { userLoginData } from '@/lib/zustand';
@@ -13,6 +13,7 @@ import { TemplateCaptures, Templates } from '@/generated/prisma';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import Configs, { DurationList } from '@/lib/config';
 
 function Inner() {
   const { push } = useRouter();
@@ -27,6 +28,7 @@ function Inner() {
   const [captureImage, setCaptureImage] = useState<TemplateCaptures[]>([]);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
   const [dataTemplate, setDataTemplate] = useState<Templates | null>(null);
+  const [selectDuration, setSelectDuration] = useState<DurationProps>(DurationList.find(x => x.month == Configs.defaultDuration) ?? DurationList[0]);
 
   const [totalVotes, setTotalVotes] = useState(0);
   const [totalRates, setTotalRates] = useState(0);
@@ -99,7 +101,7 @@ function Inner() {
   }, [captureImage.length]);
 
   const addTemplate = async () => {
-    if(dataTemplate === null) return;
+    if (dataTemplate === null) return;
 
     setLoading(true);
     if (statusLogin !== "authenticated") {
@@ -219,14 +221,14 @@ function Inner() {
                   {
                     dataTemplate.disc_price ? <div className="mt-3 flex items-center gap-3">
                       <span className="text-lg line-through text-muted">
-                        Rp {dataTemplate.price.toLocaleString("id-ID")}
+                        Rp {(dataTemplate.price + selectDuration.value).toLocaleString("id-ID")}
                       </span>
                       <span className="text-2xl font-bold text-indigo-600">
-                        Rp {(dataTemplate.price - dataTemplate.disc_price).toLocaleString("id-ID")}
+                        Rp {((dataTemplate.price + selectDuration.value) - dataTemplate.disc_price).toLocaleString("id-ID")}
                       </span>
                     </div> : <div className='mt-3'>
                       <span className="text-2xl font-bold text-indigo-600">
-                        Rp {dataTemplate.price.toLocaleString("id-ID")}
+                        Rp {(dataTemplate.price + selectDuration.value).toLocaleString("id-ID")}
                       </span>
                     </div>
                   }

@@ -2,7 +2,7 @@
 
 import BreadcrumbList from "@/components/breadcrumb-list";
 import { useLoading } from "@/components/loading/loading-context";
-import { BreadcrumbType, Color } from "@/lib/model-types";
+import { BreadcrumbType, Color, DurationProps } from "@/lib/model-types";
 import { useSmartLink } from "@/lib/smart-link";
 import { CartCheckoutProps, eventStatusLabels, formatDate, showConfirm, toast } from "@/lib/utils";
 import { CancelOrderEvent, GetDataEventByCode, GetFirstRsvpPreview, StoreSnapMidtrans } from "@/server/event";
@@ -14,7 +14,7 @@ import Badge from "@/components/ui/badge";
 import Alert from "@/components/ui/alert";
 import Input from "@/components/ui/input";
 import { CheckVoucherCode } from "@/server/systems/voucher";
-import Configs from "@/lib/config";
+import Configs, { DurationList } from "@/lib/config";
 import TabListWraper from "../components/wraper-list";
 import TabContentWraper from "../components/wraper-content";
 
@@ -42,8 +42,8 @@ function Inner() {
   const [priceInit, setPriceInit] = useState(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
 
-  const [initPriceAddOn, setInitPriceAddOn] = useState(Configs.priceAddOn1);
-  const [isCheckedAddOn1, setIsCheckedAddOn1] = useState(false);
+  // Continue this logic include into grand total price
+  const [selectDuration, setSelectDuration] = useState<DurationProps>(DurationList.find(x => x.month == Configs.defaultDuration) ?? DurationList[0]);
   const [grandTotalOrder, setGrandTotalOrder] = useState(0);
 
   const [isApplyVoucher, setIsApplyVoucher] = useState(false);
@@ -58,6 +58,8 @@ function Inner() {
       if (data) {
         setDataEvent(data);
         let setGrandTotal = 0;
+        let activeDur: DurationProps = { ...selectDuration };
+        if (data.duration) activeDur.month = data.duration;
 
         if (data.template) {
           setTemplateColor(data.template.colors ? JSON.parse(data.template.colors) : []);
@@ -68,8 +70,7 @@ function Inner() {
         }
 
         if (data.tr) {
-          setIsCheckedAddOn1(data.tr.add_ons1 !== null ? data.tr.add_ons1 : false);
-          setInitPriceAddOn(data.tr.add_ons1_amount ?? Configs.priceAddOn1);
+          if (data.tr.duration_amount) activeDur.value = data.tr.duration_amount;
 
           setVoucherInputVal(data.tr.voucher_code ?? "");
           setDiscountAmount(data.tr.voucher_amount ?? 0);
@@ -78,6 +79,7 @@ function Inner() {
         }
 
         setGrandTotalOrder(setGrandTotal);
+        setSelectDuration(activeDur);
       }
     }
   };
@@ -85,9 +87,6 @@ function Inner() {
   const resetAllState = () => {
     setPriceInit(0);
     setTemplateColor([]);
-
-    setInitPriceAddOn(Configs.priceAddOn1);
-    setIsCheckedAddOn1(false);
 
     setVoucherInputVal("");
     setDiscountAmount(0);
@@ -98,6 +97,8 @@ function Inner() {
     setVoucherData(null);
     setVoucherActiveCode("");
     setDiscountAmount(0);
+
+    setSelectDuration(DurationList.find(x => x.month == Configs.defaultDuration) ?? DurationList[0]);
   };
 
   useEffect(() => {
@@ -121,11 +122,11 @@ function Inner() {
 
   useEffect(() => {
     if (dataEvent?.tr !== null) return;
-    const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, addOns: isCheckedAddOn1, voucher: voucherData });
+    const allPropsCheckout = CartCheckoutProps({ subTotal: priceInit, voucher: voucherData, duration: selectDuration });
 
     setDiscountAmount(allPropsCheckout.dicAmountResult);
     setGrandTotalOrder(allPropsCheckout.totalAmount);
-  }, [voucherData, isCheckedAddOn1]);
+  }, [voucherData, selectDuration]);
 
   const applyVoucherCode = async () => {
     if (voucherInputVal.trim() === "") return;
@@ -183,8 +184,7 @@ function Inner() {
       const snapRes = await StoreSnapMidtrans({
         event_id: eventId,
         voucher_id: voucherData ? voucherData.id : null,
-        add_ons1: isCheckedAddOn1,
-        add_ons1_amount: isCheckedAddOn1 ? initPriceAddOn : null
+        duration: selectDuration
       });
       if (snapRes !== undefined && snapRes.token) handleCheckoutPayment(snapRes.token);
     } catch (error: any) {
@@ -266,7 +266,7 @@ function Inner() {
   };
 
   const handlePreview = async (eventId: number, url: string | null) => {
-    if(!url) return;
+    if (!url) return;
 
     try {
       const getRow = await GetFirstRsvpPreview(eventId);
@@ -318,17 +318,7 @@ function Inner() {
 
                   {/* Detail Info */}
                   <div className="col-span-12 md:col-span-4 flex flex-col">
-                    <div className="flex items-center gap-4">
-                      <div className="text-sm text-muted flex items-center gap-2">
-                        <span>
-                          Status: <Badge label={eventStatusLabels[dataEvent.tmp_status].name} status={eventStatusLabels[dataEvent.tmp_status].color} />
-                        </span>
-                        <span>•</span>
-                        <span>Order At: {dataEvent.createdAt ? formatDate(dataEvent.createdAt, "medium") : "-"}</span>
-                      </div>
-                    </div>
-
-                    <span className="mt-2 text-sm font-semibold text-indigo-500 uppercase tracking-wide">
+                    <span className="text-sm font-semibold text-indigo-500 uppercase tracking-wide">
                       {dataEvent.template.ctg_name}
                     </span>
                     <h1 className="text-xl font-bold text-gray-800">{dataEvent.template.name}</h1>
@@ -397,6 +387,16 @@ function Inner() {
                       </table>
                     </div>
 
+                    <div className="flex items-center gap-4 mt-3">
+                      <div className="text-sm text-muted flex items-center gap-2">
+                        <span>
+                          Status: <Badge label={eventStatusLabels[dataEvent.tmp_status].name} status={eventStatusLabels[dataEvent.tmp_status].color} />
+                        </span>
+                        <span>•</span>
+                        <span>Order At: {dataEvent.createdAt ? formatDate(dataEvent.createdAt, "medium") : "-"}</span>
+                      </div>
+                    </div>
+
                     <Alert status={eventStatusLabels[dataEvent.tmp_status].color}>
                       <p className="text-sm text-gray-700">
                         {
@@ -423,15 +423,26 @@ function Inner() {
                       <div className="px-3 py-2">
                         <div className="space-y-1 text-sm">
                           <div className="flex justify-between">
-                            <span>Subtotal:</span>
+                            <span>Template:</span>
                             <span>Rp {priceInit.toLocaleString("id-ID")}</span>
                           </div>
-                          {
-                            isCheckedAddOn1 && <div className="flex justify-between">
-                              <span>WA-Invitation:</span>
-                              <span>Rp {initPriceAddOn.toLocaleString("id-ID")}</span>
-                            </div>
-                          }
+                          <div className="flex justify-between">
+                            {
+                              dataEvent.tr === null ? <select value={selectDuration.month}
+                                onChange={(e) => {
+                                  const selVal = parseInt(e.target.value);
+                                  const findDur = DurationList.find(x => x.month == selVal) ?? DurationList[0];
+                                  setSelectDuration(findDur);
+                                }}
+                                className="border-none bg-transparent outline-none focus:outline-none focus:ring-0 cursor-pointer"
+                              >
+                                {
+                                  DurationList.map((x, i) => (<option key={i} value={x.month}>{x.month} Month</option>))
+                                }
+                              </select> : <span>{selectDuration.month} Month:</span>
+                            }
+                            <span>Rp {selectDuration.value.toLocaleString("id-ID")}</span>
+                          </div>
                           {
                             discountAmount > 0 && <div className="flex justify-between text-green-600">
                               <span>Voucher: ({voucherActiveCode})</span>
@@ -446,7 +457,7 @@ function Inner() {
                       </div>
                     </div>
 
-                    <div className="mt-2.5">
+                    {/* <div className="mt-2.5">
                       <label className="block text-sm font-medium mb-1 dark:text-white">
                         Add-On
                       </label>
@@ -466,9 +477,9 @@ function Inner() {
                       <p className="text-xs text-muted mt-1.5 italic">
                         <i className='bx bx-info-circle'></i>&nbsp;Enable this feature to automatically send invitations to your WhatsApp guests.
                       </p>
-                    </div>
+                    </div> */}
 
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <label htmlFor="inpVoucherCode" className="block text-sm font-medium mb-1 dark:text-white">
                         Voucher Code
                       </label>
@@ -516,7 +527,7 @@ function Inner() {
                   </div>
                 </div>
 
-                <div className="relative min-h-75 mt-6">
+                <div className="relative mt-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
                     {/* Text Section */}
                     <div>
@@ -528,7 +539,21 @@ function Inner() {
 
                     {/* Preview Button */}
                     <div>
-                      <button onClick={() => handlePreview(dataEvent.id, dataEvent.template?.url ?? null)} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition sm:shrink-0">
+                      <button
+                        disabled={dataEvent.tmp_status !== "ACTIVE"}
+                        onClick={() =>
+                          handlePreview(dataEvent.id, dataEvent.template?.url ?? null)
+                        }
+                        className={
+                          `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition sm:shrink-0 ${dataEvent.tmp_status === "ACTIVE"
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          }`
+                        }
+                      >
+                        {dataEvent.tmp_status !== "ACTIVE" && (
+                          <i className="bx bx-lock-alt text-base"></i>
+                        )}
                         Preview
                       </button>
                     </div>
@@ -538,8 +563,7 @@ function Inner() {
 
                   <div className="w-full">
                     {
-                      (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") &&
-                      <div className="flex flex-col sm:flex-row ">
+                      (dataEvent.tmp_status !== "NOT_PAID" && dataEvent.tmp_status !== "PENDING") && <div className="flex flex-col sm:flex-row ">
                         <div className="w-full sm:w-44 border-b sm:border-b-0 border-gray-200 sticky top-0 sm:top-4 sm:self-start bg-white z-10">
                           <TabListWraper event_type={dataEvent.tmp_ctg_key} />
                         </div>
@@ -620,19 +644,78 @@ function Inner() {
                     }
                   </div>
 
-                  {/* Overlay blur + terkunci */}
                   {
-                    (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && <div className="absolute inset-0 bg-white/10 backdrop-blur-xs flex flex-col items-center justify-center z-10">
-                      <div className="flex flex-col items-center text-center">
-                        <i className='bx bx-lock text-4xl mb-3'></i>
-                        <p className="text-gray-700 font-medium">
-                          This section is locked!
-                        </p>
-                        <p className="text-gray-500 text-sm mt-1">
-                          Please complete your order to unlock full access for customize your event invitation.
-                        </p>
+                    (dataEvent.tmp_status === "NOT_PAID" || dataEvent.tmp_status === "PENDING") && (
+                      <div className="flex items-center justify-center pt-6">
+                        {/* Decorative Glow */}
+                        <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+                        <div className="absolute right-0 bottom-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+
+                        {/* Main Card */}
+                        <div className="relative max-w-md w-full mx-4 rounded-3xl border border-white/50 bg-white/80 backdrop-blur-xl shadow-2xl p-8">
+
+                          {/* Badge */}
+                          <div className="flex justify-center mb-5">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                              LOCKED FEATURE
+                            </span>
+                          </div>
+
+                          {/* Lock Icon */}
+                          <div className="flex justify-center mb-5">
+                            <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                              <i className="bx bx-lock-alt text-white text-4xl"></i>
+                            </div>
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-center text-gray-800">
+                            Event Customization Locked
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-center text-gray-500 mt-2 text-sm">
+                            Complete your order to unlock all customization features and personalize your wedding invitation.
+                          </p>
+
+                          {/* Feature List */}
+                          <div className="mt-6 space-y-3">
+                            <div className="flex items-center gap-3 text-sm">
+                              <i className="bx bx-check-circle text-green-500 text-lg"></i>
+                              <span>Customize all event sections</span>
+                            </div>
+
+                            <div className="flex items-center gap-3 text-sm">
+                              <i className="bx bx-check-circle text-green-500 text-lg"></i>
+                              <span>Edit wedding information anytime</span>
+                            </div>
+
+                            <div className="flex items-center gap-3 text-sm">
+                              <i className="bx bx-check-circle text-green-500 text-lg"></i>
+                              <span>Access premium invitation settings</span>
+                            </div>
+
+                            <div className="flex items-center gap-3 text-sm">
+                              <i className="bx bx-check-circle text-green-500 text-lg"></i>
+                              <span>Manage RSVP and guest data</span>
+                            </div>
+                          </div>
+
+                          {/* Status */}
+                          <div className="mt-6 rounded-xl bg-gray-100 border border-gray-200 p-3">
+                            <div className="text-xs text-gray-500">
+                              Current Status
+                            </div>
+
+                            <div className="font-semibold text-amber-600">
+                              {dataEvent.tmp_status === "PENDING"
+                                ? "Payment Pending"
+                                : "Waiting for Payment"}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )
                   }
                 </div>
               </div> : <div className="animate-pulse h-full w-full bg-gray-200 rounded-xl dark:bg-neutral-700"></div>

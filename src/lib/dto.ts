@@ -1,4 +1,5 @@
 import { DiscTypeEnum, EventGiftTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, RsvpStatusEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
+import { DurationProps } from "./model-types";
 
 export type DtoSignIn = {
   email: string;
@@ -113,8 +114,7 @@ export type DtoVouchers = {
 export type DtoTr = {
   event_id: number;
   voucher_id: number | null;
-  add_ons1: boolean | null;
-  add_ons1_amount: number | null;
+  duration: DurationProps;
 };
 
 export type DtoMainInfoWedding = {

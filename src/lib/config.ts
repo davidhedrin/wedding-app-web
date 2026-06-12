@@ -1,4 +1,4 @@
-import { CategoryKeyProps, MusicGroupProps, PaymentMethodProps } from "./model-types";
+import { CategoryKeyProps, DurationProps, MusicGroupProps, PaymentMethodProps } from "./model-types";
 import categoryKeys from "@/json/template-key.json";
 import musicThemeKeys from "@/json/music-theme.json";
 import paymentMethod from "@/json/payment-method.json";
@@ -7,26 +7,31 @@ const Configs = {
   app_name: "Wedlyvite",
   base_url: process.env.NEXT_PUBLIC_BASE_URL,
 
-  resend_from: "no-replay@wedlyvite.my.id",
+  resend_from: "no-replay@wedlyvite.my.id", //
   
   valid_reset_pass: 5, // Minute
   valid_email_verify: 5, // Minute
 
-  maxSizePictureInMB: 5,
-  maxSizeAudioInMB: 6,
+  maxSizePictureInMB: 5, //
+  maxSizeAudioInMB: 6, //
   nameBtnSubmit: "submitType",
   nameBtnSaveVal: "save",
   nameBtnSaveCloseVal: "saveClose",
-  priceAddOn1: 49000,
-
-  tryDays: 3,
-  toastDuration: 4000, // In second
+  tryDays: 3, //
+  toastDuration: 4000,
 
   s3_bucket: process.env.NEXT_PUBLIC_CLOUDFLARE_BUCKET,
   p_limit: 20,
   keyCustomMusic: "custom_upload",
+
+  defaultDuration: 12,
 };
 export default Configs;
+
+export const DurationList: DurationProps[] = [
+  { month: 6, value: 15000 },
+  { month: 12, value: 25000 },
+];
 
 export const CategoryKeys: CategoryKeyProps[] = categoryKeys;
 export const MusicThemeKeys: MusicGroupProps[] = musicThemeKeys;

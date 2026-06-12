@@ -192,13 +192,15 @@ model Vouchers {
 }
 
 model Events {
-  id          Int             @id @default(autoincrement())
-  user_id     Int
-  tmp_id      Int
-  tmp_status  EventStatusEnum
-  tmp_code    String          @unique
-  tmp_ctg     String
-  tmp_ctg_key String
+  id            Int             @id @default(autoincrement())
+  user_id       Int
+  tmp_id        Int
+  tmp_status    EventStatusEnum
+  tmp_code      String          @unique
+  tmp_ctg       String
+  tmp_ctg_key   String
+  duration      Int?
+  duration_date DateTime?
 
   greeting_msg      String?
   couple_img_name   String?
@@ -251,17 +253,13 @@ model Tr {
   pay_bill_code    String?
   qris_url         String?
 
-  subtotal       Int
-  voucher_code   String?
-  voucher_slug   String?
-  voucher_type   DiscTypeEnum?
-  voucher_amount Int?
-
-  /// Add-on fields RSVP
-  add_ons1        Boolean?
-  add_ons1_amount Int?
-
-  total_amount Int
+  subtotal        Int
+  duration_amount Int
+  voucher_code    String?
+  voucher_slug    String?
+  voucher_type    DiscTypeEnum?
+  voucher_amount  Int?
+  total_amount    Int
 
   user  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   event Events @relation(fields: [event_id], references: [id], onDelete: Cascade)
