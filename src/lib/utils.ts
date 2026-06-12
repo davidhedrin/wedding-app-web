@@ -277,17 +277,18 @@ export function CartCheckoutProps({
   duration: DurationProps;
 }) {
   let dicAmountResult = 0;
+  let fixSubTotal = subTotal + duration.value;
 
   if (voucher !== null) {
     if (voucher.disc_type === DiscTypeEnum.Amount) dicAmountResult = Number(voucher.disc_amount);
     if (voucher.disc_type === DiscTypeEnum.Percent) {
-      const dicsPerAmount = Math.ceil(subTotal * (voucher.disc_amount / 100));
+      const dicsPerAmount = Math.ceil(fixSubTotal * (voucher.disc_amount / 100));
       dicAmountResult = dicsPerAmount;
     };
-    dicAmountResult = Math.min(dicAmountResult, subTotal);
+    dicAmountResult = Math.min(dicAmountResult, fixSubTotal);
   };
 
-  const grandTotalAmount = (subTotal + duration.value) - dicAmountResult;
+  const grandTotalAmount = fixSubTotal - dicAmountResult;
   return {
     dicAmountResult,
     totalAmount: grandTotalAmount

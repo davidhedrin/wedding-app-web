@@ -42,7 +42,6 @@ function Inner() {
   const [priceInit, setPriceInit] = useState(0);
   const [templateColor, setTemplateColor] = useState<Color[]>([]);
 
-  // Continue this logic include into grand total price
   const [selectDuration, setSelectDuration] = useState<DurationProps>(DurationList.find(x => x.month == Configs.defaultDuration) ?? DurationList[0]);
   const [grandTotalOrder, setGrandTotalOrder] = useState(0);
 

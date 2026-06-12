@@ -259,8 +259,8 @@ export async function StoreSnapMidtrans(formData: DtoTr): Promise<MidtransSnapRe
           voucher_code: checkVoucher && checkVoucher.code,
           voucher_slug: checkVoucher && checkVoucher.slug,
           voucher_type: checkVoucher && checkVoucher.disc_type,
-          voucher_amount: checkVoucher && checkVoucher.disc_amount,
           duration_amount: formData.duration.value,
+          voucher_amount: allPropsCheckout.dicAmountResult,
           total_amount: allPropsCheckout.totalAmount
         }
       });
