@@ -389,6 +389,7 @@ model EventRsvp {
   barcode    String?         @unique
   desc       String?
   show_desc  Boolean         @default(false)
+  is_present Boolean         @default(false)
 
   createdBy String?
   updatedBy String?
