@@ -4,7 +4,7 @@ import { CommonParams, PaginateResult, RsvpStatsParams, UploadFileRespons } from
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadAnyFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
@@ -755,6 +755,50 @@ export async function ChangeDataEventPosting(id: number, status: boolean) {
     throw error;
   }
 };
+
+export async function ScanningQrCodeRsvp(barcode: string): Promise<DtoScanQrRsvp | null> {
+  const getData: DtoScanQrRsvp | null = await db.$transaction(async (tx) => {
+    const findData = await tx.eventRsvp.findUnique({
+      where: { barcode }
+    });
+    if(!findData) return null;
+    if(findData.att_count > 0) return {
+      data: findData,
+      isFirst: false,
+    };
+
+    const updateData = await tx.eventRsvp.update({
+      where: { id: findData.id },
+      data: {
+        att_count: {
+          increment: 1
+        }
+      }
+    });
+    return {
+      data: updateData,
+      isFirst: true,
+    };
+  });
+
+  return getData;
+}
+
+export async function IncreasRscpBarcode(id: number): Promise<DtoScanQrRsvp> {
+  const updateData = await db.eventRsvp.update({
+    where: { id: id },
+    data: {
+      att_count: {
+        increment: 1
+      }
+    }
+  });
+
+  return {
+    data: updateData,
+    isFirst: true
+  }
+}
 // End Event RSVP
 
 export async function UpdateShippingAddress(event_id: number, address: string) {

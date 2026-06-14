@@ -1,4 +1,4 @@
-import { DiscTypeEnum, EventGiftTypeEnum, EventStatusEnum, GroomBrideEnum, RolesEnum, RsvpStatusEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
+import { DiscTypeEnum, EventGiftTypeEnum, EventRsvp, EventStatusEnum, GroomBrideEnum, RolesEnum, RsvpStatusEnum, ScheduleEnum, TradRecepType } from "@/generated/prisma";
 import { DurationProps } from "./model-types";
 
 export type DtoSignIn = {
@@ -230,3 +230,8 @@ export type DtoReservation = {
   email_wa: string | null;
   message: string | null;
 };
+
+export type DtoScanQrRsvp = {
+  data: EventRsvp | null;
+  isFirst: boolean;
+}

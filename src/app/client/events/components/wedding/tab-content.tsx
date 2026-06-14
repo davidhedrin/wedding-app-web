@@ -14,12 +14,14 @@ import Select from "@/components/ui/select";
 import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
 import { ZodErrors } from "@/components/zod-errors";
-import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, StoreUploadExcelRsvp, UpdateShippingAddress } from "@/server/event-detail";
+import { ChangeDataEventPosting, DeleteDataEventFAQ, DeleteDataEventGifts, DeleteDataEventHistories, DeleteDataEventRsvp, DeleteEventGalleryById, GetDataEventFAQ, GetDataEventFAQById, GetDataEventGifts, GetDataEventGiftsById, GetDataEventHistories, GetDataEventHistoriesById, GetDataEventRsvp, GetDataEventRsvpById, GetDataRsvpCountStatistics, GetEventGalleryByEventId, GetGroomBrideDataByEventId, GetScheduleByEventId, IncreasRscpBarcode, ScanningQrCodeRsvp, StoreEventGalleries, StoreUpdateEventFAQ, StoreUpdateEventRSVP, StoreUpdateGift, StoreUpdateHistory, StoreUpdateMainInfoWedding, StoreUpdateSchedule, StoreUploadExcelRsvp, UpdateShippingAddress } from "@/server/event-detail";
 import UiPortal from "@/components/ui-portal";
 import { GetDataEventWithSelect } from "@/server/event";
 import * as XLSX from "xlsx";
+import { Scanner } from "@yudiel/react-qr-scanner";
+import LoadingUI from "@/components/loading/loading-ui";
 
 const MapPicker = dynamic(
   () => import("@/components/map-picker"),
@@ -3041,6 +3043,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
   const [datas, setDatas] = useState<EventRsvp[]>([]);
   const [tblSortList, setTblSortList] = useState<TableShortList[]>([]);
   const [tblThColomns, setTblThColomns] = useState<TableThModel[]>([
+    { name: "Scanning", key: "att_count", key_sort: "att_count", IsVisible: true },
     { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
     { name: "Name", key: "name", key_sort: "name", IsVisible: true },
     { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
@@ -3444,6 +3447,80 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     if (activeIdxTab == 5) fatchNeedData();
   }, [activeIdxTab]);
 
+
+  const modalScanQr = "modal-scan-qr";
+  const btnCloseModalQr = "btn-close-modal-scan-qr";
+
+  const [startScanQr, setStartScanQr] = useState(false);
+  const [isLoadingQr, setIsLoadingQr] = useState(false);
+  const [rsvpQrData, setRsvpQrData] = useState<DtoScanQrRsvp | null>(null);
+  const handleStartScan = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach((track) => { track.stop() });
+
+      setStartScanQr(true);
+    } catch (error) {
+      modalAction(btnCloseModalQr);
+      toast({
+        type: "info",
+        title: "Scanner Failed",
+        message: "Please allow the camera before scanning the QR code!"
+      });
+    }
+  };
+
+  const handleScanQr = async (detectedCodes: any) => {
+    const value = detectedCodes?.[0]?.rawValue;
+    if (!value) return;
+
+    setIsLoadingQr(true);
+    try {
+      const findData = await ScanningQrCodeRsvp(value);
+      if (!findData) {
+        toast({
+          type: "warning",
+          title: "Scanner Failed",
+          message: "Sorry, but QR Code is not falid or not found!"
+        });
+        setIsLoadingQr(false);
+        return;
+      }
+
+      setRsvpQrData(findData);
+    } catch (error) {
+      toast({
+        type: "warning",
+        title: "Scanner Failed",
+        message: "QR Code is not falid or not found!"
+      });
+    }
+    setIsLoadingQr(false);
+  };
+
+  const handleIncereasQr = async (id?: number) => {
+    if (!id) return;
+
+    setIsLoadingQr(true);
+    try {
+      const findData = await IncreasRscpBarcode(id);
+      setRsvpQrData(findData);
+    } catch (error) {
+      toast({
+        type: "warning",
+        title: "Scanner Failed",
+        message: "Failed to checkin QR Code. Wait a moment or try again!"
+      });
+    }
+    setIsLoadingQr(false);
+  };
+
+  const handleCloseScanQr = () => {
+    setStartScanQr(false);
+    setIsLoadingQr(false);
+    setRsvpQrData(null);
+  };
+
   return (
     <div>
       <div className="mb-4 mt-3">
@@ -3565,14 +3642,24 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
       <div className="bg-white border border-gray-200 rounded-xl p-3">
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex flex-col sm:flex-row gap-2 pb-4">
-            <button type="button"
-              id={`btn-${modalUploadRsvp}`}
-              onClick={resetUploadExcelRsvp}
-              aria-haspopup="dialog" aria-expanded="false" aria-controls={modalUploadRsvp} data-hs-overlay={`#${modalUploadRsvp}`}
-              className="w-full sm:w-auto py-1.5 px-3 inline-flex items-center justify-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              <i className='bx bx-spreadsheet text-lg me-1'></i> Upload
-            </button>
+            <div className="w-full sm:w-auto flex items-center gap-2">
+              <button type="button"
+                onClick={() => handleStartScan()}
+                id={`btn-${modalScanQr}`}
+                aria-haspopup="dialog" aria-expanded="false" aria-controls={modalScanQr} data-hs-overlay={`#${modalScanQr}`}
+                className="w-full py-1.5 px-3 inline-flex items-center justify-center text-sm font-medium rounded-lg border border-transparent bg-green-100 text-green-800 hover:bg-green-200 focus:outline-hidden focus:bg-green-200 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <i className='bx bx-qr-scan text-lg me-1'></i> Scan
+              </button>
+              <button type="button"
+                id={`btn-${modalUploadRsvp}`}
+                onClick={resetUploadExcelRsvp}
+                aria-haspopup="dialog" aria-expanded="false" aria-controls={modalUploadRsvp} data-hs-overlay={`#${modalUploadRsvp}`}
+                className="w-full py-1.5 px-3 inline-flex items-center justify-center text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-hidden focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <i className='bx bx-spreadsheet text-lg me-1'></i> Upload
+              </button>
+            </div>
             <div className="flex-1">
               <TableTopToolbar
                 inputSearch={inputSearch}
@@ -3624,6 +3711,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                           <tr key={data.id} className="hover:bg-gray-50 dark:hover:bg-neutral-700">
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800">{(pageTable - 1) * perPage + i + 1}</td>
 
+                            {'att_count' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.att_count} Times</td>}
                             {'barcode' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.barcode}</td>}
                             {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
                             {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
@@ -3985,6 +4073,146 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      </UiPortal>
+
+      <UiPortal>
+        <div id={modalScanQr} className="hs-overlay [--overlay-backdrop:static] hidden size-full fixed bg-black/30 top-0 inset-s-0 z-80 overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabIndex={-1} data-hs-overlay-keyboard="false">
+          <div className="sm:max-w-md hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:w-full m-3 h-[calc(100%-56px)] sm:mx-auto flex items-center">
+            <div className="max-h-full overflow-hidden w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-2 px-4 border-b border-gray-200">
+                <div>
+                  <div className="flex items-center gap-1 text-sm mb-0.5">
+                    <i className='bx bx-qr-scan text-lg'></i> Scan QR Code
+                  </div>
+                </div>
+                <button onClick={handleCloseScanQr} id={btnCloseModalQr} type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none" aria-label="Close" data-hs-overlay={`#${modalScanQr}`}>
+                  <span className="sr-only">Close</span>
+                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="py-3 px-4 overflow-y-auto">
+                {
+                  isLoadingQr ? <div className="h-40">
+                    <LoadingUI activeTitle={false} fullscreen={false} />
+                  </div> : (
+                    rsvpQrData ? <>
+                      {
+                        rsvpQrData.isFirst ? <>
+                          <div className="flex items-center justify-center">
+                            <div className="p-3 rounded-full bg-green-500/15">
+                              <i className="bx bx-badge-check bx-tada text-6xl text-green-500" />
+                            </div>
+                          </div>
+
+                          <div className="text-center mt-4">
+                            <h1 className="text-lg">
+                              Check-in Successful
+                            </h1>
+
+                            <p className="text-sm text-muted">
+                              The QR code has been verified successfully.
+                            </p>
+                          </div>
+
+                          <div className="mt-6 flex justify-center items-center gap-3">
+                            <button
+                              onClick={() => setRsvpQrData(null)}
+                              type="button"
+                              className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                            >
+                              Scan Again
+                            </button>
+
+                            <button onClick={() => {
+                              modalAction(btnCloseModalQr);
+                              handleCloseScanQr();
+                            }} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                              Done
+                            </button>
+                          </div>
+                        </> : <>
+                          <div className="flex items-center justify-center">
+                            <div className="p-3 rounded-full bg-yellow-500/15">
+                              <i className="bx bx-info-circle bx-tada text-6xl text-yellow-500" />
+                            </div>
+                          </div>
+
+                          <div className="text-center mt-4">
+                            <h1 className="text-lg font-semibold">
+                              Already Checked-in
+                            </h1>
+
+                            <p className="text-sm text-muted mt-1">
+                              This QR code has been scanned before.
+                            </p>
+
+                            <div className="mt-3 text-sm text-gray-600">
+                              <p>
+                                Total check-ins:{" "}
+                                <span className="font-semibold text-gray-900">{rsvpQrData.data?.att_count} times</span>
+                              </p>
+                              <p className="mt-1 text-muted">
+                                You can continue checking in this QR code if needed.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="mt-6 flex justify-center items-center gap-3">
+                            <button
+                              onClick={() => handleIncereasQr(rsvpQrData.data?.id)}
+                              type="button"
+                              className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-yellow-500 text-black hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 disabled:opacity-50 disabled:pointer-events-none"
+                            >
+                              Continue Check-in
+                            </button>
+
+                            <button onClick={() => {
+                              modalAction(btnCloseModalQr);
+                              handleCloseScanQr();
+                            }} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                              Cancel
+                            </button>
+                          </div>
+                        </>
+                      }
+                    </> : <div>
+                      <div className="overflow-hidden rounded-xl">
+                        {
+                          startScanQr && <Scanner
+                            constraints={{
+                              facingMode: "environment",
+                            }}
+                            onScan={handleScanQr}
+                          />
+                        }
+                      </div>
+
+                      <p className="mt-3 text-center text-sm text-gray-500">
+                        Point the camera at the QR Code in bright light.
+                      </p>
+                    </div>
+                  )
+                }
+              </div>
+              {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
+                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
+                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
+                </div>
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalScanQr}`}>
+                    Close
+                  </button>
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    Submit
+                  </button>
+                </div>
+              </div> */}
+            </div>
           </div>
         </div>
       </UiPortal>
