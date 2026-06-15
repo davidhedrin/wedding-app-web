@@ -36,6 +36,17 @@ export const metadata: Metadata = {
   description: "Wedding invitation builder platform",
   icons: {
     icon: "/assets/img/logo/wedlyvite-logo-web.png"
+  },
+  openGraph: {
+    title: Configs.app_name,
+    description: "Wedding invitation builder platform",
+    images: [
+      {
+        url: `${Configs.base_url}/assets/img/logo/wedlyvite-basic.png`,
+        width: 1200,
+        height: 630,
+      },
+    ]
   }
 };
 

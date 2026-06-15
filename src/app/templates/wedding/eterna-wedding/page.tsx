@@ -88,7 +88,7 @@ function Inner() {
   const searchParams = useSearchParams();
   const invtParams = Object.fromEntries(searchParams.entries()) as InvitationParams;
   const [eventDatas, setEventDatas] = useState<EventInitProps | null>(null);
-  
+
   const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [groom, setGroom] = useState<GroomBrideProps | null>(null);
   const [bride, setBride] = useState<GroomBrideProps | null>(null);
@@ -1216,41 +1216,194 @@ function Inner() {
 
               {/* Alamat Pengiriman */}
               <div className="my-3 rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="text-xs uppercase tracking-wider text-stone-400">
-                  Alamat Pengiriman
-                </p>
-                <p className="my-3 text-sm text-stone-200 leading-relaxed">
-                  {
-                    eventDatas ?
-                      (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
-                      : "Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia"
-                  }
-                </p>
-                {
-                  eventDatas ? (
-                    eventDatas.wishlist_address && <button
-                      onClick={() => {
-                        copyToClipboard(eventDatas.wishlist_address ?? "");
-                        toast({
-                          type: "success",
-                          title: "Copy to Clipboard",
-                          message: "Well done, Text copied to clipboard.",
-                        });
-                      }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
-                      Salin
-                    </button>
-                  ) : <button
-                    onClick={() => {
-                      copyToClipboard("Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia");
-                      toast({
-                        type: "success",
-                        title: "Copy to Clipboard",
-                        message: "Well done, Text copied to clipboard.",
-                      });
-                    }} className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-xs text-stone-200 transition hover:bg-white/10">
-                    Salin
-                  </button>
-                }
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                  {/* Penerima */}
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-stone-400">
+                      Penerima
+                    </p>
+
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <p className="text-sm text-stone-200 wrap-break-word">
+                        {
+                          eventDatas
+                            ? (eventDatas.wishlist_recip ?? "Please wait! Recipient is waiting to adding.")
+                            : "Aisyah & Rizky"
+                        }
+                      </p>
+
+                      {
+                        eventDatas ? (
+                          eventDatas.wishlist_recip && (
+                            <button
+                              onClick={() => {
+                                copyToClipboard(eventDatas.wishlist_recip ?? "");
+                                toast({
+                                  type: "success",
+                                  title: "Copy to Clipboard",
+                                  message: "Recipient copied successfully.",
+                                });
+                              }}
+                              className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                            >
+                              <svg viewBox="0 0 24 24" className="h-4 w-4">
+                                <path
+                                  fill="currentColor"
+                                  d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                                />
+                              </svg>
+                            </button>
+                          )
+                        ) : (
+                          <button
+                            onClick={() => {
+                              copyToClipboard("Aisyah & Rizky");
+                              toast({
+                                type: "success",
+                                title: "Copy to Clipboard",
+                                message: "Recipient copied successfully.",
+                              });
+                            }}
+                            className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                          >
+                            <svg viewBox="0 0 24 24" className="h-4 w-4">
+                              <path
+                                fill="currentColor"
+                                d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                              />
+                            </svg>
+                          </button>
+                        )
+                      }
+                    </div>
+                  </div>
+
+                  {/* Nomor HP */}
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-stone-400">
+                      Nomor HP
+                    </p>
+
+                    <div className="mt-2 flex items-center justify-between gap-3">
+                      <p className="text-sm text-stone-200 wrap-break-word">
+                        {
+                          eventDatas
+                            ? (eventDatas.wishlist_phone ?? "Please wait! Phone number is waiting to adding.")
+                            : "+62 812 3456 7890"
+                        }
+                      </p>
+
+                      {
+                        eventDatas ? (
+                          eventDatas.wishlist_phone && (
+                            <button
+                              onClick={() => {
+                                copyToClipboard(eventDatas.wishlist_phone ?? "");
+                                toast({
+                                  type: "success",
+                                  title: "Copy to Clipboard",
+                                  message: "Phone number copied successfully.",
+                                });
+                              }}
+                              className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                            >
+                              <svg viewBox="0 0 24 24" className="h-4 w-4">
+                                <path
+                                  fill="currentColor"
+                                  d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                                />
+                              </svg>
+                            </button>
+                          )
+                        ) : (
+                          <button
+                            onClick={() => {
+                              copyToClipboard("+62 812 3456 7890");
+                              toast({
+                                type: "success",
+                                title: "Copy to Clipboard",
+                                message: "Phone number copied successfully.",
+                              });
+                            }}
+                            className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                          >
+                            <svg viewBox="0 0 24 24" className="h-4 w-4">
+                              <path
+                                fill="currentColor"
+                                d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                              />
+                            </svg>
+                          </button>
+                        )
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="my-4 border-t border-white/10" />
+
+                {/* Alamat */}
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-stone-400">
+                    Alamat Pengiriman
+                  </p>
+
+                  <div className="mt-2 flex items-start justify-between gap-3">
+                    <p className="text-sm text-stone-200 leading-relaxed wrap-break-word">
+                      {
+                        eventDatas
+                          ? (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
+                          : "Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia"
+                      }
+                    </p>
+
+                    {
+                      eventDatas ? (
+                        eventDatas.wishlist_address && (
+                          <button
+                            onClick={() => {
+                              copyToClipboard(eventDatas.wishlist_address ?? "");
+                              toast({
+                                type: "success",
+                                title: "Copy to Clipboard",
+                                message: "Address copied successfully.",
+                              });
+                            }}
+                            className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                          >
+                            <svg viewBox="0 0 24 24" className="h-4 w-4">
+                              <path
+                                fill="currentColor"
+                                d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                              />
+                            </svg>
+                          </button>
+                        )
+                      ) : (
+                        <button
+                          onClick={() => {
+                            copyToClipboard("Aisyah & Rizky Jl. Mawar Indah No. 12 Jakarta Selatan, 12345 Indonesia");
+                            toast({
+                              type: "success",
+                              title: "Copy to Clipboard",
+                              message: "Address copied successfully.",
+                            });
+                          }}
+                          className="shrink-0 rounded-lg border border-white/10 p-2 text-stone-300 transition hover:bg-white/10"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-4 w-4">
+                            <path
+                              fill="currentColor"
+                              d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                            />
+                          </svg>
+                        </button>
+                      )
+                    }
+                  </div>
+                </div>
               </div>
 
               <p className="my-2 text-sm text-stone-300 leading-relaxed">
@@ -1271,7 +1424,7 @@ function Inner() {
                           {x.name}{x.qty === x.reserve_qty && " (FULL)"}
                         </p>
                         <div className="text-xs text-stone-300 space-y-0.5">
-                          <p>Harga: {x.product_price}</p>
+                          <p>Harga: Rp {x.product_price ? (x.product_price ?? 0).toLocaleString('id-ID') : "-"}</p>
                           <p>Jumlah: {x.qty} Unit • Direservasi: {x.reserve_qty} Unit</p>
                         </div>
 

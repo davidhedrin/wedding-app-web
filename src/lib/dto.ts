@@ -235,3 +235,10 @@ export type DtoScanQrRsvp = {
   data: EventRsvp | null;
   isFirst: boolean;
 }
+
+export type DtoWhislistRsvp = {
+  event_id: number;
+  wishlist_recip: string | null;
+  wishlist_phone: string | null;
+  wishlist_address: string | null;
+}

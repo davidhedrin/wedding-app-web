@@ -4,7 +4,7 @@ import { CommonParams, PaginateResult, RsvpStatsParams, UploadFileRespons } from
 import { db } from "../../prisma/db-init";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { auth } from "@/app/api/auth/auth-setup";
-import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
+import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp, DtoWhislistRsvp } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadAnyFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
 import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
@@ -756,10 +756,10 @@ export async function ChangeDataEventPosting(id: number, status: boolean) {
   }
 };
 
-export async function ScanningQrCodeRsvp(barcode: string): Promise<DtoScanQrRsvp | null> {
+export async function ScanningQrCodeRsvp(event_id: number, barcode: string): Promise<DtoScanQrRsvp | null> {
   const getData: DtoScanQrRsvp | null = await db.$transaction(async (tx) => {
     const findData = await tx.eventRsvp.findUnique({
-      where: { barcode }
+      where: { event_id, barcode }
     });
     if(!findData) return null;
     if(findData.att_count > 0) return {
@@ -801,16 +801,18 @@ export async function IncreasRscpBarcode(id: number): Promise<DtoScanQrRsvp> {
 }
 // End Event RSVP
 
-export async function UpdateShippingAddress(event_id: number, address: string) {
+export async function UpdateShippingAddress(formData: DtoWhislistRsvp) {
   try {
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
     const { user } = session;
 
     await db.events.update({
-      where: { id: event_id },
+      where: { id: formData.event_id },
       data: {
-        wishlist_address: address
+        wishlist_recip: formData.wishlist_recip,
+        wishlist_phone: formData.wishlist_phone,
+        wishlist_address: formData.wishlist_address
       }
     });
   } catch (error: any) {

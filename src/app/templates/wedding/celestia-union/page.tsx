@@ -1461,39 +1461,48 @@ function Inner() {
               {/* Decorative Accent */}
               <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10" />
 
-              <div className="flex flex-col gap-4">
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-white/60">
-                    Alamat Lengkap
-                  </div>
-                  <div className="mt-1 text-white leading-relaxed">
-                    {
-                      eventDatas ?
-                        (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
-                        : "Jl. Mawar No. 10 Kel. Melati Indah Jakarta Selatan DKI Jakarta 12345 Indonesia"
-                    }
-                  </div>
-                </div>
+              <div className="flex flex-col gap-5">
+                {/* Nama Penerima */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs uppercase tracking-wider text-white/60">
+                      Penerima
+                    </div>
 
-                {
-                  eventDatas ? (
-                    eventDatas.wishlist_address && <div>
-                      <button
-                        onClick={() => {
-                          copyToClipboard(eventDatas.wishlist_address ?? "");
-                          toast({
-                            type: "success",
-                            title: "Copy to Clipboard",
-                            message: "Well done, Text copied to clipboard.",
-                          });
-                        }}
-                        className={classNames(
-                          'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
-                          THEME.accentBg,
-                          THEME.accentRing
-                        )}
-                      >
-                        Salin Alamat
+                    <div className="mt-1 text-white wrap-break-word">
+                      {
+                        eventDatas
+                          ? (eventDatas.wishlist_recip ?? "Please wait! Recipient is waiting to adding.")
+                          : "Budi Santoso"
+                      }
+                    </div>
+                  </div>
+
+                  {
+                    eventDatas ? (
+                      eventDatas.wishlist_recip && (
+                        <button
+                          onClick={() => {
+                            copyToClipboard(eventDatas.wishlist_recip ?? "");
+
+                            toast({
+                              type: "success",
+                              title: "Copy to Clipboard",
+                              message: "Recipient copied successfully.",
+                            });
+                          }}
+                          className="shrink-0 rounded-full border border-white/10 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-4 w-4">
+                            <path
+                              fill="currentColor"
+                              d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                            />
+                          </svg>
+                        </button>
+                      )
+                    ) : (
+                      <button className="shrink-0 rounded-full border border-white/10 p-2 text-white/70">
                         <svg viewBox="0 0 24 24" className="h-4 w-4">
                           <path
                             fill="currentColor"
@@ -1501,25 +1510,113 @@ function Inner() {
                           />
                         </svg>
                       </button>
+                    )
+                  }
+                </div>
+
+                {/* Nomor HP */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs uppercase tracking-wider text-white/60">
+                      Nomor HP
                     </div>
-                  ) : <div>
-                    <button
-                      className={classNames(
-                        'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-xs font-semibold text-black transition',
-                        THEME.accentBg,
-                        THEME.accentRing
-                      )}
-                    >
-                      Salin Alamat
-                      <svg viewBox="0 0 24 24" className="h-4 w-4">
-                        <path
-                          fill="currentColor"
-                          d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
-                        />
-                      </svg>
-                    </button>
+
+                    <div className="mt-1 text-white">
+                      {
+                        eventDatas
+                          ? (eventDatas.wishlist_phone ?? "Please wait! Phone number is waiting to adding.")
+                          : "+62 812 3456 7890"
+                      }
+                    </div>
                   </div>
-                }
+
+                  {
+                    eventDatas ? (
+                      eventDatas.wishlist_phone && (
+                        <button
+                          onClick={() => {
+                            copyToClipboard(eventDatas.wishlist_phone ?? "");
+
+                            toast({
+                              type: "success",
+                              title: "Copy to Clipboard",
+                              message: "Phone number copied successfully.",
+                            });
+                          }}
+                          className="shrink-0 rounded-full border border-white/10 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-4 w-4">
+                            <path
+                              fill="currentColor"
+                              d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                            />
+                          </svg>
+                        </button>
+                      )
+                    ) : (
+                      <button className="shrink-0 rounded-full border border-white/10 p-2 text-white/70">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4">
+                          <path
+                            fill="currentColor"
+                            d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                          />
+                        </svg>
+                      </button>
+                    )
+                  }
+                </div>
+
+                {/* Alamat */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs uppercase tracking-wider text-white/60">
+                      Alamat Pengiriman
+                    </div>
+
+                    <div className="mt-1 text-white leading-relaxed">
+                      {
+                        eventDatas
+                          ? (eventDatas.wishlist_address ?? "Please wait! Shipping address is waiting to adding.")
+                          : "Jl. Mawar No. 10 Kel. Melati Indah Jakarta Selatan DKI Jakarta 12345 Indonesia"
+                      }
+                    </div>
+                  </div>
+
+                  {
+                    eventDatas ? (
+                      eventDatas.wishlist_address && (
+                        <button
+                          onClick={() => {
+                            copyToClipboard(eventDatas.wishlist_address ?? "");
+
+                            toast({
+                              type: "success",
+                              title: "Copy to Clipboard",
+                              message: "Address copied successfully.",
+                            });
+                          }}
+                          className="shrink-0 rounded-full border border-white/10 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-4 w-4">
+                            <path
+                              fill="currentColor"
+                              d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                            />
+                          </svg>
+                        </button>
+                      )
+                    ) : (
+                      <button className="shrink-0 rounded-full border border-white/10 p-2 text-white/70">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4">
+                          <path
+                            fill="currentColor"
+                            d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"
+                          />
+                        </svg>
+                      </button>
+                    )
+                  }
+                </div>
               </div>
             </div>
 
@@ -1550,7 +1647,7 @@ function Inner() {
                         <div className="mt-2 text-sm text-white/70 space-y-1">
                           <div>
                             <span className="text-white/80">Perkiraan Harga:</span>{' '}
-                            {x.product_price}
+                            Rp {x.product_price ? (x.product_price ?? 0).toLocaleString('id-ID') : "-"}
                           </div>
                           <div>
                             <span className="text-white/80">Jumlah:</span>{' '}

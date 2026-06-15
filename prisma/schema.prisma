@@ -214,6 +214,8 @@ model Events {
   youtube_url       String?
 
   schedule_note    String?
+  wishlist_recip   String?
+  wishlist_phone   String?
   wishlist_address String?
 
   createdBy String?

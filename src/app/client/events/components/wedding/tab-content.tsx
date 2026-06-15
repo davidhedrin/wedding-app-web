@@ -2298,6 +2298,8 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
   // End For Wishlist Gift
 
   const [stateFormShippingAddress, setStateFormShippingAddress] = useState<FormState>({ success: false, errors: {} });
+  const [shippingRecipient, setShippingRecipient] = useState<string>(dataEvent.wishlist_recip ?? "");
+  const [shippingContact, setShippingContact] = useState<string>(dataEvent.wishlist_phone ?? "");
   const [shippingAddress, setShippingAddress] = useState<string>(dataEvent.wishlist_address ?? "");
   const [isHaveShippingAdd, setIsHaveShippingAdd] = useState<boolean>(dataEvent.wishlist_address != null ? true : false);
 
@@ -2312,7 +2314,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
 
       qty: giftType === EventGiftTypeEnum.Wishlist ? (reservationQty === "" ? 1 : reservationQty) : null,
       product_url: giftType === EventGiftTypeEnum.Wishlist ? reservationUrl : null,
-      product_price: giftType === EventGiftTypeEnum.Wishlist ? parseFromIDR(productPrice) : null,
+      product_price: giftType === EventGiftTypeEnum.Wishlist ? (productPrice.trim() != "" ? parseFromIDR(productPrice) : null) : null,
     };
 
     return data;
@@ -2368,14 +2370,21 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
 
   const openModalWishlistAddress = async () => {
     setStateFormShippingAddress({ success: true, errors: {} });
+    setShippingRecipient("");
+    setShippingContact("");
     setShippingAddress("");
     setLoading(true);
     const getSchadule = await GetDataEventWithSelect({
       event_id: dataEvent.id, select: {
+        wishlist_recip: true,
+        wishlist_phone: true,
         wishlist_address: true
       }
     });
+    setShippingRecipient(getSchadule ? getSchadule.wishlist_recip ?? "" : "");
+    setShippingContact(getSchadule ? getSchadule.wishlist_phone ?? "" : "");
     setShippingAddress(getSchadule ? getSchadule.wishlist_address ?? "" : "");
+
     setIsHaveShippingAdd(getSchadule ? getSchadule.wishlist_address != null ? true : false : false);
     setLoading(false);
 
@@ -2383,6 +2392,8 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
   };
 
   const FormSchemaWishlistAddress = z.object({
+    wishlist_recip: z.string().min(1, { message: 'Recipient name is required field.' }).trim(),
+    wishlist_phone: z.string().min(1, { message: 'Contact number is required field.' }).trim(),
     shipping_address: z.string().min(1, { message: 'Address is required field.' }).trim(),
   });
   const handleSubmitFormWishlistAddress = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -2416,7 +2427,12 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
 
     setLoading(true);
     try {
-      await UpdateShippingAddress(dataEvent.id, shippingAddress.trim());
+      await UpdateShippingAddress({
+        event_id: dataEvent.id,
+        wishlist_recip: shippingRecipient.trim() != "" ? shippingRecipient.trim() : null,
+        wishlist_phone: shippingContact.trim() != "" ? shippingContact.trim() : null,
+        wishlist_address: shippingAddress.trim() != "" ? shippingAddress.trim() : null
+      });
       setIsHaveShippingAdd(true);
       toast({
         type: "success",
@@ -2448,7 +2464,6 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
     const FormSchemaWhGift = z.object({
       product_name: z.string().min(1, { message: 'Name is required field.' }).trim(),
       reservation_qty: z.string().min(1, { message: 'QTY is required field.' }).trim(),
-      product_price: z.string().min(1, { message: 'Price required field.' }).trim(),
     });
 
     const FormSchemaGift = giftType === EventGiftTypeEnum.Transfer ? FormSchemaTfGift : giftType === EventGiftTypeEnum.Wishlist ? FormSchemaWhGift : z.object({});
@@ -2847,7 +2862,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
                         {x.name}
                       </div>
                       <p className="text-sm text-gray-500 font-semibold">
-                        Rp {(x.product_price ?? 0).toLocaleString('id-ID')}
+                        Rp {x.product_price ? (x.product_price ?? 0).toLocaleString('id-ID') : "-"}
                       </p>
                       <p className="text-sm text-gray-500">
                         Reservation URL: {
@@ -2932,8 +2947,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
                       {stateFormGift.errors?.product_name && <ZodErrors err={stateFormGift.errors?.product_name} />}
                     </div>
                     <div className="col-span-12 md:col-span-6">
-                      <Input value={productPrice} onChange={(e) => setProductPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='input-no-spinner' id='product_price' label='Price' placeholder='Enter product price' mandatory />
-                      {stateFormGift.errors?.product_price && <ZodErrors err={stateFormGift.errors?.product_price} />}
+                      <Input value={productPrice} onChange={(e) => setProductPrice(inputFormatPriceIdr(e.target.value) || "")} type='text' className='input-no-spinner' id='product_price' label='Price' placeholder='Enter product price' />
                     </div>
                     <div className="col-span-12 md:col-span-6">
                       <Input
@@ -3004,8 +3018,18 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
                 </button>
               </div>
               <div className="py-3 px-4 overflow-y-auto">
-                <Textarea value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} id="shipping_address" placeholder="Enter the shipping address" rows={3} />
-                {stateFormShippingAddress.errors?.shipping_address && <ZodErrors err={stateFormShippingAddress.errors?.shipping_address} />}
+                <div className="mb-2">
+                  <Input value={shippingRecipient} onChange={(e) => setShippingRecipient(e.target.value)} type='text' id='wishlist_recip' placeholder='Enter shipping recipient' />
+                  {stateFormShippingAddress.errors?.wishlist_recip && <ZodErrors err={stateFormShippingAddress.errors?.wishlist_recip} />}
+                </div>
+                <div className="mb-2">
+                  <Input value={shippingContact} onChange={(e) => setShippingContact(e.target.value)} type='text' id='wishlist_phone' placeholder='Enter shipping contact number' />
+                  {stateFormShippingAddress.errors?.wishlist_phone && <ZodErrors err={stateFormShippingAddress.errors?.wishlist_phone} />}
+                </div>
+                <div className="mb-2">
+                  <Textarea value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} id="shipping_address" placeholder="Enter the shipping address" rows={3} />
+                  {stateFormShippingAddress.errors?.shipping_address && <ZodErrors err={stateFormShippingAddress.errors?.shipping_address} />}
+                </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
                 <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
@@ -3476,7 +3500,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
 
     setIsLoadingQr(true);
     try {
-      const findData = await ScanningQrCodeRsvp(value);
+      const findData = await ScanningQrCodeRsvp(event_id, value);
       if (!findData) {
         toast({
           type: "warning",
@@ -4199,19 +4223,6 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                   )
                 }
               </div>
-              {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 py-2.5 px-4 border-t border-gray-200">
-                <div className="text-xs text-gray-500 sm:order-1 order-1 italic">
-                  <p>Fields marked with <span className="text-red-500">*</span> are required.</p>
-                </div>
-                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
-                  <button id={btnCloseModal} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none" data-hs-overlay={`#${modalScanQr}`}>
-                    Close
-                  </button>
-                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                    Submit
-                  </button>
-                </div>
-              </div> */}
             </div>
           </div>
         </div>

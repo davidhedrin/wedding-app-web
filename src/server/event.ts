@@ -362,6 +362,8 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
         custom_music_r2: true,
         custom_music_name: true,
         schedule_note: true,
+        wishlist_recip: true,
+        wishlist_phone: true,
         wishlist_address: true,
         youtube_url: true,
         
