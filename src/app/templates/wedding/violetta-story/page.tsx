@@ -1545,7 +1545,7 @@ function Inner() {
                             <img className="h-5" src={allPaymentMethod.find(m => m.key === x.name)?.icon} />
                           </div>
                           <p className="text-white/70">No. Rek: {x.no_rek}</p>
-                          <p className="text-white/50">a.n. {x.name}</p>
+                          <p className="text-white/50">a.n. {x.account}</p>
                         </div>
 
                         <button
