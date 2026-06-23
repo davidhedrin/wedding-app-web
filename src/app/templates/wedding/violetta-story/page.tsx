@@ -719,7 +719,7 @@ function Inner() {
                 >
                   <div className="relative">
                     <img
-                      src={IMAGES[idx]}
+                      src={x.img_path ?? ""}
                       alt={x.shortname}
                       className="h-72 w-full object-cover"
                     />
