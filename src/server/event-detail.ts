@@ -26,67 +26,15 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
     if(!user) throw new Error("Authentication credential not Found!");
 
     const event_id = formData.event_id ?? 0;
-    const groomData = formData.groom_bride.find((x) => x.type === "Groom");
-    const brideData = formData.groom_bride.find((x) => x.type === "Bride");
+    var groomData = formData.groom_bride.find((x) => x.type === "Groom");
+    var brideData = formData.groom_bride.find((x) => x.type === "Bride");
 
     const findEventData = await db.events.findUnique({
       where: { id: event_id }
     });
     if(Configs.s3_bucket !== undefined){
-      if (groomData) { // Groom File Upload
-        const groomType = groomData.type.toString().toLowerCase();
-        const dataIdGroom = groomData.id ?? 0;
-
-        const existingGroom = await db.groomBrideInfo.findUnique({
-          where: { id: dataIdGroom }
-        });
-
-        if(existingGroom){
-          if (groomData.file_img) {
-            const upFile = await CloudflareUploadFile(groomData.file_img, "webp", Configs.s3_bucket, `${groomType}-${event_id}`);
-            if (upFile?.status) {
-              if (existingGroom.img_name) CloudflareDeleteFile(Configs.s3_bucket, existingGroom.img_name).catch(() => {});
-              groomData.img_name = upFile.filename;
-              groomData.img_url = upFile.path;
-            };
-          };
-        } else {
-          if (groomData.file_img) {
-            const upFile = await CloudflareUploadFile(groomData.file_img, "webp", Configs.s3_bucket, `${groomType}-${event_id}`);
-            if (upFile?.status) {
-              groomData.img_name = upFile.filename;
-              groomData.img_url = upFile.path;
-            };
-          };
-        }
-      }
-      if (brideData) { // Bride File Upload
-        const brideType = brideData.type.toString().toLowerCase();
-        const dataIdBride = brideData.id ?? 0;
-
-        const existingBride = await db.groomBrideInfo.findUnique({
-          where: { id: dataIdBride }
-        });
-
-        if(existingBride){
-          if (brideData.file_img) {
-            const upFile = await CloudflareUploadFile(brideData.file_img, "webp", Configs.s3_bucket, `${brideType}-${event_id}`);
-            if (upFile?.status) {
-              if (existingBride.img_name) CloudflareDeleteFile(Configs.s3_bucket, existingBride.img_name).catch(() => {});
-              brideData.img_name = upFile.filename;
-              brideData.img_url = upFile.path;
-            };
-          };
-        } else {
-          if (brideData.file_img) {
-            const upFile = await CloudflareUploadFile(brideData.file_img, "webp", Configs.s3_bucket, `${brideType}-${event_id}`);
-            if (upFile?.status) {
-              brideData.img_name = upFile.filename;
-              brideData.img_url = upFile.path;
-            };
-          };
-        }
-      }
+      if (groomData) groomData = await uploadImgGroomBride(groomData, event_id);
+      if (brideData) brideData = await uploadImgGroomBride(brideData, event_id);
 
       // if(findEventData && findEventData.couple_img_name && formData.couple_file_img === null) CloudflareDeleteFile(Configs.s3_bucket, findEventData.couple_img_name).catch(err => {});
       if(formData.couple_file_img !== null) {
@@ -137,10 +85,40 @@ export async function StoreUpdateMainInfoWedding(formData: DtoMainInfoWedding) {
       await Promise.all(tasksGroomBride);
     });
   } catch (error: any) {
-    console.log(error);
-    console.log(error.message);
     throw error;
   }
+};
+
+async function uploadImgGroomBride(data: DtoGroomBride, event_id: number): Promise<DtoGroomBride> {
+  if(Configs.s3_bucket !== undefined){
+    const groomBrideType = data.type.toString().toLowerCase();
+    const dataId = data.id ?? 0;
+  
+    const existing = await db.groomBrideInfo.findUnique({
+      where: { id: dataId }
+    });
+  
+    if(existing){
+      if (data.file_img) {
+        const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${groomBrideType}-${event_id}`);
+        if (upFile?.status) {
+          if (existing.img_name) CloudflareDeleteFile(Configs.s3_bucket, existing.img_name).catch(() => {});
+          data.img_name = upFile.filename;
+          data.img_url = upFile.path;
+        };
+      };
+    } else {
+      if (data.file_img) {
+        const upFile = await CloudflareUploadFile(data.file_img, "webp", Configs.s3_bucket, `${groomBrideType}-${event_id}`);
+        if (upFile?.status) {
+          data.img_name = upFile.filename;
+          data.img_url = upFile.path;
+        };
+      };
+    }
+  }
+
+  return data;
 };
 
 async function upsertGroomBride({
@@ -157,46 +135,41 @@ async function upsertGroomBride({
   if (data === undefined) return;
   const dataId = data.id ?? 0;
 
-  if (dataId > 0) {
-    await tr.groomBrideInfo.update({
-      where: { id: dataId },
-      data: {
-        fullname: data.fullname,
-        shortname: data.shortname,
-        birth_place: data.birth_place,
-        birth_date: data.birth_date,
-        birth_order: data.birth_order,
-        father_name: data.father_name,
-        mother_name: data.mother_name,
-        place_origin: data.place_origin,
-        occupation: data.occupation,
-        personal_msg: data.personal_msg,
-        img_name: data.img_name,
-        img_path: data.img_url,
-        updatedBy: user?.email
-      }
-    });
-
-    return;
-  } else {
-    await tr.groomBrideInfo.create({
-      data: {
-        event_id,
-        type: data.type,
-        fullname: data.fullname,
-        shortname: data.shortname,
-        birth_place: data.birth_place,
-        birth_date: data.birth_date,
-        birth_order: data.birth_order,
-        father_name: data.father_name,
-        mother_name: data.mother_name,
-        place_origin: data.place_origin,
-        occupation: data.occupation,
-        personal_msg: data.personal_msg,
-        createdBy: user?.email
-      }
-    });
-  };
+  await tr.groomBrideInfo.upsert({
+    where: { id: dataId },
+    update: {
+      fullname: data.fullname,
+      shortname: data.shortname,
+      birth_place: data.birth_place,
+      birth_date: data.birth_date,
+      birth_order: data.birth_order,
+      father_name: data.father_name,
+      mother_name: data.mother_name,
+      place_origin: data.place_origin,
+      occupation: data.occupation,
+      personal_msg: data.personal_msg,
+      img_name: data.img_name,
+      img_path: data.img_url,
+      updatedBy: user?.email
+    },
+    create: {
+      event_id,
+      type: data.type,
+      fullname: data.fullname,
+      shortname: data.shortname,
+      birth_place: data.birth_place,
+      birth_date: data.birth_date,
+      birth_order: data.birth_order,
+      father_name: data.father_name,
+      mother_name: data.mother_name,
+      place_origin: data.place_origin,
+      occupation: data.occupation,
+      personal_msg: data.personal_msg,
+      img_name: data.img_name,
+      img_path: data.img_url,
+      createdBy: user?.email
+    }
+  })
 };
 // End Groom Bride Info
 
@@ -308,7 +281,6 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
 
     if(uploadPromises.length === 0) return;
     const results = await Promise.all(uploadPromises);
-    console.log(results)
 
     const createData = results.map(x => ({
       event_id,

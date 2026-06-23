@@ -712,7 +712,7 @@ function Inner() {
               eventDatas ? eventDatas.gb_info.map((x, idx) => (
                 <div
                   key={idx}
-                  className="reveal rounded-3xl overflow-hidden card"
+                  className="rounded-3xl overflow-hidden card"
                   ref={(el) => {
                     if (el) revealRef.current[`m-${idx}`] = el
                   }}
@@ -721,7 +721,7 @@ function Inner() {
                     <img
                       src={x.img_path ?? ""}
                       alt={x.shortname}
-                      className="h-72 w-full object-cover"
+                      className="h-full w-full object-cover object-top"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                   </div>
@@ -741,7 +741,7 @@ function Inner() {
               ].map((p, idx) => (
                 <div
                   key={p.name}
-                  className="reveal rounded-3xl overflow-hidden card"
+                  className="rounded-3xl overflow-hidden card"
                   ref={(el) => {
                     if (el) revealRef.current[`m-${idx}`] = el
                   }}
@@ -750,7 +750,7 @@ function Inner() {
                     <img
                       src={IMAGES[idx]}
                       alt={p.name}
-                      className="h-72 w-full object-cover"
+                      className="h-full w-full object-cover object-top"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                   </div>

@@ -45,9 +45,7 @@ export async function signInGoogle() {
   try {
     await signIn('google', {
       redirectTo: "/client/dashboard"
-    }).then((res) => {
-      console.log(res);
-    });
+    }).then((res) => { });
   } catch (err: any) {
     throw err;
   }
