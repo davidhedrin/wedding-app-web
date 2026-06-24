@@ -590,15 +590,7 @@ function Inner() {
               {/* COUNTDOWN */}
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <span className={`chip px-3 py-2 rounded-full ${THEME.chip}`}>
-                  {WEDDING_DATE.toLocaleDateString("id-ID", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}{" "}
-                  WIB
+                  {formatDate(eventDatas?.event_time ?? WEDDING_DATE, "full")} pukul {formatDate(eventDatas?.event_time ?? WEDDING_DATE, undefined, "short")}
                 </span>
               </div>
 

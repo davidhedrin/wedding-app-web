@@ -183,7 +183,7 @@ export function formatDate(dateString: string | Date, dtStyle?: "short" | "full"
   const timeFormatter = tmStyle ? new Intl.DateTimeFormat("id-ID", { timeStyle: tmStyle }) : null;
 
   const formattedDate = dateFormatter ? dateFormatter.format(date) : "";
-  const formattedTime = timeFormatter ? `. ${timeFormatter.format(date)}` : "";
+  const formattedTime = timeFormatter ? `${dtStyle !== undefined ? '. ' : ''}${timeFormatter.format(date)}` : "";
 
   return tmStyle ? `${formattedDate} ${formattedTime}` : formattedDate;
 };

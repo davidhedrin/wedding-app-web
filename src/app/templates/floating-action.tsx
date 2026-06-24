@@ -119,7 +119,7 @@ export default function FloatingActionButton({
             onClick={() => setShowQR(false)}
           >
             <div
-              className="bg-white rounded-2xl shadow-2xl px-6 py-4 w-full max-w-xs relative text-center"
+              className="bg-white rounded-2xl shadow-2xl px-4 py-4 w-full max-w-xs relative text-center border-y-8 border-y-pink-500"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -129,35 +129,35 @@ export default function FloatingActionButton({
                 <i className="bx bx-x text-2xl"></i>
               </button>
 
-              <h2 className="text-lg font-semibold mb-2">
+              <h2 className="text-lg text-muted font-semibold mb-2">
                 Scan QR-Code
               </h2>
 
               <p className="text-sm text-gray-600 underline">
                 Undangan Untuk
               </p>
-              <p className="text-base font-semibold">
+              <p className="text-base text-muted font-semibold mt-2">
                 {guestName}
               </p>
               <p className="text-sm text-gray-500">
                 {eventDate}
               </p>
 
-              <div className="bg-white p-4 rounded-xl border flex justify-center my-3">
-                <QRCode value={qrValue} size={230} bgColor="#ffffff" fgColor="#000000" level="H" />
+              <div className="bg-white rounded-xl border flex justify-center my-4">
+                <QRCode value={qrValue} size={240} bgColor="#ffffff" fgColor="#000000" level="H" />
               </div>
 
               <div className="mb-2">
                 <p className="text-sm text-muted">
                   QR Code:
                 </p>
-                <p className="text-base font-bold">
+                <p className="text-base text-muted font-bold">
                   {qrValue}
                 </p>
               </div>
 
               <p className="text-xs text-gray-500">
-                Note: Tingkatkan brightness layar agar memudahkan untuk discan
+                Note: Tingkatkan brightness layar agar memudahkan untuk discan.
               </p>
             </div>
           </div>
