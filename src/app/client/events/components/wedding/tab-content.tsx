@@ -3070,8 +3070,8 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     { name: "Scanning", key: "att_count", key_sort: "att_count", IsVisible: true },
     { name: "Barcode", key: "barcode", key_sort: "barcode", IsVisible: true },
     { name: "Name", key: "name", key_sort: "name", IsVisible: true },
-    { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
     { name: "Attandance", key: "att_status", key_sort: "att_status", IsVisible: true },
+    { name: "No Phone", key: "phone", key_sort: "phone", IsVisible: true },
   ]);
   const [dataRsvpStas, setDataRsvpStas] = useState<RsvpStatsParams>({
     total: 0,
@@ -3464,13 +3464,13 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     const fatchNeedData = async () => {
       setLoading(true);
       await fatchDatas();
+      await loadGroomBrideName();
       setIsFirstRender(false);
       setLoading(false);
     };
 
     if (activeIdxTab == 5) fatchNeedData();
   }, [activeIdxTab]);
-
 
   const modalScanQr = "modal-scan-qr";
   const btnCloseModalQr = "btn-close-modal-scan-qr";
@@ -3544,6 +3544,46 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
     setIsLoadingQr(false);
     setRsvpQrData(null);
   };
+
+  const [groomInfo, setGroomInfo] = useState<{ full: string, short: string } | null>(null);
+  const [brideInfo, setBrideInfo] = useState<{ full: string, short: string } | null>(null);
+  const loadGroomBrideName = async () => {
+    const getData = await GetGroomBrideDataByEventId(event_id);
+    getData.forEach(x => {
+      const setterType = x.type;
+
+      if (setterType === "Groom") {
+        setGroomInfo({
+          full: x.fullname,
+          short: x.shortname
+        });
+      } else if (setterType === "Bride") {
+        setBrideInfo({
+          full: x.fullname,
+          short: x.shortname
+        });
+      }
+    });
+  };
+  const msgSendWa = [
+    "Dear {{guestName}},",
+    "",
+    "Two hearts become one.",
+    "By the grace and blessing of God, we warmly invite you to celebrate the wedding of.",
+    "",
+    "*{{brideFullName}}*",
+    "&",
+    "*{{groomFullName}}*",
+    "",
+    "Please open your invitation:",
+    "{{link}}",
+    "",
+    "Your presence and blessings would mean so much to us.",
+    "See you on our special day!",
+    "",
+    "With Love,",
+    "{{brideShortName}} & {{groomShortName}}",
+  ].join("\n");
 
   return (
     <div>
@@ -3688,8 +3728,8 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
               <TableTopToolbar
                 inputSearch={inputSearch}
                 tblSortList={tblSortList}
-                thColomn={tblThColomns}
-                setTblThColomns={setTblThColomns}
+                // thColomn={tblThColomns}
+                // setTblThColomns={setTblThColomns}
                 setTblSortList={setTblSortList}
                 setInputSearch={setInputSearch}
                 fatchData={() => fatchDatas(pageTable)}
@@ -3725,7 +3765,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             if (x.IsVisible) return <th key={x.key} scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">{x.name}</th>
                           })
                         }
-                        <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">URL</th>
+                        <th scope="col" className="px-3 py-2.5 text-start text-xs font-medium text-gray-500 uppercase">Invitation</th>
                         <th scope="col" className="px-3 py-2.5 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
                       </tr>
                     </thead>
@@ -3738,22 +3778,108 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                             {'att_count' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.att_count} Times</td>}
                             {'barcode' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.barcode}</td>}
                             {'name' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.name}</td>}
-                            {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
                             {
                               'att_status' in data && <td className={`px-3 py-2.5 whitespace-nowrap text-sm text-gray-800 ${data.att_status == null && "italic"}`}>
                                 {data.att_status ?? "Not Respon"}{data.att_status && data.att_status === "PRESENCE" ? (data.att_number ? ` (${data.att_number} Person)` : "") : ""}
                               </td>
                             }
+                            {
+                              'phone' in data &&
+                              // <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                              //   <div className="flex items-center gap-2">
+                              //     <span>{data.phone || "-"}</span>
+
+                              //     {data.phone && (
+                              //       <button
+                              //         type="button"
+                              //         title="Kirim WhatsApp"
+                              //         className="flex px-1.5 py-0.5 text-sm items-center justify-center rounded-full bg-green-500 text-white transition-all duration-200 hover:scale-105 hover:bg-green-600 active:scale-95 shadow-sm hover:shadow-md cursor-pointer"
+                              //         onClick={() => {
+                              //           const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
+                              //           const phoneNp = data.phone?.replace(/^0/, "62");
+                              //           const message = msgSendWa
+                              //             .replaceAll("{{guestName}}", data.name)
+                              //             .replaceAll("{{brideFullName}}", brideInfo ? brideInfo.full : "")
+                              //             .replaceAll("{{groomFullName}}", groomInfo ? groomInfo.full : "")
+                              //             .replaceAll("{{brideShortName}}", brideInfo ? brideInfo.short : "")
+                              //             .replaceAll("{{groomShortName}}", groomInfo ? groomInfo.short : "")
+                              //             .replaceAll("{{link}}", craateUrl);
+
+                              //           window.open(
+                              //             `https://wa.me/${phoneNp}?text=${encodeURIComponent(message)}`,
+                              //             "_blank"
+                              //           );
+                              //         }}
+                              //       >
+                              //         Send <i className="bx bxl-whatsapp text-lg"></i>
+                              //       </button>
+                              //     )}
+                              //   </div>
+                              // </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
+                                {data.phone || "-"}
+                              </td>
+                            }
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                              <span onClick={() => {
-                                const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
-                                copyToClipboard(craateUrl);
-                                toast({
-                                  type: "success",
-                                  title: "Copy to Clipboard",
-                                  message: "Well done, Text copied to clipboard.",
-                                });
-                              }} className="underline text-blue-600 cursor-pointer">Copy URL <i className='bx bx-copy-alt text-base'></i></span>
+                              <div className="flex items-center gap-2">
+                                <div>
+                                  <button
+                                    type="button"
+                                    title="Kirim WhatsApp"
+                                    className="flex gap-0.5 px-1.5 py-0.5 text-xs items-center justify-center rounded-full bg-blue-500 text-white transition-all duration-200 hover:scale-105 hover:bg-blue-600 active:scale-95 shadow-sm hover:shadow-md cursor-pointer"
+                                    onClick={() => {
+                                      const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
+                                      const message = msgSendWa
+                                        .replaceAll("{{guestName}}", data.name)
+                                        .replaceAll("{{brideFullName}}", brideInfo ? brideInfo.full : "")
+                                        .replaceAll("{{groomFullName}}", groomInfo ? groomInfo.full : "")
+                                        .replaceAll("{{brideShortName}}", brideInfo ? brideInfo.short : "")
+                                        .replaceAll("{{groomShortName}}", groomInfo ? groomInfo.short : "")
+                                        .replaceAll("{{link}}", craateUrl);
+
+                                      copyToClipboard(message);
+                                      toast({
+                                        type: "success",
+                                        title: "Copy to Clipboard",
+                                        message: "Well done, Text copied to clipboard.",
+                                      });
+                                    }}
+                                  >
+                                    Copy <i className="bx bx-copy-alt text-base"></i>
+                                  </button>
+                                </div>
+                                <div>
+                                  {
+                                    data.phone && data.phone.trim() !== "" ? (
+                                      <button
+                                        type="button"
+                                        title="Kirim WhatsApp"
+                                        className="flex gap-0.5 px-1.5 py-0.5 text-xs items-center justify-center rounded-full bg-green-500 text-white transition-all duration-200 hover:scale-105 hover:bg-green-600 active:scale-95 shadow-sm hover:shadow-md cursor-pointer"
+                                        onClick={() => {
+                                          const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
+                                          const phoneNp = data.phone?.replace(/^0/, "62");
+                                          const message = msgSendWa
+                                            .replaceAll("{{guestName}}", data.name)
+                                            .replaceAll("{{brideFullName}}", brideInfo ? brideInfo.full : "")
+                                            .replaceAll("{{groomFullName}}", groomInfo ? groomInfo.full : "")
+                                            .replaceAll("{{brideShortName}}", brideInfo ? brideInfo.short : "")
+                                            .replaceAll("{{groomShortName}}", groomInfo ? groomInfo.short : "")
+                                            .replaceAll("{{link}}", craateUrl);
+
+                                          window.open(
+                                            `https://wa.me/${phoneNp}?text=${encodeURIComponent(message)}`,
+                                            "_blank"
+                                          );
+                                        }}
+                                      >
+                                        Send <i className="bx bxl-whatsapp text-lg"></i>
+                                      </button>
+                                    ) : <div className="flex gap-0.5 px-1.5 py-0.5 text-xs items-center justify-center rounded-full bg-gray-400 text-white transition-all duration-200 shadow-sm">
+                                      Send <i className="bx bxl-whatsapp text-lg"></i>
+                                    </div>
+                                  }
+                                </div>
+                              </div>
                             </td>
 
                             <td className="px-3 py-2.5 whitespace-nowrap text-end text-sm font-medium space-x-1">
@@ -4229,6 +4355,12 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
       </UiPortal>
     </div>
   )
+};
+
+function createMsgSendWa({ url, barcode, guestName }: { url: string, barcode: string, guestName: string }) {
+  const craateUrl = `${Configs.base_url}/${url}?code=${barcode}`;
+
+
 };
 
 function FAQTabContent(event_id: number) {
