@@ -1106,14 +1106,19 @@ function Inner() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm text-white/80">Jumlah Tamu</label>
-                  <input value={rsvpAttNumber} onChange={(e) => {
+                  {/* <input value={rsvpAttNumber} onChange={(e) => {
                     const value = e.target.value;
                     if (value === "") {
                       setRsvpAttNumber(1);
                       return;
                     }
                     setRsvpAttNumber(parseInt(value));
-                  }} name="jumlah" type="number" min={1} className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
+                  }} name="jumlah" type="number" min={1} className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} /> */}
+
+                  <select value={rsvpAttNumber} onChange={(e) => setRsvpAttNumber(parseInt(e.target.value))} name="status" className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)}>
+                    <option value="1">1 Orang</option>
+                    <option value="2">2 Orang</option>
+                  </select>
                 </div>
                 <div>
                   <label className="mb-1 block text-sm text-white/80">Kehadiran</label>

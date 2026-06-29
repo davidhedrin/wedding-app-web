@@ -1258,7 +1258,7 @@ function Inner() {
 
             <div>
               <label className="text-sm text-white/80">Jumlah Tamu</label>
-              <input
+              {/* <input
                 type="number"
                 value={rsvpAttNumber}
                 onChange={(e) => {
@@ -1270,7 +1270,14 @@ function Inner() {
                   setRsvpAttNumber(parseInt(value));
                 }}
                 className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
-              />
+              /> */}
+              <select
+                value={rsvpAttNumber} onChange={(e) => setRsvpAttNumber(parseInt(e.target.value))}
+                className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-fuchsia-500"
+              >
+                <option value="1">1 Orang</option>
+                <option value="2">2 Orang</option>
+              </select>
             </div>
 
             <div className="md:col-span-2">
@@ -2016,7 +2023,7 @@ function Inner() {
           <div className="grid md:grid-cols-12 gap-8">
             <div className="md:col-span-4">
               <h4 className={`text-xl ${playfair.className}`}>
-                <span className={THEME.accent}>A&Z</span> Wedding
+                <span className={THEME.accent}>{groom?.shortname ? groom.shortname.charAt(0).toUpperCase() : "A"} & {bride?.shortname ? bride.shortname.charAt(0).toUpperCase() : "Z"}</span> Wedding
               </h4>
               <p className="text-white/80 mt-2">
                 {eventDatas ? (eventDatas.greeting_msg ?? "-") : "Assalamualaikum/Salam sejahtera, kami bermaksud menyelenggarakan pernikahan putra-putri kami. Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}

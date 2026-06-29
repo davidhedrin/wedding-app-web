@@ -927,7 +927,7 @@ function Inner() {
                 <option value={RsvpStatusEnum.UNKNOWN}>Belum pasti</option>
               </select>
             </div>
-            <Field
+            {/* <Field
               value={rsvpAttNumber} onChange={(e) => {
                 const value = e.target.value;
                 if (value === "") {
@@ -941,7 +941,19 @@ function Inner() {
               type="number"
               min={1}
               placeholder="1"
-            />
+            /> */}
+            <div>
+              <Label>Jumlah Tamu</Label>
+              <select
+                value={rsvpAttNumber} onChange={(e) => setRsvpAttNumber(parseInt(e.target.value))}
+                name="jumlah"
+                required
+                className="mt-2 w-full rounded-xl bg-stone-900/70 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-white/20"
+              >
+                <option value="1">1 Orang</option>
+                <option value="2">2 Orang</option>
+              </select>
+            </div>
             <div className="md:col-span-2">
               <Label>Catatan</Label>
               <textarea
