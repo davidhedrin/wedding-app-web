@@ -3783,43 +3783,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                                 {data.att_status ?? "Not Respon"}{data.att_status && data.att_status === "PRESENCE" ? (data.att_number ? ` (${data.att_number} Person)` : "") : ""}
                               </td>
                             }
-                            {
-                              'phone' in data &&
-                              // <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                              //   <div className="flex items-center gap-2">
-                              //     <span>{data.phone || "-"}</span>
-
-                              //     {data.phone && (
-                              //       <button
-                              //         type="button"
-                              //         title="Kirim WhatsApp"
-                              //         className="flex px-1.5 py-0.5 text-sm items-center justify-center rounded-full bg-green-500 text-white transition-all duration-200 hover:scale-105 hover:bg-green-600 active:scale-95 shadow-sm hover:shadow-md cursor-pointer"
-                              //         onClick={() => {
-                              //           const craateUrl = `${Configs.base_url}/${url}?code=${data.barcode}`;
-                              //           const phoneNp = data.phone?.replace(/^0/, "62");
-                              //           const message = msgSendWa
-                              //             .replaceAll("{{guestName}}", data.name)
-                              //             .replaceAll("{{brideFullName}}", brideInfo ? brideInfo.full : "")
-                              //             .replaceAll("{{groomFullName}}", groomInfo ? groomInfo.full : "")
-                              //             .replaceAll("{{brideShortName}}", brideInfo ? brideInfo.short : "")
-                              //             .replaceAll("{{groomShortName}}", groomInfo ? groomInfo.short : "")
-                              //             .replaceAll("{{link}}", craateUrl);
-
-                              //           window.open(
-                              //             `https://wa.me/${phoneNp}?text=${encodeURIComponent(message)}`,
-                              //             "_blank"
-                              //           );
-                              //         }}
-                              //       >
-                              //         Send <i className="bx bxl-whatsapp text-lg"></i>
-                              //       </button>
-                              //     )}
-                              //   </div>
-                              // </td>
-                              <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
-                                {data.phone || "-"}
-                              </td>
-                            }
+                            {'phone' in data &&<td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                               <div className="flex items-center gap-2">
                                 <div>

@@ -11,6 +11,7 @@ import { SessionProvider } from "next-auth/react";
 import { ToastProvider } from "@/components/toast-provider";
 import ModalConfirm from "@/components/modal-confirm";
 import PrelineProvider from "@/components/preline-provider";
+import ImageViewer from "@/components/img-viewer/image-viewer";
 
 // const fontStyleApp = Work_Sans({
 //   variable: "--font-work-sans",
@@ -65,6 +66,7 @@ export default function RootLayout({
             <Loading />
             <LayoutWraper>{children}</LayoutWraper>
             <PrelineProvider />
+            <ImageViewer />
           </LoadingProvider>
         </SessionProvider>
       </body>

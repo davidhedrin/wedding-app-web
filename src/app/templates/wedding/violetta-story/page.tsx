@@ -16,6 +16,7 @@ import { GenProfileDescWedding } from "../../utils";
 import LoadingUI from '@/components/loading/loading-ui';
 import FloatingActionButton from '../../floating-action';
 import { ModalWishlist } from '../../modal-wishlist';
+import { useImageViewer } from "@/components/img-viewer/use-image-viewer";
 
 /**
  * Invitation Type: Wedding
@@ -57,7 +58,7 @@ const THEME = {
   glass: "bg-white/10 backdrop-blur-md",
 };
 
-const IMAGES = Array.from({ length: 8 }).map(
+const IMAGES = Array.from({ length: 7 }).map(
   () => `${Configs.base_url}/assets/img/2149043983.jpg`
 );
 
@@ -101,6 +102,7 @@ function useLockBodyScroll(isLocked: boolean) {
 
 // === HALAMAN ===
 function Inner() {
+  const openImgViewer = useImageViewer((s) => s.openImgViewer);
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
@@ -679,7 +681,7 @@ function Inner() {
                 alt="Foto prewedding"
                 className="h-80 sm:h-96 w-full object-cover"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(eventDatas ? eventDatas.couple_img_path ?? "" : IMAGES[0])} />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex items-center gap-2">
                   <span className={`text-sm ${THEME.accent}`}>#{groom?.shortname ?? "Aisyah"}{bride?.shortname ?? "Zidan"}</span>
@@ -715,7 +717,7 @@ function Inner() {
                       alt={x.shortname}
                       className="h-full w-full object-cover object-top"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(x.img_path ?? "")} />
                   </div>
                   <div className="p-6">
                     <h3 className={`text-2xl ${playfair.className}`}>{x.fullname}</h3>
@@ -744,7 +746,7 @@ function Inner() {
                       alt={p.name}
                       className="h-full w-full object-cover object-top"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(IMAGES[idx])} />
                   </div>
                   <div className="p-6">
                     <h3 className={`text-2xl ${playfair.className}`}>{p.name}</h3>
@@ -982,88 +984,40 @@ function Inner() {
             subtitle="Potret kisah kami"
           />
 
-          <div className="reveal relative rounded-3xl overflow-hidden border border-white/10" ref={(el) => {
+          <div className="reveal relative rounded-3xl overflow-hidden" ref={(el) => {
             if (el) revealRef.current["gal"] = el
           }}>
             {
-              eventDatas ? <div className="relative h-72 sm:h-96">
-                {eventDatas.event_galleries.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src.img_path ?? ""}
-                    alt={`Galeri ${i + 1}`}
-                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIdx ? "opacity-100" : "opacity-0"}`}
-                  />
-                ))}
-                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-
-                {/* Controls */}
-                <button
-                  aria-label="Sebelumnya"
-                  onClick={galPrev}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-                >
-                  ‹
-                </button>
-                <button
-                  aria-label="Berikutnya"
-                  onClick={galNext}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-                >
-                  ›
-                </button>
-
-                {/* Dots */}
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-                  {eventDatas.event_galleries.map((_, i) => (
-                    <button
-                      key={i}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`h-2 w-2 rounded-full transition ${i === galIdx ? "bg-white" : "bg-white/50 hover:bg-white/70"}`}
-                      onClick={() => setGalIdx(i)}
+              eventDatas ? <div className="flex flex-wrap justify-center gap-3">
+                {eventDatas.event_galleries.map((src, index) => (
+                  <div
+                    key={index}
+                    className="w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] aspect-square group relative overflow-hidden rounded-2xl bg-stone-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    <img
+                      src={src.img_path ?? ""}
+                      alt={`Gallery ${index + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                  ))}
-                </div>
-              </div> : <div className="relative h-72 sm:h-96">
-                {IMAGES.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`Galeri ${i + 1}`}
-                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === galIdx ? "opacity-100" : "opacity-0"
-                      }`}
-                  />
+
+                    <div className="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10" onClick={() => openImgViewer(src.img_path ?? "")} />
+                  </div>
                 ))}
-                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-
-                {/* Controls */}
-                <button
-                  aria-label="Sebelumnya"
-                  onClick={galPrev}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-                >
-                  ‹
-                </button>
-                <button
-                  aria-label="Berikutnya"
-                  onClick={galNext}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-2 bg-black/40 hover:bg-black/60"
-                >
-                  ›
-                </button>
-
-                {/* Dots */}
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-                  {IMAGES.map((_, i) => (
-                    <button
-                      key={i}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`h-2 w-2 rounded-full transition ${i === galIdx ? "bg-white" : "bg-white/50 hover:bg-white/70"
-                        }`}
-                      onClick={() => setGalIdx(i)}
+              </div> : <div className="flex flex-wrap justify-center gap-3">
+                {IMAGES.map((src, index) => (
+                  <div
+                    key={index}
+                    className="w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] aspect-square group relative overflow-hidden rounded-2xl bg-stone-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    <img
+                      src={src}
+                      alt={`Gallery ${index + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                  ))}
-                </div>
+
+                    <div className="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10" onClick={() => openImgViewer(src)} />
+                  </div>
+                ))}
               </div>
             }
           </div>
@@ -1149,7 +1103,8 @@ function Inner() {
                     {ev.gallery?.img_path && (
                       <div className="md:w-1/3 mt-3 md:mt-0">
                         <img
-                          src={ev.gallery.img_path}
+                          src={ev.gallery.img_path ?? ""}
+                          onClick={() => openImgViewer(ev.gallery ? ev.gallery.img_path ?? "" : "")}
                           alt={ev.name}
                           className="h-44 w-full object-cover rounded-xl border border-white/10"
                         />
@@ -1201,6 +1156,7 @@ function Inner() {
                     <div className="md:w-1/3 mt-3 md:mt-0">
                       <img
                         src={IMAGES[i % IMAGES.length]}
+                        onClick={() => openImgViewer(IMAGES[i % IMAGES.length])}
                         alt={item.title}
                         className="h-44 w-full object-cover rounded-xl border border-white/10"
                       />
