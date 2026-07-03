@@ -55,6 +55,8 @@ export type UploadFileRespons = {
   message: string | null;
   filename: string | null;
   path: string | null;
+  width: number | null;
+  height: number | null;
 };
 
 export type CategoryKeyProps = {
@@ -129,6 +131,8 @@ export type EventInitProps = {
   event_galleries: {
     img_name: string | null;
     img_path: string | null;
+    width: number | null;
+    height: number | null;
   }[];
   event_histories: {
     name: string;

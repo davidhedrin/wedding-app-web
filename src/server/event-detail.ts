@@ -255,7 +255,7 @@ export async function StoreUpdateSchedule(event_id: number, formData: DtoSchedul
 // End Schedule Info
 
 // Event Galleries
-export async function StoreEventGalleries(event_id: number, formData: DtoEventGallery[]) {
+export async function StoreEventGalleries(event_id: number, formData: DtoEventGallery[]): Promise<boolean> {
   try{
     const session = await auth();
     if(!session) throw new Error("Authentication credential not Found!");
@@ -279,16 +279,22 @@ export async function StoreEventGalleries(event_id: number, formData: DtoEventGa
       });
     }
 
-    if(uploadPromises.length === 0) return;
-    const results = await Promise.all(uploadPromises);
+    if(uploadPromises.length === 0) return false;
+    const results = await Promise.allSettled(uploadPromises);
+    const failed = results.filter(r => r.status === "rejected");
+    if (failed.length > 0) return false;
 
-    const createData = results.map(x => ({
+    const successResults = results.filter((r): r is PromiseFulfilledResult<UploadFileRespons> => r.status === "fulfilled").map((r) => r.value);
+    const createData = successResults.map(x => ({
       event_id,
       img_name: x.filename,
       img_path: x.path,
-      createdBy: user?.email
+      createdBy: user?.email,
+      width: x.width,
+      height: x.height,
     }));
     await db.eventGalleries.createMany({data: createData});
+    return true;
   } catch (error: any) {
     throw error;
   }

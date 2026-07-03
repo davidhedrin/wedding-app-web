@@ -51,6 +51,10 @@ export async function UploadFile(file: File, loc: string, prefix?: string): Prom
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    const sharpInstance = sharp(buffer);
+    const metadata = await sharpInstance.metadata();
+    const { width = null, height = null } = metadata;
   
     const uploadsDir = path.join(process.cwd(), loc);
     if (!existsSync(uploadsDir)) {
@@ -71,14 +75,18 @@ export async function UploadFile(file: File, loc: string, prefix?: string): Prom
       status: true,
       filename: fileName,
       message: "File upload successfully",
-      path: filePath
+      path: filePath,
+      width,
+      height,
     };
   } catch (err: any) {
     return {
       status: false,
       message: err.message,
       filename: null,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   }
 };
@@ -91,7 +99,9 @@ export async function DeleteFile(loc: string, filename: string): Promise<UploadF
         status: false,
         message: "File was not found.",
         filename: filename,
-        path: null
+        path: null,
+        width: null,
+        height: null
       };
     }
 
@@ -100,14 +110,18 @@ export async function DeleteFile(loc: string, filename: string): Promise<UploadF
       status: true,
       message: "File deleted successfully.",
       filename: filename,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   } catch (err: any) {
     return {
       status: false,
       message: err.message,
       filename: filename,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   }
 };
@@ -125,12 +139,23 @@ export async function UploadFileCompress(
     const sizeKb = fileBuffer.length / 1024;
     let { quality, effort } = getCompressionParams(sizeKb);
 
-    const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
-      quality,
-      effort,
-      chromaSubsampling: "4:2:0",
-      smartSubsample: true
-    }).toBuffer();
+    const sharpInstance = sharp(fileBuffer);
+    // const compressedBuffer = await sharp(fileBuffer).toFormat(to_format, {
+    //   quality,
+    //   effort,
+    //   chromaSubsampling: "4:2:0",
+    //   smartSubsample: true
+    // }).toBuffer();
+    const [metadata, compressedBuffer] = await Promise.all([
+      sharpInstance.metadata(),
+      sharpInstance.toFormat(to_format, {
+        quality,
+        effort,
+        chromaSubsampling: "4:2:0",
+        smartSubsample: true,
+      }).toBuffer(),
+    ]);
+    const { width = null, height = null } = metadata;
 
     const uploadsDir = path.join(process.cwd(), loc);
 
@@ -149,14 +174,18 @@ export async function UploadFileCompress(
       status: true,
       message: "File upload successfully",
       filename: fileName,
-      path: filePath
+      path: filePath,
+      width,
+      height
     };
   } catch (err: any) {
     return {
       status: false,
       message: err.message,
       filename: null,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   }
 };
@@ -181,13 +210,27 @@ export async function CloudflareUploadFile(
 
     const sizeKb = fileBuffer.length / 1024;
     let { quality, effort } = getCompressionParams(sizeKb);
+    
+    const sharpInstance = sharp(fileBuffer).rotate();
+    // const metadata = await sharpInstance.metadata();
+    // const { width = null, height = null } = metadata;
 
-    const compressedBuffer = await sharp(fileBuffer).rotate().toFormat(to_format, {
-      quality,
-      effort,
-      chromaSubsampling: "4:2:0",
-      smartSubsample: true
-    }).toBuffer();
+    // const compressedBuffer = await sharpInstance.toFormat(to_format, {
+    //   quality,
+    //   effort,
+    //   chromaSubsampling: "4:2:0",
+    //   smartSubsample: true
+    // }).toBuffer();
+    const [metadata, compressedBuffer] = await Promise.all([
+      sharpInstance.metadata(),
+      sharpInstance.toFormat(to_format, {
+        quality,
+        effort,
+        chromaSubsampling: "4:2:0",
+        smartSubsample: true,
+      }).toBuffer(),
+    ]);
+    const { width = null, height = null } = metadata;
 
     const randomName = stringWithTimestamp(5, true);
     const ext = getExtSharp(to_format);
@@ -206,14 +249,18 @@ export async function CloudflareUploadFile(
       status: true,
       message: "File upload successfully",
       filename: fileName,
-      path: fileUrl
+      path: fileUrl,
+      width,
+      height
     };
   } catch (err: any) {
     return {
       status: false,
       message: err.message,
       filename: null,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   }
 };
@@ -231,14 +278,18 @@ export async function CloudflareDeleteFile(bucket: string, filename: string): Pr
       status: true,
       message: "File deleted successfully.",
       filename: filename,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   } catch (err: any) {
     return {
       status: false,
       message: err.message,
       filename: null,
-      path: null
+      path: null,
+      width: null,
+      height: null
     };
   }
 };
@@ -275,6 +326,8 @@ export async function CloudflareUploadAnyFile(
       message: "File upload successfully",
       filename: fileName,
       path: fileUrl,
+      width: null,
+      height: null
     };
   } catch (err: any) {
     return {
@@ -282,6 +335,8 @@ export async function CloudflareUploadAnyFile(
       message: err.message,
       filename: null,
       path: null,
+      width: null,
+      height: null
     };
   }
 };

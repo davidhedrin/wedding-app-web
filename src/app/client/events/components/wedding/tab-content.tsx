@@ -1594,13 +1594,21 @@ function GalleryTabContent(event_id: number) {
     if (!confirmed) return;
 
     setLoading(true);
-    await StoreEventGalleries(event_id, newImages);
-    toast({
-      type: "success",
-      title: "Upload successfully",
-      message: "Your upload has been successfully completed"
-    });
-    await fatchDatas();
+    const result = await StoreEventGalleries(event_id, newImages);
+    if (result) {
+      toast({
+        type: "success",
+        title: "Upload Successfully",
+        message: "Your upload has been successfully completed"
+      });
+      await fatchDatas();
+    } else {
+      toast({
+        type: "warning",
+        title: "Upload Failed",
+        message: "Something wrong when upload your file. Wait a moment or try again"
+      });
+    }
     setLoading(false);
   };
 
@@ -3783,7 +3791,7 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
                                 {data.att_status ?? "Not Respon"}{data.att_status && data.att_status === "PRESENCE" ? (data.att_number ? ` (${data.att_number} Person)` : "") : ""}
                               </td>
                             }
-                            {'phone' in data &&<td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
+                            {'phone' in data && <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">{data.phone || "-"}</td>}
                             <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-800">
                               <div className="flex items-center gap-2">
                                 <div>

@@ -409,6 +409,8 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
           select: {
             img_name: true,
             img_path: true,
+            width: true,
+            height: true
           }
         },
         event_histories: {

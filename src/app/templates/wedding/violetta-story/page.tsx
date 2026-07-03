@@ -17,6 +17,7 @@ import LoadingUI from '@/components/loading/loading-ui';
 import FloatingActionButton from '../../floating-action';
 import { ModalWishlist } from '../../modal-wishlist';
 import { useImageViewer } from "@/components/img-viewer/use-image-viewer";
+import GalleryAlbum, { GalleryPhotoProps } from "@/components/img-viewer/gallery-album";
 
 /**
  * Invitation Type: Wedding
@@ -58,9 +59,22 @@ const THEME = {
   glass: "bg-white/10 backdrop-blur-md",
 };
 
-const IMAGES = Array.from({ length: 7 }).map(
-  () => `${Configs.base_url}/assets/img/2149043983.jpg`
-);
+const DEMO_SIZES_IMG: readonly (readonly [number, number])[] = [
+  [1200, 800],
+  [800, 1200],
+  [1600, 900],
+  [900, 1600],
+  [1000, 1000],
+  [1400, 900],
+  [900, 600],
+  [1280, 720],
+];
+
+const IMAGES: GalleryPhotoProps[] = DEMO_SIZES_IMG.map(([width, height]) => ({
+  src: `${Configs.base_url}/assets/img/2149043983.jpg`,
+  width,
+  height,
+}));
 
 // === KOMPONEN KECIL ===
 const SectionTitle: React.FC<{ title: string; subtitle?: string }> = ({
@@ -117,6 +131,7 @@ function Inner() {
   const [groomProfile, setGroomProfile] = useState<string>();
   const [brideProfile, setBrideProfile] = useState<string>();
   const [longlatLoc, setLonglatLoc] = useState<string>();
+  const [galleryAlbum, setGalleryAlbum] = useState<GalleryPhotoProps[] | null>(null);
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
@@ -263,6 +278,12 @@ function Inner() {
                 setTimeWedTor({ title: title, time, loc: x.location });
               }
             });
+
+            setGalleryAlbum(findData.event_galleries.map(x => ({
+              src: x.img_path ?? "",
+              width: x.width ?? 0,
+              height: x.height ?? 0,
+            })));
 
             fatchWishlist(findData.event_rsvp.event_id);
             fatchRsvpMsg(findData.event_rsvp.event_id);
@@ -677,11 +698,11 @@ function Inner() {
               }}
             >
               <img
-                src={eventDatas ? (eventDatas.couple_img_path ?? "") : IMAGES[0]}
+                src={eventDatas ? (eventDatas.couple_img_path ?? "") : IMAGES[0].src}
                 alt="Foto prewedding"
                 className="h-80 sm:h-96 w-full object-cover"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(eventDatas ? eventDatas.couple_img_path ?? "" : IMAGES[0])} />
+              <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(eventDatas ? eventDatas.couple_img_path ?? "" : IMAGES[0].src)} />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex items-center gap-2">
                   <span className={`text-sm ${THEME.accent}`}>#{groom?.shortname ?? "Aisyah"}{bride?.shortname ?? "Zidan"}</span>
@@ -742,11 +763,11 @@ function Inner() {
                 >
                   <div className="relative">
                     <img
-                      src={IMAGES[idx]}
+                      src={IMAGES[idx].src}
                       alt={p.name}
                       className="h-full w-full object-cover object-top"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(IMAGES[idx])} />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" onClick={() => openImgViewer(IMAGES[idx].src)} />
                   </div>
                   <div className="p-6">
                     <h3 className={`text-2xl ${playfair.className}`}>{p.name}</h3>
@@ -988,37 +1009,7 @@ function Inner() {
             if (el) revealRef.current["gal"] = el
           }}>
             {
-              eventDatas ? <div className="flex flex-wrap justify-center gap-3">
-                {eventDatas.event_galleries.map((src, index) => (
-                  <div
-                    key={index}
-                    className="w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] aspect-square group relative overflow-hidden rounded-2xl bg-stone-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <img
-                      src={src.img_path ?? ""}
-                      alt={`Gallery ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-
-                    <div className="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10" onClick={() => openImgViewer(src.img_path ?? "")} />
-                  </div>
-                ))}
-              </div> : <div className="flex flex-wrap justify-center gap-3">
-                {IMAGES.map((src, index) => (
-                  <div
-                    key={index}
-                    className="w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] aspect-square group relative overflow-hidden rounded-2xl bg-stone-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <img
-                      src={src}
-                      alt={`Gallery ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-
-                    <div className="absolute inset-0 bg-black/0 transition duration-300 group-hover:bg-black/10" onClick={() => openImgViewer(src)} />
-                  </div>
-                ))}
-              </div>
+              galleryAlbum ? <GalleryAlbum imgs={galleryAlbum} /> : <GalleryAlbum imgs={IMAGES} isDemo />
             }
           </div>
 
@@ -1155,8 +1146,8 @@ function Inner() {
                     {/* Gambar bagian kanan */}
                     <div className="md:w-1/3 mt-3 md:mt-0">
                       <img
-                        src={IMAGES[i % IMAGES.length]}
-                        onClick={() => openImgViewer(IMAGES[i % IMAGES.length])}
+                        src={IMAGES[i % IMAGES.length].src}
+                        onClick={() => openImgViewer(IMAGES[i % IMAGES.length].src)}
                         alt={item.title}
                         className="h-44 w-full object-cover rounded-xl border border-white/10"
                       />

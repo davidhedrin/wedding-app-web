@@ -17,6 +17,8 @@ import { GenProfileDescWedding } from '../../utils';
 import LoadingUI from '@/components/loading/loading-ui';
 import FloatingActionButton from '../../floating-action';
 import { ModalWishlist } from '../../modal-wishlist';
+import GalleryAlbum, { GalleryPhotoProps } from "@/components/img-viewer/gallery-album";
+import { useImageViewer } from '@/components/img-viewer/use-image-viewer';
 
 const greatVibes = Great_Vibes({ subsets: ['latin'], weight: ['400'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'] });
@@ -38,12 +40,22 @@ const THEME = {
   borderSoft: 'border-white/10',
 };
 
-const IMAGES = [
-  `${Configs.base_url}/assets/img/2149043983.jpg`,
-  `${Configs.base_url}/assets/img/2149043983.jpg`,
-  `${Configs.base_url}/assets/img/2149043983.jpg`,
-  `${Configs.base_url}/assets/img/2149043983.jpg`,
+const DEMO_SIZES_IMG: readonly (readonly [number, number])[] = [
+  [1200, 800],
+  [800, 1200],
+  [1600, 900],
+  [900, 1600],
+  [1000, 1000],
+  [1400, 900],
+  [900, 600],
+  [1280, 720],
 ];
+
+const IMAGES: GalleryPhotoProps[] = DEMO_SIZES_IMG.map(([width, height]) => ({
+  src: `${Configs.base_url}/assets/img/2149043983.jpg`,
+  width,
+  height,
+}));
 
 const NAV = [
   { id: 'mempelai', label: 'Mempelai' },
@@ -78,6 +90,7 @@ const TARGET_DATE = new Date();
 TARGET_DATE.setDate(TARGET_DATE.getDate() + 12);
 
 function Inner() {
+  const openImgViewer = useImageViewer((s) => s.openImgViewer);
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
@@ -92,6 +105,7 @@ function Inner() {
   const [groomProfile, setGroomProfile] = useState<string>();
   const [brideProfile, setBrideProfile] = useState<string>();
   const [longlatLoc, setLonglatLoc] = useState<string>();
+  const [galleryAlbum, setGalleryAlbum] = useState<GalleryPhotoProps[] | null>(null);
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
@@ -224,6 +238,12 @@ function Inner() {
 
             const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
             if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+
+            setGalleryAlbum(findData.event_galleries.map(x => ({
+              src: x.img_path ?? "",
+              width: x.width ?? 0,
+              height: x.height ?? 0,
+            })));
 
             fatchWishlist(findData.event_rsvp.event_id);
             fatchRsvpMsg(findData.event_rsvp.event_id);
@@ -470,7 +490,7 @@ function Inner() {
           <div className="absolute inset-0">
             {/* Background image */}
             <img
-              src={eventDatas ? eventDatas.couple_img_path ?? IMAGES[0] : IMAGES[0]}
+              src={eventDatas ? eventDatas.couple_img_path ?? IMAGES[0].src : IMAGES[0].src}
               alt="Background"
               className="h-full w-full object-cover"
             />
@@ -566,6 +586,7 @@ function Inner() {
                   <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
                     <img
                       src={x.img_path ?? ""}
+                      onClick={() => openImgViewer(x.img_path ?? "")}
                       alt={x.shortname}
                       className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{
@@ -605,7 +626,8 @@ function Inner() {
                 >
                   <div className="relative w-full h-62.5 overflow-hidden rounded-2xl">
                     <img
-                      src={IMAGES[0]}
+                      src={IMAGES[0].src}
+                      onClick={() => openImgViewer(IMAGES[0].src)}
                       alt={p.name}
                       className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{
@@ -818,117 +840,11 @@ function Inner() {
             <p className="mt-2 text-white/80">Potret kebahagiaan kami.</p>
           </div>
 
-          {
-            eventDatas ? <div className="relative mt-10">
-              {/* Tombol panah kiri */}
-              <button
-                onClick={() => scrollGallery('left')}
-                className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path fill="currentColor" d="M15 18l-6-6 6-6" />
-                </svg>
-              </button>
-
-              {/* Tombol panah kanan */}
-              <button
-                onClick={() => scrollGallery('right')}
-                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path fill="currentColor" d="M9 6l6 6-6 6" />
-                </svg>
-              </button>
-
-              {/* Container galeri */}
-              <div
-                ref={galleryRef}
-                className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
-              >
-                {eventDatas.event_galleries.map((x, i) => (
-                  <div key={i} className="snap-center shrink-0">
-                    <div
-                      className={classNames(
-                        'group relative h-72 w-52 md:h-96 md:w-72 overflow-hidden rounded-2xl border shadow-lg transition-transform hover:scale-[1.02]',
-                        THEME.borderSoft,
-                        THEME.cardBg
-                      )}
-                    >
-                      <img
-                        src={x.img_path ?? ""}
-                        alt={`Foto ${i + 1}`}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      {/* Overlay hover */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
-                        <svg
-                          className="h-10 w-10 text-amber-300 drop-shadow-md"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> : <div className="relative mt-10">
-              {/* Tombol panah kiri */}
-              <button
-                onClick={() => scrollGallery('left')}
-                className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path fill="currentColor" d="M15 18l-6-6 6-6" />
-                </svg>
-              </button>
-
-              {/* Tombol panah kanan */}
-              <button
-                onClick={() => scrollGallery('right')}
-                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white shadow-lg backdrop-blur hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/40"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6">
-                  <path fill="currentColor" d="M9 6l6 6-6 6" />
-                </svg>
-              </button>
-
-              {/* Container galeri */}
-              <div
-                ref={galleryRef}
-                className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-4"
-              >
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="snap-center shrink-0">
-                    <div
-                      className={classNames(
-                        'group relative h-72 w-52 md:h-96 md:w-72 overflow-hidden rounded-2xl border shadow-lg transition-transform hover:scale-[1.02]',
-                        THEME.borderSoft,
-                        THEME.cardBg
-                      )}
-                    >
-                      <img
-                        src={IMAGES[0]}
-                        alt={`Foto ${i + 1}`}
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      {/* Overlay hover */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-linear-to-t from-black/60 via-black/30 to-transparent opacity-0 transition group-hover:opacity-100">
-                        <svg
-                          className="h-10 w-10 text-amber-300 drop-shadow-md"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          }
+          <div className="relative mt-10">
+            {
+              galleryAlbum ? <GalleryAlbum imgs={galleryAlbum} /> : <GalleryAlbum imgs={IMAGES} isDemo />
+            }
+          </div>
 
           {
             eventDatas ? (
@@ -1040,6 +956,7 @@ function Inner() {
                             <div className="aspect-4/3 w-full md:aspect-3/2">
                               <img
                                 src={ev.gallery.img_path}
+                                onClick={() => openImgViewer(ev.gallery?.img_path ?? "")}
                                 alt={ev.name}
                                 className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                               />
@@ -1052,10 +969,10 @@ function Inner() {
                   </div>
                 );
               }) : [
-                { t: '2018', title: 'Pertama Bertemu', desc: 'Bersua di kampus dan memulai pertemanan.' },
-                { t: '2020', title: 'Perjalanan Bersama', desc: 'Belajar saling memahami dalam suka & duka.' },
-                { t: '2024', title: 'Lamaran', desc: 'Mengikat janji untuk melangkah lebih serius.' },
-                { t: '2025', title: 'Menuju Akad', desc: 'Menyiapkan hari H dengan penuh harap.' },
+                { t: '2018', title: 'Pertama Bertemu', desc: 'Bersua di kampus dan memulai pertemanan.', img_path: IMAGES[0].src },
+                { t: '2020', title: 'Perjalanan Bersama', desc: 'Belajar saling memahami dalam suka & duka.', img_path: IMAGES[0].src },
+                { t: '2024', title: 'Lamaran', desc: 'Mengikat janji untuk melangkah lebih serius.', img_path: IMAGES[0].src },
+                { t: '2025', title: 'Menuju Akad', desc: 'Menyiapkan hari H dengan penuh harap.', img_path: IMAGES[0].src },
               ].map((item, idx) => {
                 const isRight = idx % 2 === 1;
                 return (
@@ -1071,6 +988,21 @@ function Inner() {
                         <h3 className={classNames(playfair.className, 'text-xl text-white')}>{item.title}</h3>
                       </div>
                       <p className="mt-2 text-white/80">{item.desc}</p>
+
+                      {item?.img_path && (
+                        <div className="col-span-12 md:col-span-6 mt-2">
+                          <div className="overflow-hidden rounded-xl border border-white/10">
+                            <div className="aspect-4/3 w-full md:aspect-3/2">
+                              <img
+                                src={item.img_path}
+                                onClick={() => openImgViewer(item.img_path)}
+                                alt={item.title}
+                                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className={classNames('absolute left-4 top-1.5 h-3 w-3 -translate-x-1/2 rounded-full ring-4 ring-black/40 md:left-1/2 md:-translate-x-1/2', THEME.accentBg)} />
                   </div>

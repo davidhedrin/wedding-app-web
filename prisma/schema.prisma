@@ -320,6 +320,8 @@ model EventGalleries {
   event_id Int
   img_name String?
   img_path String?
+  width    Int?
+  height   Int?
 
   createdBy String?
   createdAt DateTime? @default(now())

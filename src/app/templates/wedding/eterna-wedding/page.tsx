@@ -16,6 +16,8 @@ import { GetDataEventGifts, GetDataEventRsvp } from "@/server/event-detail";
 import FloatingActionButton from "@/app/templates/floating-action";
 import { ModalWishlist } from "../../modal-wishlist";
 import Configs, { MusicThemeKeys, PaymentMethodKeys } from "@/lib/config";
+import { useImageViewer } from "@/components/img-viewer/use-image-viewer";
+import GalleryAlbum, { GalleryPhotoProps } from "@/components/img-viewer/gallery-album";
 
 /**
  * Invitation Type: Wedding
@@ -33,15 +35,28 @@ type SectionKey =
   | "hadiah"
   | "faq";
 
+const DEMO_SIZES_IMG: readonly (readonly [number, number])[] = [
+  [1200, 800],
+  [800, 1200],
+  [1600, 900],
+  [900, 1600],
+  [1000, 1000],
+  [1400, 900],
+  [900, 600],
+  [1280, 720],
+];
+
+const GALLERY: GalleryPhotoProps[] = DEMO_SIZES_IMG.map(([width, height]) => ({
+  src: `${Configs.base_url}/assets/img/2149043983.jpg`,
+  width,
+  height,
+}));
+
 const IMAGES = [
   `${Configs.base_url}/assets/img/2149043983.jpg`,
   `${Configs.base_url}/assets/img/2149043983.jpg`,
   `${Configs.base_url}/assets/img/2149043983.jpg`,
 ];
-
-const GALLERY = new Array(8).fill(
-  `${Configs.base_url}/assets/img/2149043983.jpg`
-);
 
 const WEDDING_DATE = new Date();
 WEDDING_DATE.setDate(WEDDING_DATE.getDate() + 12);
@@ -81,6 +96,7 @@ const dummyMessages = [
 ];
 
 function Inner() {
+  const openImgViewer = useImageViewer((s) => s.openImgViewer);
   const musicThemeWedding = MusicThemeKeys.find(x => x.key === "wed");
   const allPaymentMethod = PaymentMethodKeys.filter(x => x.status === true);
 
@@ -95,6 +111,7 @@ function Inner() {
   const [groomProfile, setGroomProfile] = useState<string>();
   const [brideProfile, setBrideProfile] = useState<string>();
   const [longlatLoc, setLonglatLoc] = useState<string>();
+  const [galleryAlbum, setGalleryAlbum] = useState<GalleryPhotoProps[] | null>(null);
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
@@ -227,6 +244,12 @@ function Inner() {
 
             const getfirstSchedule = findData.schedule_info.find(x => x.type === "WED_MB");
             if (getfirstSchedule) setLonglatLoc(`${getfirstSchedule.latitude},${getfirstSchedule.longitude}`);
+
+            setGalleryAlbum(findData.event_galleries.map(x => ({
+              src: x.img_path ?? "",
+              width: x.width ?? 0,
+              height: x.height ?? 0,
+            })));
 
             fatchWishlist(findData.event_rsvp.event_id);
             fatchRsvpMsg(findData.event_rsvp.event_id);
@@ -513,6 +536,7 @@ function Inner() {
                     <div className="relative aspect-4/3">
                       <img
                         src={x.img_path ?? ""}
+                        onClick={() => openImgViewer(x.img_path ?? "")}
                         alt={x.shortname}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       />
@@ -551,6 +575,7 @@ function Inner() {
                   <div className="relative aspect-4/3">
                     <img
                       src={IMAGES[0]}
+                      onClick={() => openImgViewer(IMAGES[0])}
                       alt={p.name}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
@@ -669,83 +694,7 @@ function Inner() {
         >
           <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/5">
             {
-              eventDatas ? <div className="relative aspect-video">
-                {/* Slides */}
-                {eventDatas.event_galleries.map((x, i) => (
-                  <img
-                    key={i}
-                    src={x.img_path ?? ""}
-                    alt={`Foto ${i + 1}`}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === gIndex ? "opacity-100" : "opacity-0"
-                      }`}
-                  />
-                ))}
-                {/* Controls */}
-                <button
-                  onClick={() => slideTo(gIndex - 1)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                  aria-label="Sebelumnya"
-                >
-                  <ChevronLeftIcon />
-                </button>
-                <button
-                  onClick={() => slideTo(gIndex + 1)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                  aria-label="Berikutnya"
-                >
-                  <ChevronRightIcon />
-                </button>
-                {/* Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {eventDatas.event_galleries.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => slideTo(i)}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`h-2 w-2 rounded-full transition ${i === gIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
-                        }`}
-                    />
-                  ))}
-                </div>
-              </div> : <div className="relative aspect-video">
-                {/* Slides */}
-                {GALLERY.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`Foto ${i + 1}`}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === gIndex ? "opacity-100" : "opacity-0"
-                      }`}
-                  />
-                ))}
-                {/* Controls */}
-                <button
-                  onClick={() => slideTo(gIndex - 1)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                  aria-label="Sebelumnya"
-                >
-                  <ChevronLeftIcon />
-                </button>
-                <button
-                  onClick={() => slideTo(gIndex + 1)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-stone-900/50 hover:bg-stone-900/70 p-3 backdrop-blur border border-white/10"
-                  aria-label="Berikutnya"
-                >
-                  <ChevronRightIcon />
-                </button>
-                {/* Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {GALLERY.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => slideTo(i)}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`h-2 w-2 rounded-full transition ${i === gIndex ? "bg-white" : "bg-white/40 hover:bg-white/60"
-                        }`}
-                    />
-                  ))}
-                </div>
-              </div>
+              galleryAlbum ? <GalleryAlbum imgs={galleryAlbum} /> : <GalleryAlbum imgs={GALLERY} isDemo />
             }
           </div>
 
@@ -831,6 +780,7 @@ function Inner() {
                             <div className="aspect-4/3 w-full md:aspect-3/2">
                               <img
                                 src={ev.gallery.img_path}
+                                onClick={() => openImgViewer(ev.gallery?.img_path ?? "")}
                                 alt={ev.name}
                                 className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                               />
@@ -849,24 +799,36 @@ function Inner() {
                   t: "2018",
                   title: "Pertemuan Pertama",
                   body: "Kami berkenalan saat kegiatan kampus. Dari sapaan singkat, tumbuh rasa yang hangat.",
+                  gallery: {
+                    img_path: IMAGES[0]
+                  }
                 },
                 {
                   m: "08",
                   t: "2019",
                   title: "Mulai Serius",
                   body: "Berjalan bersama melewati suka duka, saling menguatkan mimpi satu sama lain.",
+                  gallery: {
+                    img_path: IMAGES[0]
+                  }
                 },
                 {
                   m: "03",
                   t: "2023",
                   title: "Lamaran",
                   body: "Keluarga bertemu, doa dipanjatkan, niat kami dimantapkan.",
+                  gallery: {
+                    img_path: IMAGES[0]
+                  }
                 },
                 {
                   m: "06",
                   t: "2025",
                   title: "Menuju Pelaminan",
                   body: "Dengan restu orang tua dan sahabat, kami melangkah ke babak baru.",
+                  gallery: {
+                    img_path: IMAGES[0]
+                  }
                 },
               ].map((ev, i) => (
                 <li key={i} className="mb-10 ms-5">
@@ -878,7 +840,30 @@ function Inner() {
                         {getMonthName(ev.m)} - {ev.t}
                       </span>
                     </div>
-                    <p className="mt-2 text-stone-300">{ev.body}</p>
+
+                    {/* <p className="mt-2 text-stone-300">{ev.body}</p> */}
+                    <div className="mt-4 grid grid-cols-12 gap-6 items-start">
+                      <div className={`col-span-12 ${ev.gallery?.img_path ? "md:col-span-6" : "md:col-span-12"}`}>
+                        <p className="text-stone-300">
+                          {ev.body}
+                        </p>
+                      </div>
+
+                      {ev.gallery?.img_path && (
+                        <div className="col-span-12 md:col-span-6">
+                          <div className="overflow-hidden rounded-xl border border-white/10">
+                            <div className="aspect-4/3 w-full md:aspect-3/2">
+                              <img
+                                src={ev.gallery.img_path}
+                                onClick={() => openImgViewer(ev.gallery.img_path)}
+                                alt={ev.title}
+                                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </li>
               ))}
