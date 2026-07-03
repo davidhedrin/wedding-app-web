@@ -11,10 +11,7 @@ module.exports = {
       },
 
       autorestart: false,
-      watch: false,
-
-      cron_restart: undefined,
-      stop_exit_codes: [0]
+      watch: false
     }
   ]
 }
