@@ -271,40 +271,63 @@ export const ModalWishlist = ({
 
             <div className="border-2 border-blue-300 border-dashed" />
 
-            <form onSubmit={handleSubmit} className="p-4">
-              <div className="mb-2">
-                <div className="text-sm font-semibold">
-                  Identitas Pemberi Hadiah:
+            {
+              maxQty > 0 ? <form onSubmit={handleSubmit} className="p-4">
+                <div className="mb-2">
+                  <div className="text-sm font-semibold">
+                    Identitas Pemberi Hadiah:
+                  </div>
+                  <p className="text-xs text-muted italic">Penting: Informasi pengirim tidak untuk dipublikasikan. Tamu undangan lain tidak dapat melihatnya.</p>
                 </div>
-                <p className="text-xs text-muted">Note: Kosongkan jika ingin menyembunyikan identitas anda.</p>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
-                <div className="col-span-12 md:col-span-6">
-                  <Input value={name} onChange={(e) => setName(e.target.value)} type='text' id='rsp_name' label='Nama' placeholder='Masukkan nama anda' />
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
+                  <div className="col-span-12 md:col-span-6">
+                    <Input value={name} onChange={(e) => setName(e.target.value)} type='text' id='rsp_name' label='Nama' placeholder='Masukkan nama anda' />
+                  </div>
+                  <div className="col-span-12 md:col-span-6">
+                    <Input value={emailWa} onChange={(e) => setEmailWa(e.target.value)} type='text' id='rsp_email_wa' label='Email / WhatsApp' placeholder='Email atau no whatsapp' />
+                  </div>
+                  <div className="col-span-12">
+                    <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} id='rsp_msg' label='Ucapan & Doa' placeholder='Masukkan ucapan atau Doa jika ada' />
+                  </div>
                 </div>
-                <div className="col-span-12 md:col-span-6">
-                  <Input value={emailWa} onChange={(e) => setEmailWa(e.target.value)} type='text' id='rsp_email_wa' label='Email / WhatsApp' placeholder='Email atau no whatsapp' />
-                </div>
-                <div className="col-span-12">
-                  <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} id='rsp_msg' label='Ucapan & Doa' placeholder='Masukkan ucapan atau Doa jika ada' />
-                </div>
-              </div>
 
-              <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
-                <button onClick={() => closeModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                  Close
-                </button>
-                <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                  {wishlistRsp ? "Update" : "Submit"}
-                </button>
-                {
-                  wishlistRsp && <button onClick={() => cancelReservation(wishlistRsp.id)} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 focus:outline-hidden focus:bg-red-700 disabled:opacity-50 disabled:pointer-events-none">
-                    Cancel
+                <div className="flex justify-start sm:justify-end gap-x-2 sm:order-2 order-2">
+                  <button onClick={() => closeModal()} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                    Close
                   </button>
-                }
+                  <button type="submit" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                    {wishlistRsp ? "Update" : "Submit"}
+                  </button>
+                  {
+                    wishlistRsp && <button onClick={() => cancelReservation(wishlistRsp.id)} type="button" className="py-1.5 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 focus:outline-hidden focus:bg-red-700 disabled:opacity-50 disabled:pointer-events-none">
+                      Cancel
+                    </button>
+                  }
+                </div>
+              </form> : <div className="p-4">
+                <div className="bg-blue-100/60 border-s-4 border-blue-600 rounded-lg p-3 dark:bg-blue-800/30" role="alert" aria-labelledby="hs-bordered-success-style-label">
+                  <div className="flex items-start">
+                    <div className="shrink-0 leading-0">
+                      <span className="inline-flex justify-center items-center size-8 rounded-full border-4 border-blue-100 bg-blue-200 text-blue-600 dark:border-blue-900 dark:bg-blue-600 dark:text-blue-400">
+                        <i className='bx bx-info-square text-4xl'></i>
+                      </span>
+                    </div>
+                    <div className="ms-2">
+                      <div className="text-foreground font-semibold text-sm">
+                        Reservasi Wishlist Penuh.
+                      </div>
+                      <p className="text-sm text-foreground">
+                        Terimakasih atas antusian anda. Tapi kami mohon maaf,
+                        reservasi untuk item ini telah mecapai batas permintaan.
+                        Jika anda berkenan, bisa temukan daftar item lain yang sama berhaganya bagi kami.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>
+            }
+
           </div>
         }
       </div>

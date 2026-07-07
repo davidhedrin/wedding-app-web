@@ -448,16 +448,26 @@ type GetDataEventGiftsParams = {
   orderBy?: Prisma.EventGiftsOrderByWithRelationInput | Prisma.EventGiftsOrderByWithRelationInput[];
   select?: Prisma.EventGiftsSelect<DefaultArgs> | undefined;
 } & CommonParams;
-export async function GetDataEventGifts(event_id: number, params: GetDataEventGiftsParams): Promise<PaginateResult<EventGifts>> {
+export async function GetDataEventGifts(event_id: number, params: GetDataEventGiftsParams): Promise<PaginateResult<EventGifts & {
+  _count: { wishlist_reserve: number }
+}>> {
   const { curPage = 1, perPage = 10, where = {}, orderBy = {}, select } = params;
   const skip = (curPage - 1) * perPage;
+
   const [data, total] = await Promise.all([
     db.eventGifts.findMany({
       skip,
       take: perPage,
       where: { ...where, event_id },
       orderBy,
-      select
+      select: {
+        ...select,
+        _count: {
+          select: {
+            wishlist_reserve: true,
+          }
+        }
+      }
     }),
     db.eventGifts.count({ where: { ...where, event_id } })
   ]);

@@ -2597,7 +2597,9 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
   const [perPageWs, setPerPageWs] = useState(8);
   const [totalPageWs, setTotalPageWs] = useState(0);
   const [totalCountWs, setTotalCountWs] = useState(0);
-  const [datasWs, setDatasWs] = useState<EventGifts[]>([]);
+  const [datasWs, setDatasWs] = useState<(EventGifts & {
+    _count: { wishlist_reserve: number }
+  })[]>([]);
   const [inputSearchWs, setInputSearchWs] = useState("");
   const [tblSortListWs, setTblSortListWs] = useState<TableShortList[]>([]);
   const [tblThColomnsWs, setTblThColomnsWs] = useState<TableThModel[]>([
@@ -4327,12 +4329,6 @@ function RSVPTabContent({ event_id, url }: { event_id: number, url: string }) {
       </UiPortal>
     </div>
   )
-};
-
-function createMsgSendWa({ url, barcode, guestName }: { url: string, barcode: string, guestName: string }) {
-  const craateUrl = `${Configs.base_url}/${url}?code=${barcode}`;
-
-
 };
 
 function FAQTabContent(event_id: number) {
