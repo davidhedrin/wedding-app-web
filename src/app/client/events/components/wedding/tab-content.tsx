@@ -2353,7 +2353,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
 
     if (id) {
       setLoading(true);
-      const data = await GetDataEventGiftsById(id);
+      const data = await GetDataEventGiftsById(type, id);
       if (data) {
         setAddEditId(data.id);
         setGiftType(data.type);

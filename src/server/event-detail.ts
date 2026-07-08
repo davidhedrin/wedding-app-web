@@ -7,7 +7,7 @@ import { auth } from "@/app/api/auth/auth-setup";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoGroomBride, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp, DtoWhislistRsvp } from "@/lib/dto";
 import { CloudflareDeleteFile, CloudflareUploadAnyFile, CloudflareUploadFile } from "./common";
 import Configs from "@/lib/config";
-import { EventFAQ, EventGalleries, EventGifts, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, GroomBrideInfo, Prisma, PrismaClient, ScheduleInfo, WishlistReservation } from "@/generated/prisma";
 import { User } from "next-auth";
 import pLimit from "p-limit";
 import { stringWithTimestamp } from "@/lib/utils";
@@ -483,9 +483,12 @@ export async function GetDataEventGifts(event_id: number, params: GetDataEventGi
   };
 };
 
-export async function GetDataEventGiftsById(id: number): Promise<EventGifts | null> {
+export async function GetDataEventGiftsById(type: EventGiftTypeEnum, id: number): Promise<EventGifts | null> {
   const getData = await db.eventGifts.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      wishlist_reserve: true
+    }
   });
   return getData;
 };

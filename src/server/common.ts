@@ -211,19 +211,20 @@ export async function CloudflareUploadFile(
     const sizeKb = fileBuffer.length / 1024;
     let { quality, effort } = getCompressionParams(sizeKb);
     
-    const sharpInstance = sharp(fileBuffer).rotate();
+    // const sharpInstance = sharp(fileBuffer);
     // const metadata = await sharpInstance.metadata();
     // const { width = null, height = null } = metadata;
 
-    // const compressedBuffer = await sharpInstance.toFormat(to_format, {
+    // const compressedBuffer = await sharpInstance.rotate().toFormat(to_format, {
     //   quality,
     //   effort,
     //   chromaSubsampling: "4:2:0",
     //   smartSubsample: true
     // }).toBuffer();
+    
     const [metadata, compressedBuffer] = await Promise.all([
-      sharpInstance.metadata(),
-      sharpInstance.toFormat(to_format, {
+      sharp(fileBuffer).metadata(),
+      sharp(fileBuffer).rotate().toFormat(to_format, {
         quality,
         effort,
         chromaSubsampling: "4:2:0",
@@ -250,8 +251,8 @@ export async function CloudflareUploadFile(
       message: "File upload successfully",
       filename: fileName,
       path: fileUrl,
-      width,
-      height
+      width: height,
+      height: width
     };
   } catch (err: any) {
     return {
