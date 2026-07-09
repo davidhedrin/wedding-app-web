@@ -496,8 +496,7 @@ export async function UpadateRsvp(barcode: string, formData: DtoAttendanceRsvp) 
         phone: formData.rsvp_hp,
         att_status: formData.rsvp_att,
         att_number: formData.rsvp_att_number,
-        desc: formData.rsvp_desc,
-        show_desc: false
+        desc: formData.rsvp_desc
       }
     });
   } catch (error: any) {
