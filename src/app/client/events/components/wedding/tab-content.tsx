@@ -11,7 +11,7 @@ import TableTopToolbar from "@/components/table-top-toolbar";
 import { FormState, RsvpStatsParams, TableShortList, TableThModel } from "@/lib/model-types";
 import TablePagination from "@/components/table-pagination";
 import Select from "@/components/ui/select";
-import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType } from "@/generated/prisma";
+import { EventFAQ, EventGalleries, EventGifts, EventGiftTypeEnum, EventHistories, EventRsvp, Events, GroomBrideEnum, TradRecepType, WishlistReservation } from "@/generated/prisma";
 import z from "zod";
 import { useLoading } from "@/components/loading/loading-context";
 import { DtoEventFAQ, DtoEventGallery, DtoEventGift, DtoEventHistory, DtoEventRsvp, DtoMainInfoWedding, DtoScanQrRsvp, DtoScheduler, DtoUploadRsvp } from "@/lib/dto";
@@ -2303,6 +2303,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
   const [reservationQty, setReservationQty] = useState<number | "">(1);
   const [reservationUrl, setReservationUrl] = useState("");
   const [productPrice, setProductPrice] = useState("");
+  const [listReservationWs, setListReservationWs] = useState<WishlistReservation[]>([]);
   // End For Wishlist Gift
 
   const [stateFormShippingAddress, setStateFormShippingAddress] = useState<FormState>({ success: false, errors: {} });
@@ -2350,10 +2351,11 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
     setReservationQty(1);
     setReservationUrl("");
     setProductPrice("");
+    setListReservationWs([]);
 
     if (id) {
       setLoading(true);
-      const data = await GetDataEventGiftsById(type, id);
+      const data = await GetDataEventGiftsById(id);
       if (data) {
         setAddEditId(data.id);
         setGiftType(data.type);
@@ -2367,6 +2369,7 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
           setReservationQty(data.qty ?? 1);
           setReservationUrl(data.product_url ?? "");
           setProductPrice(data.product_price ? data.product_price.toLocaleString('id-ID') : "");
+          setListReservationWs(data.wishlist_reserve);
         }
       }
       setLoading(false);
@@ -2855,11 +2858,20 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
                   <div key={x.id} className="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl">
                     <div className="flex justify-between items-center bg-gray-100 border-b border-gray-200 rounded-t-xl py-2 px-3">
                       <div className="text-sm text-gray-500">
-                        {x.qty} Unit{x.qty && x.qty > 1 ? "s" : ""}
+                        Req: {x.qty} •{" "}
+                        {
+                          x._count.wishlist_reserve > 0 ? <span className="relative inline-flex me-1">
+                            <span className="animate-ping absolute inline-flex size-full rounded-full bg-green-400 opacity-75 dark:bg-green-600"></span>
+                            <span className="relative inline-flex text-xs bg-green-500 text-white rounded-full py-0.5 px-1.5">
+                              {x._count.wishlist_reserve}
+                            </span>
+                          </span> : <span className="me-1">{x._count.wishlist_reserve}</span>
+                        }
+                        Unit{x.qty > 1 ? "s" : ""}
                       </div>
                       <div className="space-x-1">
                         <button onClick={() => openModalAddEdit(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
-                          <i className='bx bxs-edit text-lg text-amber-500'></i>
+                          <i className='bx bx-show-alt text-lg text-blue-500'></i>
                         </button>
                         <button onClick={() => deleteRowGift(x.type, x.id)} type="button" className="p-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                           <i className='bx bx-trash text-lg text-red-600'></i>
@@ -2985,6 +2997,66 @@ function GiftTabContent({ dataEvent }: { dataEvent: Events }) {
                     </div>
                     <div className="col-span-12">
                       <Input value={reservationUrl} onChange={(e) => setReservationUrl(e.target.value)} type='text' id='reservation_url' label='Reservation URL' placeholder='Enter reservation reference URL' mandatory />
+                    </div>
+                    <div className="col-span-12">
+                      <label className="block text-sm font-medium mb-1 dark:text-white">
+                        Reservation List
+                      </label>
+                      <hr className="text-gray-300" />
+                      {
+                        listReservationWs.length > 0 ? <div className={`grid grid-cols-1 ${listReservationWs.length == 1 ? "grid-cols-1" : "md:grid-cols-2"} mt-3`}>
+                          {
+                            listReservationWs.map((x, i) => (
+                              <div
+                                key={x.id ?? i}
+                                className="rounded-2xl border border-slate-200/70 bg-white/80 p-3 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/70 dark:hover:border-violet-500"
+                              >
+                                {/* Header */}
+                                <div className="flex justify-between items-start gap-2">
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="truncate text-sm font-semibold text-slate-800 dark:text-white">
+                                      {i + 1}. {x.name}
+                                    </h3>
+
+                                    <p className="truncate text-sm text-slate-500 dark:text-slate-400">
+                                      {x.email_or_wa}
+                                    </p>
+                                  </div>
+
+                                  <div className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 text-sm font-medium text-emerald-600">
+                                    <span className="font-bold">{x.reserve_qty}</span> Unit{x.reserve_qty > 1 ? "s" : ""}
+                                  </div>
+                                </div>
+
+                                {/* Message */}
+                                <div className="mt-2 rounded-xl border border-slate-100 bg-slate-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800/60">
+                                  <p className="text-sm leading-relaxed text-muted">Testimonial:</p>
+                                  <p className="text-sm leading-relaxed dark:text-slate-300">
+                                    {x.message || (
+                                      <span className="italic text-slate-400">
+                                        No message sent.
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          }
+                        </div> : <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 mt-3 text-center dark:border-slate-700 dark:bg-slate-900/50">
+                          <div className="mb-3 flex p-3 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800">
+                            <i className='bx bx-package text-2xl text-blue-500'></i>
+                          </div>
+
+                          <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">
+                            No Reservations Yet
+                          </h3>
+
+                          <p className="max-w-md text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                            No guests have made a reservation for this wishlist item yet.
+                            Reservation details will appear here.
+                          </p>
+                        </div>
+                      }
                     </div>
                   </div>
                 }

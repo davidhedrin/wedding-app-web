@@ -483,7 +483,7 @@ export async function GetDataEventGifts(event_id: number, params: GetDataEventGi
   };
 };
 
-export async function GetDataEventGiftsById(type: EventGiftTypeEnum, id: number): Promise<EventGifts | null> {
+export async function GetDataEventGiftsById(id: number): Promise<EventGifts & { wishlist_reserve: WishlistReservation[] } | null> {
   const getData = await db.eventGifts.findUnique({
     where: { id },
     include: {

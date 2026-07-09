@@ -1005,7 +1005,7 @@ function Inner() {
             subtitle="Potret kisah kami"
           />
 
-          <div className="reveal relative rounded-3xl overflow-hidden" ref={(el) => {
+          <div className="relative rounded-3xl overflow-hidden" ref={(el) => {
             if (el) revealRef.current["gal"] = el
           }}>
             {
