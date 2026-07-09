@@ -115,7 +115,7 @@ function Inner() {
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
-  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum>(RsvpStatusEnum.PRESENCE);
   const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
@@ -214,7 +214,7 @@ function Inner() {
             setEventDatas(findData);
             setRsvpName(findData.event_rsvp.name);
             setRsvpHp(findData.event_rsvp.phone ?? "");
-            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? RsvpStatusEnum.PRESENCE);
             setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
             setRsvpDesc(findData.event_rsvp.desc ?? "");
             setMusicUrl(findData.music_url === Configs.keyCustomMusic ? findData.custom_music_url : findData.music_url);
@@ -355,7 +355,7 @@ function Inner() {
       await ExecuteMinimumDelay(
         UpadateRsvp(invtParams.code, {
           rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
-          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att: rsvpAtt,
           rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
           rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
         }),

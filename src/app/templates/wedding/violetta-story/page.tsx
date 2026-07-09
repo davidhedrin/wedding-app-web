@@ -135,7 +135,7 @@ function Inner() {
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
-  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum>(RsvpStatusEnum.PRESENCE);
   const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
@@ -237,7 +237,7 @@ function Inner() {
             setEventDatas(findData);
             setRsvpName(findData.event_rsvp.name);
             setRsvpHp(findData.event_rsvp.phone ?? "");
-            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? RsvpStatusEnum.PRESENCE);
             setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
             setRsvpDesc(findData.event_rsvp.desc ?? "");
             setMusicUrl(findData.music_url === Configs.keyCustomMusic ? findData.custom_music_url : findData.music_url);
@@ -351,7 +351,7 @@ function Inner() {
       await ExecuteMinimumDelay(
         UpadateRsvp(invtParams.code, {
           rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
-          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att: rsvpAtt,
           rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
           rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
         }),
@@ -1238,8 +1238,8 @@ function Inner() {
             </div>
 
             <div className="md:col-span-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <button type="submit" className={`btn ${THEME.btn} w-full sm:w-auto`}>
-                Kirim Konfirmasi
+              <button disabled={sending} type="submit" className={`btn ${THEME.btn} w-full sm:w-auto`}>
+                {sending ? "Mengirim..." : "Kirim Konfirmasi"}
               </button>
             </div>
           </form>

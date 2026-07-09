@@ -109,7 +109,7 @@ function Inner() {
 
   const [rsvpName, setRsvpName] = useState<string>("");
   const [rsvpHp, setRsvpHp] = useState<string>("");
-  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum | string>("");
+  const [rsvpAtt, setRsvpAtt] = useState<RsvpStatusEnum>(RsvpStatusEnum.PRESENCE);
   const [rsvpAttNumber, setRsvpAttNumber] = useState<number>(1);
   const [rsvpDesc, setRsvpDesc] = useState<string>("");
 
@@ -208,7 +208,7 @@ function Inner() {
             setEventDatas(findData);
             setRsvpName(findData.event_rsvp.name);
             setRsvpHp(findData.event_rsvp.phone ?? "");
-            setRsvpAtt(findData.event_rsvp.att_status ?? "");
+            setRsvpAtt(findData.event_rsvp.att_status ?? RsvpStatusEnum.PRESENCE);
             setRsvpAttNumber(findData.event_rsvp.att_number ?? 1);
             setRsvpDesc(findData.event_rsvp.desc ?? "");
             setMusicUrl(findData.music_url === Configs.keyCustomMusic ? findData.custom_music_url : findData.music_url);
@@ -343,7 +343,7 @@ function Inner() {
       await ExecuteMinimumDelay(
         UpadateRsvp(invtParams.code, {
           rsvp_hp: rsvpHp.trim() !== "" ? rsvpHp : null,
-          rsvp_att: rsvpAtt !== "" ? rsvpAtt as RsvpStatusEnum : null,
+          rsvp_att: rsvpAtt,
           rsvp_att_number: rsvpAtt as RsvpStatusEnum === "PRESENCE" ? rsvpAttNumber : null,
           rsvp_desc: rsvpDesc.trim() !== "" ? rsvpDesc : null,
         }),
@@ -1067,8 +1067,8 @@ function Inner() {
                 <textarea value={rsvpDesc} onChange={(e) => setRsvpDesc(e.target.value)} name="ucapan" rows={4} placeholder="Titipkan doa terbaik untuk kami..." className={classNames('w-full rounded-xl border bg-black/30 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring', THEME.borderSoft, THEME.accentRing)} />
               </div>
 
-              <button type="submit" className={classNames('mt-2 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-black transition hover:brightness-95 focus:outline-none focus:ring-4', THEME.accentBg, THEME.accentRing)}>
-                Kirim RSVP
+              <button disabled={sending} type="submit" className={classNames('mt-2 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-black transition hover:brightness-95 focus:outline-none focus:ring-4', THEME.accentBg, THEME.accentRing)}>
+                {sending ? "Mengirim..." : "Kirim RSVP"}
               </button>
             </form>
 
