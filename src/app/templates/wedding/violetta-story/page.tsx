@@ -1092,12 +1092,12 @@ function Inner() {
 
                     {/* Gambar bagian kanan */}
                     {ev.gallery?.img_path && (
-                      <div className="md:w-1/3 mt-3 md:mt-0">
+                      <div className="w-full h-auto md:w-1/3 mt-3 md:mt-0">
                         <img
                           src={ev.gallery.img_path ?? ""}
                           onClick={() => openImgViewer(ev.gallery ? ev.gallery.img_path ?? "" : "")}
                           alt={ev.name}
-                          className="h-44 w-full object-cover rounded-xl border border-white/10"
+                          className="w-full h-auto object-cover rounded-xl border border-white/10"
                         />
                       </div>
                     )}
@@ -1144,12 +1144,12 @@ function Inner() {
                     </div>
 
                     {/* Gambar bagian kanan */}
-                    <div className="md:w-1/3 mt-3 md:mt-0">
+                    <div className="w-full h-auto md:w-1/3 mt-3 md:mt-0">
                       <img
                         src={IMAGES[i % IMAGES.length].src}
                         onClick={() => openImgViewer(IMAGES[i % IMAGES.length].src)}
                         alt={item.title}
-                        className="h-44 w-full object-cover rounded-xl border border-white/10"
+                        className="w-full h-auto object-cover rounded-xl border border-white/10"
                       />
                     </div>
                   </div>
