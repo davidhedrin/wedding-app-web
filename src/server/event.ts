@@ -414,6 +414,10 @@ export async function GetSplashScreenEventData(barcode: string): Promise<EventIn
           }
         },
         event_histories: {
+          orderBy: [
+            { year: "asc" },
+            { month: "asc" },
+          ],
           select: {
             name: true,
             month: true,
