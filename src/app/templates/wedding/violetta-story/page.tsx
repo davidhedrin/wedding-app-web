@@ -1086,10 +1086,7 @@ function Inner() {
               eventDatas ? eventDatas.event_histories.map((ev, i) => {
                 return <li
                   key={i}
-                  className="mb-10 ml-4 reveal"
-                  ref={(el) => {
-                    if (el) revealRef.current[`story-${i}`] = el
-                  }}
+                  className="mb-10 ml-4"
                 >
                   <div className="flex flex-col md:flex-row items-start">
                     {/* Teks bagian kiri */}
