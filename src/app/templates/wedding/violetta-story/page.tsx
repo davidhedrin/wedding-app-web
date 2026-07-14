@@ -189,7 +189,19 @@ function Inner() {
         show_desc: true,
         att_status: {
           not: null
-        }
+        },
+        AND: [
+          {
+            desc: {
+              not: null,
+            },
+          },
+          {
+            desc: {
+              not: "",
+            },
+          },
+        ],
       },
       select: {
         id: true,
@@ -197,10 +209,10 @@ function Inner() {
         desc: true,
         show_desc: true,
         att_status: true,
-        createdAt: true
+        updatedAt: true
       },
       orderBy: {
-        createdAt: "asc"
+        updatedAt: "asc"
       }
     });
 
@@ -1294,7 +1306,7 @@ function Inner() {
 
                       {/* date */}
                       <p className="mt-3 text-xs text-white/40">
-                        {msg.createdAt ? msg.createdAt.toLocaleDateString("id-ID") : "-"}
+                        {msg.updatedAt ? msg.updatedAt.toLocaleDateString("id-ID") : "-"}
                       </p>
 
                     </div>

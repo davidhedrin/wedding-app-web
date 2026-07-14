@@ -160,7 +160,19 @@ function Inner() {
         show_desc: true,
         att_status: {
           not: null
-        }
+        },
+        AND: [
+          {
+            desc: {
+              not: null,
+            },
+          },
+          {
+            desc: {
+              not: "",
+            },
+          },
+        ],
       },
       select: {
         id: true,
@@ -168,10 +180,10 @@ function Inner() {
         desc: true,
         show_desc: true,
         att_status: true,
-        createdAt: true
+        updatedAt: true
       },
       orderBy: {
-        createdAt: "asc"
+        updatedAt: "asc"
       }
     });
 
@@ -1092,7 +1104,7 @@ function Inner() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="font-semibold text-white">{msg.name}</p>
-                          <p className="text-xs text-white/60">{msg.createdAt ? msg.createdAt.toLocaleDateString("id-ID") : "-"}</p>
+                          <p className="text-xs text-white/60">{msg.updatedAt ? msg.updatedAt.toLocaleDateString("id-ID") : "-"}</p>
                         </div>
 
                         {/* Status Badge */}
